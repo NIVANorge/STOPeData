@@ -92,7 +92,6 @@ populate_campaign_from_llm <- function(session, llm_campaign_data) {
 #' @noRd
 populate_references_from_llm <- function(session, llm_references_data) {
   if (is.null(llm_references_data)) return()
-  browser()
   # Determine reference type based on available fields
   ref_type <- "journal" # Default
   if (!is.null(llm_references_data$periodical_journal)) {
