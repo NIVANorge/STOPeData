@@ -278,7 +278,11 @@ mod_methods_server <- function(id) {
             moduleState$methods_data,
             new_method
           )
+          print_dev(moduleState$methods_data)
           session$userData$reactiveValues$methodsData <- moduleState$methods_data
+          print_dev(session$userData$reactiveValues$methodsData$PROTOCOL_NAME)
+
+          export_me <<- session$userData$reactiveValues$methodsData$PROTOCOL_NAME
         })
 
         # Reset form

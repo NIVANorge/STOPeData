@@ -295,6 +295,11 @@ mod_data_server <- function(id) {
       return(status_list)
     }
 
+    get_protocols <- function() {
+      session$userData$reactiveValues$methodsData$PROTOCOL_NAME
+      print(session$userData$reactiveValues$methodsData$PROTOCOL_NAME)
+    }
+
     ## Create sample-parameter combinations for measurement entry ----
     create_measurement_combinations <- function() {
       # Get all validated data
@@ -541,36 +546,46 @@ mod_data_server <- function(id) {
               "SITE_CODE",
               "PARAMETER_NAME",
               "SAMPLING_DATE",
-              "COMPARTMENT",
+              "ENVIRON_COMPARTMENT",
               "REPLICATE"
             ),
             readOnly = TRUE
+          ) |>
+          #
+          # # Configure measurement fields
+          hot_col(
+            "MEASURED_FLAG",
+            type = "dropdown",
+            source = measured_flags,
+            strict = TRUE
+          ) |>
+          hot_col(
+            c("MEASURED_VALUE", "MEASURED_SD", "LOQ_VALUE", "LOD_VALUE"),
+            type = "numeric",
+            format = "0.0000"
+          ) |>
+          hot_col(
+            c("MEASURED_UNIT", "LOQ_UNIT", "LOD_UNIT"),
+            type = "dropdown",
+            source = measured_units,
+            strict = TRUE
+          ) |>
+          hot_col(
+            c(
+              "SAMPLING_PROTOCOL",
+              "FRACTIONATION_PROTOCOL",
+              "EXTRACTION_PROTOCOL",
+              "ANALYTICAL_PROTOCOL"
+            ),
+            type = "dropdown",
+            source = methods,
+            strict = TRUE
+          ) |>
+          hot_context_menu(
+            allowRowEdit = FALSE, # Disable row operations for measurement data
+            allowColEdit = FALSE, # Disable column operations
+            customOpts = list()
           )
-        #
-        # # Configure measurement fields
-        # hot_col(
-        #   "MEASURED_FLAG",
-        #   type = "dropdown",
-        #   source = measured_flags,
-        #   strict = TRUE
-        # ) |>
-        # hot_col(
-        #   c("MEASURED_VALUE", "MEASURED_SD", "LOQ_VALUE", "LOD_VALUE"),
-        #   type = "numeric",
-        #   format = "0.0000"
-        # ) |>
-        # hot_col(
-        #   c("MEASURED_UNIT", "LOQ_UNIT", "LOD_UNIT"),
-        #   type = "dropdown",
-        #   source = measured_units,
-        #   strict = TRUE
-        # ) |>
-        #
-        # hot_context_menu(
-        #   allowRowEdit = FALSE, # Disable row operations for measurement data
-        #   allowColEdit = FALSE, # Disable column operations
-        #   customOpts = list()
-        # )
       }
     })
 
