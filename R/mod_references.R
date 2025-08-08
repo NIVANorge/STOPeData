@@ -618,7 +618,7 @@ mod_references_server <- function(id) {
       # Map fields to reference fields - reuse the update logic
       mapped_fields <- lookup_result$data
 
-      # Update all input fields with mapped values ----
+      # Update all input fields with mapped values
       # (This is the same code as in BibTeX import - consider extracting to helper function)
       updateSelectInput(
         session,
@@ -739,7 +739,7 @@ mod_references_server <- function(id) {
       # Map BibTeX fields to our reference fields using external function
       mapped_fields <- map_bibtex_to_reference_fields(parse_result$data)
 
-      # Update all input fields with mapped values ----
+      # Update all input fields with mapped values
       updateSelectInput(
         session,
         "REFERENCE_TYPE",

@@ -63,6 +63,7 @@ mod_llm_ui <- function(id) {
                 "Your Anthropic API key for Claude access. Set ANTHROPIC_API_KEY environment variable to avoid entering this each time."
               ),
               placeholder = "sk-ant-...",
+              value = Sys.getenv("ANTHROPIC_API_KEY") %||% "",
               width = "100%"
             )
           )
@@ -117,6 +118,10 @@ mod_llm_ui <- function(id) {
             width = "200px"
           ) |>
             disabled()
+        ),
+        input_task_button(
+          id = ns("fake_data"),
+          label = "Use fake data from earlier and save money"
         ),
 
         ## Status and results ----
@@ -275,11 +280,11 @@ mod_llm_server <- function(id) {
               test_response <- test_chat$chat(
                 "Hello, please respond with 'API connection successful'"
               )
-              print_dev("API test successful")
+              print_dev("LLM API connection opened.")
             },
             error = function(e) {
               showNotification(
-                paste("API connection failed:", e$message),
+                paste("LLM API connection failed:", e$message),
                 type = "error"
               )
               return()
@@ -377,9 +382,11 @@ mod_llm_server <- function(id) {
 
           # Create structured data for table-based modules and store in session
           if (!is.null(moduleState$structured_data$sites)) {
+            print(paste("sites_data:", moduleState$structured_data$sites))
             sites_data <- create_sites_from_llm(
               moduleState$structured_data$sites
             )
+            print(paste("sites_data:", sites_data))
             session$userData$reactiveValues$sitesDataLLM <- sites_data
           }
 
@@ -401,10 +408,10 @@ mod_llm_server <- function(id) {
           session$userData$reactiveValues$llmExtractionComplete <- TRUE
           session$userData$reactiveValues$llmExtractionSuccessful <- TRUE
 
-          showNotification(
-            "Forms populated with extracted data! Review and correct in each module.",
-            type = "default"
-          )
+          # showNotification(
+          #   "Forms populated with extracted data! Review and correct in each module.",
+          #   type = "default"
+          # )
 
           print_dev("All forms populated from LLM extraction")
         },
@@ -418,6 +425,29 @@ mod_llm_server <- function(id) {
       )
     }) |>
       bindEvent(input$populate_forms)
+
+    ## observe: fake data! ----
+    observe({
+      # Extract data using structured chat
+      result <- readRDS(
+        file = "inst/data/clean/example_chaudry_extract_list.rds"
+      )
+
+      # Store results
+      moduleState$extraction_complete <- TRUE
+      moduleState$extraction_successful <- TRUE
+      moduleState$structured_data <- result
+      moduleState$raw_extraction <- result
+      moduleState$error_message <- NULL
+
+      # Store in session data with LLM suffix
+      store_llm_data_in_session(session, result)
+
+      # Enable form population button
+      enable("populate_forms")
+      enable("clear_extraction")
+    }) |>
+      bindEvent(input$fake_data)
 
     ## observe: Clear extraction ----
     # upstream: user clicks input$clear_extraction
