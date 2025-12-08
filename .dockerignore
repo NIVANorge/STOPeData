@@ -6,4 +6,3 @@ renv/cache/
 .Rhistory
 .RData
 .Rproj.user/
-renv.lock

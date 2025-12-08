@@ -17,26 +17,18 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /home/shiny/stopedata
 
-COPY dependencies.R .
-RUN R --slave --no-restore -e 'source("dependencies.R")'
+
+COPY renv.lock renv.lock
+RUN R -e "install.packages(c('renv', 'pak'), repos = c(CRAN = 'https://cloud.r-project.org'))"
+RUN R -s -e "options(renv.config.pak.enabled = TRUE); renv::restore()"
 # Set the working directory *inside the shiny home directory*
 
-
-# Copy the rest of your application (app.R, R/, data/, www/, etc)
-COPY . .
-
-
-# Or lone the STOPeData repository
-#RUN git clone https://github.com/NIVAnorge/STOPeData.git
-
-# Fix permissions so the shiny user can read/write packages & app
-RUN chown -R shiny:shiny /home/shiny/stopedata /usr/local/lib/R/site-library
-
-# Switch to non-root shiny user
-USER shiny
-
-# Expose Shiny port
-EXPOSE 3838
+COPY manifest.json ./manifest.json
+COPY ./DESCRIPTION ./DESCRIPTION
+COPY ./NAMESPACE ./NAMESPACE
+COPY ./app.R ./app.R 
+COPY ./R ./R
+COPY ./inst ./inst
 
 # Run app
-CMD ["R", "-e", "shiny::runApp('.', host='0.0.0.0', port=3838)"]
+CMD ["R", "-e", "shiny::runApp('app.R', host='0.0.0.0', port=3838)"]

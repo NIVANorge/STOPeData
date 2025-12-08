@@ -12,3 +12,6 @@ cite.r
 .vscode/tasks.json
 *.pdf
 .env
+deployment/test/secrets.env
+.gitignore
+deployment/prod/secrets.env

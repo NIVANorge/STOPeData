@@ -1,0 +1,55 @@
+name: Prod Deploy
+on: [workflow_dispatch]
+
+env:
+  NAMESPACE: standalone
+  PROJECT: nivaprod-1
+  ENVIRONMENT: prod
+  ZONE: europe-west1
+  IMAGE_NAME: stop-e-data
+  WORKDIR: .
+
+jobs:
+  deploy:
+
+    # We need access to the kubernetes cluster when deploying, so we
+    # are using a runner that is deployed on the cluster.
+    runs-on: ["nivaprod-1"]
+
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          ref: main
+
+      - id: "auth"
+        name: "Authenticate to Google Cloud"
+        uses: "google-github-actions/auth@v1"
+        with:
+          token_format: access_token
+          workload_identity_provider: "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
+          service_account: "${{ secrets.WORKLOAD_IDENTITY_SA }}"
+
+      - id: 'get-credentials'
+        uses: 'google-github-actions/get-gke-credentials@v1'
+        with:
+          cluster_name: ${{ env.PROJECT }}-cluster
+          location: ${{ env.ZONE }}
+          project_id: ${{ env.PROJECT }}
+          use_internal_ip: True
+
+
+      - name: Get secrets from Secret Manager
+        run: |-
+          gcloud secrets versions access latest --project ${{ env.PROJECT }} --secret=stop-secret > ${{ env.WORKDIR }}/deployment/${{ env.ENVIRONMENT }}/secrets.env
+
+      - name: Deploy
+        run: |-
+          kubectl config set-context --current --namespace=${{ env.NAMESPACE }}
+          kubectl apply -k ${{ env.WORKDIR }}/deployment/${{ env.ENVIRONMENT }}
+          kubectl rollout status deployment/stop-e-data --timeout 120s --namespace=${{ env.NAMESPACE }}

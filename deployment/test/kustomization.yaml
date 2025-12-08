@@ -1,0 +1,12 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+namespace: standalone
+resources:
+  - ../base
+  - ./ingress.yaml
+secretGenerator:
+  - envs:
+    - secrets.env
+    name: stop-secret
+generatorOptions:
+  disableNameSuffixHash: true

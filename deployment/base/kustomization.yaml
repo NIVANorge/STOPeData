@@ -1,0 +1,9 @@
+kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1beta1
+namespace: standalone
+#- ./cronjob.yaml #cronjob might be needed if there is a need for a new database in the future. Then adapt cronjob.yaml from stop_import_gui
+resources:
+- ./deployment.yaml
+images:
+- name: '*stop-e-data*'
+  newName: europe-west1-docker.pkg.dev/niva-cd/images/stop-e-data

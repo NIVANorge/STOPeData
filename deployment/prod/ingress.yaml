@@ -1,0 +1,29 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: stop-e-data
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/affinity: 'cookie'
+    nginx.ingress.kubernetes.io/session-cookie-name: 'http-cookie'
+    nginx.ingress.kubernetes.io/session-cookie-expires: '172800'
+    nginx.ingress.kubernetes.io/session-cookie-max-age: '172800'
+    nginx.ingress.kubernetes.io/proxy-read-timeout: '18000'
+    nginx.ingress.kubernetes.io/proxy-send-timeout: '18000'
+spec:
+  ingressClassName: nginx
+  tls:
+    - secretName: stop-e-data-certificate
+      hosts:
+        - stop-e-data.p.niva.no
+  rules:
+  - host: stop-e-data.p.niva.no
+    http:
+      paths:
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: stop-e-data
+            port:
+              name: http
