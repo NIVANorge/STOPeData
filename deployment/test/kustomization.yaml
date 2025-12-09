@@ -11,6 +11,6 @@ secretGenerator:
 configMapGenerator:
   - name: stop-e-data-config
     literals:
-      - EDATA_BUILD = "Test"
+      - EDATA_BUILD=Test
 generatorOptions:
   disableNameSuffixHash: true

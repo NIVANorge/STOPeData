@@ -11,6 +11,6 @@ secretGenerator:
 configMapGenerator:
   - name: stop-e-data-config
     literals:
-      - EDATA_BUILD = "Prod"
+      - EDATA_BUILD=Prod
 generatorOptions:
   disableNameSuffixHash: true
