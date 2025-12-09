@@ -8,5 +8,9 @@ secretGenerator:
   - envs:
     - secrets.env
     name: stop-secret
+configMapGenerator:
+  - name: stop-e-data-config
+    literals:
+      - EDATA_BUILD = "Test"
 generatorOptions:
   disableNameSuffixHash: true

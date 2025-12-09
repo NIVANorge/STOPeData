@@ -36,6 +36,8 @@ spec:
         envFrom:
           - secretRef:
               name: stop-secret
+          - configMapRef:
+              name: stop-e-data-config
         resources:
           requests:
             memory: "1536Mi"
