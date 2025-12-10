@@ -80,232 +80,261 @@ initialise_userData <- function() {
 
 # ---- Schema Definitions ----
 # These functions define the structure of each table and are used by R6 generators
-
 #' Get Campaign Data Schema
 #'
-#' @return A tibble with column specifications for campaign data
+#' @return A list with version and schema tibble for campaign data
 #' @importFrom tibble tribble
 #' @export
 get_campaign_schema <- function() {
-  tribble(
-    ~column_name                  , ~data_type  , ~mandatory , ~description                    ,
-    "CAMPAIGN_NAME_SHORT"         , "character" , TRUE       , "Short campaign identifier"     ,
-    "CAMPAIGN_NAME"               , "character" , TRUE       , "Full campaign name"            ,
-    "CAMPAIGN_START_DATE"         , "Date"      , TRUE       , "Campaign start date"           ,
-    "CAMPAIGN_END_DATE"           , "Date"      , FALSE      , "Campaign end date"             ,
-    "RELIABILITY_SCORE"           , "character" , FALSE      , "Data reliability score"        ,
-    "RELIABILITY_EVAL_SYS"        , "character" , FALSE      , "Reliability evaluation system" ,
-    "CONFIDENTIALITY_EXPIRY_DATE" , "Date"      , FALSE      , "When data becomes public"      ,
-    "ORGANISATION"                , "character" , TRUE       , "Responsible organisation"      ,
-    "ENTERED_BY"                  , "character" , TRUE       , "Data entry person"             ,
-    "ENTERED_DATE"                , "Date"      , TRUE       , "Data entry date"               ,
-    "CAMPAIGN_COMMENT"            , "character" , FALSE      , "Additional comments"
+  list(
+    version = "0.3.5",
+    schema = tribble(
+      ~column_name                  , ~data_type  , ~mandatory , ~description                    ,
+      "CAMPAIGN_NAME_SHORT"         , "character" , TRUE       , "Short campaign identifier"     ,
+      "CAMPAIGN_NAME"               , "character" , TRUE       , "Full campaign name"            ,
+      "CAMPAIGN_START_DATE"         , "Date"      , TRUE       , "Campaign start date"           ,
+      "CAMPAIGN_END_DATE"           , "Date"      , FALSE      , "Campaign end date"             ,
+      "RELIABILITY_SCORE"           , "character" , FALSE      , "Data reliability score"        ,
+      "RELIABILITY_EVAL_SYS"        , "character" , FALSE      , "Reliability evaluation system" ,
+      "CONFIDENTIALITY_EXPIRY_DATE" , "Date"      , FALSE      , "When data becomes public"      ,
+      "ORGANISATION"                , "character" , TRUE       , "Responsible organisation"      ,
+      "ENTERED_BY"                  , "character" , TRUE       , "Data entry person"             ,
+      "ENTERED_DATE"                , "Date"      , TRUE       , "Data entry date"               ,
+      "CAMPAIGN_COMMENT"            , "character" , FALSE      , "Additional comments"
+    )
   )
 }
 
 #' Get Reference Data Schema
 #'
-#' @return A tibble with column specifications for reference data
+#' @return A list with version and schema tibble for reference data
 #' @importFrom tibble tribble
 #' @export
 get_reference_schema <- function() {
-  tribble(
-    ~column_name         , ~data_type  , ~mandatory , ~description                  ,
-    "REFERENCE_ID"       , "character" , TRUE       , "Unique reference identifier" ,
-    "REFERENCE_TYPE"     , "character" , TRUE       , "Type of reference"           ,
-    "DATA_SOURCE"        , "character" , TRUE       , "Source of the data"          ,
-    "AUTHOR"             , "character" , TRUE       , "Author(s)"                   ,
-    "TITLE"              , "character" , TRUE       , "Title of reference"          ,
-    "YEAR"               , "integer"   , TRUE       , "Publication year"            ,
-    "ACCESS_DATE"        , "Date"      , FALSE      , "Date accessed"               ,
-    "PERIODICAL_JOURNAL" , "character" , FALSE      , "Journal or periodical name"  ,
-    "VOLUME"             , "integer"   , FALSE      , "Volume number"               ,
-    "ISSUE"              , "integer"   , FALSE      , "Issue number"                ,
-    "PUBLISHER"          , "character" , FALSE      , "Publisher name"              ,
-    "INSTITUTION"        , "character" , FALSE      , "Institution name"            ,
-    "DOI"                , "character" , FALSE      , "Digital Object Identifier"   ,
-    "URL"                , "character" , FALSE      , "URL"                         ,
-    "ISBN_ISSN"          , "character" , FALSE      , "ISBN or ISSN"                ,
-    "EDITION"            , "character" , FALSE      , "Edition"                     ,
-    "DOCUMENT_NUMBER"    , "character" , FALSE      , "Document number"             ,
-    "REF_COMMENT"        , "character" , FALSE      , "Additional comments"
+  list(
+    version = "0.3.5",
+    schema = tribble(
+      ~column_name         , ~data_type  , ~mandatory , ~description                  ,
+      "REFERENCE_ID"       , "character" , TRUE       , "Unique reference identifier" ,
+      "REFERENCE_TYPE"     , "character" , TRUE       , "Type of reference"           ,
+      "DATA_SOURCE"        , "character" , TRUE       , "Source of the data"          ,
+      "AUTHOR"             , "character" , TRUE       , "Author(s)"                   ,
+      "TITLE"              , "character" , TRUE       , "Title of reference"          ,
+      "YEAR"               , "integer"   , TRUE       , "Publication year"            ,
+      "ACCESS_DATE"        , "Date"      , FALSE      , "Date accessed"               ,
+      "PERIODICAL_JOURNAL" , "character" , FALSE      , "Journal or periodical name"  ,
+      "VOLUME"             , "integer"   , FALSE      , "Volume number"               ,
+      "ISSUE"              , "integer"   , FALSE      , "Issue number"                ,
+      "PUBLISHER"          , "character" , FALSE      , "Publisher name"              ,
+      "INSTITUTION"        , "character" , FALSE      , "Institution name"            ,
+      "DOI"                , "character" , FALSE      , "Digital Object Identifier"   ,
+      "URL"                , "character" , FALSE      , "URL"                         ,
+      "ISBN_ISSN"          , "character" , FALSE      , "ISBN or ISSN"                ,
+      "EDITION"            , "character" , FALSE      , "Edition"                     ,
+      "DOCUMENT_NUMBER"    , "character" , FALSE      , "Document number"             ,
+      "REF_COMMENT"        , "character" , FALSE      , "Additional comments"
+    )
   )
 }
 
 #' Get Sites Data Schema
 #'
-#' @return A tibble with column specifications for sites data
+#' @return A list with version and schema tibble for sites data
 #' @importFrom tibble tribble
 #' @export
 get_sites_schema <- function() {
-  tribble(
-    ~column_name                  , ~data_type  , ~mandatory , ~description                  ,
-    "SITE_CODE"                   , "character" , TRUE       , "Unique site identifier"      ,
-    "SITE_NAME"                   , "character" , TRUE       , "Site name"                   ,
-    "SITE_GEOGRAPHIC_FEATURE"     , "character" , TRUE       , "Geographic feature type"     ,
-    "SITE_GEOGRAPHIC_FEATURE_SUB" , "character" , TRUE       , "Geographic feature subtype"  ,
-    "COUNTRY_ISO"                 , "character" , TRUE       , "ISO country code"            ,
-    "OCEAN_IHO"                   , "character" , TRUE       , "IHO ocean designation"       ,
-    "LATITUDE"                    , "numeric"   , TRUE       , "Latitude (decimal degrees)"  ,
-    "LONGITUDE"                   , "numeric"   , TRUE       , "Longitude (decimal degrees)" ,
-    "SITE_COORDINATE_SYSTEM"      , "character" , TRUE       , "Coordinate reference system" ,
-    "ALTITUDE_VALUE"              , "numeric"   , TRUE       , "Altitude value"              ,
-    "ALTITUDE_UNIT"               , "character" , TRUE       , "Altitude unit"               ,
-    "ENTERED_BY"                  , "character" , TRUE       , "Data entry person"           ,
-    "ENTERED_DATE"                , "character" , TRUE       , "Data entry date"             ,
-    "SITE_COMMENT"                , "character" , FALSE      , "Additional comments"
+  list(
+    version = "0.3.5",
+    schema = tribble(
+      ~column_name                  , ~data_type  , ~mandatory , ~description                  ,
+      "SITE_CODE"                   , "character" , TRUE       , "Unique site identifier"      ,
+      "SITE_NAME"                   , "character" , TRUE       , "Site name"                   ,
+      "SITE_GEOGRAPHIC_FEATURE"     , "character" , TRUE       , "Geographic feature type"     ,
+      "SITE_GEOGRAPHIC_FEATURE_SUB" , "character" , TRUE       , "Geographic feature subtype"  ,
+      "COUNTRY_ISO"                 , "character" , TRUE       , "ISO country code"            ,
+      "OCEAN_IHO"                   , "character" , TRUE       , "IHO ocean designation"       ,
+      "LATITUDE"                    , "numeric"   , TRUE       , "Latitude (decimal degrees)"  ,
+      "LONGITUDE"                   , "numeric"   , TRUE       , "Longitude (decimal degrees)" ,
+      "SITE_COORDINATE_SYSTEM"      , "character" , TRUE       , "Coordinate reference system" ,
+      "ALTITUDE_VALUE"              , "numeric"   , TRUE       , "Altitude value"              ,
+      "ALTITUDE_UNIT"               , "character" , TRUE       , "Altitude unit"               ,
+      "ENTERED_BY"                  , "character" , TRUE       , "Data entry person"           ,
+      "ENTERED_DATE"                , "character" , TRUE       , "Data entry date"             ,
+      "SITE_COMMENT"                , "character" , FALSE      , "Additional comments"
+    )
   )
 }
 
 #' Get Biota Data Schema
 #'
-#' @return A tibble with column specifications for biota data
+#' @return A list with version and schema tibble for biota data
 #' @importFrom tibble tribble
 #' @export
 get_biota_schema <- function() {
-  tribble(
-    ~column_name               , ~data_type  , ~mandatory , ~description                    ,
-    "SAMPLE_ID"                , "character" , TRUE       , "Unique sample identifier"      ,
-    "SITE_CODE"                , "character" , TRUE       , "Site identifier"               ,
-    "PARAMETER_NAME"           , "character" , TRUE       , "Parameter name"                ,
-    "ENVIRON_COMPARTMENT"      , "character" , TRUE       , "Environmental compartment"     ,
-    "ENVIRON_COMPARTMENT_SUB"  , "character" , FALSE      , "Environmental compartment sub" ,
-    "MEASURED_CATEGORY"        , "character" , TRUE       , "Measured category"             ,
-    "SAMPLING_DATE"            , "character" , TRUE       , "Sampling date"                 ,
-    "SUBSAMPLE"                , "character" , TRUE       , "Subsample identifier"          ,
-    "SPECIES_GROUP"            , "character" , TRUE       , "Species group"                 ,
-    "SAMPLE_SPECIES"           , "character" , TRUE       , "Sample species"                ,
-    "SAMPLE_TISSUE"            , "character" , TRUE       , "Sample tissue type"            ,
-    "SAMPLE_SPECIES_LIFESTAGE" , "character" , TRUE       , "Species life stage"            ,
-    "SAMPLE_SPECIES_GENDER"    , "character" , TRUE       , "Species gender"                ,
-    "BIOTA_COMMENT"            , "character" , FALSE      , "Additional comments"
+  list(
+    version = "0.3.5",
+    schema = tribble(
+      ~column_name               , ~data_type  , ~mandatory , ~description                    ,
+      "SAMPLE_ID"                , "character" , TRUE       , "Unique sample identifier"      ,
+      "SITE_CODE"                , "character" , TRUE       , "Site identifier"               ,
+      "PARAMETER_NAME"           , "character" , TRUE       , "Parameter name"                ,
+      "ENVIRON_COMPARTMENT"      , "character" , TRUE       , "Environmental compartment"     ,
+      "ENVIRON_COMPARTMENT_SUB"  , "character" , FALSE      , "Environmental compartment sub" ,
+      "MEASURED_CATEGORY"        , "character" , TRUE       , "Measured category"             ,
+      "SAMPLING_DATE"            , "character" , TRUE       , "Sampling date"                 ,
+      "SUBSAMPLE"                , "character" , TRUE       , "Subsample identifier"          ,
+      "SPECIES_GROUP"            , "character" , TRUE       , "Species group"                 ,
+      "SAMPLE_SPECIES"           , "character" , TRUE       , "Sample species"                ,
+      "SAMPLE_TISSUE"            , "character" , TRUE       , "Sample tissue type"            ,
+      "SAMPLE_SPECIES_LIFESTAGE" , "character" , TRUE       , "Species life stage"            ,
+      "SAMPLE_SPECIES_GENDER"    , "character" , TRUE       , "Species gender"                ,
+      "BIOTA_COMMENT"            , "character" , FALSE      , "Additional comments"
+    )
   )
 }
 
 #' Get Samples Data Schema
 #'
-#' @return A tibble with column specifications for samples data
+#' @return A list with version and schema tibble for samples data
 #' @importFrom tibble tribble
 #' @export
 get_samples_schema <- function() {
-  tribble(
-    ~column_name              , ~data_type  , ~mandatory , ~description                    ,
-    "SITE_CODE"               , "character" , TRUE       , "Site identifier"               ,
-    "SITE_NAME"               , "character" , TRUE       , "Site name"                     ,
-    "PARAMETER_NAME"          , "character" , TRUE       , "Parameter name"                ,
-    "PARAMETER_TYPE"          , "character" , TRUE       , "Parameter type"                ,
-    "ENVIRON_COMPARTMENT"     , "character" , TRUE       , "Environmental compartment"     ,
-    "ENVIRON_COMPARTMENT_SUB" , "character" , TRUE       , "Environmental compartment sub" ,
-    "MEASURED_CATEGORY"       , "character" , TRUE       , "Measured category"             ,
-    "SAMPLING_DATE"           , "character" , TRUE       , "Sampling date"                 ,
-    "SUBSAMPLE"               , "character" , TRUE       , "Subsample identifier"          ,
-    "SUBSAMPLE_ID"            , "character" , FALSE      , "Subsample ID"                  ,
-    "SAMPLE_ID"               , "character" , TRUE       , "Unique sample identifier"
+  list(
+    version = "0.3.5",
+    schema = tribble(
+      ~column_name              , ~data_type  , ~mandatory , ~description                    ,
+      "SITE_CODE"               , "character" , TRUE       , "Site identifier"               ,
+      "SITE_NAME"               , "character" , TRUE       , "Site name"                     ,
+      "PARAMETER_NAME"          , "character" , TRUE       , "Parameter name"                ,
+      "PARAMETER_TYPE"          , "character" , TRUE       , "Parameter type"                ,
+      "ENVIRON_COMPARTMENT"     , "character" , TRUE       , "Environmental compartment"     ,
+      "ENVIRON_COMPARTMENT_SUB" , "character" , TRUE       , "Environmental compartment sub" ,
+      "MEASURED_CATEGORY"       , "character" , TRUE       , "Measured category"             ,
+      "SAMPLING_DATE"           , "character" , TRUE       , "Sampling date"                 ,
+      "SUBSAMPLE"               , "character" , TRUE       , "Subsample identifier"          ,
+      "SUBSAMPLE_ID"            , "character" , FALSE      , "Subsample ID"                  ,
+      "SAMPLE_ID"               , "character" , TRUE       , "Unique sample identifier"
+    )
   )
 }
 
 #' Get Parameters Data Schema
 #'
-#' @return A tibble with column specifications for parameters data
+#' @return A list with version and schema tibble for parameters data
 #' @importFrom tibble tribble
 #' @export
 get_parameters_schema <- function() {
-  tribble(
-    ~column_name         , ~data_type  , ~mandatory , ~description             ,
-    "PARAMETER_TYPE"     , "character" , TRUE       , "Parameter type"         ,
-    "PARAMETER_TYPE_SUB" , "character" , TRUE       , "Parameter subtype"      ,
-    "MEASURED_TYPE"      , "character" , TRUE       , "Measured type"          ,
-    "PARAMETER_NAME"     , "character" , TRUE       , "Unique parameter name"  ,
-    "PARAMETER_NAME_SUB" , "character" , FALSE      , "Parameter name subtype" ,
-    "INCHIKEY_SD"        , "character" , FALSE      , "Standard InChI key"     ,
-    "PUBCHEM_CID"        , "integer"   , FALSE      , "PubChem compound ID"    ,
-    "CAS_RN"             , "character" , FALSE      , "CAS Registry Number"    ,
-    "ENTERED_BY"         , "character" , TRUE       , "Data entry person"      ,
-    "PARAMETER_COMMENT"  , "character" , FALSE      , "Additional comments"
+  list(
+    version = "0.3.5",
+    schema = tribble(
+      ~column_name         , ~data_type  , ~mandatory , ~description             ,
+      "PARAMETER_TYPE"     , "character" , TRUE       , "Parameter type"         ,
+      "PARAMETER_TYPE_SUB" , "character" , TRUE       , "Parameter subtype"      ,
+      "MEASURED_TYPE"      , "character" , TRUE       , "Measured type"          ,
+      "PARAMETER_NAME"     , "character" , TRUE       , "Unique parameter name"  ,
+      "PARAMETER_NAME_SUB" , "character" , FALSE      , "Parameter name subtype" ,
+      "INCHIKEY_SD"        , "character" , FALSE      , "Standard InChI key"     ,
+      "PUBCHEM_CID"        , "integer"   , FALSE      , "PubChem compound ID"    ,
+      "CAS_RN"             , "character" , FALSE      , "CAS Registry Number"    ,
+      "ENTERED_BY"         , "character" , TRUE       , "Data entry person"      ,
+      "PARAMETER_COMMENT"  , "character" , FALSE      , "Additional comments"
+    )
   )
 }
 
 #' Get Methods Data Schema
 #'
-#' @return A tibble with column specifications for methods data
+#' @return A list with version and schema tibble for methods data
 #' @importFrom tibble tribble
 #' @export
 get_methods_schema <- function() {
-  tribble(
-    ~column_name        , ~data_type  , ~mandatory , ~description                 ,
-    "PROTOCOL_ID"       , "character" , TRUE       , "Unique protocol identifier" ,
-    "CAMPAIGN_NAME"     , "character" , TRUE       , "Campaign name"              ,
-    "PROTOCOL_CATEGORY" , "character" , TRUE       , "Protocol category"          ,
-    "PROTOCOL_NAME"     , "character" , TRUE       , "Protocol name"              ,
-    "PROTOCOL_COMMENT"  , "character" , FALSE      , "Additional comments"
+  list(
+    version = "0.3.5",
+    schema = tribble(
+      ~column_name        , ~data_type  , ~mandatory , ~description                 ,
+      "PROTOCOL_ID"       , "character" , TRUE       , "Unique protocol identifier" ,
+      "CAMPAIGN_NAME"     , "character" , TRUE       , "Campaign name"              ,
+      "PROTOCOL_CATEGORY" , "character" , TRUE       , "Protocol category"          ,
+      "PROTOCOL_NAME"     , "character" , TRUE       , "Protocol name"              ,
+      "PROTOCOL_COMMENT"  , "character" , FALSE      , "Additional comments"
+    )
   )
 }
 
 #' Get Compartments Data Schema
 #'
-#' @return A tibble with column specifications for compartments data
+#' @return A list with version and schema tibble for compartments data
 #' @importFrom tibble tribble
 #' @export
 get_compartments_schema <- function() {
-  tribble(
-    ~column_name              , ~data_type  , ~mandatory , ~description                    ,
-    "ENVIRON_COMPARTMENT"     , "character" , TRUE       , "Environmental compartment"     ,
-    "ENVIRON_COMPARTMENT_SUB" , "character" , TRUE       , "Environmental compartment sub" ,
-    "MEASURED_CATEGORY"       , "character" , TRUE       , "Measured category"
+  list(
+    version = "0.3.5",
+    schema = tribble(
+      ~column_name              , ~data_type  , ~mandatory , ~description                    ,
+      "ENVIRON_COMPARTMENT"     , "character" , TRUE       , "Environmental compartment"     ,
+      "ENVIRON_COMPARTMENT_SUB" , "character" , TRUE       , "Environmental compartment sub" ,
+      "MEASURED_CATEGORY"       , "character" , TRUE       , "Measured category"
+    )
   )
 }
 
 #' Get Measurements Data Schema
 #'
-#' @return A tibble with column specifications for measurements data
+#' @return A list with version and schema tibble for measurements data
 #' @importFrom tibble tribble
 #' @export
 get_measurements_schema <- function() {
-  tribble(
-    ~column_name              , ~data_type  , ~mandatory , ~description                    ,
-    "SITE_CODE"               , "character" , TRUE       , "Site identifier"               ,
-    "PARAMETER_NAME"          , "character" , TRUE       , "Parameter name"                ,
-    "SAMPLING_DATE"           , "character" , TRUE       , "Sampling date"                 ,
-    "ENVIRON_COMPARTMENT_SUB" , "character" , FALSE      , "Environmental compartment sub" ,
-    "SUBSAMPLE"               , "character" , FALSE      , "Subsample identifier"          ,
-    "MEASURED_FLAG"           , "character" , FALSE      , "Measurement flag"              ,
-    "MEASURED_VALUE"          , "numeric"   , TRUE       , "Measured value"                ,
-    "UNCERTAINTY_TYPE"        , "character" , TRUE       , "Uncertainty type"              ,
-    "UNCERTAINTY_UPPER"       , "numeric"   , FALSE      , "Upper uncertainty bound"       ,
-    "UNCERTAINTY_LOWER"       , "numeric"   , FALSE      , "Lower uncertainty bound"       ,
-    "MEASURED_UNIT"           , "character" , TRUE       , "Measurement unit"              ,
-    "MEASURED_N"              , "numeric"   , FALSE      , "Number of measurements"        ,
-    "LOQ_VALUE"               , "numeric"   , FALSE      , "Limit of quantification value" ,
-    "LOQ_UNIT"                , "character" , FALSE      , "Limit of quantification unit"  ,
-    "LOD_VALUE"               , "numeric"   , FALSE      , "Limit of detection value"      ,
-    "LOD_UNIT"                , "character" , FALSE      , "Limit of detection unit"       ,
-    "SAMPLING_PROTOCOL"       , "character" , TRUE       , "Sampling protocol"             ,
-    "EXTRACTION_PROTOCOL"     , "character" , TRUE       , "Extraction protocol"           ,
-    "FRACTIONATION_PROTOCOL"  , "character" , TRUE       , "Fractionation protocol"        ,
-    "ANALYTICAL_PROTOCOL"     , "character" , TRUE       , "Analytical protocol"           ,
-    "REFERENCE_ID"            , "character" , TRUE       , "Reference identifier"          ,
-    "SAMPLE_ID"               , "character" , FALSE      , "Sample identifier"             ,
-    "CAMPAIGN_NAME_SHORT"     , "character" , FALSE      , "Short campaign identifier"     ,
-    "ENVIRON_COMPARTMENT"     , "character" , FALSE      , "Environmental compartment"     ,
-    "PARAMETER_TYPE"          , "character" , FALSE      , "Parameter type"                ,
-    "MEASURED_TYPE"           , "character" , FALSE      , "Measured type"                 ,
-    "MEASUREMENT_COMMENT"     , "character" , FALSE      , "Additional comments"
+  list(
+    version = "0.3.5",
+    schema = tribble(
+      ~column_name              , ~data_type  , ~mandatory , ~description                    ,
+      "SITE_CODE"               , "character" , TRUE       , "Site identifier"               ,
+      "PARAMETER_NAME"          , "character" , TRUE       , "Parameter name"                ,
+      "SAMPLING_DATE"           , "character" , TRUE       , "Sampling date"                 ,
+      "ENVIRON_COMPARTMENT_SUB" , "character" , FALSE      , "Environmental compartment sub" ,
+      "SUBSAMPLE"               , "character" , FALSE      , "Subsample identifier"          ,
+      "MEASURED_FLAG"           , "character" , FALSE      , "Measurement flag"              ,
+      "MEASURED_VALUE"          , "numeric"   , TRUE       , "Measured value"                ,
+      "UNCERTAINTY_TYPE"        , "character" , TRUE       , "Uncertainty type"              ,
+      "UNCERTAINTY_UPPER"       , "numeric"   , FALSE      , "Upper uncertainty bound"       ,
+      "UNCERTAINTY_LOWER"       , "numeric"   , FALSE      , "Lower uncertainty bound"       ,
+      "MEASURED_UNIT"           , "character" , TRUE       , "Measurement unit"              ,
+      "MEASURED_N"              , "numeric"   , FALSE      , "Number of measurements"        ,
+      "LOQ_VALUE"               , "numeric"   , FALSE      , "Limit of quantification value" ,
+      "LOQ_UNIT"                , "character" , FALSE      , "Limit of quantification unit"  ,
+      "LOD_VALUE"               , "numeric"   , FALSE      , "Limit of detection value"      ,
+      "LOD_UNIT"                , "character" , FALSE      , "Limit of detection unit"       ,
+      "SAMPLING_PROTOCOL"       , "character" , TRUE       , "Sampling protocol"             ,
+      "EXTRACTION_PROTOCOL"     , "character" , TRUE       , "Extraction protocol"           ,
+      "FRACTIONATION_PROTOCOL"  , "character" , TRUE       , "Fractionation protocol"        ,
+      "ANALYTICAL_PROTOCOL"     , "character" , TRUE       , "Analytical protocol"           ,
+      "REFERENCE_ID"            , "character" , TRUE       , "Reference identifier"          ,
+      "SAMPLE_ID"               , "character" , FALSE      , "Sample identifier"             ,
+      "CAMPAIGN_NAME_SHORT"     , "character" , FALSE      , "Short campaign identifier"     ,
+      "ENVIRON_COMPARTMENT"     , "character" , FALSE      , "Environmental compartment"     ,
+      "PARAMETER_TYPE"          , "character" , FALSE      , "Parameter type"                ,
+      "MEASURED_TYPE"           , "character" , FALSE      , "Measured type"                 ,
+      "MEASUREMENT_COMMENT"     , "character" , FALSE      , "Additional comments"
+    )
   )
 }
 
 #' Get CREED Scores Data Schema
 #'
-#' @return A tibble with column specifications for CREED scores data
+#' @return A list with version and schema tibble for CREED scores data
 #' @importFrom tibble tribble
 #' @export
 get_creed_scores_schema <- function() {
-  tribble(
-    ~column_name         , ~data_type  , ~mandatory , ~description               ,
-    "REFERENCE_ID"       , "character" , TRUE       , "Reference identifier"     ,
-    "SILVER_RELIABILITY" , "character" , TRUE       , "Silver reliability score" ,
-    "SILVER_RELEVANCE"   , "character" , TRUE       , "Silver relevance score"   ,
-    "GOLD_RELIABILITY"   , "character" , TRUE       , "Gold reliability score"   ,
-    "GOLD_RELEVANCE"     , "character" , TRUE       , "Gold relevance score"
+  list(
+    version = "0.3.5",
+    schema = tribble(
+      ~column_name         , ~data_type  , ~mandatory , ~description               ,
+      "REFERENCE_ID"       , "character" , TRUE       , "Reference identifier"     ,
+      "SILVER_RELIABILITY" , "character" , TRUE       , "Silver reliability score" ,
+      "SILVER_RELEVANCE"   , "character" , TRUE       , "Silver relevance score"   ,
+      "GOLD_RELIABILITY"   , "character" , TRUE       , "Gold reliability score"   ,
+      "GOLD_RELEVANCE"     , "character" , TRUE       , "Gold relevance score"
+    )
   )
 }
 
@@ -314,19 +343,90 @@ get_creed_scores_schema <- function() {
 #' Schema for CREED criterion scores used by reliability and relevance modules.
 #' This is an internal data structure for consistency across CREED modules.
 #'
-#' @return A tibble with column specifications for CREED data
+#' @return A list with version and schema tibble for CREED data
 #' @importFrom tibble tribble
 #' @export
 get_creed_data_schema <- function() {
-  tribble(
-    ~column_name           , ~data_type  , ~mandatory , ~description                ,
-    "criterion_id"         , "character" , TRUE       , "Criterion identifier"      ,
-    "criterion_title"      , "character" , TRUE       , "Criterion title"           ,
-    "required_recommended" , "character" , TRUE       , "Required or recommended"   ,
-    "relevant_data"        , "character" , TRUE       , "Relevant data description" ,
-    "score"                , "character" , TRUE       , "Score value"               ,
-    "limitations"          , "character" , FALSE      , "Limitations description"
+  list(
+    version = "0.3.5",
+    schema = tribble(
+      ~column_name           , ~data_type  , ~mandatory , ~description                ,
+      "criterion_id"         , "character" , TRUE       , "Criterion identifier"      ,
+      "criterion_title"      , "character" , TRUE       , "Criterion title"           ,
+      "required_recommended" , "character" , TRUE       , "Required or recommended"   ,
+      "relevant_data"        , "character" , TRUE       , "Relevant data description" ,
+      "score"                , "character" , TRUE       , "Score value"               ,
+      "limitations"          , "character" , FALSE      , "Limitations description"
+    )
   )
+}
+
+#' Get All Schema Versions
+#'
+#' Returns a tibble with all schema names and their versions
+#'
+#' @return A tibble with columns: schema_name, version
+#' @importFrom tibble tibble
+#' @importFrom purrr map_chr
+#' @export
+get_all_schema_versions <- function() {
+  # Get all schema functions ----
+  schema_functions <- ls(envir = .GlobalEnv, pattern = "^get_.*_schema$")
+
+  # Extract versions ----
+  versions <- map_chr(schema_functions, function(fn_name) {
+    fn <- get(fn_name, envir = .GlobalEnv)
+    fn()$version
+  })
+
+  # Clean up names ----
+  schema_names <- gsub("^get_|_schema$", "", schema_functions)
+
+  tibble(
+    schema_name = schema_names,
+    version = versions
+  )
+}
+
+#' Export All Schemas to Excel
+#'
+#' Exports all schema definitions to an Excel workbook with one sheet per schema
+#' plus a versions sheet
+#'
+#' @param path Path to save the Excel file
+#' @importFrom writexl write_xlsx
+#' @importFrom purrr map set_names
+#' @export
+export_schemas_to_excel <- function(path = "data_format_specification.xlsx") {
+  # Get all schema functions ----
+  schema_functions <- ls(envir = .GlobalEnv, pattern = "^get_.*_schema$")
+
+  # Create list of schemas ----
+  schema_list <- map(schema_functions, function(fn_name) {
+    fn <- get(fn_name, envir = .GlobalEnv)
+    fn()$schema
+  })
+
+  # Clean up names for sheet names ----
+  schema_names <- gsub("^get_|_schema$", "", schema_functions) |>
+    gsub("_", " ", x = _) |>
+    tools::toTitleCase()
+
+  names(schema_list) <- schema_names
+
+  # Add versions sheet at the beginning ----
+  versions_sheet <- get_all_schema_versions()
+
+  output_list <- c(
+    list(Versions = versions_sheet),
+    schema_list
+  )
+
+  # Write to Excel ----
+  write_xlsx(output_list, path = path)
+
+  message("Schemas exported to: ", path)
+  invisible(path)
 }
 
 
