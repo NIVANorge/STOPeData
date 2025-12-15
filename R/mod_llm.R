@@ -601,7 +601,7 @@ mod_llm_server <- function(id) {
         )
       }
     }) |>
-      bindEvent(input$ENTERED_BY, ignoreInit = FALSE)
+      bindEvent(input$ENTERED_BY |> debounce(2000), ignoreInit = FALSE)
 
     # 3. Outputs ----
 
