@@ -308,7 +308,8 @@ mod_compartments_server <- function(id) {
     }) |>
       bindEvent(
         input$compartments_table,
-        session$userData$reactiveValues$biotaData
+        session$userData$reactiveValues$compartmentsData,
+        session$userData$reactiveValues$llmExtractionComplete
       )
 
     ## observe: Load from LLM data when available ----
