@@ -5,7 +5,7 @@ on:
       - 'main'
     paths:
     - 'app.R'
-    - './R/**'
+    - 'R/**'
     - '.github/**'
     - 'deployment/base/**'
     - 'renv.lock'
