@@ -7,7 +7,7 @@
 get_compartments_schema()
 }
 \value{
-A tibble with column specifications for compartments data
+A list with version and schema tibble for compartments data
 }
 \description{
 Get Compartments Data Schema

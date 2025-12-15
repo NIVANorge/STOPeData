@@ -7,7 +7,7 @@
 get_campaign_schema()
 }
 \value{
-A tibble with column specifications for campaign data
+A list with version and schema tibble for campaign data
 }
 \description{
 Get Campaign Data Schema

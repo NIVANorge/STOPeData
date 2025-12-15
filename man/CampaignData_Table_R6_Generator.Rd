@@ -63,39 +63,6 @@ See \link{Data_Table_R6_Generator} for details on:
 }
 }
 
-\examples{
-# Create a new campaign data object
-campaign <- CampaignData_Table_R6_Generator$new()
-
-# Check the empty structure
-campaign$data
-campaign$metadata
-campaign$version  # "1.0.0"
-
-# Get mandatory fields
-campaign$mandatory_fields
-
-# Add a valid row
-new_campaign <- tibble(
-  CAMPAIGN_NAME_SHORT = "Arctic2025",
-  CAMPAIGN_NAME = "Arctic Copper Monitoring 2025",
-  CAMPAIGN_START_DATE = as.Date("2025-01-01"),
-  CAMPAIGN_END_DATE = as.Date("2025-12-05"),
-  ORGANISATION = "NIVA",
-  ENTERED_BY = "Sam",
-  ENTERED_DATE = Sys.Date(),
-  CAMPAIGN_COMMENT = "Annual monitoring campaign"
-)
-
-campaign$add_rows(new_campaign)
-campaign$n_rows  # 1
-
-# Validation prevents invalid data
-\dontrun{
-invalid <- tibble(CAMPAIGN_NAME_SHORT = "Test")  # Missing mandatory fields
-campaign$add_rows(invalid)  # Error: Missing mandatory columns
-}
-}
 \section{Super class}{
 \code{\link[STOPeData:Data_Table_R6_Generator]{STOPeData::Data_Table_R6_Generator}} -> \code{CampaignData_Table_R6_Generator}
 }

@@ -7,7 +7,7 @@
 get_samples_schema()
 }
 \value{
-A tibble with column specifications for samples data
+A list with version and schema tibble for samples data
 }
 \description{
 Get Samples Data Schema

@@ -7,7 +7,7 @@
 get_parameters_schema()
 }
 \value{
-A tibble with column specifications for parameters data
+A list with version and schema tibble for parameters data
 }
 \description{
 Get Parameters Data Schema

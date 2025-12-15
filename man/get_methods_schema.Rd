@@ -7,7 +7,7 @@
 get_methods_schema()
 }
 \value{
-A tibble with column specifications for methods data
+A list with version and schema tibble for methods data
 }
 \description{
 Get Methods Data Schema

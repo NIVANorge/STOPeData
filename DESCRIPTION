@@ -48,6 +48,7 @@ Imports:
     tidyr,
     tidyselect,
     tools,
+    writexl,
     xml2,
     yaml,
     zip

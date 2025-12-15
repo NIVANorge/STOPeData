@@ -10,7 +10,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList actionButton
-#' @importFrom shinyWidgets pickerInput
+#' @importFrom shinyWidgets pickerInput virtualSelectInput
 #' @importFrom bslib card card_body accordion accordion_panel tooltip layout_columns
 #' @importFrom bsicons bs_icon
 #' @importFrom rhandsontable rHandsontableOutput
@@ -61,7 +61,7 @@ mod_biota_ui <- function(id) {
               multiple = FALSE
             ),
 
-            pickerInput(
+            virtualSelectInput(
               ns("study_species_selector"),
               label = tooltip(
                 list(
@@ -73,6 +73,7 @@ mod_biota_ui <- function(id) {
               choices = NULL,
               selected = NULL,
               multiple = TRUE,
+              allowNewOption = TRUE
             )
           ),
 

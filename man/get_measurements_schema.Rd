@@ -7,7 +7,7 @@
 get_measurements_schema()
 }
 \value{
-A tibble with column specifications for measurements data
+A list with version and schema tibble for measurements data
 }
 \description{
 Get Measurements Data Schema

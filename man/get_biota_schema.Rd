@@ -7,7 +7,7 @@
 get_biota_schema()
 }
 \value{
-A tibble with column specifications for biota data
+A list with version and schema tibble for biota data
 }
 \description{
 Get Biota Data Schema

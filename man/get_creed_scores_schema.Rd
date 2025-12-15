@@ -7,7 +7,7 @@
 get_creed_scores_schema()
 }
 \value{
-A tibble with column specifications for CREED scores data
+A list with version and schema tibble for CREED scores data
 }
 \description{
 Get CREED Scores Data Schema

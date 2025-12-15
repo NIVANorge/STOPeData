@@ -7,7 +7,7 @@
 get_reference_schema()
 }
 \value{
-A tibble with column specifications for reference data
+A list with version and schema tibble for reference data
 }
 \description{
 Get Reference Data Schema

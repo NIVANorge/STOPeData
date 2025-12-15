@@ -7,7 +7,7 @@
 get_sites_schema()
 }
 \value{
-A tibble with column specifications for sites data
+A list with version and schema tibble for sites data
 }
 \description{
 Get Sites Data Schema

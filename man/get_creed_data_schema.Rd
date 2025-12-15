@@ -7,7 +7,7 @@
 get_creed_data_schema()
 }
 \value{
-A tibble with column specifications for CREED data
+A list with version and schema tibble for CREED data
 }
 \description{
 Schema for CREED criterion scores used by reliability and relevance modules.

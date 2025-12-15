@@ -262,39 +262,6 @@ Data_Table_R6_Generator <- R6Class(
 #' * `$n_rows`
 #'
 #' @export
-#'
-#' @examples
-#' # Create a new campaign data object
-#' campaign <- CampaignData_Table_R6_Generator$new()
-#'
-#' # Check the empty structure
-#' campaign$data
-#' campaign$metadata
-#' campaign$version  # "1.0.0"
-#'
-#' # Get mandatory fields
-#' campaign$mandatory_fields
-#'
-#' # Add a valid row
-#' new_campaign <- tibble(
-#'   CAMPAIGN_NAME_SHORT = "Arctic2025",
-#'   CAMPAIGN_NAME = "Arctic Copper Monitoring 2025",
-#'   CAMPAIGN_START_DATE = as.Date("2025-01-01"),
-#'   CAMPAIGN_END_DATE = as.Date("2025-12-05"),
-#'   ORGANISATION = "NIVA",
-#'   ENTERED_BY = "Sam",
-#'   ENTERED_DATE = Sys.Date(),
-#'   CAMPAIGN_COMMENT = "Annual monitoring campaign"
-#' )
-#'
-#' campaign$add_rows(new_campaign)
-#' campaign$n_rows  # 1
-#'
-#' # Validation prevents invalid data
-#' \dontrun{
-#' invalid <- tibble(CAMPAIGN_NAME_SHORT = "Test")  # Missing mandatory fields
-#' campaign$add_rows(invalid)  # Error: Missing mandatory columns
-#' }
 CampaignData_Table_R6_Generator <- R6Class(
   "CampaignData_Table_R6_Generator",
   inherit = Data_Table_R6_Generator,
@@ -304,7 +271,7 @@ CampaignData_Table_R6_Generator <- R6Class(
 
     # This function gets called during initialize(), not at class definition
     get_schema = function() {
-      get_campaign_schema()
+      get_campaign_schema()$schema
     }
   ),
 
@@ -329,7 +296,7 @@ ReferenceData_Table_R6_Generator <- R6Class(
 
     # This function gets called during initialize(), not at class definition
     get_schema = function() {
-      get_reference_schema()
+      get_reference_schema()$schema
     }
   ),
 
@@ -355,7 +322,7 @@ SitesData_Table_R6_Generator <- R6Class(
 
     # This function gets called during initialize(), not at class definition
     get_schema = function() {
-      get_sites_schema()
+      get_sites_schema()$schema
     }
   ),
 
@@ -381,7 +348,7 @@ BiotaData_Table_R6_Generator <- R6Class(
 
     # This function gets called during initialize(), not at class definition
     get_schema = function() {
-      get_biota_schema()
+      get_biota_schema()$schema
     }
   ),
 
@@ -407,7 +374,7 @@ SamplesData_Table_R6_Generator <- R6Class(
 
     # This function gets called during initialize(), not at class definition
     get_schema = function() {
-      get_samples_schema()
+      get_samples_schema()$schema
     }
   ),
 
@@ -433,7 +400,7 @@ ParametersData_Table_R6_Generator <- R6Class(
 
     # This function gets called during initialize(), not at class definition
     get_schema = function() {
-      get_parameters_schema()
+      get_parameters_schema()$schema
     }
   ),
 
@@ -459,7 +426,7 @@ MethodsData_Table_R6_Generator <- R6Class(
 
     # This function gets called during initialize(), not at class definition
     get_schema = function() {
-      get_methods_schema()
+      get_methods_schema()$schema
     }
   ),
 
@@ -485,7 +452,7 @@ CompartmentsData_Table_R6_Generator <- R6Class(
 
     # This function gets called during initialize(), not at class definition
     get_schema = function() {
-      get_compartments_schema()
+      get_compartments_schema()$schema
     }
   ),
 
@@ -511,7 +478,7 @@ MeasurementsData_Table_R6_Generator <- R6Class(
 
     # This function gets called during initialize(), not at class definition
     get_schema = function() {
-      get_measurements_schema()
+      get_measurements_schema()$schema
     }
   ),
 
@@ -540,7 +507,7 @@ CREEDScoresData_Table_R6_Generator <- R6Class(
     schema_version = "1.0.0",
 
     get_schema = function() {
-      get_creed_scores_schema()
+      get_creed_scores_schema()$schema
     }
   ),
 
@@ -565,7 +532,7 @@ CREEDData_Table_R6_Generator <- R6Class(
     schema_version = "1.0.0",
 
     get_schema = function() {
-      get_creed_data_schema()
+      get_creed_data_schema()$schema
     }
   ),
 
