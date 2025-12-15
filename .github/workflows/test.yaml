@@ -4,9 +4,11 @@ on:
     branches:
       - 'main'
     paths:
-    - 'app/**'
+    - 'app.R'
+    - './R/**'
     - '.github/**'
     - 'deployment/base/**'
+    - 'renv.lock'
     - 'deployment/test/**'
     - 'Dockerfile'
     - 'dependencies.R'
