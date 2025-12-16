@@ -304,7 +304,7 @@ initialise_measurements_tibble <- function() {
   # Used to construct MEASURMENTS table
   # Merges SAMPLES, COMPARTMENTS, BIOTA
   tibble(
-    SITE_CODE = glue("Vannmiljø_{Vannlok_kode}"),
+    SITE_CODE = character(),
     PARAMETER_NAME = character(), # Foreign key
     SAMPLING_DATE = character(),
     ENVIRON_COMPARTMENT_SUB = character(),
