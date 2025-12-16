@@ -15,6 +15,7 @@
 #' @importFrom rhandsontable rHandsontableOutput
 #' @importFrom shinyjs useShinyjs
 #' @importFrom golem print_dev
+#' @import eDataDRF
 #' @export
 mod_biota_ui <- function(id) {
   ns <- NS(id)
@@ -173,10 +174,9 @@ mod_biota_ui <- function(id) {
 #' @importFrom rhandsontable renderRHandsontable rhandsontable hot_to_r hot_col hot_context_menu
 #' @importFrom shinyjs enable disable
 #' @importFrom glue glue
-#' @importFrom readr read_csv
 #' @importFrom dplyr pull rename
-#' @importFrom arrow read_parquet
 #' @importFrom tibble tibble
+#' @import eDataDRF
 #' @export
 mod_biota_server <- function(id) {
   moduleServer(id, function(input, output, session) {

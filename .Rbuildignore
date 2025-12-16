@@ -12,3 +12,6 @@ _\.new\.png$
 ^rsconnect$
 ^\.rscignore$
 ^LICENSE\.md$
+.dockerignore/*
+.github/*
+.vscode/*

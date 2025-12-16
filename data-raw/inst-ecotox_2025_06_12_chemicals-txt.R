@@ -3,7 +3,7 @@
 # downloaded from EPA ECOTOX
 
 # usethis::use_data(
-#   "inst/data/raw/ecotox_2025_06_12_chemicals.txt",
+#   "inst/extdata/raw/ecotox_2025_06_12_chemicals.txt",
 #   overwrite = TRUE
 # )
 
@@ -29,7 +29,7 @@ format_cas_number <- function(cas_string) {
 }
 
 chemicals <- readr::read_delim(
-  file = "inst/data/raw/ecotox_2025_06_12_chemicals.txt",
+  file = "inst/extdata/raw/ecotox_2025_06_12_chemicals.txt",
   delim = "|",
   col_names = TRUE,
   col_types = "cccc",
@@ -46,5 +46,5 @@ chemicals <- readr::read_delim(
 
 chemicals |>
   arrow::write_parquet(
-    sink = "inst/data/clean/ecotox_2025_06_12_chemicals.parquet"
+    sink = "inst/extdata/clean/ecotox_2025_06_12_chemicals.parquet"
   )

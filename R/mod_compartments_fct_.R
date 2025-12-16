@@ -9,6 +9,7 @@
 #'
 #' @return tibble with one row containing the specified compartment information
 #' @importFrom dplyr add_row
+#' @import eDataDRF
 #' @export
 #' @seealso \code{\link{initialise_compartments_tibble}}
 create_compartment_combination <- function(

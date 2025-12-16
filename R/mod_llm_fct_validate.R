@@ -19,8 +19,12 @@ map_to_vocabulary <- function(
     return(default_value)
   }
 
-  mapping_table <- readr::read_csv(
-    "inst/data/clean/llm_vocabulary_mapping.csv",
+  mapping_table <- read_csv(
+    system.file(
+      "extdata/clean",
+      "llm_vocabulary_mapping.csv",
+      package = "STOPeData"
+    ),
     show_col_types = FALSE
   )
 

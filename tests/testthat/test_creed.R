@@ -2,7 +2,7 @@
 # test big overarching CREED functions that a) get lots of data from the right sources and b) send it to the right sinks
 
 # from fct_dummy_data.R
-sessionData <- dummy_session_data()
+sessionData <- create_dummy_session_data()
 # --------------------
 
 # Tests: Main summary function ----
@@ -52,8 +52,8 @@ test_that("summarise_CREED_details correctly counts sites and samples", {
   num_sites <- result$value[result$field == "num_sites"]
   num_samples <- result$value[result$field == "num_samples"]
 
-  expect_equal(num_sites, "3")
-  expect_equal(num_samples, "4")
+  expect_equal(num_sites, "2")
+  expect_equal(num_samples, "2")
 })
 
 test_that("summarise_CREED_details separates sampling and analytical methods", {
@@ -62,9 +62,9 @@ test_that("summarise_CREED_details separates sampling and analytical methods", {
   sampling_methods <- result$value[result$field == "sampling_methods"]
   analytical_methods <- result$value[result$field == "analytical_methods"]
 
-  expect_true(grepl("Sampling Protocols", sampling_methods))
-  expect_true(grepl("grab", sampling_methods))
-  expect_true(grepl("Analytical Protocols", analytical_methods))
+  expect_true(grepl("Sampling Protocol", sampling_methods))
+  expect_true(grepl("Grab", sampling_methods))
+  expect_true(grepl("Analytical Protocol", analytical_methods))
   expect_true(grepl("ICP-MS", analytical_methods))
 })
 
@@ -91,7 +91,7 @@ test_that("summarise_CREED_details calculates LOQ/LOD info correctly", {
 
   expect_true(grepl("LOQ:", loq_info))
   expect_true(grepl("LOD:", loq_info))
-  expect_true(grepl("0.1 to 1", loq_info)) # Range of LOQ values
+  expect_true(grepl("0.05 to 1", loq_info)) # Range of LOQ values
 })
 
 test_that("summarise_CREED_details handles NA dates correctly", {
@@ -115,9 +115,9 @@ test_that("summarise_CREED_details deduplicates values correctly", {
   result <- summarise_CREED_details(sessionData)
   medium <- result$value[result$field == "medium"]
 
-  # Should not have "Sediment" repeated multiple times in output
-  sediment_count <- length(gregexpr("Sediment", medium)[[1]])
-  expect_lte(sediment_count, 2) # Once in the value, once in potential plural
+  # Should not have "Aquatic Sediment" repeated multiple times in output
+  aquatic_sediment_count <- length(gregexpr("Aquatic Sediment", medium)[[1]])
+  expect_lte(aquatic_sediment_count, 2) # Once in the value, once in potential plural
 })
 
 # test-creed-reliability-functions.R ----
@@ -129,7 +129,7 @@ test_that("summarise_CREED_reliability correctly summarises compartments and pro
 
   # Should contain compartments
   expect_true(grepl("compartment", rb1_value))
-  expect_true(grepl("Sediment", rb1_value))
+  expect_true(grepl("Aquatic Sediment", rb1_value))
 
   # Should contain protocol information
   expect_true(grepl("protocol", rb1_value))
@@ -140,7 +140,7 @@ test_that("summarise_CREED_reliability correctly summarises sites for RB4", {
 
   rb4_value <- result$value[result$field == "RB4"]
 
-  expect_true(grepl("3 sites", rb4_value))
+  expect_true(grepl("2 sites", rb4_value))
 })
 
 test_that("summarise_CREED_reliability correctly calculates date range for RB5", {
@@ -148,8 +148,8 @@ test_that("summarise_CREED_reliability correctly calculates date range for RB5",
 
   rb5_value <- result$value[result$field == "RB5"]
 
-  expect_true(grepl("2023-01-15", rb5_value))
-  expect_true(grepl("2023-09-05", rb5_value))
+  expect_true(grepl("2023-03-15", rb5_value))
+  expect_true(grepl("2023-04-20", rb5_value))
   expect_true(grepl("to", rb5_value))
 })
 
@@ -190,7 +190,7 @@ test_that("summarise_CREED_reliability calculates LOD/LOQ for RB7", {
 
   expect_true(grepl("LOQ:", rb7_value))
   expect_true(grepl("LOD:", rb7_value))
-  expect_true(grepl("0.1 to 1", rb7_value)) # LOQ range
+  expect_true(grepl("0.05 to 1", rb7_value)) # LOQ range
 })
 
 test_that("summarise_CREED_reliability calculates significant figures for RB15", {
@@ -264,12 +264,11 @@ test_that("summarise_CREED_reliability handles missing data gracefully", {
 
 test_that("summarise_CREED_reliability handles uncertainty types for RB14 and RB18", {
   # Add uncertainty data
-  sessionData$measurementsData$UNCERTAINTY_TYPE <- c("SD", "SD", "CI", "SD")
+  sessionData$measurementsData$UNCERTAINTY_TYPE <- c("SD", "SD", NA)
   sessionData$measurementsData$MEASUREMENT_COMMENT <- c(
-    "Good",
-    "Fair",
     NA,
-    "Good"
+    NA,
+    "Below LOQ - biota sample"
   )
 
   result <- summarise_CREED_reliability(sessionData)
@@ -284,5 +283,4 @@ test_that("summarise_CREED_reliability handles uncertainty types for RB14 and RB
   # RB18 should have only uncertainty types
   expect_true(grepl("Uncertainty types", rb18_value))
   expect_true(grepl("SD", rb18_value))
-  expect_true(grepl("CI", rb18_value))
 })

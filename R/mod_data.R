@@ -14,6 +14,7 @@
 #' @importFrom bsicons bs_icon
 #' @importFrom rhandsontable rHandsontableOutput
 #' @importFrom shinyjs useShinyjs show hide hidden
+#' @import eDataDRF
 #' @export
 mod_data_ui <- function(id) {
   ns <- NS(id)
@@ -120,6 +121,7 @@ mod_data_ui <- function(id) {
 #' @importFrom tibble tibble
 #' @importFrom utils capture.output head
 #' @importFrom purrr is_empty map_lgl
+#' @import eDataDRF
 #' @export
 mod_data_server <- function(id, parent_session) {
   moduleServer(id, function(input, output, session) {

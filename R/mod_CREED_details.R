@@ -237,6 +237,7 @@ mod_CREED_details_ui <- function(id) {
 #' @importFrom golem print_dev
 #' @importFrom shiny updateTextAreaInput bindEvent isTruthy
 #' @importFrom tibble tibble
+#' @import eDataDRF
 #' @export
 mod_CREED_details_server <- function(id) {
   moduleServer(id, function(input, output, session) {

@@ -16,6 +16,7 @@
 #' @importFrom rcrossref cr_works
 #' @importFrom httr GET content http_error
 #' @importFrom xml2 read_xml xml_find_first xml_text
+#' @import eDataDRF
 #' @export
 mod_references_ui <- function(id) {
   ns <- NS(id)
@@ -359,6 +360,7 @@ mod_references_ui <- function(id) {
 #' @importFrom shinyjs enable disable
 #' @importFrom tibble tibble as_tibble
 #' @importFrom dplyr add_row
+#' @import eDataDRF
 #' @export
 mod_references_server <- function(id) {
   moduleServer(id, function(input, output, session) {

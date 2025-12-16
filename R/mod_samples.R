@@ -16,6 +16,7 @@
 #' @importFrom shinyjs useShinyjs enable disable
 #' @importFrom shinyWidgets airDatepickerInput pickerInput
 #' @importFrom golem get_golem_wd
+#' @import eDataDRF
 mod_samples_ui <- function(id) {
   ns <- NS(id)
 
@@ -228,6 +229,7 @@ mod_samples_ui <- function(id) {
 #' @importFrom purrr is_empty
 #' @importFrom glue glue
 #' @importFrom tibble as_tibble add_row
+#' @import eDataDRF
 
 mod_samples_server <- function(id) {
   moduleServer(id, function(input, output, session) {

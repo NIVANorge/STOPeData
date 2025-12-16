@@ -20,6 +20,7 @@
 #' @importFrom tibble add_row
 #' @importFrom dplyr mutate across
 #' @importFrom tidyselect where
+#' @import eDataDRF
 #' @export
 dummy_campaign_tibble <- function() {
   initialise_campaign_tibble() |>
@@ -45,6 +46,7 @@ dummy_campaign_tibble <- function() {
 #'
 #' @return A tibble with 1 row of dummy reference data
 #' @importFrom tibble add_row
+#' @import eDataDRF
 #' @export
 dummy_references_tibble <- function() {
   initialise_references_tibble() |>
@@ -77,6 +79,7 @@ dummy_references_tibble <- function() {
 #'
 #' @return A tibble with 2 rows of dummy site data
 #' @importFrom tibble add_row
+#' @import eDataDRF
 #' @export
 dummy_sites_tibble <- function() {
   initialise_sites_tibble() |>
@@ -120,6 +123,7 @@ dummy_sites_tibble <- function() {
 #' Inherits column structure from initialise_parameters_tibble().
 #'
 #' @return A tibble with 3 rows of dummy parameter data
+#' @import eDataDRF
 #' @importFrom tibble add_row
 #' @export
 dummy_parameters_tibble <- function() {
@@ -168,6 +172,7 @@ dummy_parameters_tibble <- function() {
 #' Inherits column structure from initialise_compartments_tibble().
 #'
 #' @return A tibble with 2 rows of dummy compartment data
+#' @import eDataDRF
 #' @importFrom tibble add_row
 #' @export
 dummy_compartments_tibble <- function() {
@@ -191,6 +196,7 @@ dummy_compartments_tibble <- function() {
 #'
 #' @return A tibble with 4 rows of dummy methods data
 #' @importFrom tibble add_row
+#' @import eDataDRF
 #' @export
 dummy_methods_tibble <- function() {
   initialise_methods_tibble() |>
@@ -231,6 +237,7 @@ dummy_methods_tibble <- function() {
 #'
 #' @return A tibble with 2 rows of dummy sample data
 #' @importFrom tibble add_row
+#' @import eDataDRF
 #' @export
 dummy_samples_tibble <- function() {
   initialise_samples_tibble() |>
@@ -269,6 +276,7 @@ dummy_samples_tibble <- function() {
 #'
 #' @return A tibble with 1 row of dummy biota data
 #' @importFrom tibble add_row
+#' @import eDataDRF
 #' @export
 dummy_biota_tibble <- function() {
   initialise_biota_tibble() |>
@@ -296,6 +304,7 @@ dummy_biota_tibble <- function() {
 #' Inherits column structure from initialise_measurements_tibble().
 #'
 #' @return A tibble with 3 rows of dummy measurement data
+#' @import eDataDRF
 #' @importFrom tibble add_row
 #' @export
 dummy_measurements_tibble <- function() {

@@ -6,6 +6,7 @@
 #'
 #' @return Character vector of parameter names
 #' @importFrom dplyr filter pull
+#' @import eDataDRF
 #' @export
 get_parameters_of_types <- function(
   param_type,
@@ -34,6 +35,7 @@ get_parameters_of_types <- function(
 #' @param entered_by Character string specifying who entered the parameter
 #'
 #' @return tibble with blank parameter template
+#' @import eDataDRF
 #' @export
 #' @seealso \code{\link{initialise_parameters_tibble}}
 create_new_parameter <- function(param_type, entered_by) {
@@ -64,6 +66,7 @@ create_new_parameter <- function(param_type, entered_by) {
 #'
 #' @return tibble with parameter information or NULL if not found
 #' @importFrom dplyr filter slice add_row
+#' @import eDataDRF
 #' @export
 #' @seealso \code{\link{initialise_parameters_tibble}}
 create_existing_parameter <- function(

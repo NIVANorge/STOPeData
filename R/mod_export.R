@@ -12,6 +12,7 @@
 #' @importFrom shiny NS tagList downloadButton hr div
 #' @importFrom bslib card card_body accordion accordion_panel layout_column_wrap
 #' @importFrom bsicons bs_icon
+#' @import eDataDRF
 #' @export
 mod_export_ui <- function(id) {
   ns <- NS(id)
@@ -73,6 +74,7 @@ mod_export_ui <- function(id) {
 #' @importFrom golem get_golem_version print_dev
 #' @importFrom readr write_excel_csv
 #' @importFrom zip zip
+#' @import eDataDRF
 #' @export
 mod_export_server <- function(id) {
   moduleServer(id, function(input, output, session) {

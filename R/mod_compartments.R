@@ -14,6 +14,7 @@
 #' @importFrom bsicons bs_icon
 #' @importFrom rhandsontable rHandsontableOutput
 #' @importFrom shinyjs useShinyjs
+#' @import eDataDRF
 #' @export
 mod_compartments_ui <- function(id) {
   ns <- NS(id)
@@ -124,6 +125,7 @@ mod_compartments_ui <- function(id) {
 #' @importFrom purrr is_empty
 #' @importFrom glue glue
 #' @importFrom dplyr add_row
+#' @import eDataDRF
 #' @export
 mod_compartments_server <- function(id) {
   moduleServer(id, function(input, output, session) {

@@ -542,7 +542,8 @@ summarise_date_range <- function(dates) {
     return(paste0(as.character(min_date), " (n=", n_unique, ")"))
   } else {
     # Calculate interval in days
-    interval_days <- as.numeric(difftime(max_date, min_date, units = "days"))
+    interval_days <- as.numeric(difftime(max_date, min_date, units = "days")) |>
+      round(digits = 0)
 
     return(paste0(
       min_date,
@@ -552,7 +553,7 @@ summarise_date_range <- function(dates) {
       n_unique,
       ", ",
       interval_days,
-      " days)"
+      " days (to nearest day))"
     ))
   }
 }

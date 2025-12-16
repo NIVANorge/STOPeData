@@ -508,9 +508,9 @@ create_conditional_criterion <- function(
       criterion_id,
       title,
       type,
-      description,
-      note,
-      is_conditional = TRUE
+      description
+      # note,
+      # is_conditional = TRUE
     )
   )
 }
@@ -519,7 +519,11 @@ create_conditional_criterion <- function(
 
 #' @importFrom yaml read_yaml
 copper_CREED_purpose_statement <- function() {
-  read_yaml("inst/app/www/md/CREED_Copper_Purpose.yml")
+  read_yaml(system.file(
+    "app/www/md/",
+    "CREED_Copper_Purpose.yml",
+    package = "STOPeData"
+  ))
 }
 
 

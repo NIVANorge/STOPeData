@@ -12,6 +12,7 @@
 #' @importFrom shiny NS tagList checkboxInput icon div strong textOutput updateCheckboxInput moduleServer observe renderText
 #' @importFrom bslib input_task_button
 #' @importFrom bsicons bs_icon
+#' @import eDataDRF
 #' @export
 mod_CREED_gateway_ui <- function(id) {
   ns <- NS(id)

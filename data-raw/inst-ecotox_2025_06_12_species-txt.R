@@ -7,12 +7,12 @@
 # downloaded from EPA ECOTOX
 
 # usethis::use_data(
-#   "inst/data/raw/ecotox_2025_06_12_chemicals.txt",
+#   "inst/extdata/raw/ecotox_2025_06_12_chemicals.txt",
 #   overwrite = TRUE
 # )
 
 species <- readr::read_delim(
-  file = "inst/data/raw/ecotox_2025_06_12_species.txt",
+  file = "inst/extdata/raw/ecotox_2025_06_12_species.txt",
   delim = "|",
   col_names = TRUE,
   col_types = "ccccccccccccccccc",
@@ -31,5 +31,5 @@ species <- readr::read_delim(
 
 species |>
   arrow::write_parquet(
-    sink = "inst/data/clean/ecotox_2025_06_12_species.parquet"
+    sink = "inst/extdata/clean/ecotox_2025_06_12_species.parquet"
   )

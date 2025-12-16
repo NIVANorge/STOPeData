@@ -13,6 +13,7 @@
 #' @importFrom bslib card card_body layout_column_wrap accordion accordion_panel tooltip
 #' @importFrom bsicons bs_icon
 #' @importFrom tibble tibble
+#' @import eDataDRF
 #' @export
 mod_campaign_ui <- function(id) {
   ns <- NS(id)
@@ -203,6 +204,7 @@ mod_campaign_ui <- function(id) {
 #' @importFrom shiny moduleServer reactive reactiveValues observe renderText updateTextInput updateDateInput updateNumericInput updateTextAreaInput bindEvent
 #' @importFrom glue glue
 #' @importFrom tibble add_row
+#' @import eDataDRF
 #' @export
 mod_campaign_server <- function(id) {
   moduleServer(id, function(input, output, session) {

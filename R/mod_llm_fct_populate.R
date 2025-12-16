@@ -106,6 +106,7 @@ populate_campaign_from_llm <- function(session, llm_campaign_data) {
 #' @description Updates references module input fields with LLM extracted data
 #' @param session Shiny session object
 #' @param llm_references_data References data extracted by LLM
+#' @importFrom dplyr rename_with
 #' @noRd
 # ! FORMAT-BASED
 populate_references_from_llm <- function(session, llm_references_data) {

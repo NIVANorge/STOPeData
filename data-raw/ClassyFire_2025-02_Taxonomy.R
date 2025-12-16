@@ -8,7 +8,7 @@ chemicals_vector <- chemicals$CAS_RN
 # From https://ice.ntp.niehs.nih.gov/DATASETDESCRIPTION?section=Chemical%20Taxonomies
 
 chemical_taxonomy <- readr::read_tsv(
-  file = "inst/data/raw/ClassyFire_2025-02_ChemicalTaxonomies.txt",
+  file = "inst/extdata/raw/ClassyFire_2025-02_ChemicalTaxonomies.txt",
   col_names = TRUE,
   trim_ws = TRUE,
   col_select = c(Chemical_Name, CASRN, DTXSID, InChiKey, Superclass) # save some time, we don't need the whole taxonomy system
@@ -32,5 +32,5 @@ filtered <- chemical_taxonomy |>
 
 filtered |>
   arrow::write_parquet(
-    sink = "inst/data/clean/ClassyFire_Taxonomy_2025_02.parquet"
+    sink = "inst/extdata/clean/ClassyFire_Taxonomy_2025_02.parquet"
   )

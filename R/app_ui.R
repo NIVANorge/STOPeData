@@ -6,6 +6,7 @@
 #' @importFrom bslib page_navbar nav_panel nav_spacer nav_menu nav_item bs_theme navset_card_tab sidebar navbar_options input_dark_mode
 #' @importFrom bsicons bs_icon
 #' @importFrom htmltools HTML
+#' @import eDataDRF
 #' @noRd
 app_ui <- function(request) {
   tagList(

@@ -2,16 +2,16 @@
 # tests for all the little CREED summarise_* functions designed to provide a text summary of tables or individual variables
 
 # Setup: Create dummy data matching actual structure ----
-dummy <- create_dummy_module_data()
+dummy <- create_dummy_session_data()
 
 # Tests for calculate_coordinate_precision() ----
 test_that("calculate_coordinate_precision finds minimum decimal places", {
   result <- calculate_coordinate_precision(
-    dummy$sites$LATITUDE,
-    dummy$sites$LONGITUDE
+    dummy$sitesData$LATITUDE,
+    dummy$sitesData$LONGITUDE
   )
-  # Lat: 59.9139 (4), 60.3913 (4), 59.3293 (4)
-  # Lon: 10.7522 (4), 5.3221 (4), 18.0686 (4)
+  # Lat: 59.9139 (4), 60.3913 (4)
+  # Lon: 10.7522 (4), 5.3221 (4)
   expect_equal(result, 4)
 })
 
@@ -32,28 +32,28 @@ test_that("calculate_coordinate_precision returns N/A for all NA", {
 # Tests for summarise_sites() ----
 test_that("summarise_sites returns full summary with all parameters TRUE", {
   result <- summarise_sites(
-    dummy$sites,
+    dummy$sitesData,
     COUNTRY_ISO = TRUE,
     OCEAN_IHO = TRUE,
     SITE_GEOGRAPHIC_FEATURE = TRUE,
     SITE_GEOGRAPHIC_FEATURE_SUB = TRUE,
     PRECISION = TRUE
   )
-  expect_match(result, "3 sites")
-  expect_match(result, "Norway, Sweden") # including brackets and escape characters messes with the test somehow
-  expect_match(result, "Oslo, Bergen, Stockholm")
+  expect_match(result, "2 sites")
+  expect_match(result, "NO") # Country code
+  expect_match(result, "Skagerrak, North Sea")
   expect_match(result, "Distinct features")
   expect_match(result, "Lowest coordinate precision: 4")
 })
 
 test_that("summarise_sites respects FALSE parameters", {
   result <- summarise_sites(
-    dummy$sites,
+    dummy$sitesData,
     COUNTRY_ISO = FALSE,
     OCEAN_IHO = FALSE,
     PRECISION = FALSE
   )
-  expect_match(result, "3 sites")
+  expect_match(result, "2 sites")
   expect_false(grepl("Countries", result))
   expect_false(grepl("Areas", result))
   expect_false(grepl("precision", result))
@@ -62,13 +62,20 @@ test_that("summarise_sites respects FALSE parameters", {
 test_that("summarise_sites handles coordinate precision correctly", {
   # Create custom test data with varying decimal places
   test_coords <- tibble(
-    SITE_ID = c("S1", "S2", "S3"),
-    COUNTRY_ISO = c("Norway", "Norway", "Sweden"),
+    SITE_CODE = c("S1", "S2", "S3"),
+    SITE_NAME = c("Site 1", "Site 2", "Site 3"),
+    COUNTRY_ISO = c("NO", "NO", "SE"),
     OCEAN_IHO = c("Oslo", "Bergen", "Stockholm"),
-    SITE_GEOGRAPHIC_FEATURE = c("Fjord", "Fjord", "Lake"),
-    SITE_GEOGRAPHIC_FEATURE_SUB = c("Inner", "Outer", "Shallow"),
+    SITE_GEOGRAPHIC_FEATURE = c("Coastal, fjord", "Coastal, fjord", "Lake"),
+    SITE_GEOGRAPHIC_FEATURE_SUB = c("Water column", "Sediment", "Water column"),
     LATITUDE = c(60.1, 60.12, 60.123),
-    LONGITUDE = c(10.1234, 10.12, 10.1)
+    LONGITUDE = c(10.1234, 10.12, 10.1),
+    SITE_COORDINATE_SYSTEM = rep("WGS84", 3),
+    ALTITUDE_VALUE = rep(NA_real_, 3),
+    ALTITUDE_UNIT = rep(NA_character_, 3),
+    ENTERED_BY = rep("test_user", 3),
+    ENTERED_DATE = rep("2023-07-01", 3),
+    SITE_COMMENT = rep(NA_character_, 3)
   )
 
   result <- summarise_sites(test_coords, PRECISION = TRUE)
@@ -93,7 +100,7 @@ test_that("summarise_date_range handles various date inputs correctly", {
   ))
   expect_equal(
     summarise_date_range(date_range),
-    "2024-01-15 to 2024-03-20 (n=3, 65 days)"
+    "2024-01-15 to 2024-03-20 (n=3, 65 days (to nearest day))"
   )
 
   # All same date (multiple entries)
@@ -125,6 +132,6 @@ test_that("summarise_date_range handles various date inputs correctly", {
   mixed_dates <- as.Date(c("2024-01-15", NA, "2024-02-15"))
   expect_equal(
     summarise_date_range(mixed_dates),
-    "2024-01-15 to 2024-02-15 (n=2, 31 days)"
+    "2024-01-15 to 2024-02-15 (n=2, 31 days (to nearest day))"
   )
 })

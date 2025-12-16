@@ -17,6 +17,7 @@
 #' @importFrom shinyWidgets pickerInput
 #' @importFrom shinyjs useShinyjs
 #' @importFrom tibble tibble
+#' @import eDataDRF
 #' @export
 mod_parameters_ui <- function(id) {
   ns <- NS(id)
@@ -175,6 +176,7 @@ mod_parameters_ui <- function(id) {
 #' @importFrom tibble tibble
 #' @importFrom stats setNames
 #' @importFrom shinyWidgets updatePickerInput
+#' @import eDataDRF
 #' @export
 mod_parameters_server <- function(id) {
   moduleServer(id, function(input, output, session) {

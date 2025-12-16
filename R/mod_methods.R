@@ -14,6 +14,7 @@
 #' @importFrom bsicons bs_icon
 #' @importFrom rhandsontable rHandsontableOutput
 #' @importFrom shinyjs useShinyjs
+#' @import eDataDRF
 #' @export
 mod_methods_ui <- function(id) {
   ns <- NS(id)
@@ -116,6 +117,7 @@ mod_methods_ui <- function(id) {
 #' @importFrom tibble tibble deframe
 #' @importFrom dplyr filter select ungroup row_number relocate
 #' @importFrom purrr is_empty
+#' @import eDataDRF
 #' @export
 mod_methods_server <- function(id) {
   moduleServer(id, function(input, output, session) {

@@ -12,6 +12,7 @@
 #' @importFrom shiny NS tagList textAreaInput h5 p strong div actionButton fileInput downloadButton hr h5
 #' @importFrom bslib layout_columns input_task_button
 #' @importFrom bsicons bs_icon
+#' @import eDataDRF
 mod_CREED_purpose_ui <- function(id) {
   ns <- NS(id)
 

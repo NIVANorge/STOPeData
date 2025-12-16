@@ -4,7 +4,7 @@
 # usethis::use_data(IHO_Oceans, overwrite = TRUE)
 
 oceans <- readr::read_tsv(
-  "inst/data/raw/Limits_of_oceans_and_seas.tsv",
+  "inst/extdata/raw/Limits_of_oceans_and_seas.tsv",
   skip = 15
 ) |>
   dplyr::mutate(
@@ -17,4 +17,4 @@ oceans <- readr::read_tsv(
   dplyr::distinct() |>
   arrange(NAME)
 
-readr::write_rds(x = oceans, file = "inst/data/clean/IHO_oceans.rds")
+readr::write_rds(x = oceans, file = "inst/extdata/clean/IHO_oceans.rds")

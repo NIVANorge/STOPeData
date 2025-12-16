@@ -13,6 +13,7 @@
 #' @importFrom bslib card card_body layout_column_wrap accordion accordion_panel
 #' @importFrom bsicons bs_icon
 #' @importFrom plotly plotlyOutput
+#' @import eDataDRF
 #' @export
 mod_review_ui <- function(id) {
   ns <- NS(id)
@@ -135,6 +136,7 @@ mod_review_ui <- function(id) {
 #' @importFrom plotly ggplotly add_text
 #' @importFrom glue glue
 #' @importFrom golem print_dev
+#' @import eDataDRF
 #' @export
 mod_review_server <- function(id) {
   moduleServer(id, function(input, output, session) {
