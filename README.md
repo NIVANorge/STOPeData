@@ -14,7 +14,7 @@
     STOPeData is a data entry and formatting Shiny app in the Source to Outcome Pathway/Risk assessment database family, designed to make extracting data on chemical concentrations in the environment from papers and reports easier. 
     <br />
     <br />
-    <a href="https://sawelch-niva-stopedata.share.connect.posit.cloud">View Demo</a>
+    <a href="https://stop.t.niva.no/eData/">View Test Version</a> (requires NIVA account)
     &middot;
     <a href="https://github.com/sawelch-NIVA/STOPeData/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     &middot;
