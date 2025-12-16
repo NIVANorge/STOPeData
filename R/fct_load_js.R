@@ -15,7 +15,7 @@
 #'
 #' @examples
 #' \dontrun{
-#' rhandsontable(data) %>%
+#' rhandsontable(data) |>
 #'   hot_col("mandatory_column", renderer = mandatory_highlight_text())
 #' }
 #'
@@ -54,7 +54,7 @@ mandatory_highlight_text <- function() {
 #'
 #' @examples
 #' \dontrun{
-#' rhandsontable(data) %>%
+#' rhandsontable(data) |>
 #'   hot_col("mandatory_column", type = "dropdown", renderer = mandatory_highlight_dropdown())
 #' }
 #'
@@ -95,7 +95,7 @@ mandatory_highlight_dropdown <- function() {
 #'
 #' @examples
 #' \dontrun{
-#' rhandsontable(data) %>%
+#' rhandsontable(data) |>
 #'   hot_col("mandatory_column", renderer = mandatory_highlight_subtle())
 #' }
 #'

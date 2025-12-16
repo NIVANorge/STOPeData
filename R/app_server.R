@@ -475,7 +475,7 @@ app_server <- function(input, output, session) {
             glue("• {.x}: {dims$rows} rows × {dims$cols} columns")
           }
         }
-      ) %>%
+      ) |>
         paste(collapse = "\n")
 
       footer_content <- div(
