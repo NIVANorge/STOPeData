@@ -151,7 +151,6 @@ mod_data_server <- function(id, parent_session) {
     # Rule 1: Check if data entry is ready
     iv$add_rule("measurement_table_validation", function(value) {
       if (!moduleState$data_entry_ready) {
-        browser()
         moduleState$validation_message <<- "Complete all setup modules before entering measurement data"
         return("Complete all setup modules before entering measurement data")
       }
@@ -534,12 +533,9 @@ mod_data_server <- function(id, parent_session) {
     # upstream: all session$userData$reactiveValues validation flags
     # downstream: moduleState$data_entry_ready, session$userData$reactiveValues$measurementsData
     observe({
-      browser()
       # req(isFALSE(session$userData$reactiveValues$saveExtractionSuccessful)) # need to be a little careful here, as if we upload measurments data
       # the observer will create combinations and upload existing data, resulting in n new entries each time.
       if (modulesStatus()) {
-        browser()
-
         moduleState$data_entry_ready <- TRUE
 
         # CHANGED: Create measurement combinations and store in userData

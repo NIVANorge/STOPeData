@@ -932,9 +932,6 @@ collect_CREED_data <- function(criteria_config, input) {
   # Loop through all criteria ----
   for (criterion_id in names(criteria_config)) {
     golem::print_dev(criterion_id)
-    # if (stringr::str_detect(criterion_id, "RB")) {
-    #   browser()
-    # }
 
     # Get input values ----
     score_input <- input[[paste0(criterion_id, "_score")]]

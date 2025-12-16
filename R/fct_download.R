@@ -352,9 +352,7 @@ download_all_data <- function(session, moduleState = NULL) {
       for (dataset_name in moduleState$available_datasets) {
         tryCatch(
           {
-            if (stringr::str_detect(dataset_name, "CREED")) {
-              browser()
-            }
+            if (stringr::str_detect(dataset_name, "CREED")) {}
             print_dev(glue("prepping {dataset_name} for export"))
 
             data <- rv[[dataset_name]]
@@ -455,7 +453,7 @@ write_creed_report_txt <- function(
   file_path
 ) {
   # Helper for string repetition
-  browser()
+
   `%r%` <- function(string, times) {
     paste(rep(string, times), collapse = "")
   }

@@ -393,7 +393,6 @@ mod_sites_server <- function(id) {
     observe({
       req(moduleState$clicked_coords)
 
-      browser()
       # Create new site with map coordinates
       new_site <- create_new_site(
         site_number = moduleState$next_site_id,

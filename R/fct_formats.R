@@ -304,7 +304,7 @@ initialise_measurements_tibble <- function() {
   # Used to construct MEASURMENTS table
   # Merges SAMPLES, COMPARTMENTS, BIOTA
   tibble(
-    SITE_CODE = character(), # Foreign key
+    SITE_CODE = glue("Vannmiljø_{Vannlok_kode}"),
     PARAMETER_NAME = character(), # Foreign key
     SAMPLING_DATE = character(),
     ENVIRON_COMPARTMENT_SUB = character(),
@@ -828,7 +828,6 @@ uncertainty_types_vocabulary <- function() {
     "5th-95th Percentile",
     "Coefficient of Variation (%)",
     "Median Absolute Deviation",
-    "First-Third Quartile Range",
     "Minimum-Maximum",
     "Variance",
     "Standard Error of Mean",
