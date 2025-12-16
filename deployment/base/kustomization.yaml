@@ -7,4 +7,4 @@ resources:
 images:
 - name: '*stop-e-data*'
   newName: europe-west1-docker.pkg.dev/niva-cd/images/stop-e-data
-  newTag: f824475
+  newTag: b15e43e
