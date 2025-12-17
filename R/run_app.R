@@ -22,8 +22,8 @@ run_app <- function(
   logger::log_layout(logger::layout_json())
   logger::log_threshold(logger::INFO)
 
-  logger::log_messages()
-  logger::log_warnings()
+  logger::log_messages(muffle = TRUE)
+  logger::log_warnings(muffle = TRUE)
 
   with_golem_options(
     app = shinyApp(

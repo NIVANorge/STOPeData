@@ -31,4 +31,4 @@ COPY ./R ./R
 COPY ./inst ./inst
 
 # Run app
-CMD ["R", "-e", "shiny::runApp('app.R', host='0.0.0.0', port=3838)"]
+CMD ["R", "--quiet" "-e", "shiny::runApp('app.R', host='0.0.0.0', port=3838)"]
