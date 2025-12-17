@@ -25,6 +25,7 @@ Imports:
     ISOcodes,
     jsonlite,
     leaflet,
+    logger,
     lubridate,
     markdown,
     openxlsx2,

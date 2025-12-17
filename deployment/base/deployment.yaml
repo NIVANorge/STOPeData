@@ -55,7 +55,7 @@ spec:
             port: 3838
           initialDelaySeconds: 30
           periodSeconds: 1800
-          timeoutSeconds: 5
+          timeoutSeconds: 10
 ---
 # Service exposing the timescale DB
 apiVersion: v1
