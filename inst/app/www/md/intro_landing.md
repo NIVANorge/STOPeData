@@ -8,5 +8,6 @@ Since this app is exclusively being used for EXPECT's AEP copper data extraction
 4. Check for Supplementary Information/Supporting Information (ESI) first. If it contains raw data tables, [merge it with the main PDF](https://smallpdf.com/merge-pdf) before uploading.
 5. Use two screens - one for the app, one for the paper. Some UI elements need wider screens.
 6. You can work in Excel if easier, but use the controlled vocabulary.
+7. **Since the migration to NIVA's cloud server, entered data has started being retained between sessions. This can be useful, but hit Ctrl + Shift + R before starting a new extraction to clear existing data.**
 
 If something breaks, email saw@niva.no or log an issue [here](https://github.com/sawelch-NIVA/STOPeData/issues) with screenshots and your extraction file.
