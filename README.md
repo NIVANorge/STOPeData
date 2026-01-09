@@ -76,7 +76,7 @@ I haven't tested setting the app up to run locally on systems other than my home
 
 ### Prerequisites
 
-* R version 4.5.1
+* R version 4.5.2
 * Various R packages (see MANIFEST)
 
 ### Installation
@@ -149,7 +149,7 @@ See the [open issues](https://github.com/sawelch-NIVA/STOPeData/issues) for a fu
 
 Sam Welch - sam.welch@niva.no
 
-Project Link: [https://github.com/sawelch-NIVA/STOPeData](https://github.com/sawelch-NIVA/STOPeData)
+Project Link: [https://github.com/NIVANorge/STOPeData](https://github.com/sawelch-NIVA/STOPeData)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
