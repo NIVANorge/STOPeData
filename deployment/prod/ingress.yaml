@@ -4,6 +4,7 @@ metadata:
   name: stop-e-data
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/enable-global-auth: 'false'
     nginx.ingress.kubernetes.io/affinity: 'cookie'
     nginx.ingress.kubernetes.io/session-cookie-name: 'http-cookie'
     nginx.ingress.kubernetes.io/session-cookie-expires: '172800'
