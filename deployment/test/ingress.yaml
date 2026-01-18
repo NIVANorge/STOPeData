@@ -4,6 +4,9 @@ metadata:
   name: stop-e-data
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/auth-url: 'http://stop-oauth2-proxy.standalone.svc.cluster.local/oauth2/auth'
+    nginx.ingress.kubernetes.io/auth-signin: 'https://stop.auth.t.niva.no/oauth2/sign_in'
+    nginx.ingress.kubernetes.io/auth-response-headers: 'X-Auth-Request-Email, X-Auth-Request-User, X-Forwarded-Access-Token, X-Auth-Request-Groups, X-Auth-Request-Preferred-Username'
     nginx.ingress.kubernetes.io/affinity: 'cookie'
     nginx.ingress.kubernetes.io/session-cookie-name: 'http-cookie'
     nginx.ingress.kubernetes.io/session-cookie-expires: '172800'
