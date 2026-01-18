@@ -239,7 +239,7 @@ create_biota_schema <- function() {
 create_methods_schema <- function() {
   type_array(
     type_object(
-      .description = "Analytical and sampling methods used",
+      .description = "Analytical, extraction, fractioning and sampling methods used. Ensure fractionation protocol is included, even when it's very similar to extraction protocol.",
       protocol_category = type_string(
         description = as.character(glue(
           "Protocol type: {paste(protocol_categories_vocabulary(), collapse = ', ')}"
@@ -253,7 +253,7 @@ create_methods_schema <- function() {
         required = FALSE
       ),
       protocol_comment = type_string(
-        description = "Additional details about the method, including a more specific description of the method (applicance name, reagents, use of SRM, lab spike samples, lab replicates, control recoveries, method blanks, field blanks, or field QC)., ideally transcribed from source without modification.",
+        description = "Additional details about the method, including a more specific description of the method (appliance name, reagents, use of SRM, lab spike samples, lab replicates, control recoveries, method blanks, field blanks, or field QC)., ideally transcribed from source without modification.",
         required = FALSE
       )
     )
