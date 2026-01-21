@@ -2,17 +2,46 @@ name: Build & Push
 on:
   push:
     branches:
-      - 'master'
+      - 'main'
     paths:
-      - '.github/workflows/**'
-      - 'R/**'
-      - 'inst/**'
       - 'app.R'
+      - 'R/**'
+      - 'inst/app/www/md/**'
+      - '.github/**'
+      - 'deployment/base/**'
+      - 'renv.lock'
+      - 'deployment/test/**'
       - 'Dockerfile'
+      - 'dependencies.R'
 env:
   IMAGE_NAME: stopedata
 jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: "Checkout"
+      uses: actions/checkout@v3
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+
+    - name: Install Poetry
+      run: |
+        pip install poetry==1.4.2
+
+    - name: Install dependencies
+      run: poetry install --with dev
+      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
+
+    - name: "Run tests"
+      run: |
+        poetry run pytest
+  
   build:
+    needs:
+      - test
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -38,8 +67,8 @@ jobs:
       uses: "google-github-actions/auth@v1"
       with:
         token_format: access_token
-        workload_identity_provider: "${{ secrets.WORKLOAD_IDENTITY_PROVIDER }}"
-        service_account: "${{ secrets.WORKLOAD_IDENTITY_SA }}"
+        workload_identity_provider: "${{ secrets.POOL }}"
+        service_account: "${{ secrets.SA }}"
 
     - name: Login to Artifact Registry
       uses: "docker/login-action@v2"
