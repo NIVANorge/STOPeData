@@ -14,7 +14,7 @@ on:
       - 'Dockerfile'
       - 'dependencies.R'
 env:
-  IMAGE_NAME: stopedata
+  IMAGE_NAME: stop-e-data
 jobs:
   
   build:
