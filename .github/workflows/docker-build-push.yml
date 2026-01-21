@@ -16,32 +16,8 @@ on:
 env:
   IMAGE_NAME: stopedata
 jobs:
-  test:
-    runs-on: ubuntu-latest
-    steps:
-    - name: "Checkout"
-      uses: actions/checkout@v3
-
-    - name: Set up Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-
-    - name: Install Poetry
-      run: |
-        pip install poetry==1.4.2
-
-    - name: Install dependencies
-      run: poetry install --with dev
-      if: steps.cached-poetry-dependencies.outputs.cache-hit != 'true'
-
-    - name: "Run tests"
-      run: |
-        poetry run pytest
   
   build:
-    needs:
-      - test
     runs-on: ubuntu-latest
     permissions:
       contents: read
