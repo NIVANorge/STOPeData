@@ -60,3 +60,9 @@ jobs:
         push: true
         context: .
         tags: ${{ steps.meta.outputs.tags }}
+
+    - id: image_tag
+      name: Show image tag
+      run: |-
+        echo "Image digest: ${{ steps.docker_push.outputs.digest }}"
+        echo "Image tag: ${{ steps.meta.outputs.tags }}"
