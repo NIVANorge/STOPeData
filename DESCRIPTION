@@ -15,7 +15,7 @@ Imports:
     bslib,
     config,
     dplyr,
-    eDataDRF,
+    eDataDRF (>= 0.0.0.9000),
     ellmer,
     ggplot2,
     glue,
@@ -58,3 +58,5 @@ Suggests:
 Config/testthat/edition: 3
 URL: https://github.com/sawelch-NIVA/STOPeData
 BugReports: https://github.com/sawelch-NIVA/STOPeData/issues
+Remotes:  
+    sawelch-NIVA/eDataDRF
