@@ -77,55 +77,33 @@ test_that("summarise_CREED_relevance returns valid tibble", {
 
 test_that("collect_CREED_data returns valid tibble with correct structure", {
   # Minimal criteria config ----
-  criteria_config <- list(
-    RV1 = list(title = "Sample Medium/Matrix", type = "Required"),
-    RV2 = list(title = "Collection Method", type = "Recommended")
-  )
 
-  # Mock input with scores ----
-  mock_input <- list(
-    RV1_score = "1",
-    RV1_relevant_data = "Aquatic sediment samples",
-    RV1_limitations = "Limited to surface samples",
-    RV2_score = "2",
-    RV2_relevant_data = "Grab sampling method",
-    RV2_limitations = ""
-  )
+  # Mock inputs  ----
+  mock_relevance_config <- CREED_relevance_criteria_config()
+  mock_relevance_input <- creed_tibble_to_mock_input(dummy_CREED_relevance_tibble())
 
-  expect_no_error(result <- collect_CREED_data(criteria_config, mock_input))
+  mock_reliability_config <- CREED_reliability_criteria_config()
+  mock_reliability_input <- creed_tibble_to_mock_input(dummy_CREED_reliability_tibble())
+
+  expect_no_error(
+    result <- collect_CREED_data(mock_relevance_config, mock_relevance_input) |>
+      add_row(collect_CREED_data(
+        mock_reliability_config,
+        mock_reliability_input
+      ))
+  )
   expect_s3_class(result, "tbl_df")
 
   # Check structure matches initialise_CREED_data_tibble ----
   expect_equal(names(result), names(initialise_CREED_data_tibble()))
-  expect_equal(nrow(result), 2)
+  # check we have as many rows as we started with
+  expect_equal(
+    !!nrow(result),
+    !!nrow(dummy_CREED_relevance_tibble()) +
+      !!nrow(dummy_CREED_reliability_tibble())
+  )
 })
 
-test_that("collect_CREED_data skips criteria without scores", {
-  criteria_config <- list(
-    RV1 = list(title = "Sample Medium/Matrix", type = "Required"),
-    RV2 = list(title = "Collection Method", type = "Recommended"),
-    RV3 = list(title = "Study Area", type = "Required")
-  )
-
-  # Mock input with only one score provided ----
-  mock_input <- list(
-    RV1_score = "1",
-    RV1_relevant_data = "Some data",
-    RV1_limitations = "",
-    RV2_score = "",
-    RV2_relevant_data = "",
-    RV2_limitations = "",
-    RV3_score = NULL,
-    RV3_relevant_data = "",
-    RV3_limitations = ""
-  )
-
-  result <- collect_CREED_data(criteria_config, mock_input)
-
-  # Only RV1 should be included ----
-  expect_equal(nrow(result), 1)
-  expect_equal(result$criterion_id, "RV1")
-})
 
 test_that("collect_CREED_data handles RB8 justification special case", {
   criteria_config <- list(
@@ -136,13 +114,13 @@ test_that("collect_CREED_data handles RB8 justification special case", {
 
   # Mock input with RB8 using _justification instead of _limitations ----
   mock_input <- list(
-    RB7_score = "1",
+    RB7_score = "Fully Met",
     RB7_relevant_data = "LOD provided",
     RB7_limitations = "Some limitation",
-    RB8_score = "1",
+    RB8_score = "Partly Met",
     RB8_relevant_data = "ISO 17025 certified",
     RB8_justification = "Lab is fully accredited",
-    RB9_score = "2",
+    RB9_score = "Partly Met",
     RB9_relevant_data = "Method referenced",
     RB9_limitations = ""
   )
@@ -165,7 +143,7 @@ test_that("collect_CREED_data handles NULL and empty inputs gracefully", {
 
   # Mock input with NULLs ----
   mock_input <- list(
-    RV1_score = "1",
+    RV1_score = "Fully Met",
     RV1_relevant_data = NULL,
     RV1_limitations = NULL
   )

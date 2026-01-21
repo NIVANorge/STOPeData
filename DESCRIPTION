@@ -1,6 +1,6 @@
 Package: STOPeData
 Title: eData - A data entry, formatting, and review tool for exposure data
-Version: 0.0.0.9006
+Version: 0.0.0.9008
 Authors@R: 
     person("Sam A.", "Welch", , "saw@niva.no", role = c("aut", "cre"))
 Description: A Shiny app to import environmental monitoring data from papers or other data sources, formatting with the eData format and validating. Review data, export, and check data quality against the CREED criteria.

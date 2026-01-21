@@ -402,7 +402,6 @@ dummy_measurements_tibble <- function() {
 # =========================================================================
 # SESSION DATA CREATION
 # =========================================================================
-
 #' Create Dummy Session Data
 #'
 #' @description Creates a complete userData-like list structure populated with
@@ -428,6 +427,11 @@ create_dummy_session_data <- function() {
   userData$biotaData <- dummy_biota_tibble()
   userData$measurementsData <- dummy_measurements_tibble()
 
+  # Populate CREED data ----
+  userData$creedReliability <- dummy_CREED_reliability_tibble()
+  userData$creedRelevance <- dummy_CREED_relevance_tibble()
+  userData$creedScores <- dummy_CREED_scores_tibble()
+
   # Set validity flags to TRUE since we have data ----
   userData$campaignDataValid <- TRUE
   userData$referenceDataValid <- TRUE
@@ -438,10 +442,11 @@ create_dummy_session_data <- function() {
   userData$samplesDataValid <- TRUE
   userData$biotaDataValid <- TRUE
   userData$measurementsDataValid <- TRUE
+  userData$creedReliabilityValid <- TRUE
+  userData$creedRelevanceValid <- TRUE
 
   userData
 }
-
 
 # =========================================================================
 # LEGACY FUNCTIONS (kept for backwards compatibility)
@@ -553,6 +558,357 @@ create_dummy_data <- function(uppercase_columns = FALSE) {
   return(dummy_data)
 }
 
+#' Create Dummy CREED Reliability Tibble
+#'
+#' @description Creates a 19-row CREED reliability tibble (RB1-RB19) with
+#' realistic test data including scores, extracted data, and limitations.
+#' Inherits column structure from initialise_CREED_data_tibble().
+#'
+#' @return A tibble with 19 rows of dummy CREED reliability data
+#' @importFrom tibble add_row
+#' @export
+dummy_CREED_reliability_tibble <- function() {
+  initialise_CREED_data_tibble() |>
+    # Convert score to integer to match collect_CREED_data behaviour
+    mutate(score = integer(0)) |>
+
+    # RB1: Sample Medium/Matrix ----
+    add_row(
+      criterion_id = "RB1",
+      criterion_title = "Sample Medium/Matrix",
+      required_recommended = "Required",
+      relevant_data = "1 compartment: Aquatic Sediment\n2 samples. Grain size: <63um sieved fraction.",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB2: Collection Method/Sample Type ----
+    add_row(
+      criterion_id = "RB2",
+      criterion_title = "Collection Method/Sample Type",
+      required_recommended = "Recommended",
+      relevant_data = "1 protocol:\nSampling Protocol - Grab: (Surface sediments collected using Van Veen grab sampler)",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB3: Sample Handling ----
+    add_row(
+      criterion_id = "RB3",
+      criterion_title = "Sample Handling",
+      required_recommended = "Recommended",
+      relevant_data = "Samples stored frozen at -20°C until analysis. Dried at 60°C before digestion.",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB4: Site Location ----
+    add_row(
+      criterion_id = "RB4",
+      criterion_title = "Site Location",
+      required_recommended = "Required",
+      relevant_data = "2 sites. Countries (1): Norway. Areas (1): Oslofjord. Lowest coordinate precision: 4",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB5: Date and Time ----
+    add_row(
+      criterion_id = "RB5",
+      criterion_title = "Date and Time",
+      required_recommended = "Required",
+      relevant_data = "2023-03-15 to 2023-04-20 (n=2)",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB6: Analyte(s) Measured ----
+    add_row(
+      criterion_id = "RB6",
+      criterion_title = "Analyte(s) Measured",
+      required_recommended = "Required",
+      relevant_data = "1 protocol:\nAnalytical Protocol - ICP-MS: (Inductively coupled plasma mass spectrometry)",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB7: LOD/LOQ ----
+    add_row(
+      criterion_id = "RB7",
+      criterion_title = "Limit of Detection and/or Limit of Quantification",
+      required_recommended = "Required",
+      relevant_data = "LOD: 0.1-0.3 mg/kg; LOQ: 0.5-1.0 mg/kg",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB8: Accreditation/QMS ----
+    add_row(
+      criterion_id = "RB8",
+      criterion_title = "Accreditation/Quality Management System",
+      required_recommended = "Required",
+      relevant_data = "Relevant data not collected by app. Please complete manually.",
+      score = 4L,
+      limitations = "Justification: Laboratory accreditation status not reported in source."
+    ) |>
+
+    # RB9: Method ----
+    add_row(
+      criterion_id = "RB9",
+      criterion_title = "Method",
+      required_recommended = "Required",
+      relevant_data = "4 protocols:\nSampling Protocol - Grab\nExtraction Protocol - Acid digestion: (HNO3/HCl microwave-assisted)\nFractionation Protocol - Total\nAnalytical Protocol - ICP-MS",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB10: Lab Blank Contamination ----
+    add_row(
+      criterion_id = "RB10",
+      criterion_title = "Lab Blank Contamination",
+      required_recommended = "Recommended",
+      relevant_data = "Method blanks analysed with each batch.",
+      score = 2L,
+      limitations = "Blank values not explicitly reported."
+    ) |>
+
+    # RB11: Recovery/Accuracy ----
+    add_row(
+      criterion_id = "RB11",
+      criterion_title = "Recovery/Accuracy",
+      required_recommended = "Recommended",
+      relevant_data = "CRM MESS-3 analysed. Recovery: 95-102%.",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB12: Reproducibility/Precision ----
+    add_row(
+      criterion_id = "RB12",
+      criterion_title = "Reproducibility/Precision",
+      required_recommended = "Recommended",
+      relevant_data = "Triplicate analyses performed. RSD <10%.",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB13: Field QC ----
+    add_row(
+      criterion_id = "RB13",
+      criterion_title = "Field QC",
+      required_recommended = "Recommended",
+      relevant_data = "1 protocol:\nSampling Protocol - Grab",
+      score = 4L,
+      limitations = "No evidence of field blanks or duplicates."
+    ) |>
+
+    # RB14: Calculations ----
+    add_row(
+      criterion_id = "RB14",
+      criterion_title = "Calculations",
+      required_recommended = "Recommended",
+      relevant_data = "Uncertainty types: Standard Deviation",
+      score = 1L,
+      limitations = "Not relevant - no normalisation applied."
+    ) |>
+
+    # RB15: Significant Figures ----
+    add_row(
+      criterion_id = "RB15",
+      criterion_title = "Significant Figures",
+      required_recommended = "Recommended",
+      relevant_data = "Measured parameter values reported to 3 significant figures",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB16: Outliers ----
+    add_row(
+      criterion_id = "RB16",
+      criterion_title = "Outliers",
+      required_recommended = "Recommended",
+      relevant_data = "Relevant data not collected by app. Please complete manually.",
+      score = 1L,
+      limitations = "No outliers reported or removed."
+    ) |>
+
+    # RB17: Censored Data ----
+    add_row(
+      criterion_id = "RB17",
+      criterion_title = "Censored Data",
+      required_recommended = "Required",
+      relevant_data = "Relevant data not collected by app. Please complete manually.",
+      score = 1L,
+      limitations = "One value reported as <LOQ with LOQ provided."
+    ) |>
+
+    # RB18: Summary Statistics Procedures ----
+    add_row(
+      criterion_id = "RB18",
+      criterion_title = "Summary Statistics Procedures",
+      required_recommended = "Recommended",
+      relevant_data = "Uncertainty types: Standard Deviation",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RB19: Supporting Data Quality ----
+    add_row(
+      criterion_id = "RB19",
+      criterion_title = "Supporting Data Quality",
+      required_recommended = "Recommended",
+      relevant_data = "Relevant data not collected by app. Please complete manually.",
+      score = 1L,
+      limitations = "No supporting parameters required."
+    )
+}
+
+
+#' Create Dummy CREED Relevance Tibble
+#'
+#' @description Creates an 11-row CREED relevance tibble (RV1-RV11) with
+#' realistic test data including scores, extracted data, and limitations.
+#' Inherits column structure from initialise_CREED_data_tibble().
+#'
+#' @return A tibble with 11 rows of dummy CREED relevance data
+#' @importFrom tibble add_row
+#' @export
+dummy_CREED_relevance_tibble <- function() {
+  initialise_CREED_data_tibble() |>
+    # Convert score to integer to match collect_CREED_data behaviour
+    mutate(score = integer(0)) |>
+
+    # RV1: Sample Medium/Matrix ----
+    add_row(
+      criterion_id = "RV1",
+      criterion_title = "Sample Medium/Matrix",
+      required_recommended = "Required",
+      relevant_data = "1 compartment: Aquatic Sediment",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RV2: Collection Method/Sample Type ----
+    add_row(
+      criterion_id = "RV2",
+      criterion_title = "Collection Method/Sample Type",
+      required_recommended = "Recommended",
+      relevant_data = "1 protocol:\nSampling Protocol - Grab: (Surface sediments collected using Van Veen grab sampler)",
+      score = 1L,
+      limitations = "Sampling reported to adequate level of detail."
+    ) |>
+
+    # RV3: Study Area ----
+    add_row(
+      criterion_id = "RV3",
+      criterion_title = "Study Area",
+      required_recommended = "Required",
+      relevant_data = "2 sites. Countries (1): Norway. Areas (1): Oslofjord. Lowest coordinate precision: 4",
+      score = 2L,
+      limitations = "Limited to two sites within single fjord system."
+    ) |>
+
+    # RV4: Site Type ----
+    add_row(
+      criterion_id = "RV4",
+      criterion_title = "Site Type",
+      required_recommended = "Recommended",
+      relevant_data = "2 sites. Distinct features: Types: Coastal, fjord, Subtypes: Sediment",
+      score = 2L,
+      limitations = "Rationale for specific site selection not provided."
+    ) |>
+
+    # RV5: Sampling Timespan ----
+    add_row(
+      criterion_id = "RV5",
+      criterion_title = "Sampling Timespan",
+      required_recommended = "Required",
+      relevant_data = "2023-03-15 to 2023-04-20 (n=2)",
+      score = 1L,
+      limitations = ""
+    ) |>
+
+    # RV6: Sampling Frequency ----
+    add_row(
+      criterion_id = "RV6",
+      criterion_title = "Sampling Frequency",
+      required_recommended = "Required",
+      relevant_data = "2023-03-15 to 2023-04-20 (n=2)",
+      score = 2L,
+      limitations = "Single sampling event per site."
+    ) |>
+
+    # RV7: Temporal Conditions ----
+    add_row(
+      criterion_id = "RV7",
+      criterion_title = "Temporal Conditions",
+      required_recommended = "Recommended",
+      relevant_data = "Relevant data not collected by app. Please complete manually.",
+      score = 4L,
+      limitations = "Season, weather conditions not reported."
+    ) |>
+
+    # RV8: Analyte ----
+    add_row(
+      criterion_id = "RV8",
+      criterion_title = "Analyte",
+      required_recommended = "Required",
+      relevant_data = "1 protocol:\nFractionation Protocol - Total",
+      score = 1L,
+      limitations = "Total metal concentration appropriate for purpose."
+    ) |>
+
+    # RV9: Sensitivity/LOD/LOQ ----
+    add_row(
+      criterion_id = "RV9",
+      criterion_title = "Sensitivity/LOD/LOQ",
+      required_recommended = "Required",
+      relevant_data = "1 protocol:\nAnalytical Protocol - ICP-MS: (Inductively coupled plasma mass spectrometry)",
+      score = 1L,
+      limitations = "ICP-MS provides adequate sensitivity for environmental assessment."
+    ) |>
+
+    # RV10: Summary Statistics Type ----
+    add_row(
+      criterion_id = "RV10",
+      criterion_title = "Summary Statistics Type",
+      required_recommended = "Recommended",
+      relevant_data = "Uncertainty types: Standard Deviation",
+      score = 2L,
+      limitations = "Mean +/- SD reported."
+    ) |>
+
+    # RV11: Supporting Parameters ----
+    add_row(
+      criterion_id = "RV11",
+      criterion_title = "Supporting Parameters",
+      required_recommended = "Recommended",
+      relevant_data = "1 protocol:\nFractionation Protocol - Total",
+      score = 1L,
+      limitations = "Total metals appropriate; no additional supporting parameters required."
+    )
+}
+
+
+#' Create Dummy CREED Scores Tibble
+#'
+#' @description Creates a 1-row CREED scores summary tibble with test data.
+#' Inherits column structure from initialise_CREED_scores_tibble().
+#'
+#' @return A tibble with 1 row of dummy CREED scores data
+#' @importFrom tibble add_row
+#' @export
+dummy_CREED_scores_tibble <- function() {
+  initialise_CREED_scores_tibble() |>
+    add_row(
+      REFERENCE_ID = "REF-001",
+      SILVER_RELIABILITY = "Usable with restrictions",
+      SILVER_RELEVANCE = "Usable with restrictions",
+      GOLD_RELIABILITY = "Usable with restrictions",
+      GOLD_RELEVANCE = "Usable with restrictions"
+    )
+}
+
 #' Populate session data directly with dummy data
 #'
 #' @description Stores dummy data directly into session reactiveValues.
@@ -635,4 +991,67 @@ populate_session_with_dummy_data <- function(
   }
 
   print_dev("Dummy data population complete")
+}
+
+
+#' Convert CREED Tibble to Mock Input List
+#'
+#' @description Converts a CREED data tibble (from dummy_CREED_reliability_tibble()
+#' or dummy_CREED_relevance_tibble()) into a mock shiny input list object suitable for testing
+#' collect_CREED_data().
+#'
+#' @param creed_tibble A tibble with columns: criterion_id, relevant_data, score, limitations
+#'
+#' @return A named list shaped like a shiny input reactiveValues with {criterion_id}_score,
+#' {criterion_id}_relevant_data, and {criterion_id}_limitations (or _justification for RB8)
+#'
+#' @details
+#' Score values are converted from numeric to text:
+#' - 1 = "Fully Met" (or "Not Relevant")
+#' - 2 = "Partly Met"
+#' - 3 = "Not Reported"
+#' - 4 = "Not Met"
+#'
+#' RB8 uses _justification instead of _limitations per CREED module convention.
+#'
+#' @examples
+#' mock_input <- creed_tibble_to_mock_input(dummy_CREED_relevance_tibble())
+#' result <- collect_CREED_data(relevance_criteria_config, mock_input)
+#'
+#' @export
+creed_tibble_to_mock_input <- function(creed_tibble) {
+  # Score numeric -> text lookup (inverse of CREED_choices_vocabulary) ----
+  score_labels <- c(
+    "1" = "Fully Met",
+    "2" = "Partly Met",
+    "3" = "Not Reported",
+    "4" = "Not Met"
+  )
+
+  # Build mock input list ----
+  mock_input <- list()
+
+  for (i in seq_len(nrow(creed_tibble))) {
+    row <- creed_tibble[i, ]
+    criterion_id <- row$criterion_id
+
+    # Convert numeric score to text label ----
+    score_text <- score_labels[as.character(row$score)]
+
+    # Add score and relevant_data ----
+    mock_input[[paste0(criterion_id, "_score")]] <- score_text
+    mock_input[[paste0(criterion_id, "_relevant_data")]] <- row$relevant_data
+
+    # RB8 uses _justification; all others use _limitations ----
+    if (criterion_id == "RB8") {
+      # Strip "Justification: " prefix if present (it gets added back by collect_CREED_data)
+      justification <- row$limitations
+      justification <- sub("^Justification: ", "", justification)
+      mock_input[[paste0(criterion_id, "_justification")]] <- justification
+    } else {
+      mock_input[[paste0(criterion_id, "_limitations")]] <- row$limitations
+    }
+  }
+
+  mock_input
 }

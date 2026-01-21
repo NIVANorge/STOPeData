@@ -48,7 +48,7 @@ mod_CREED_relevance_ui <- function(id) {
           selectInput(
             inputId = ns("RV1_score"),
             label = "Score:",
-            choices = CREED_choices_vocabulary(),
+            choices = names(CREED_choices_vocabulary()),
             width = "150px"
           )
         )
@@ -90,7 +90,7 @@ mod_CREED_relevance_ui <- function(id) {
           selectInput(
             inputId = ns("RV2_score"),
             label = "Score:",
-            choices = CREED_choices_vocabulary(),
+            choices = names(CREED_choices_vocabulary()),
             width = "150px"
           )
         )
@@ -134,7 +134,7 @@ mod_CREED_relevance_ui <- function(id) {
           selectInput(
             inputId = ns("RV3_score"),
             label = "Score:",
-            choices = CREED_choices_vocabulary(),
+            choices = names(CREED_choices_vocabulary()),
             width = "150px"
           )
         )
@@ -176,7 +176,7 @@ mod_CREED_relevance_ui <- function(id) {
           selectInput(
             inputId = ns("RV4_score"),
             label = "Score:",
-            choices = CREED_choices_vocabulary(),
+            choices = names(CREED_choices_vocabulary()),
             width = "150px"
           )
         )
@@ -220,7 +220,7 @@ mod_CREED_relevance_ui <- function(id) {
           selectInput(
             inputId = ns("RV5_score"),
             label = "Score:",
-            choices = CREED_choices_vocabulary(),
+            choices = names(CREED_choices_vocabulary()),
             width = "150px"
           )
         )
@@ -262,7 +262,7 @@ mod_CREED_relevance_ui <- function(id) {
           selectInput(
             inputId = ns("RV6_score"),
             label = "Score:",
-            choices = CREED_choices_vocabulary(),
+            choices = names(CREED_choices_vocabulary()),
             width = "150px"
           )
         )
@@ -304,7 +304,7 @@ mod_CREED_relevance_ui <- function(id) {
           selectInput(
             inputId = ns("RV7_score"),
             label = "Score:",
-            choices = CREED_choices_vocabulary(),
+            choices = names(CREED_choices_vocabulary()),
             width = "150px"
           )
         )
@@ -348,7 +348,7 @@ mod_CREED_relevance_ui <- function(id) {
           selectInput(
             inputId = ns("RV8_score"),
             label = "Score:",
-            choices = CREED_choices_vocabulary(),
+            choices = names(CREED_choices_vocabulary()),
             width = "150px"
           )
         )
@@ -390,7 +390,7 @@ mod_CREED_relevance_ui <- function(id) {
           selectInput(
             inputId = ns("RV9_score"),
             label = "Score:",
-            choices = CREED_choices_vocabulary(),
+            choices = names(CREED_choices_vocabulary()),
             width = "150px"
           )
         )
@@ -434,7 +434,7 @@ mod_CREED_relevance_ui <- function(id) {
           selectInput(
             inputId = ns("RV10_score"),
             label = "Score:",
-            choices = CREED_choices_vocabulary(),
+            choices = names(CREED_choices_vocabulary()),
             width = "150px"
           )
         )
@@ -478,7 +478,7 @@ mod_CREED_relevance_ui <- function(id) {
           selectInput(
             inputId = ns("RV11_score"),
             label = "Score:",
-            choices = CREED_choices_vocabulary(),
+            choices = names(CREED_choices_vocabulary()),
             width = "150px"
           )
         )
@@ -589,27 +589,10 @@ mod_CREED_relevance_server <- function(id) {
     # upstream: input$calc_scores, session$userData$reactiveValues$creedCalculateScores
     # downstream: session$userData$reactiveValues$creedRelevance
     observe({
-      # Define relevance criteria configuration ----
-      criteria_config <- list(
-        RV1 = list(title = "Sample Medium/Matrix", type = "Required"),
-        RV2 = list(
-          title = "Collection Method/Sample Type",
-          type = "Recommended"
-        ),
-        RV3 = list(title = "Study Area", type = "Required"),
-        RV4 = list(title = "Site Type", type = "Recommended"),
-        RV5 = list(title = "Sampling Timespan", type = "Required"),
-        RV6 = list(title = "Sampling Frequency", type = "Required"),
-        RV7 = list(title = "Temporal Conditions", type = "Recommended"),
-        RV8 = list(title = "Analyte", type = "Required"),
-        RV9 = list(title = "Sensitivity/LOD/LOQ", type = "Required"),
-        RV10 = list(title = "Summary Statistics Type", type = "Recommended"),
-        RV11 = list(title = "Supporting Parameters", type = "Recommended")
-      )
-
       # Collect and store data ----
       session$userData$reactiveValues$creedRelevance <- collect_CREED_data(
-        criteria_config = criteria_config,
+        # defined in mod_CREED_fct_helpers.R
+        criteria_config = CREED_relevance_criteria_config(),
         input = input
       )
     }) |>

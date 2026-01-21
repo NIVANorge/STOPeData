@@ -66,6 +66,11 @@ This app is part of the [Source to Outcome Pathway/Risk assessment database](htt
 
 [![R](https://img.shields.io/badge/R-%23276DC3.svg?logo=r&logoColor=white)](#)
 
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/NIVANorge/STOPeData/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NIVANorge/STOPeData/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 

@@ -344,7 +344,7 @@ create_criterion_section <- function(
         selectInput(
           inputId = ns(paste0(criterion_id, "_score")),
           label = "Score:",
-          choices = CREED_choices_vocabulary(),
+          choices = names(CREED_choices_vocabulary()),
           width = "150px",
         )
       )
@@ -518,6 +518,7 @@ create_conditional_criterion <- function(
 # Data Helpers/Storage Functions ----
 
 #' @importFrom yaml read_yaml
+#' @export
 copper_CREED_purpose_statement <- function() {
   read_yaml(system.file(
     "app/www/md/",
@@ -931,14 +932,16 @@ autopop_relevance_fields <- function(sessionData) {
 #' @export
 collect_CREED_data <- function(criteria_config, input) {
   # Start from standardised empty structure
-  data <- initialise_CREED_data_tibble()
+  data <- initialise_CREED_data_tibble() |> mutate(score = integer(0)) # needed because we've switched to storing score as a number
 
   # Loop through all criteria ----
   for (criterion_id in names(criteria_config)) {
-    golem::print_dev(criterion_id)
+    # golem::print_dev(criterion_id)
 
     # Get input values ----
     score_input <- input[[paste0(criterion_id, "_score")]]
+    # get the score as a text string (e.g. "Not Met", then match it against the named vector to get its numeric score)
+    score_numeric <- CREED_choices_vocabulary()[[score_input]]
     relevant_data_input <- input[[paste0(criterion_id, "_relevant_data")]]
 
     # Handle RB8 justification special case ----
@@ -952,18 +955,123 @@ collect_CREED_data <- function(criteria_config, input) {
     }
 
     # Only add row if score is provided ----
-    if (isTruthy(score_input) && score_input != "") {
+    if (isTruthy(score_numeric) && score_numeric != "") {
       data <- data |>
         add_row(
           criterion_id = criterion_id,
           criterion_title = criteria_config[[criterion_id]]$title,
           required_recommended = criteria_config[[criterion_id]]$type,
           relevant_data = relevant_data_input %||% "",
-          score = score_input,
+          score = score_numeric,
           limitations = limitations_input %||% ""
         )
     }
   }
 
   data
+}
+
+#' CREED Reliability Criteria Configuration
+#'
+#' @description Returns the configuration list for all 19 CREED reliability
+#' criteria (RB1-RB19). Each criterion includes its title and whether it is
+#' Required or Recommended.
+#'
+#' @return A named list where each element is a criterion configuration with:
+#'   \describe{
+#'     \item{title}{Character. Human-readable criterion title.}
+#'     \item{type}{Character. Either "Required" or "Recommended".}
+#'   }
+#'
+#' @details
+#' Reliability criteria assess the methodological quality of the data:
+#' - RB1-RB3: Media (sample medium, collection method, handling)
+#' - RB4: Spatial (site location)
+#' - RB5: Temporal (date and time)
+#' - RB6-RB13: Analytical (analytes, LOD/LOQ, QA/QC, methods)
+#' - RB14-RB18: Data handling (calculations, significant figures, outliers, censored data)
+#' - RB19: Supporting parameters
+#'
+#' RB8 (Accreditation/QMS) is a shortcut criterion: if fully met, RB9-RB12 may be skipped.
+#'
+#' @examples
+#' config <- CREED_reliability_criteria_config()
+#' config$RB1$title
+#' # [1] "Sample Medium/Matrix"
+#'
+#' @seealso [CREED_relevance_criteria_config()], [collect_CREED_data()]
+#' @export
+CREED_reliability_criteria_config <- function() {
+  list(
+    RB1 = list(title = "Sample Medium/Matrix", type = "Required"),
+    RB2 = list(title = "Collection Method/Sample Type", type = "Recommended"),
+    RB3 = list(title = "Sample Handling", type = "Recommended"),
+    RB4 = list(title = "Site Location", type = "Required"),
+    RB5 = list(title = "Date and Time", type = "Required"),
+    RB6 = list(title = "Analyte(s) Measured", type = "Required"),
+    RB7 = list(
+      title = "Limit of Detection and/or Limit of Quantification",
+      type = "Required"
+    ),
+    RB8 = list(
+      title = "Accreditation/Quality Management System",
+      type = "Required"
+    ),
+    RB9 = list(title = "Method", type = "Required"),
+    RB10 = list(title = "Lab Blank Contamination", type = "Recommended"),
+    RB11 = list(title = "Recovery/Accuracy", type = "Recommended"),
+    RB12 = list(title = "Reproducibility/Precision", type = "Recommended"),
+    RB13 = list(title = "Field QC", type = "Recommended"),
+    RB14 = list(title = "Calculations", type = "Recommended"),
+    RB15 = list(title = "Significant Figures", type = "Recommended"),
+    RB16 = list(title = "Outliers", type = "Recommended"),
+    RB17 = list(title = "Censored Data", type = "Required"),
+    RB18 = list(title = "Summary Statistics Procedures", type = "Recommended"),
+    RB19 = list(title = "Supporting Data Quality", type = "Recommended")
+  )
+}
+
+
+#' CREED Relevance Criteria Configuration
+#'
+#' @description Returns the configuration list for all 11 CREED relevance
+#' criteria (RV1-RV11). Each criterion includes its title and whether it is
+#' Required or Recommended.
+#'
+#' @return A named list where each element is a criterion configuration with:
+#'   \describe{
+#'     \item{title}{Character. Human-readable criterion title.}
+#'     \item{type}{Character. Either "Required" or "Recommended".}
+#'   }
+#'
+#' @details
+#' Relevance criteria assess the fitness-for-purpose of the data:
+#' - RV1-RV2: Media (sample medium, collection method)
+#' - RV3-RV4: Spatial (study area, site type)
+#' - RV5-RV7: Temporal (timespan, frequency, conditions)
+#' - RV8-RV9: Analytical (analyte, sensitivity)
+#' - RV10: Data handling (summary statistics)
+#' - RV11: Supporting parameters
+#'
+#' @examples
+#' config <- CREED_relevance_criteria_config()
+#' config$RV3$type
+#' # [1] "Required"
+#'
+#' @seealso [CREED_reliability_criteria_config()], [collect_CREED_data()]
+#' @export
+CREED_relevance_criteria_config <- function() {
+  list(
+    RV1 = list(title = "Sample Medium/Matrix", type = "Required"),
+    RV2 = list(title = "Collection Method/Sample Type", type = "Recommended"),
+    RV3 = list(title = "Study Area", type = "Required"),
+    RV4 = list(title = "Site Type", type = "Recommended"),
+    RV5 = list(title = "Sampling Timespan", type = "Required"),
+    RV6 = list(title = "Sampling Frequency", type = "Required"),
+    RV7 = list(title = "Temporal Conditions", type = "Recommended"),
+    RV8 = list(title = "Analyte", type = "Required"),
+    RV9 = list(title = "Sensitivity/LOD/LOQ", type = "Required"),
+    RV10 = list(title = "Summary Statistics Type", type = "Recommended"),
+    RV11 = list(title = "Supporting Parameters", type = "Recommended")
+  )
 }

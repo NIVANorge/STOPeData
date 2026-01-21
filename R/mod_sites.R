@@ -151,7 +151,7 @@ mod_sites_ui <- function(id) {
                 min = 1,
                 max = 8,
                 step = 1,
-                width = "80px",
+                width = "80px"
               ) |>
                 tagAppendAttributes(class = 'form-control-sm'),
               "Set the precision of clicked coordinates. 0 d.p. = 111 km, 1 d.p. = 11.1 km, etc.  "
@@ -224,7 +224,6 @@ mod_sites_server <- function(id) {
     ## InputValidator for table-level validation ----
     iv <- InputValidator$new()
     iv$add_rule("sites_table_validation", function(value) {
-      # CHANGED: Reference userData instead of moduleState
       if (nrow(session$userData$reactiveValues$sitesData) == 0) {
         "At least one site must be added"
       } else {
@@ -242,7 +241,6 @@ mod_sites_server <- function(id) {
           "ENTERED_DATE"
         )
 
-        # CHANGED: Reference userData instead of moduleState
         for (i in 1:nrow(session$userData$reactiveValues$sitesData)) {
           for (field in required_fields) {
             value <- session$userData$reactiveValues$sitesData[i, field]
@@ -321,7 +319,6 @@ mod_sites_server <- function(id) {
       # Combine into single data frame
       new_sites <- do.call(rbind, new_sites_list)
 
-      # CHANGED: Add to userData instead of moduleState
       session$userData$reactiveValues$sitesData <- add_row(
         session$userData$reactiveValues$sitesData,
         new_sites
@@ -347,7 +344,6 @@ mod_sites_server <- function(id) {
     # downstream: session$userData$reactiveValues$sitesData
     observe({
       if (!is.null(input$sites_table)) {
-        # CHANGED: Update userData directly from the table
         session$userData$reactiveValues$sitesData <- hot_to_r(input$sites_table)
       }
     }) |>
@@ -406,7 +402,6 @@ mod_sites_server <- function(id) {
       new_site$LATITUDE <- moduleState$clicked_coords$lat
       new_site$LONGITUDE <- moduleState$clicked_coords$lng
 
-      # CHANGED: Add to userData instead of moduleState
       session$userData$reactiveValues$sitesData <- rbind(
         session$userData$reactiveValues$sitesData,
         new_site
@@ -443,7 +438,6 @@ mod_sites_server <- function(id) {
       req(moduleState$selected_rows)
       req(nrow(session$userData$reactiveValues$sitesData) > 0)
 
-      # CHANGED: Update coordinates in userData
       for (row_idx in moduleState$selected_rows) {
         if (row_idx <= nrow(session$userData$reactiveValues$sitesData)) {
           session$userData$reactiveValues$sitesData[
@@ -507,7 +501,6 @@ mod_sites_server <- function(id) {
       # Trigger validation check
       validation_result <- iv$is_valid()
 
-      # CHANGED: Update validation status in userData
       if (
         validation_result && nrow(session$userData$reactiveValues$sitesData) > 0
       ) {
@@ -528,7 +521,6 @@ mod_sites_server <- function(id) {
           nrow(llm_sites) > 0 &&
           session$userData$reactiveValues$llmExtractionComplete
       ) {
-        # CHANGED: Replace userData with LLM data
         session$userData$reactiveValues$sitesData <- llm_sites
 
         # Update next_site_id counter
@@ -558,7 +550,6 @@ mod_sites_server <- function(id) {
     # upstream: session$userData$reactiveValues$sitesData
     # downstream: UI table display
     output$sites_table <- renderRHandsontable({
-      # CHANGED: Reference userData instead of moduleState
       rhandsontable(
         session$userData$reactiveValues$sitesData,
         stretchH = "all",
@@ -735,7 +726,6 @@ mod_sites_server <- function(id) {
         addTiles() |>
         mapOptions(zoomToLimits = "always") # don't adjust zoom level when we add a point
 
-      # CHANGED: Reference userData instead of moduleState
       # Add markers for sites with valid coordinates
       if (nrow(session$userData$reactiveValues$sitesData) > 0) {
         # Convert to numeric, handling potential character values
@@ -837,7 +827,6 @@ mod_sites_server <- function(id) {
         NULL
       }
 
-      # CHANGED: Reference userData validation status instead of moduleState
       validation_status <- if (session$userData$reactiveValues$sitesDataValid) {
         div(
           bs_icon("clipboard2-check"),
@@ -863,7 +852,6 @@ mod_sites_server <- function(id) {
     # upstream: session$userData$reactiveValues$sitesData (when valid)
     # downstream: UI data display
     output$validated_data_display <- renderText({
-      # CHANGED: Show data only when valid, reference userData
       if (
         session$userData$reactiveValues$sitesDataValid &&
           nrow(session$userData$reactiveValues$sitesData) > 0

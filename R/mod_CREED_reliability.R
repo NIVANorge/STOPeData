@@ -109,7 +109,7 @@ mod_CREED_reliability_ui <- function(id) {
         selectInput(
           inputId = ns("RB8_score"),
           label = "Score:",
-          choices = CREED_choices_vocabulary(),
+          choices = names(CREED_choices_vocabulary()),
           width = "150px"
         )
       ),
@@ -354,44 +354,10 @@ mod_CREED_reliability_server <- function(id) {
     # upstream: input$calc_scores, session$userData$reactiveValues$creedCalculateScores
     # downstream: session$userData$reactiveValues$creedReliability
     observe({
-      # Define reliability criteria configuration ----
-      criteria_config <- list(
-        RB1 = list(title = "Sample Medium/Matrix", type = "Required"),
-        RB2 = list(
-          title = "Collection Method/Sample Type",
-          type = "Recommended"
-        ),
-        RB3 = list(title = "Sample Handling", type = "Recommended"),
-        RB4 = list(title = "Site Location", type = "Required"),
-        RB5 = list(title = "Date and Time", type = "Required"),
-        RB6 = list(title = "Analyte(s) Measured", type = "Required"),
-        RB7 = list(
-          title = "Limit of Detection and/or Limit of Quantification",
-          type = "Required"
-        ),
-        RB8 = list(
-          title = "Accreditation/Quality Management System",
-          type = "Required"
-        ),
-        RB9 = list(title = "Method", type = "Required"),
-        RB10 = list(title = "Lab Blank Contamination", type = "Recommended"),
-        RB11 = list(title = "Recovery/Accuracy", type = "Recommended"),
-        RB12 = list(title = "Reproducibility/Precision", type = "Recommended"),
-        RB13 = list(title = "Field QC", type = "Recommended"),
-        RB14 = list(title = "Calculations", type = "Recommended"),
-        RB15 = list(title = "Significant Figures", type = "Recommended"),
-        RB16 = list(title = "Outliers", type = "Recommended"),
-        RB17 = list(title = "Censored Data", type = "Required"),
-        RB18 = list(
-          title = "Summary Statistics Procedures",
-          type = "Recommended"
-        ),
-        RB19 = list(title = "Supporting Data Quality", type = "Recommended")
-      )
-
       # Collect and store data ----
       session$userData$reactiveValues$creedReliability <- collect_CREED_data(
-        criteria_config = criteria_config,
+        # defined in mod_CREED_fct_helpers.R
+        criteria_config = CREED_reliability_criteria_config(),
         input = input
       )
     }) |>
