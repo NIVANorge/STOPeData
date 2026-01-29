@@ -225,3 +225,11 @@ CREED-Specific Formatting
     opacity: 0.6;
     pointer-events: none;
 }
+
+/* ===================
+    Navbar
+   =================== */
+
+/* Curiously, bslib support for putting a logo in the navbar is awful. */
+
+.navbar-brand {display: flex;}

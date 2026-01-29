@@ -32,7 +32,15 @@ app_ui <- function(request) {
     golem_add_external_resources(),
     # Your application UI logic
     page_navbar(
-      title = paste0("STOP eData (", Sys.getenv("EDATA_BUILD"), ")"),
+      title = div(
+        style = "display: flex; align-items: center;",
+        tags$img(
+          style = "width: 70px; height: 70px; margin: 0 3px 0 1px;",
+          src = "www/eData_DRF_logo.svg",
+          alt = "eData Logo"
+        ),
+        paste0("(", Sys.getenv("EDATA_BUILD"), ")"),
+      ),
       lang = "en",
       id = "main-page",
       window_title = "eData (demo)",
@@ -176,7 +184,16 @@ app_ui <- function(request) {
           "FAQ and References"
         )
       ),
+      nav_spacer(),
       nav_item(input_dark_mode(id = "darkmode")),
+      nav_item(
+        tags$a(
+          bsicons::bs_icon("github"),
+          href = "https://github.com/NIVANorge/STOPeData",
+          target = "_blank",
+          class = "nav-link"
+        )
+      ),
       nav_spacer(),
       footer = tags$span(
         ## Navigation buttons ----
