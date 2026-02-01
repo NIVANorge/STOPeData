@@ -4,7 +4,7 @@
 <!-- PROJECT LOGO -->
 <br />
 <div align="center">
-  <a href="https://github.com/sawelch-NIVA/STOPeData">
+  <a href="https://github.com/NIVANorge/STOPeData">
     <img src="images/stopsquarecropped.png" alt="Logo" width="80" height="80">
   </a>
 
@@ -14,11 +14,13 @@
     STOPeData is a data entry and formatting Shiny app in the Source to Outcome Pathway/Risk assessment database family, designed to make extracting data on chemical concentrations in the environment from papers and reports easier. 
     <br />
     <br />
-    <a href="https://stop.t.niva.no/eData/">View Test Version</a> (requires NIVA account)
+    <a href="https://edata.test-stop.niva.no">Test Version</a> (requires NIVA account)
     &middot;
-    <a href="https://github.com/sawelch-NIVA/STOPeData/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    <a href="https://edata.stop.niva.no">Prod</a>
     &middot;
-    <a href="https://github.com/sawelch-NIVA/STOPeData/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
+    <a href="https://github.com/NIVANorge/STOPeData/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
+    &middot;
+    <a href="https://github.com/NIVANorge/STOPeData/issues/new?labels=enhancement&template=feature-request---.md">Request Feature</a>
   </p>
 </div>
 
@@ -89,7 +91,7 @@ I haven't tested setting the app up to run locally on systems other than my home
 1. (Optional) Get an [Anthropic API key](https://console.anthropic.com) for LLM data extraction
 2. Clone the repo
    ```sh
-   git clone https://github.com/sawelch-NIVA/STOPeData.git
+   git clone https://github.com/NIVANorge/STOPeData.git
    ```
 3. Install NPM packages
    ```sh
@@ -144,7 +146,7 @@ Assisted assessment of data quality using the CREED framework.
 - [ ] Connection to the Risk Assessment database for lookups and long-term storage
 - [ ] Support for more formats
 
-See the [open issues](https://github.com/sawelch-NIVA/STOPeData/issues) for a full list of proposed features (and known issues).
+See the [open issues](https://github.com/NIVANorge/STOPeData/issues) for a full list of proposed features (and known issues).
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -154,7 +156,7 @@ See the [open issues](https://github.com/sawelch-NIVA/STOPeData/issues) for a fu
 
 Sam Welch - sam.welch@niva.no
 
-Project Link: [https://github.com/NIVANorge/STOPeData](https://github.com/sawelch-NIVA/STOPeData)
+Project Link: [https://github.com/NIVANorge/STOPeData](https://github.com/NIVANorge/STOPeData)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
