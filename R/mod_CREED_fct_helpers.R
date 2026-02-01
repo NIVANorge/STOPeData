@@ -517,6 +517,9 @@ create_conditional_criterion <- function(
 
 # Data Helpers/Storage Functions ----
 
+#' @title Load copper CREED purpose statement
+#' @description Load a pre-written CREED purpose statement for a copper exposure assessment
+#' @return nested list of criteria and thresholds to meet them
 #' @importFrom yaml read_yaml
 #' @export
 copper_CREED_purpose_statement <- function() {

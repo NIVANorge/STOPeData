@@ -2,11 +2,6 @@
 # A Shiny module for reference data entry with conditional validation based on reference type
 
 #' References UI Function ----
-#'
-#' @description A shiny Module for reference data entry and validation with conditional fields.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList textInput dateInput selectInput textAreaInput actionButton numericInput
@@ -17,7 +12,6 @@
 #' @importFrom httr GET content http_error
 #' @importFrom xml2 read_xml xml_find_first xml_text
 #' @import eDataDRF
-#' @export
 mod_references_ui <- function(id) {
   ns <- NS(id)
 
@@ -361,7 +355,6 @@ mod_references_ui <- function(id) {
 #' @importFrom tibble tibble as_tibble
 #' @importFrom dplyr add_row
 #' @import eDataDRF
-#' @export
 mod_references_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

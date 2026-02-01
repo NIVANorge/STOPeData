@@ -1,19 +1,12 @@
 # CREED Gateway Module ----
 # A Shiny module for CREED gateway criteria assessment with auto-population from study data
 
-#' CREED Gateway UI Function ----
-#'
-#' @description A shiny Module for assessing CREED gateway criteria with automatic population from study metadata.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList checkboxInput icon div strong textOutput updateCheckboxInput moduleServer observe renderText
 #' @importFrom bslib input_task_button
 #' @importFrom bsicons bs_icon
 #' @import eDataDRF
-#' @export
 mod_CREED_gateway_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -169,7 +162,6 @@ mod_CREED_gateway_ui <- function(id) {
 #' @noRd
 #' @importFrom shiny moduleServer observe updateCheckboxInput renderText bindEvent
 #' @importFrom tibble as_tibble
-#' @export
 mod_CREED_gateway_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

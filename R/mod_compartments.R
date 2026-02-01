@@ -2,11 +2,6 @@
 # A Shiny module for environmental compartment combinations with form-then-table approach
 
 #' Compartments UI Function ----
-#'
-#' @description A shiny Module for environmental compartment combinations data entry.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList selectInput actionButton
@@ -15,7 +10,6 @@
 #' @importFrom rhandsontable rHandsontableOutput
 #' @importFrom shinyjs useShinyjs
 #' @import eDataDRF
-#' @export
 mod_compartments_ui <- function(id) {
   ns <- NS(id)
 
@@ -126,7 +120,6 @@ mod_compartments_ui <- function(id) {
 #' @importFrom glue glue
 #' @importFrom dplyr add_row
 #' @import eDataDRF
-#' @export
 mod_compartments_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -267,7 +260,7 @@ mod_compartments_server <- function(id) {
 
         showNotification(
           glue(
-            "Added combination: {compartment} → {sub_compartment} → {category}"
+            "Added combination: {compartment} \u2192 {sub_compartment} \u2192 {category}"
           ),
           type = "message"
         )

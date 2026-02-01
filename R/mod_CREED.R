@@ -2,18 +2,12 @@
 # A Shiny module for CREED-based dataset quality assessment
 
 #' CREED UI Function ----
-#'
-#' @description A shiny Module for CREED dataset quality assessment.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList textInput textAreaInput actionButton checkboxInput renderText markdown HTML
 #' @importFrom bslib card card_body layout_column_wrap accordion accordion_panel input_task_button
 #' @importFrom bsicons bs_icon
 #' @importFrom shinyjs disabled disable enable
-#' @export
 mod_CREED_ui <- function(id) {
   ns <- NS(id)
 
@@ -180,8 +174,6 @@ mod_CREED_ui <- function(id) {
 #' @importFrom golem print_dev
 #' @importFrom shinyjs enable disable
 #' @importFrom dplyr add_row
-
-#' @export
 mod_CREED_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

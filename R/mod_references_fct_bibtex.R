@@ -60,18 +60,18 @@ bib_string2df_alt <- function(string, ...) {
 #'
 #' @details
 #' The function maps BibTeX reference types to the four supported reference types:
-#' - article → journal
-#' - book → book
-#' - techreport/report/manual → report
-#' - misc → dataset
+#' - article -> journal
+#' - book -> book
+#' - techreport/report/manual -> report
+#' - misc -> dataset
 #' - Other types (inproceedings, incollection, theses, etc.) are mapped to closest equivalent
 #'
 #' Field mappings follow standard BibTeX conventions:
-#' - JOURNAL/BOOKTITLE → PERIODICAL_JOURNAL
-#' - NUMBER → ISSUE
-#' - ADDRESS → PUBLISHED_PLACE
-#' - SCHOOL → INSTITUTION (for theses)
-#' - EDITOR → SERIES_EDITOR
+#' - JOURNAL/BOOKTITLE -> PERIODICAL_JOURNAL
+#' - NUMBER -> ISSUE
+#' - ADDRESS -> PUBLISHED_PLACE
+#' - SCHOOL -> INSTITUTION (for theses)
+#' - EDITOR -> SERIES_EDITOR
 #'
 #' @examples
 #' \dontrun{
@@ -113,11 +113,11 @@ map_bibtex_to_reference_fields <- function(
     "manual" = "Report",
     "misc" = "Dataset",
     # Default mappings for unmapped types - TODO: extend definition to cover these types
-    "inproceedings" = "Journal", # Conference papers → journal
+    "inproceedings" = "Journal", # Conference papers -> journal
     "conference" = "Journal",
-    "incollection" = "Book", # Book chapters → book
+    "incollection" = "Book", # Book chapters -> book
     "inbook" = "Book",
-    "phdthesis" = "Report", # Theses → report
+    "phdthesis" = "Report", # Theses -> report
     "mastersthesis" = "Report",
     "unpublished" = "Report"
   )
@@ -387,79 +387,73 @@ clean_bibtex_text <- function(text) {
   # Common LaTeX accent command replacements
   latex_replacements <- list(
     # Diaeresis/umlaut
-    '\\{\\\\"a\\}' = 'ä',
-    '\\{\\\\"A\\}' = 'Ä',
-    '\\{\\\\"e\\}' = 'ë',
-    '\\{\\\\"E\\}' = 'Ë',
-    '\\{\\\\"i\\}' = 'ï',
-    '\\{\\\\"I\\}' = 'Ï',
-    '\\{\\\\"o\\}' = 'ö',
-    '\\{\\\\"O\\}' = 'Ö',
-    '\\{\\\\"u\\}' = 'ü',
-    '\\{\\\\"U\\}' = 'Ü',
+    '\\{\\\\"a\\}' = '\u00E4', # ä
+    '\\{\\\\"A\\}' = '\u00C4', # Ä
+    '\\{\\\\"e\\}' = '\u00EB', # ë
+    '\\{\\\\"E\\}' = '\u00CB', # Ë
+    '\\{\\\\"i\\}' = '\u00EF', # ï
+    '\\{\\\\"I\\}' = '\u00CF', # Ï
+    '\\{\\\\"o\\}' = '\u00F6', # ö
+    '\\{\\\\"O\\}' = '\u00D6', # Ö
+    '\\{\\\\"u\\}' = '\u00FC', # ü
+    '\\{\\\\"U\\}' = '\u00DC', # Ü
 
     # Acute accent
-    "\\{\\\\'a\\}" = 'á',
-    "\\{\\\\'A\\}" = 'Á',
-    "\\{\\\\'e\\}" = 'é',
-    "\\{\\\\'E\\}" = 'É',
-    "\\{\\\\'i\\}" = 'í',
-    "\\{\\\\'I\\}" = 'Í',
-    "\\{\\\\'o\\}" = 'ó',
-    "\\{\\\\'O\\}" = 'Ó',
-    "\\{\\\\'u\\}" = 'ú',
-    "\\{\\\\'U\\}" = 'Ú',
+    "\\{\\\\'a\\}" = '\u00E1', # á
+    "\\{\\\\'A\\}" = '\u00C1', # Á
+    "\\{\\\\'e\\}" = '\u00E9', # é
+    "\\{\\\\'E\\}" = '\u00C9', # É
+    "\\{\\\\'i\\}" = '\u00ED', # í
+    "\\{\\\\'I\\}" = '\u00CD', # Í
+    "\\{\\\\'o\\}" = '\u00F3', # ó
+    "\\{\\\\'O\\}" = '\u00D3', # Ó
+    "\\{\\\\'u\\}" = '\u00FA', # ú
+    "\\{\\\\'U\\}" = '\u00DA', # Ú
 
     # Grave accent
-    '\\{\\\\`a\\}' = 'à',
-    '\\{\\\\`A\\}' = 'À',
-    '\\{\\\\`e\\}' = 'è',
-    '\\{\\\\`E\\}' = 'È',
-    '\\{\\\\`i\\}' = 'ì',
-    '\\{\\\\`I\\}' = 'Ì',
-    '\\{\\\\`o\\}' = 'ò',
-    '\\{\\\\`O\\}' = 'Ò',
-    '\\{\\\\`u\\}' = 'ù',
-    '\\{\\\\`U\\}' = 'Ù',
+    '\\{\\\\`a\\}' = '\u00E0', # à
+    '\\{\\\\`A\\}' = '\u00C0', # À
+    '\\{\\\\`e\\}' = '\u00E8', # è
+    '\\{\\\\`E\\}' = '\u00C8', # È
+    '\\{\\\\`i\\}' = '\u00EC', # ì
+    '\\{\\\\`I\\}' = '\u00CC', # Ì
+    '\\{\\\\`o\\}' = '\u00F2', # ò
+    '\\{\\\\`O\\}' = '\u00D2', # Ò
+    '\\{\\\\`u\\}' = '\u00F9', # ù
+    '\\{\\\\`U\\}' = '\u00D9', # Ù
 
     # Circumflex accent
-    '\\{\\\\\\^a\\}' = 'â',
-    '\\{\\\\\\^A\\}' = 'Â',
-    '\\{\\\\\\^e\\}' = 'ê',
-    '\\{\\\\\\^E\\}' = 'Ê',
-    '\\{\\\\\\^i\\}' = 'î',
-    '\\{\\\\\\^I\\}' = 'Î',
-    '\\{\\\\\\^o\\}' = 'ô',
-    '\\{\\\\\\^O\\}' = 'Ô',
-    '\\{\\\\\\^u\\}' = 'û',
-    '\\{\\\\\\^U\\}' = 'Û',
+    '\\{\\\\\\^a\\}' = '\u00E2', # â
+    '\\{\\\\\\^A\\}' = '\u00C2', # Â
+    '\\{\\\\\\^e\\}' = '\u00EA', # ê
+    '\\{\\\\\\^E\\}' = '\u00CA', # Ê
+    '\\{\\\\\\^i\\}' = '\u00EE', # î
+    '\\{\\\\\\^I\\}' = '\u00CE', # Î
+    '\\{\\\\\\^o\\}' = '\u00F4', # ô
+    '\\{\\\\\\^O\\}' = '\u00D4', # Ô
+    '\\{\\\\\\^u\\}' = '\u00FB', # û
+    '\\{\\\\\\^U\\}' = '\u00DB', # Û
 
     # Tilde
-    '\\{\\\\~a\\}' = 'ã',
-    '\\{\\\\~A\\}' = 'Ã',
-    '\\{\\\\~n\\}' = 'ñ',
-    '\\{\\\\~N\\}' = 'Ñ',
-    '\\{\\\\~o\\}' = 'õ',
-    '\\{\\\\~O\\}' = 'Õ',
+    '\\{\\\\~a\\}' = '\u00E3', # ã
+    '\\{\\\\~A\\}' = '\u00C3', # Ã
+    '\\{\\\\~n\\}' = '\u00F1', # ñ
+    '\\{\\\\~N\\}' = '\u00D1', # Ñ
+    '\\{\\\\~o\\}' = '\u00F5', # õ
+    '\\{\\\\~O\\}' = '\u00D5', # Õ
 
     # Cedilla
-    '\\{\\\\c\\{c\\}\\}' = 'ç',
-    '\\{\\\\c\\{C\\}\\}' = 'Ç',
+    '\\{\\\\c\\{c\\}\\}' = '\u00E7', # ç
+    '\\{\\\\c\\{C\\}\\}' = '\u00C7', # Ç
 
     # Special characters
-    '\\{\\\\ss\\}' = 'ß',
-    '\\{\\\\ae\\}' = 'æ',
-    '\\{\\\\AE\\}' = 'Æ',
-    '\\{\\\\o\\}' = 'ø',
-    '\\{\\\\O\\}' = 'Ø',
-    '\\{\\\\aa\\}' = 'å',
-    '\\{\\\\AA\\}' = 'Å',
-    '\\{\\\\ae\\}' = 'æ',
-    '\\{\\\\AE\\}' = 'Æ',
-    '\\{\\\\o\\}' = 'ø',
-    '\\{\\\\O\\}' = 'Ø',
-    '\\{\\\\aa\\}' = 'å',
-    '\\{\\\\AA\\}' = 'Å'
+    '\\{\\\\ss\\}' = '\u00DF', # ß
+    '\\{\\\\ae\\}' = '\u00E6', # æ
+    '\\{\\\\AE\\}' = '\u00C6', # Æ
+    '\\{\\\\o\\}' = '\u00F8', # ø
+    '\\{\\\\O\\}' = '\u00D8', # Ø
+    '\\{\\\\aa\\}' = '\u00E5', # å
+    '\\{\\\\AA\\}' = '\u00C5' # Å
   )
 
   # Apply LaTeX replacements

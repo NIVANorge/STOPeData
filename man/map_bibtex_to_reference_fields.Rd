@@ -23,18 +23,18 @@ mapping between BibTeX conventions and the reference data structure.
 }
 \details{
 The function maps BibTeX reference types to the four supported reference types:
-- article → journal
-- book → book
-- techreport/report/manual → report
-- misc → dataset
+- article -> journal
+- book -> book
+- techreport/report/manual -> report
+- misc -> dataset
 - Other types (inproceedings, incollection, theses, etc.) are mapped to closest equivalent
 
 Field mappings follow standard BibTeX conventions:
-- JOURNAL/BOOKTITLE → PERIODICAL_JOURNAL
-- NUMBER → ISSUE
-- ADDRESS → PUBLISHED_PLACE
-- SCHOOL → INSTITUTION (for theses)
-- EDITOR → SERIES_EDITOR
+- JOURNAL/BOOKTITLE -> PERIODICAL_JOURNAL
+- NUMBER -> ISSUE
+- ADDRESS -> PUBLISHED_PLACE
+- SCHOOL -> INSTITUTION (for theses)
+- EDITOR -> SERIES_EDITOR
 }
 \examples{
 \dontrun{

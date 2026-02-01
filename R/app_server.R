@@ -471,9 +471,9 @@ app_server <- function(input, output, session) {
         ~ {
           dims <- dataset_dimensions[[.x]]
           if (dims$type == "text") {
-            glue("• {.x}: {dims$chars} characters")
+            glue("- {.x}: {dims$chars} characters")
           } else {
-            glue("• {.x}: {dims$rows} rows × {dims$cols} columns")
+            glue("- {.x}: {dims$rows} rows \u00D7 {dims$cols} columns")
           }
         }
       ) |>

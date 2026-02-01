@@ -9,7 +9,6 @@ Depends:
   R (>= 4.1.0)
 Imports: 
     arrow,
-    attempt,
     bib2df,
     bsicons,
     bslib,
@@ -26,10 +25,7 @@ Imports:
     jsonlite,
     leaflet,
     logger,
-    lubridate,
-    markdown,
     openxlsx2,
-    pkgload,
     plotly,
     purrr,
     rcrossref (>= 1.2.0),
@@ -37,7 +33,6 @@ Imports:
     rhandsontable,
     shiny (>= 1.11.1),
     shinyjs,
-    shinytest2,
     shinyvalidate,
     shinyWidgets,
     stringi,

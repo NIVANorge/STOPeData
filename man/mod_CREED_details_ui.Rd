@@ -10,5 +10,5 @@ mod_CREED_details_ui(id)
 \item{id, input, output, session}{Internal parameters for {shiny}.}
 }
 \description{
-A shiny Module.
+CREED_details UI Function
 }

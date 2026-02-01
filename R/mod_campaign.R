@@ -2,11 +2,6 @@
 # A Shiny module for campaign data entry with validation using shinyvalidate
 
 #' Campaign UI Function ----
-#'
-#' @description A shiny Module for campaign data entry and validation.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList textInput dateInput selectInput textAreaInput actionButton
@@ -14,7 +9,6 @@
 #' @importFrom bsicons bs_icon
 #' @importFrom tibble tibble
 #' @import eDataDRF
-#' @export
 mod_campaign_ui <- function(id) {
   ns <- NS(id)
 
@@ -38,7 +32,7 @@ mod_campaign_ui <- function(id) {
               list("Campaign Name", bs_icon("info-circle-fill")),
               "Text string used to identify the sampling campaign or project. Ensure a consistent Campaign string is used."
             ),
-            placeholder = "e.g., 'Vannmiljø Mitigation Monitoring 2025'",
+            placeholder = "e.g., 'Vannmiljo Mitigation Monitoring 2025'",
             width = "100%"
           ),
 
@@ -205,7 +199,6 @@ mod_campaign_ui <- function(id) {
 #' @importFrom glue glue
 #' @importFrom tibble add_row
 #' @import eDataDRF
-#' @export
 mod_campaign_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

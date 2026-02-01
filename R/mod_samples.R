@@ -2,11 +2,6 @@
 # A Shiny module for sample combinations of sites, parameters, and compartments
 
 #' Samples UI Function ----
-#'
-#' @description A shiny Module for sample combinations data entry with selectize inputs.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList dateInput actionButton

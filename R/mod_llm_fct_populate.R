@@ -723,7 +723,6 @@ create_biota_from_llm <- function(llm_biota_data) {
   print_dev(glue("Created {nrow(biota_tibble)} biota entries from LLM data"))
   return(biota_tibble)
 }
-
 #' Validate Species Against Database
 #'
 #' @description Validates species names against database with scientific name priority
@@ -765,12 +764,12 @@ validate_species_against_database <- function(biota_data, species_database) {
     ]
 
     if (nrow(scientific_matches) > 0) {
-      output_lines <- c(output_lines, "  ✓ Found as scientific name")
+      output_lines <- c(output_lines, "  \u2713 Found as scientific name")
       if (nrow(scientific_matches) > 1) {
         output_lines <- c(
           output_lines,
           paste0(
-            "    → Multiple entries found (",
+            "    \u2192 Multiple entries found (",
             nrow(scientific_matches),
             " matches)"
           )
@@ -780,7 +779,7 @@ validate_species_against_database <- function(biota_data, species_database) {
       # Show the canonical scientific name
       output_lines <- c(
         output_lines,
-        paste0("    → Canonical: ", scientific_matches$SPECIES_NAME[1])
+        paste0("    \u2192 Canonical: ", scientific_matches$SPECIES_NAME[1])
       )
     } else {
       # Try common name match
@@ -789,26 +788,26 @@ validate_species_against_database <- function(biota_data, species_database) {
       ]
 
       if (nrow(common_matches) > 0) {
-        output_lines <- c(output_lines, "  ⚠ Found as common name")
+        output_lines <- c(output_lines, "  \u26A0 Found as common name")
         has_warnings <- TRUE
 
         if (nrow(common_matches) > 1) {
           output_lines <- c(
             output_lines,
             paste0(
-              "    → Multiple species match this common name (",
+              "    \u2192 Multiple species match this common name (",
               nrow(common_matches),
               " matches)"
             )
           )
-          output_lines <- c(output_lines, "    → Manual review required:")
+          output_lines <- c(output_lines, "    \u2192 Manual review required:")
 
           # List all matching scientific names (limit to first 10)
           display_count <- min(10, nrow(common_matches))
           for (i in 1:display_count) {
             output_lines <- c(
               output_lines,
-              paste0("       • ", common_matches$SPECIES_NAME[i])
+              paste0("       \u2022 ", common_matches$SPECIES_NAME[i])
             )
           }
           if (nrow(common_matches) > 10) {
@@ -824,12 +823,21 @@ validate_species_against_database <- function(biota_data, species_database) {
         } else {
           output_lines <- c(
             output_lines,
-            paste0("    → Scientific name: ", common_matches$SPECIES_NAME[1])
+            paste0(
+              "    \u2192 Scientific name: ",
+              common_matches$SPECIES_NAME[1]
+            )
           )
         }
       } else {
-        output_lines <- c(output_lines, "  ⚠ Species not found in database")
-        output_lines <- c(output_lines, "    → Manual verification required")
+        output_lines <- c(
+          output_lines,
+          "  \u26A0 Species not found in database"
+        )
+        output_lines <- c(
+          output_lines,
+          "    \u2192 Manual verification required"
+        )
         has_warnings <- TRUE
       }
     }
@@ -879,11 +887,14 @@ validate_species_against_database <- function(biota_data, species_database) {
     output_lines <- c(output_lines, "")
     output_lines <- c(
       output_lines,
-      "⚠ Manual review recommended for flagged species."
+      "\u26A0 Manual review recommended for flagged species."
     )
   } else {
     output_lines <- c(output_lines, "")
-    output_lines <- c(output_lines, "✓ All species found as scientific names!")
+    output_lines <- c(
+      output_lines,
+      "\u2713 All species found as scientific names!"
+    )
   }
 
   return(list(

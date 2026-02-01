@@ -1,11 +1,9 @@
 #' CREED_details UI Function
 #'
-#' @description A shiny Module.
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #' @importFrom shiny NS tagList textAreaInput
 #' @importFrom bslib input_task_button tooltip
-#' @export
 mod_CREED_details_ui <- function(id) {
   ns <- NS(id)
 
@@ -192,12 +190,11 @@ mod_CREED_details_ui <- function(id) {
         inputId = ns("site_density"),
         label = tooltip(
           list("Site Density", bs_icon("info-circle-fill")),
-          "Spatial distribution of sampling sites (e.g., 1 site per 100 km², grid spacing)."
+          "Spatial distribution of sampling sites (e.g., 1 site per 100 km\u00B2, grid spacing)."
         ),
-        placeholder = "e.g., 1 site per 100 km²",
+        placeholder = "e.g., 1 site per 100 km\u00B2",
         width = "100%"
       ),
-
       textInput(
         inputId = ns("sampling_frequency"),
         label = tooltip(
@@ -233,12 +230,10 @@ mod_CREED_details_ui <- function(id) {
 
 
 #' CREED_details Server Functions
-#' @import shiny
 #' @importFrom golem print_dev
 #' @importFrom shiny updateTextAreaInput bindEvent isTruthy
 #' @importFrom tibble tibble
 #' @import eDataDRF
-#' @export
 mod_CREED_details_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

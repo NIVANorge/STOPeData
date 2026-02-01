@@ -104,9 +104,9 @@ update_compartments_selectize <- function(session, compartments_data) {
       )
       comp_labels <- paste(
         compartments_data$ENVIRON_COMPARTMENT,
-        "→",
+        "\u2192",
         compartments_data$ENVIRON_COMPARTMENT_SUB,
-        "→",
+        "\u2192",
         compartments_data$MEASURED_CATEGORY
       )
       choices <- setNames(comp_values, comp_labels)
@@ -468,7 +468,7 @@ update_combination_preview <- function(
   div(
     strong("Preview: "),
     sprintf(
-      "%d sites × %d parameters × %d compartments × %d dates × %d subsamples = %d total samples",
+      "%d sites \u00D7 %d parameters \u00D7 %d compartments \u00D7 %d dates \u00D7 %d subsamples = %d total samples",
       sites_count,
       params_count,
       comps_count,

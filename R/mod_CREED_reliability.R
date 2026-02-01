@@ -254,7 +254,6 @@ mod_CREED_reliability_ui <- function(id) {
 #'
 #' @noRd
 #' @importFrom shiny moduleServer reactive reactiveValues observe renderUI isTruthy
-#' @export
 mod_CREED_reliability_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

@@ -529,7 +529,7 @@ create_dummy_data <- function(uppercase_columns = FALSE) {
         "Not reported"
       ),
       protocol_comment = c(
-        "Adult copepods collected between January and March 1997, acclimated to 15°C for 12 days",
+        "Adult copepods collected between January and March 1997, acclimated to 15 degrees C for 12 days",
         "Radioactivity measured with NaI(Tl) gamma detectors at specific energy levels for each isotope",
         ""
       )
@@ -597,7 +597,7 @@ dummy_CREED_reliability_tibble <- function() {
       criterion_id = "RB3",
       criterion_title = "Sample Handling",
       required_recommended = "Recommended",
-      relevant_data = "Samples stored frozen at -20°C until analysis. Dried at 60°C before digestion.",
+      relevant_data = "Samples stored frozen at -20 degrees C until analysis. Dried at 60 degrees C before digestion.",
       score = 1L,
       limitations = ""
     ) |>

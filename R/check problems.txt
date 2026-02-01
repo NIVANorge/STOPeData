@@ -1,0 +1,724 @@
+   Invalid license file pointers: LICENSE
+N  checking top-level files (2.4s)
+   Non-standard files/directories found at top level:
+     'Dockerfile' 'dependencies.R' 'docker-compose.yml' 'images'
+     'manifest.json' 'protocols.csv'
+✔  checking for left-over files ... 
+✔  checking index information
+W  checking package subdirectories (833ms)
+   Found the following non-empty subdirectories of 'inst' also used by R:
+     inst/data
+   It is recommended not to interfere with package subdirectories used by
+   R.
+
+✔  checking S3 generic/method consistency (2.9s)
+✔  checking replacement functions (2.5s)
+✔  checking foreign function calls (3.5s)
+─  checking R code for possible problems ... [38s] NOTE (37.6s)
+   create_existing_parameter: no visible binding for global variable
+     'PARAMETER_NAME'
+   create_existing_parameter: no visible binding for global variable
+     'PARAMETER_TYPE'
+   create_methods_from_llm: no visible binding for global variable
+     'PROTOCOL_CATEGORY'
+   create_methods_from_llm: no visible binding for global variable
+     'PROTOCOL_NAME'
+   create_methods_from_llm: no visible binding for global variable
+     'PROTOCOL_ID'
+   create_samples_from_llm: no visible binding for global variable
+     'samples_tibble'
+   get_parameters_filtered: no visible binding for global variable
+     'PARAMETER_TYPE'
+   get_parameters_filtered: no visible binding for global variable
+     'PARAMETER_TYPE_SUB'
+   get_parameters_filtered: no visible binding for global variable
+     'PARAMETER_NAME'
+   get_parameters_of_types: no visible binding for global variable
+     'PARAMETER_TYPE'
+   get_parameters_of_types: no visible binding for global variable
+     'PARAMETER_NAME'
+   mod_CREED_gateway_server : <anonymous> :
+     auto_populate_gateway_criteria: no visible binding for global
+     variable 'x'
+   mod_CREED_server : <anonymous>: no visible binding for global variable
+     'score'
+   mod_CREED_server : <anonymous>: no visible binding for global variable
+     'required_recommended'
+   mod_CREED_server : <anonymous>: no visible binding for global variable
+     'numeric_score'
+   mod_biota_server : <anonymous>: no visible binding for global variable
+     'SPECIES_GROUP'
+   mod_biota_server : <anonymous>: no visible binding for global variable
+     'SPECIES_NAME'
+   mod_biota_server : <anonymous>: no visible binding for global variable
+     'pretty_name'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'PROTOCOL_CATEGORY'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'PROTOCOL_ID'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'SAMPLE_ID'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'SITE_CODE'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'PARAMETER_NAME'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'SAMPLING_DATE'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'ENVIRON_COMPARTMENT'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'ENVIRON_COMPARTMENT_SUB'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'SUBSAMPLE'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'PARAMETER_TYPE'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'MEASURED_TYPE'
+   mod_data_server : <anonymous> : create_measurement_combinations: no
+     visible binding for global variable 'REFERENCE_ID'
+   mod_data_server : <anonymous>: no visible binding for global variable
+     'SUBSAMPLE'
+   mod_data_server : <anonymous>: no visible binding for global variable
+     'PROTOCOL_CATEGORY'
+   mod_data_server : <anonymous>: no visible binding for global variable
+     'PROTOCOL_ID'
+   mod_methods_server : <anonymous>: no visible binding for global
+     variable 'Protocol_Type'
+   mod_methods_server : <anonymous>: no visible binding for global
+     variable 'Long_Name'
+   mod_methods_server : <anonymous>: no visible binding for global
+     variable 'Short_Name'
+   mod_methods_server : <anonymous>: no visible binding for global
+     variable 'PROTOCOL_CATEGORY'
+   mod_methods_server : <anonymous>: no visible binding for global
+     variable 'PROTOCOL_NAME'
+   mod_methods_server : <anonymous>: no visible binding for global
+     variable 'PROTOCOL_ID'
+   mod_parameters_server : <anonymous>: no visible binding for global
+     variable 'PARAMETER_TYPE'
+   mod_parameters_server : <anonymous>: no visible binding for global
+     variable 'PARAMETER_TYPE_SUB'
+   mod_parameters_server : <anonymous>: no visible binding for global
+     variable 'PARAMETER_COMMENT'
+   mod_review_server : <anonymous> : create_dummy_review_data: no visible
+     global function definition for 'runif'
+   mod_review_server : <anonymous>: no visible binding for global variable
+     'MEASURED_VALUE'
+   mod_review_server : <anonymous>: no visible binding for global variable
+     'MEASURED_FLAG'
+   mod_review_server : <anonymous>: no visible binding for global variable
+     'PARAMETER_NAME'
+   mod_review_server : <anonymous>: no visible binding for global variable
+     'MEASURED_UNIT'
+   mod_review_server : <anonymous>: no visible binding for global variable
+     'unique_units'
+   mod_samples_server : <anonymous>: no visible binding for global
+     variable 'SUBSAMPLE'
+   validate_and_parse_bibtex: no visible binding for global variable
+     'error_msg'
+   validate_parameters_against_database: no visible binding for global
+     variable 'CAS_RN'
+   validate_parameters_against_database : <anonymous>: no visible binding
+     for global variable 'CAS_RN'
+   Undefined global functions or variables:
+     CAS_RN ENVIRON_COMPARTMENT ENVIRON_COMPARTMENT_SUB Long_Name
+     MEASURED_FLAG MEASURED_TYPE MEASURED_UNIT MEASURED_VALUE
+     PARAMETER_COMMENT PARAMETER_NAME PARAMETER_TYPE PARAMETER_TYPE_SUB
+     PROTOCOL_CATEGORY PROTOCOL_ID PROTOCOL_NAME Protocol_Type
+     REFERENCE_ID SAMPLE_ID SAMPLING_DATE SITE_CODE SPECIES_GROUP
+     SPECIES_NAME SUBSAMPLE Short_Name error_msg numeric_score pretty_name
+     required_recommended runif samples_tibble score unique_units x
+   Consider adding
+     importFrom("stats", "runif")
+   to your NAMESPACE file.
+W  checking Rd files (1.4s)
+   checkRd: (-1) collect_CREED_data.Rd:27: Lost braces; missing escapes or markup?
+       27 | - `{criterion_id}_score`
+          |    ^
+   checkRd: (-1) collect_CREED_data.Rd:28: Lost braces; missing escapes or markup?
+       28 | - `{criterion_id}_relevant_data`
+          |    ^
+   checkRd: (-1) collect_CREED_data.Rd:29: Lost braces; missing escapes or markup?
+       29 | - `{criterion_id}_limitations`
+          |    ^
+   checkRd: (-1) creed_tibble_to_mock_input.Rd:13: Lost braces; missing escapes or markup?
+       13 | A named list shaped like a shiny input reactiveValues with {criterion_id}_score,
+          |                                                            ^
+   checkRd: (-1) creed_tibble_to_mock_input.Rd:14: Lost braces; missing escapes or markup?
+       14 | {criterion_id}_relevant_data, and {criterion_id}_limitations (or _justification for RB8)
+          | ^
+   checkRd: (-1) creed_tibble_to_mock_input.Rd:14: Lost braces; missing escapes or markup?
+       14 | {criterion_id}_relevant_data, and {criterion_id}_limitations (or _justification for RB8)
+          |                                   ^
+   checkRd: (-1) generate_protocol_id.Rd:30: Lost braces; missing escapes or markup?
+       30 |   `{TypeCode}{SequenceNumber}_{AbbreviatedName}_{CampaignAbbrev}`
+          |    ^
+   checkRd: (-1) generate_protocol_id.Rd:30: Lost braces
+       30 |   `{TypeCode}{SequenceNumber}_{AbbreviatedName}_{CampaignAbbrev}`
+          |              ^
+   checkRd: (-1) generate_protocol_id.Rd:30: Lost braces; missing escapes or markup?
+       30 |   `{TypeCode}{SequenceNumber}_{AbbreviatedName}_{CampaignAbbrev}`
+          |                               ^
+   checkRd: (-1) generate_protocol_id.Rd:30: Lost braces; missing escapes or markup?
+       30 |   `{TypeCode}{SequenceNumber}_{AbbreviatedName}_{CampaignAbbrev}`
+          |                                                 ^
+   checkRd: (5) grapes-or-truthy-or-grapes.Rd:3: \name should not contain !, | or @
+   checkRd: (-1) mod_CREED_details_ui.Rd:10: Lost braces; missing escapes or markup?
+       10 | \item{id, input, output, session}{Internal parameters for {shiny}.}
+          |                                                           ^
+   checkRd: (-1) validate_doi_format.Rd:20: Lost braces; missing escapes or markup?
+       20 | DOI format follows the pattern: 10.{registrant}/{suffix}
+          |                                    ^
+   checkRd: (-1) validate_doi_format.Rd:20: Lost braces; missing escapes or markup?
+       20 | DOI format follows the pattern: 10.{registrant}/{suffix}
+          |                                                 ^
+✔  checking Rd metadata ... 
+✔  checking Rd line widths ... 
+N  checking Rd cross-references (2.2s)
+   Found the following Rd file(s) with Rd \link{} targets missing package
+   anchors:
+     create_compartment_combination.Rd: initialise_compartments_tibble
+     create_existing_parameter.Rd: initialise_parameters_tibble
+     create_new_parameter.Rd: initialise_parameters_tibble
+   Please provide package anchors for all Rd \link{} targets not in the
+   package itself and the base packages.
+W  checking for missing documentation entries (5.9s)
+   Undocumented code objects:
+     'copper_CREED_purpose_statement' 'mod_CREED_gateway_server'
+     'mod_CREED_gateway_ui' 'mod_CREED_reliability_server'
+     'mod_CREED_server' 'mod_CREED_ui' 'mod_biota_server' 'mod_biota_ui'
+     'mod_campaign_server' 'mod_campaign_ui' 'mod_compartments_server'
+     'mod_compartments_ui' 'mod_data_server' 'mod_data_ui'
+     'mod_export_server' 'mod_export_ui' 'mod_landing_server'
+     'mod_landing_ui' 'mod_llm_server' 'mod_llm_ui' 'mod_methods_server'
+     'mod_methods_ui' 'mod_parameters_server' 'mod_parameters_ui'
+     'mod_references_server' 'mod_references_ui' 'mod_review_server'
+     'mod_review_ui' 'mod_sites_server' 'mod_sites_ui'
+   All user-level objects in a package should have documentation entries.
+   See chapter 'Writing R documentation files' in the 'Writing R
+   Extensions' manual.
+✔  checking for code/documentation mismatches (10.4s)
+W  checking Rd \usage sections (550ms)
+   Documented arguments not in \usage in Rd file 'check_available_datasets.Rd':
+     'dataset_names'
+   
+   Undocumented arguments in Rd file 'info_accordion.Rd'
+     '...'
+   
+   Undocumented arguments in Rd file 'isRelevant.Rd'
+     'input'
+   Documented arguments not in \usage in Rd file 'isRelevant.Rd':
+     'first' 'second'
+   
+   Undocumented arguments in Rd file 'mod_CREED_details_server.Rd'
+     'id'
+   
+   Documented arguments not in \usage in Rd file 'mod_CREED_details_ui.Rd':
+     'input' 'output' 'session'
+   
+   Functions with \usage entries need to have the appropriate \alias
+   entries, and all their arguments documented.
+   The \usage entries must correspond to syntactically valid R code.
+   See chapter 'Writing R documentation files' in the 'Writing R
+   Extensions' manual.
+✔  checking Rd contents (4.4s)
+✔  checking for unstated dependencies in examples (456ms)
+E  checking examples (6s)
+   Running examples in 'STOPeData-Ex.R' failed
+   The error most likely occurred in:
+   
+   > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+   > ### Name: creed_tibble_to_mock_input
+   > ### Title: Convert CREED Tibble to Mock Input List
+   > ### Aliases: creed_tibble_to_mock_input
+   > 
+   > ### ** Examples
+   > 
+   > mock_input <- creed_tibble_to_mock_input(dummy_CREED_relevance_tibble())
+   > result <- collect_CREED_data(relevance_criteria_config, mock_input)
+   Error: object 'relevance_criteria_config' not found
+   Execution halted
+✔  checking for unstated dependencies in 'tests' (345ms)
+─  checking tests (381ms)
+   Running the tests in 'tests/testthat.R' failed.
+   Last 13 lines of output:
+     
+     Error ('test_dummy_data.R:147:3'): create_dummy_session_data column structures match initialise functions
+     Error in `initialise_campaign_tibble()`: could not find function "initialise_campaign_tibble"
+     Backtrace:
+         ▆
+      1. └─testthat::expect_equal(names(result$campaignData), names(initialise_campaign_tibble())) at test_dummy_data.R:147:3
+      2.   └─testthat::quasi_label(enquo(expected), expected.label)
+      3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+     ────────────────────────────────────────────────────────────────────────────────
+     
+     Maximum number of failures exceeded; quitting.
+     ℹ Increase this number with (e.g.) `testthat::set_max_fails(Inf)` 
+     Error:
+     ! Test failures.
+     Execution halted
+N  checking for non-standard things in the check directory
+   Found the following files/directories:
+     ''NULL''
+✔  checking for detritus in the temp directory
+   
+   See
+     'C:/Users/SAW/AppData/Local/Temp/RtmpwnenEb/file5c6472373114/STOPeData.Rcheck/00check.log'
+   for details.
+   
+   ERROR: Unknown command "TMPDIR=C:/Users/SAW/AppData/Local/Temp/RtmpSISl2R/file174037b5d1f". Did you mean command "install"?
+   Warning in system2("quarto", "-V", stdout = TRUE, env = paste0("TMPDIR=",  :
+     running command '"quarto" TMPDIR=C:/Users/SAW/AppData/Local/Temp/RtmpSISl2R/file174037b5d1f -V' had status 1
+   
+
+── R CMD check results ───────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── STOPeData 0.0.0.9008 ────
+Duration: 3m 23.8s
+
+❯ checking examples ... ERROR
+  Running examples in 'STOPeData-Ex.R' failed
+  The error most likely occurred in:
+  
+  > base::assign(".ptime", proc.time(), pos = "CheckExEnv")
+  > ### Name: creed_tibble_to_mock_input
+  > ### Title: Convert CREED Tibble to Mock Input List
+  > ### Aliases: creed_tibble_to_mock_input
+  > 
+  > ### ** Examples
+  > 
+  > mock_input <- creed_tibble_to_mock_input(dummy_CREED_relevance_tibble())
+  > result <- collect_CREED_data(relevance_criteria_config, mock_input)
+  Error: object 'relevance_criteria_config' not found
+  Execution halted
+
+❯ checking tests ...
+  See below...
+
+❯ checking DESCRIPTION meta-information ... WARNING
+  Invalid license file pointers: LICENSE
+
+❯ checking package subdirectories ... WARNING
+  Found the following non-empty subdirectories of 'inst' also used by R:
+    inst/data
+  It is recommended not to interfere with package subdirectories used by
+  R.
+
+❯ checking code files for non-ASCII characters ... WARNING
+  Found the following files with non-ASCII characters:
+    R/app_server.R
+    R/fct_dummy_data.R
+    R/mod_CREED_details.R
+    R/mod_campaign.R
+    R/mod_compartments.R
+    R/mod_export.R
+    R/mod_llm.R
+    R/mod_llm_fct_populate.R
+    R/mod_llm_fct_validate.R
+    R/mod_references_fct_bibtex.R
+    R/mod_samples_fct.R
+  Portable packages must use only ASCII characters in their R code and
+  NAMESPACE directives, except perhaps in comments.
+  Use \uxxxx escapes for other characters.
+  Function 'tools::showNonASCIIfile' can help in finding non-ASCII
+  characters in files.
+
+❯ checking Rd files ... WARNING
+  checkRd: (-1) collect_CREED_data.Rd:27: Lost braces; missing escapes or markup?
+      27 | - `{criterion_id}_score`
+         |    ^
+  checkRd: (-1) collect_CREED_data.Rd:28: Lost braces; missing escapes or markup?
+      28 | - `{criterion_id}_relevant_data`
+         |    ^
+  checkRd: (-1) collect_CREED_data.Rd:29: Lost braces; missing escapes or markup?
+      29 | - `{criterion_id}_limitations`
+         |    ^
+  checkRd: (-1) creed_tibble_to_mock_input.Rd:13: Lost braces; missing escapes or markup?
+      13 | A named list shaped like a shiny input reactiveValues with {criterion_id}_score,
+         |                                                            ^
+  checkRd: (-1) creed_tibble_to_mock_input.Rd:14: Lost braces; missing escapes or markup?
+      14 | {criterion_id}_relevant_data, and {criterion_id}_limitations (or _justification for RB8)
+         | ^
+  checkRd: (-1) creed_tibble_to_mock_input.Rd:14: Lost braces; missing escapes or markup?
+      14 | {criterion_id}_relevant_data, and {criterion_id}_limitations (or _justification for RB8)
+         |                                   ^
+  checkRd: (-1) generate_protocol_id.Rd:30: Lost braces; missing escapes or markup?
+      30 |   `{TypeCode}{SequenceNumber}_{AbbreviatedName}_{CampaignAbbrev}`
+         |    ^
+  checkRd: (-1) generate_protocol_id.Rd:30: Lost braces
+      30 |   `{TypeCode}{SequenceNumber}_{AbbreviatedName}_{CampaignAbbrev}`
+         |              ^
+  checkRd: (-1) generate_protocol_id.Rd:30: Lost braces; missing escapes or markup?
+      30 |   `{TypeCode}{SequenceNumber}_{AbbreviatedName}_{CampaignAbbrev}`
+         |                               ^
+  checkRd: (-1) generate_protocol_id.Rd:30: Lost braces; missing escapes or markup?
+      30 |   `{TypeCode}{SequenceNumber}_{AbbreviatedName}_{CampaignAbbrev}`
+         |                                                 ^
+  checkRd: (5) grapes-or-truthy-or-grapes.Rd:3: \name should not contain !, | or @
+  checkRd: (-1) mod_CREED_details_ui.Rd:10: Lost braces; missing escapes or markup?
+      10 | \item{id, input, output, session}{Internal parameters for {shiny}.}
+         |                                                           ^
+  checkRd: (-1) validate_doi_format.Rd:20: Lost braces; missing escapes or markup?
+      20 | DOI format follows the pattern: 10.{registrant}/{suffix}
+         |                                    ^
+  checkRd: (-1) validate_doi_format.Rd:20: Lost braces; missing escapes or markup?
+      20 | DOI format follows the pattern: 10.{registrant}/{suffix}
+         |                                                 ^
+
+❯ checking for missing documentation entries ... WARNING
+  Undocumented code objects:
+    'copper_CREED_purpose_statement' 'mod_CREED_gateway_server'
+    'mod_CREED_gateway_ui' 'mod_CREED_reliability_server'
+    'mod_CREED_server' 'mod_CREED_ui' 'mod_biota_server' 'mod_biota_ui'
+    'mod_campaign_server' 'mod_campaign_ui' 'mod_compartments_server'
+    'mod_compartments_ui' 'mod_data_server' 'mod_data_ui'
+    'mod_export_server' 'mod_export_ui' 'mod_landing_server'
+    'mod_landing_ui' 'mod_llm_server' 'mod_llm_ui' 'mod_methods_server'
+    'mod_methods_ui' 'mod_parameters_server' 'mod_parameters_ui'
+    'mod_references_server' 'mod_references_ui' 'mod_review_server'
+    'mod_review_ui' 'mod_sites_server' 'mod_sites_ui'
+  All user-level objects in a package should have documentation entries.
+  See chapter 'Writing R documentation files' in the 'Writing R
+  Extensions' manual.
+
+❯ checking Rd \usage sections ... WARNING
+  Documented arguments not in \usage in Rd file 'check_available_datasets.Rd':
+    'dataset_names'
+  
+  Undocumented arguments in Rd file 'info_accordion.Rd'
+    '...'
+  
+  Undocumented arguments in Rd file 'isRelevant.Rd'
+    'input'
+  Documented arguments not in \usage in Rd file 'isRelevant.Rd':
+    'first' 'second'
+  
+  Undocumented arguments in Rd file 'mod_CREED_details_server.Rd'
+    'id'
+  
+  Documented arguments not in \usage in Rd file 'mod_CREED_details_ui.Rd':
+    'input' 'output' 'session'
+  
+  Functions with \usage entries need to have the appropriate \alias
+  entries, and all their arguments documented.
+  The \usage entries must correspond to syntactically valid R code.
+  See chapter 'Writing R documentation files' in the 'Writing R
+  Extensions' manual.
+
+❯ checking top-level files ... NOTE
+  Non-standard files/directories found at top level:
+    'Dockerfile' 'dependencies.R' 'docker-compose.yml' 'images'
+    'manifest.json' 'protocols.csv'
+
+❯ checking dependencies in R code ... NOTE
+  Namespaces in Imports field not imported from:
+    'attempt' 'lubridate' 'markdown' 'pkgload' 'shinytest2'
+    All declared Imports should be used.
+
+❯ checking R code for possible problems ... [38s] NOTE
+  create_existing_parameter: no visible binding for global variable
+    'PARAMETER_NAME'
+  create_existing_parameter: no visible binding for global variable
+    'PARAMETER_TYPE'
+  create_methods_from_llm: no visible binding for global variable
+    'PROTOCOL_CATEGORY'
+  create_methods_from_llm: no visible binding for global variable
+    'PROTOCOL_NAME'
+  create_methods_from_llm: no visible binding for global variable
+    'PROTOCOL_ID'
+  create_samples_from_llm: no visible binding for global variable
+    'samples_tibble'
+  get_parameters_filtered: no visible binding for global variable
+    'PARAMETER_TYPE'
+  get_parameters_filtered: no visible binding for global variable
+    'PARAMETER_TYPE_SUB'
+  get_parameters_filtered: no visible binding for global variable
+    'PARAMETER_NAME'
+  get_parameters_of_types: no visible binding for global variable
+    'PARAMETER_TYPE'
+  get_parameters_of_types: no visible binding for global variable
+    'PARAMETER_NAME'
+  mod_CREED_gateway_server : <anonymous> :
+    auto_populate_gateway_criteria: no visible binding for global
+    variable 'x'
+  mod_CREED_server : <anonymous>: no visible binding for global variable
+    'score'
+  mod_CREED_server : <anonymous>: no visible binding for global variable
+    'required_recommended'
+  mod_CREED_server : <anonymous>: no visible binding for global variable
+    'numeric_score'
+  mod_biota_server : <anonymous>: no visible binding for global variable
+    'SPECIES_GROUP'
+  mod_biota_server : <anonymous>: no visible binding for global variable
+    'SPECIES_NAME'
+  mod_biota_server : <anonymous>: no visible binding for global variable
+    'pretty_name'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'PROTOCOL_CATEGORY'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'PROTOCOL_ID'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'SAMPLE_ID'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'SITE_CODE'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'PARAMETER_NAME'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'SAMPLING_DATE'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'ENVIRON_COMPARTMENT'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'ENVIRON_COMPARTMENT_SUB'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'SUBSAMPLE'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'PARAMETER_TYPE'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'MEASURED_TYPE'
+  mod_data_server : <anonymous> : create_measurement_combinations: no
+    visible binding for global variable 'REFERENCE_ID'
+  mod_data_server : <anonymous>: no visible binding for global variable
+    'SUBSAMPLE'
+  mod_data_server : <anonymous>: no visible binding for global variable
+    'PROTOCOL_CATEGORY'
+  mod_data_server : <anonymous>: no visible binding for global variable
+    'PROTOCOL_ID'
+  mod_methods_server : <anonymous>: no visible binding for global
+    variable 'Protocol_Type'
+  mod_methods_server : <anonymous>: no visible binding for global
+    variable 'Long_Name'
+  mod_methods_server : <anonymous>: no visible binding for global
+    variable 'Short_Name'
+  mod_methods_server : <anonymous>: no visible binding for global
+    variable 'PROTOCOL_CATEGORY'
+  mod_methods_server : <anonymous>: no visible binding for global
+    variable 'PROTOCOL_NAME'
+  mod_methods_server : <anonymous>: no visible binding for global
+    variable 'PROTOCOL_ID'
+  mod_parameters_server : <anonymous>: no visible binding for global
+    variable 'PARAMETER_TYPE'
+  mod_parameters_server : <anonymous>: no visible binding for global
+    variable 'PARAMETER_TYPE_SUB'
+  mod_parameters_server : <anonymous>: no visible binding for global
+    variable 'PARAMETER_COMMENT'
+  mod_review_server : <anonymous> : create_dummy_review_data: no visible
+    global function definition for 'runif'
+  mod_review_server : <anonymous>: no visible binding for global variable
+    'MEASURED_VALUE'
+  mod_review_server : <anonymous>: no visible binding for global variable
+    'MEASURED_FLAG'
+  mod_review_server : <anonymous>: no visible binding for global variable
+    'PARAMETER_NAME'
+  mod_review_server : <anonymous>: no visible binding for global variable
+    'MEASURED_UNIT'
+  mod_review_server : <anonymous>: no visible binding for global variable
+    'unique_units'
+  mod_samples_server : <anonymous>: no visible binding for global
+    variable 'SUBSAMPLE'
+  validate_and_parse_bibtex: no visible binding for global variable
+    'error_msg'
+  validate_parameters_against_database: no visible binding for global
+    variable 'CAS_RN'
+  validate_parameters_against_database : <anonymous>: no visible binding
+    for global variable 'CAS_RN'
+  Undefined global functions or variables:
+    CAS_RN ENVIRON_COMPARTMENT ENVIRON_COMPARTMENT_SUB Long_Name
+    MEASURED_FLAG MEASURED_TYPE MEASURED_UNIT MEASURED_VALUE
+    PARAMETER_COMMENT PARAMETER_NAME PARAMETER_TYPE PARAMETER_TYPE_SUB
+    PROTOCOL_CATEGORY PROTOCOL_ID PROTOCOL_NAME Protocol_Type
+    REFERENCE_ID SAMPLE_ID SAMPLING_DATE SITE_CODE SPECIES_GROUP
+    SPECIES_NAME SUBSAMPLE Short_Name error_msg numeric_score pretty_name
+    required_recommended runif samples_tibble score unique_units x
+  Consider adding
+    importFrom("stats", "runif")
+  to your NAMESPACE file.
+
+❯ checking Rd cross-references ... NOTE
+  Found the following Rd file(s) with Rd \link{} targets missing package
+  anchors:
+    create_compartment_combination.Rd: initialise_compartments_tibble
+    create_existing_parameter.Rd: initialise_parameters_tibble
+    create_new_parameter.Rd: initialise_parameters_tibble
+  Please provide package anchors for all Rd \link{} targets not in the
+  package itself and the base packages.
+
+❯ checking for non-standard things in the check directory ... NOTE
+  Found the following files/directories:
+    ''NULL''
+
+── Test failures ─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── testthat ────
+
+> library(STOPeData)
+> shinytest2::test_app()
+Loading required package: testthat
+Loading required package: shiny
+✔ | F W  S  OK | Context
+
+⠏ |          0 | app                                                            
+✖ | 1        0 | app
+────────────────────────────────────────────────────────────────────────────────
+Failure ('test_app.R:75:3'): Test that initialise_userData() works
+Expected `initialise_userData()` not to throw any errors.
+Actually got a <simpleError> with message:
+  could not find function "initialise_userData"
+────────────────────────────────────────────────────────────────────────────────
+
+⠏ |          0 | campaign                                                       
+⠏ |          0 | compartments                                                   
+✖ | 1        0 | compartments
+────────────────────────────────────────────────────────────────────────────────
+Error ('test_compartments.R:5:3'): create_compartment_combination matches initialise structure
+Error in `initialise_compartments_tibble()`: could not find function "initialise_compartments_tibble"
+────────────────────────────────────────────────────────────────────────────────
+
+⠏ |          0 | creed                                                          
+⠋ |          1 | creed                                                          
+⠼ |          5 | creed                                                          
+⠋ |         11 | creed                                                          
+⠴ |         16 | creed                                                          
+⠏ | 1       19 | creed                                                          
+⠙ | 1       21 | creed                                                          
+⠼ | 1       24 | creed                                                          
+⠏ | 1       29 | creed                                                          
+⠼ | 1       34 | creed                                                          
+⠦ | 1       46 | creed                                                          
+✖ | 1       60 | creed [1.8s]
+────────────────────────────────────────────────────────────────────────────────
+Error ('test_creed.R:108:3'): summarise_CREED_details deduplicates values correctly
+Error in `add_row(sessionData$compartmentsData, tibble(ENVIRON_COMPARTMENT = "Aquatic"))`: could not find function "add_row"
+────────────────────────────────────────────────────────────────────────────────
+
+⠏ |          0 | creed_helpers                                                  
+⠋ |          1 | creed_helpers                                                  
+⠦ |          7 | creed_helpers                                                  
+⠹ |         13 | creed_helpers                                                  
+⠇ |         19 | creed_helpers                                                  
+⠇ | 2       27 | creed_helpers                                                  
+✖ | 2       30 | creed_helpers
+────────────────────────────────────────────────────────────────────────────────
+Failure ('test_creed_helpers.R:88:3'): collect_CREED_data returns valid tibble with correct structure
+Expected `... <- NULL` not to throw any errors.
+Actually got a <simpleError> with message:
+  could not find function "add_row"
+
+Error ('test_creed_helpers.R:95:3'): collect_CREED_data returns valid tibble with correct structure
+Error in `eval(code, test_env)`: object 'result' not found
+Backtrace:
+    ▆
+ 1. └─testthat::expect_s3_class(result, "tbl_df") at test_creed_helpers.R:95:3
+ 2.   └─testthat::quasi_label(enquo(object))
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+────────────────────────────────────────────────────────────────────────────────
+
+⠏ |          0 | creed_summarise                                                
+⠋ |          1 | creed_summarise                                                
+⠴ | 1       15 | creed_summarise                                                
+✖ | 1       19 | creed_summarise
+────────────────────────────────────────────────────────────────────────────────
+Error ('test_creed_summarise.R:64:3'): summarise_sites handles coordinate precision correctly
+Error in `tibble(SITE_CODE = c("S1", "S2", "S3"), SITE_NAME = c("Site 1", "Site 2", "Site 3"), COUNTRY_ISO = c("NO", "NO", "SE"), OCEAN_IHO = c("Oslo", "Bergen", "Stockholm"), SITE_GEOGRAPHIC_FEATURE = c("Coastal, fjord", "Coastal, fjord", "Lake"), SITE_GEOGRAPHIC_FEATURE_SUB = c("Water column", "Sediment", "Water column"), LATITUDE = c(60.1, 60.12, 60.123), LONGITUDE = c(10.1234, 10.12, 10.1), SITE_COORDINATE_SYSTEM = rep("WGS84", 3), ALTITUDE_VALUE = rep(NA_real_, 3), ALTITUDE_UNIT = rep(NA_character_, 3),      ENTERED_BY = rep("test_user", 3), ENTERED_DATE = rep("2023-07-01", 3), SITE_COMMENT = rep(NA_character_, 3))`: could not find function "tibble"
+────────────────────────────────────────────────────────────────────────────────
+
+⠏ |          0 | dummy_data                                                     
+⠴ | 1        5 | dummy_data                                                     
+⠼ | 3       12 | dummy_data                                                     
+⠏ | 4       16 | dummy_data                                                     
+⠴ | 5       21 | dummy_data                                                     
+⠋ | 6       25 | dummy_data                                                     
+⠴ | 7       29 | dummy_data                                                     
+⠋ | 8       33 | dummy_data                                                     
+⠙ | 8       34 | dummy_data                                                     
+⠴ | 9       37 | dummy_data                                                     
+⠦ | 9       38 | dummy_data                                                     
+⠦ | 9       58 | dummy_data                                                     
+⠋ | 9       62 | dummy_data                                                     
+⠹ | 9       64 | dummy_data                                                     
+⠴ | 10       66 | dummy_data                                                    
+✖ | 10       66 | dummy_data [4.5s]
+────────────────────────────────────────────────────────────────────────────────
+Error ('test_dummy_data.R:24:3'): dummy_campaign_tibble creates valid tibble
+Error in `initialise_campaign_tibble()`: could not find function "initialise_campaign_tibble"
+Backtrace:
+    ▆
+ 1. └─testthat::expect_equal(names(result), names(initialise_campaign_tibble())) at test_dummy_data.R:24:3
+ 2.   └─testthat::quasi_label(enquo(expected), expected.label)
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Error ('test_dummy_data.R:32:3'): dummy_references_tibble creates valid tibble
+Error in `initialise_references_tibble()`: could not find function "initialise_references_tibble"
+Backtrace:
+    ▆
+ 1. └─testthat::expect_equal(names(result), names(initialise_references_tibble())) at test_dummy_data.R:32:3
+ 2.   └─testthat::quasi_label(enquo(expected), expected.label)
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Error ('test_dummy_data.R:40:3'): dummy_sites_tibble creates valid tibble
+Error in `initialise_sites_tibble()`: could not find function "initialise_sites_tibble"
+Backtrace:
+    ▆
+ 1. └─testthat::expect_equal(names(result), names(initialise_sites_tibble())) at test_dummy_data.R:40:3
+ 2.   └─testthat::quasi_label(enquo(expected), expected.label)
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Error ('test_dummy_data.R:48:3'): dummy_parameters_tibble creates valid tibble
+Error in `initialise_parameters_tibble()`: could not find function "initialise_parameters_tibble"
+Backtrace:
+    ▆
+ 1. └─testthat::expect_equal(names(result), names(initialise_parameters_tibble())) at test_dummy_data.R:48:3
+ 2.   └─testthat::quasi_label(enquo(expected), expected.label)
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Error ('test_dummy_data.R:56:3'): dummy_compartments_tibble creates valid tibble
+Error in `initialise_compartments_tibble()`: could not find function "initialise_compartments_tibble"
+Backtrace:
+    ▆
+ 1. └─testthat::expect_equal(names(result), names(initialise_compartments_tibble())) at test_dummy_data.R:56:3
+ 2.   └─testthat::quasi_label(enquo(expected), expected.label)
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Error ('test_dummy_data.R:64:3'): dummy_methods_tibble creates valid tibble
+Error in `initialise_methods_tibble()`: could not find function "initialise_methods_tibble"
+Backtrace:
+    ▆
+ 1. └─testthat::expect_equal(names(result), names(initialise_methods_tibble())) at test_dummy_data.R:64:3
+ 2.   └─testthat::quasi_label(enquo(expected), expected.label)
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Error ('test_dummy_data.R:72:3'): dummy_samples_tibble creates valid tibble
+Error in `initialise_samples_tibble()`: could not find function "initialise_samples_tibble"
+Backtrace:
+    ▆
+ 1. └─testthat::expect_equal(names(result), names(initialise_samples_tibble())) at test_dummy_data.R:72:3
+ 2.   └─testthat::quasi_label(enquo(expected), expected.label)
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Error ('test_dummy_data.R:80:3'): dummy_biota_tibble creates valid tibble
+Error in `initialise_biota_tibble()`: could not find function "initialise_biota_tibble"
+Backtrace:
+    ▆
+ 1. └─testthat::expect_equal(names(result), names(initialise_biota_tibble())) at test_dummy_data.R:80:3
+ 2.   └─testthat::quasi_label(enquo(expected), expected.label)
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Error ('test_dummy_data.R:88:3'): dummy_measurements_tibble creates valid tibble
+Error in `initialise_measurements_tibble()`: could not find function "initialise_measurements_tibble"
+Backtrace:
+    ▆
+ 1. └─testthat::expect_equal(names(result), names(initialise_measurements_tibble())) at test_dummy_data.R:88:3
+ 2.   └─testthat::quasi_label(enquo(expected), expected.label)
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+
+Error ('test_dummy_data.R:147:3'): create_dummy_session_data column structures match initialise functions
+Error in `initialise_campaign_tibble()`: could not find function "initialise_campaign_tibble"
+Backtrace:
+    ▆
+ 1. └─testthat::expect_equal(names(result$campaignData), names(initialise_campaign_tibble())) at test_dummy_data.R:147:3
+ 2.   └─testthat::quasi_label(enquo(expected), expected.label)
+ 3.     └─rlang::eval_bare(expr, quo_get_env(quo))
+────────────────────────────────────────────────────────────────────────────────
+
+Maximum number of failures exceeded; quitting.
+ℹ Increase this number with (e.g.) `testthat::set_max_fails(Inf)` 
+Error:
+! Test failures.
+Execution halted
+
+2 errors ✖ | 6 warnings ✖ | 5 notes ✖

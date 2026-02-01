@@ -2,11 +2,6 @@
 # A Shiny module for consolidating setup data and entering measurement values
 
 #' Data UI Function ----
-#'
-#' @description A shiny Module for measurement data entry with consolidated sample-parameter combinations.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList
@@ -15,7 +10,6 @@
 #' @importFrom rhandsontable rHandsontableOutput
 #' @importFrom shinyjs useShinyjs show hide hidden
 #' @import eDataDRF
-#' @export
 mod_data_ui <- function(id) {
   ns <- NS(id)
 
@@ -122,7 +116,6 @@ mod_data_ui <- function(id) {
 #' @importFrom utils capture.output head
 #' @importFrom purrr is_empty map_lgl
 #' @import eDataDRF
-#' @export
 mod_data_server <- function(id, parent_session) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

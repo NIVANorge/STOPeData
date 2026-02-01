@@ -3,10 +3,6 @@
 
 #' CREED_purpose UI Function
 #'
-#' @description A shiny Module for defining CREED assessment purpose and criterion thresholds.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList textAreaInput h5 p strong div actionButton fileInput downloadButton hr h5

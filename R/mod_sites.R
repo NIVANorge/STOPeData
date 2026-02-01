@@ -2,11 +2,6 @@
 # A Shiny module for site data entry with table-based editing and map visualization
 
 #' Sites UI Function ----
-#'
-#' @description A shiny Module for site data entry with editable table and map visualization.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList selectInput numericInput textInput dateInput textAreaInput actionButton tags tagAppendAttributes
@@ -16,7 +11,6 @@
 #' @importFrom shinyjs useShinyjs
 #' @importFrom leaflet leafletOutput
 #' @import eDataDRF
-#' @export
 mod_sites_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -207,7 +201,6 @@ mod_sites_ui <- function(id) {
 #' @importFrom dplyr pull
 #' @importFrom bslib update_task_button
 #' @import eDataDRF
-#' @export
 mod_sites_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

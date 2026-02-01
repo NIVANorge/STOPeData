@@ -2,11 +2,6 @@
 # A Shiny module for visual review of measurement data before export
 
 #' Review UI Function ----
-#'
-#' @description A shiny Module for visual data review with interactive plots.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList selectInput
@@ -14,7 +9,6 @@
 #' @importFrom bsicons bs_icon
 #' @importFrom plotly plotlyOutput
 #' @import eDataDRF
-#' @export
 mod_review_ui <- function(id) {
   ns <- NS(id)
 
@@ -135,9 +129,10 @@ mod_review_ui <- function(id) {
 #' @importFrom ggplot2 ggplot aes geom_point geom_boxplot geom_bar theme_minimal labs
 #' @importFrom plotly ggplotly add_text
 #' @importFrom glue glue
+#' @importFrom stats runif
 #' @importFrom golem print_dev
 #' @import eDataDRF
-#' @export
+
 mod_review_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

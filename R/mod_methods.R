@@ -2,11 +2,6 @@
 # A Shiny module for analytical and Sampling Protocols with categorized protocol selection
 
 #' Methods UI Function ----
-#'
-#' @description A shiny Module for methods data entry with categorized protocol selection.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList selectInput actionButton
@@ -15,7 +10,6 @@
 #' @importFrom rhandsontable rHandsontableOutput
 #' @importFrom shinyjs useShinyjs
 #' @import eDataDRF
-#' @export
 mod_methods_ui <- function(id) {
   ns <- NS(id)
 
@@ -118,7 +112,6 @@ mod_methods_ui <- function(id) {
 #' @importFrom dplyr filter select ungroup row_number relocate
 #' @importFrom purrr is_empty
 #' @import eDataDRF
-#' @export
 mod_methods_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

@@ -2,18 +2,12 @@
 # A Shiny module for exporting measurement data to Excel or CSV formats
 
 #' Export UI Function ----
-#'
-#' @description A shiny Module for data export functionality.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList downloadButton hr div
 #' @importFrom bslib card card_body accordion accordion_panel layout_column_wrap
 #' @importFrom bsicons bs_icon
 #' @import eDataDRF
-#' @export
 mod_export_ui <- function(id) {
   ns <- NS(id)
 
@@ -75,7 +69,6 @@ mod_export_ui <- function(id) {
 #' @importFrom readr write_excel_csv
 #' @importFrom zip zip
 #' @import eDataDRF
-#' @export
 mod_export_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -253,7 +246,7 @@ mod_export_server <- function(id) {
         function(dataset_name) {
           display_name <- get_dataset_display_name(dataset_name)
           dims <- moduleState$dataset_dimensions[[dataset_name]]
-          glue("{display_name} ({dims$rows} × {dims$cols})")
+          glue("{display_name} ({dims$rows} \u00D7 {dims$cols})")
         }
       )
 
@@ -330,7 +323,7 @@ mod_export_server <- function(id) {
         # Check if we have dimension info (only available after "Get Data" is clicked)
         if (dataset_name %in% names(moduleState$dataset_dimensions)) {
           dims <- moduleState$dataset_dimensions[[dataset_name]]
-          dimensions <- glue("{dims$rows} rows × {dims$cols} columns")
+          dimensions <- glue("{dims$rows} rows \u00D7 {dims$cols} columns")
           has_data <- TRUE
         } else {
           dimensions <- "No data available"

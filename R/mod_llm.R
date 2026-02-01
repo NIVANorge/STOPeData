@@ -2,11 +2,6 @@
 # A Shiny module for PDF upload and automated data extraction using Claude
 
 #' LLM Extraction UI Function ----
-#'
-#' @description A shiny Module for PDF upload and Claude-powered data extraction.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList fileInput textInput actionButton downloadButton downloadHandler
@@ -14,7 +9,6 @@
 #' @importFrom bsicons bs_icon
 #' @importFrom shinyjs useShinyjs disabled
 #' @import eDataDRF
-#' @export
 mod_llm_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -212,7 +206,6 @@ mod_llm_ui <- function(id) {
 #' @importFrom ellmer chat_anthropic params content_pdf_file type_object type_string type_integer type_number type_array
 #' @importFrom utils str
 #' @importFrom tibble as_tibble
-#' @export
 mod_llm_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -787,11 +780,12 @@ render_extraction_comments <- function(named_list) {
         "extraction_assessement" = "Extraction Grade"
       )
       score_emoji <- c(
-        "Score: 5" = "🟢",
-        "Score: 4" = "🟢",
-        "Score: 3" = "🟡",
-        "Score: 2" = "🟠",
-        "Score: 1" = "🔴"
+        # emoji coloured circles
+        "Score: 5" = "\U0001F7E2",
+        "Score: 4" = "\U0001F7E2",
+        "Score: 3" = "\U0001F7E1",
+        "Score: 2" = "\U0001F7E0",
+        "Score: 1" = "\U0001F534"
       )
       tags$div(
         tags$strong(paste0(pretty_name[[nm]], ": ")),

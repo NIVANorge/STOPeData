@@ -2,11 +2,6 @@
 # A Shiny module for CREED relevance criteria evaluation
 
 #' CREED_relevance UI Function
-#'
-#' @description A shiny Module for evaluating CREED relevance criteria.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList textInput textAreaInput actionButton checkboxInput renderText selectInput h4 p strong em div

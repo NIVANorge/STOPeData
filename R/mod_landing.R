@@ -1,16 +1,10 @@
 #' landing UI Function
-#'
-#' @description A shiny Module.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList icon
 #' @importFrom shinyjs disabled
 #' @importFrom bslib layout_column_wrap card card_body
 #' @importFrom bslib input_task_button
-#' @export
 mod_landing_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -107,7 +101,6 @@ mod_landing_ui <- function(id) {
 #' @param parent_session The parent session object to access main navbar
 #' @noRd
 #' @importFrom shiny moduleServer updateNavbarPage
-#' @export
 mod_landing_server <- function(id, parent_session) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

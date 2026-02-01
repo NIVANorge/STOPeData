@@ -2,11 +2,6 @@
 # A Shiny module for parameter data entry with filtered dropdowns and chemical validation
 
 #' Parameters UI Function ----
-#'
-#' @description A shiny Module for parameter data entry with type-filtered parameter selection.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny moduleServer reactive reactiveValues observe renderText renderUI showNotification updateSelectInput
@@ -18,7 +13,6 @@
 #' @importFrom shinyjs useShinyjs
 #' @importFrom tibble tibble
 #' @import eDataDRF
-#' @export
 mod_parameters_ui <- function(id) {
   ns <- NS(id)
 
@@ -177,7 +171,6 @@ mod_parameters_ui <- function(id) {
 #' @importFrom stats setNames
 #' @importFrom shinyWidgets updatePickerInput
 #' @import eDataDRF
-#' @export
 mod_parameters_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

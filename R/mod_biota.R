@@ -2,11 +2,6 @@
 # A Shiny module for entering biota-specific sample details
 
 #' Biota UI Function ----
-#'
-#' @description A shiny Module for biota data entry with species, tissue, and other biological details.
-#'
-#' @param id,input,output,session Internal parameters for {shiny}.
-#'
 #' @noRd
 #'
 #' @importFrom shiny NS tagList actionButton selectizeInput
@@ -16,7 +11,6 @@
 #' @importFrom shinyjs useShinyjs
 #' @importFrom golem print_dev
 #' @import eDataDRF
-#' @export
 mod_biota_ui <- function(id) {
   ns <- NS(id)
 
@@ -177,7 +171,6 @@ mod_biota_ui <- function(id) {
 #' @importFrom dplyr pull rename
 #' @importFrom tibble tibble
 #' @import eDataDRF
-#' @export
 mod_biota_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns

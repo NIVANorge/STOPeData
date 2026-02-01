@@ -195,7 +195,7 @@ validate_parameters_against_database <- function(
         name_found <- TRUE
         name_validation_lines <- c(
           name_validation_lines,
-          "  ✓ Name found in database"
+          "  \u2713 Name found in database"
         )
 
         # Suggest CAS if missing
@@ -204,20 +204,20 @@ validate_parameters_against_database <- function(
         ) {
           name_validation_lines <- c(
             name_validation_lines,
-            glue("  → Suggested CAS: {exact_matches$CAS_RN[1]}")
+            glue("  \u2192 Suggested CAS: {exact_matches$CAS_RN[1]}")
           )
         }
       } else {
         name_validation_lines <- c(
           name_validation_lines,
-          "  ⚠ Name not found in database"
+          "  \u26A0 Name not found in database"
         )
         has_warnings <- TRUE
       }
     } else {
       name_validation_lines <- c(
         name_validation_lines,
-        "  ⚠ No parameter name provided"
+        "  \u26A0 No parameter name provided"
       )
       has_warnings <- TRUE
     }
@@ -234,7 +234,7 @@ validate_parameters_against_database <- function(
         cas_found <- TRUE
         cas_validation_lines <- c(
           cas_validation_lines,
-          "  ✓ CAS number found in database"
+          "  \u2713 CAS number found in database"
         )
 
         # Check name-CAS consistency
@@ -245,7 +245,7 @@ validate_parameters_against_database <- function(
           cas_validation_lines <- c(
             cas_validation_lines,
             glue(
-              "  ⚠ Name-CAS mismatch. CAS {cas_rn} belongs to: {cas_matches$PARAMETER_NAME[1]}"
+              "  \u26A0 Name-CAS mismatch. CAS {cas_rn} belongs to: {cas_matches$PARAMETER_NAME[1]}"
             )
           )
           has_warnings <- TRUE
@@ -253,7 +253,7 @@ validate_parameters_against_database <- function(
       } else {
         cas_validation_lines <- c(
           cas_validation_lines,
-          "  ⚠ CAS number not found in database"
+          "  \u26A0 CAS number not found in database"
         )
         has_warnings <- TRUE
       }
@@ -264,7 +264,7 @@ validate_parameters_against_database <- function(
     if (!name_found && !cas_found) {
       overall_status_lines <- c(
         overall_status_lines,
-        "  → Recommendation: Verify parameter identity"
+        "  \u2192 Recommendation: Verify parameter identity"
       )
     }
 
@@ -321,13 +321,13 @@ validate_parameters_against_database <- function(
   final_status_section <- if (has_warnings) {
     glue(
       "",
-      "⚠ Some parameters need review. Check suggestions above.",
+      "\u26A0 Some parameters need review. Check suggestions above.",
       .sep = "\n"
     )
   } else {
     glue(
       "",
-      "✓ All parameters found in database!",
+      "\u2713 All parameters found in database!",
       .sep = "\n"
     )
   }
