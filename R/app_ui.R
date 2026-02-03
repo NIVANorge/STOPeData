@@ -194,6 +194,11 @@ app_ui <- function(request) {
           class = "nav-link"
         )
       ),
+      # FIXME: Remove this button
+      nav_item(
+        actionButton("browser", "browser"),
+        tags$script("$('#browser').hide();")
+      ),
       nav_spacer(),
       footer = tags$span(
         ## Navigation buttons ----
@@ -235,8 +240,7 @@ app_ui <- function(request) {
         div(
           style = "margin: 0px 5px 10px 15px; font-size: var(--font-size-sm)",
           HTML(paste0(
-            '<a href="https://github.com/sawelch-NIVA/STOPeData">STOP eData</a>',
-            " is developed by Sam Welch with assistance from Viviane Giradin and Knut Erik Tollefsen. Work on this tool has been funded by ",
+            "This app is developed by Sam Welch with assistance from Viviane Giradin, Kim Leirvik, and Knut Erik Tollefsen. Work on this tool has been funded by ",
             '<a href="https://www.niva.no/en/projects/parc">PARC</a>,',
             ' <a href="https://www.niva.no/en/projects/expect">EXPECT</a>,',
             ' and <a href="https://www.niva.no/en/featured-pages/nctp">NCTP</a>.',

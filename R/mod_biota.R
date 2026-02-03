@@ -453,7 +453,6 @@ mod_biota_server <- function(id) {
         samples_data <- session$userData$reactiveValues$samplesData
         biota_samples <- extract_biota_samples(samples_data)
 
-        # CHANGED: Update userData instead of moduleState
         session$userData$reactiveValues$biotaData <- biota_samples
       }
     }) |>
@@ -464,16 +463,15 @@ mod_biota_server <- function(id) {
       )
 
     ## observe ~bindEvent(LLM data validates or updates): Load and validate LLM biota ----
-    # upstream: session$userData$reactiveValues$llmExtractionComplete
+    # upstream: session$userData$reactiveValues$llmPopulateModules
     # downstream: session$userData$reactiveValues$biotaData, moduleState$llm_lookup_validation, moduleState$llm_validation_results
     observe({
       llm_biota <- session$userData$reactiveValues$biotaDataLLM |> na.omit() # LLM returns a column of all NAs if there are no hits
       if (
         !is.null(llm_biota) &&
           nrow(llm_biota) > 0 &&
-          session$userData$reactiveValues$llmExtractionComplete
+          session$userData$reactiveValues$llmPopulateModules
       ) {
-        # CHANGED: Load to userData instead of moduleState
         session$userData$reactiveValues$biotaData <- llm_biota
 
         # Run validation if moduleState$species_options is available
@@ -524,10 +522,15 @@ mod_biota_server <- function(id) {
           #   )
           moduleState$llm_lookup_validation <- FALSE
         }
+      } else {
+        showNotification(
+          "llmPopulateModules triggered but llm biota data null or empty",
+          type = "error"
+        )
       }
     }) |>
       bindEvent(
-        session$userData$reactiveValues$llmExtractionComplete,
+        session$userData$reactiveValues$llmPopulateModules,
         ignoreInit = TRUE,
         ignoreNULL = FALSE
       )

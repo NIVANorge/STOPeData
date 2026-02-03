@@ -1,5 +1,2 @@
-- This module uses the [Claude Sonnet 4 Large Language Model](https://www.anthropic.com/claude/sonnet) (last updated 14th May 2025) to automatically extract environmental exposure data from uploaded PDFs. Upload a research paper or report, provide your Anthropic API key (note that this requires an Anthropic developer account, which is not the same as a subscription to Claude), and the system will attempt to populate all form fields automatically.
-- LLMs can and do make mistakes, including hallucinating information that is not present in the source document, so please carefully review and correct the extracted data in subsequent modules before validation.
-- If you don't have an API key to hand, click "Load Dummy Data" for example data.
-- LLM extractions are stochastic, not deterministic. It is not guaranteed you will get the same output each time you extract data from the same source.
-- **Note that LLM data extraction will overwrite existing manually entered data.**
+- Extract data from PDFs using a [Large Language Model](https://ig.ft.com/generative-ai/) (LLM)
+- LLMs make mistakes! Use the data modules and validation tools to check extractions.

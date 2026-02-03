@@ -9,10 +9,19 @@
 #' @importFrom htmltools HTML
 #' @importFrom purrr map_chr
 #' @importFrom tools file_ext
+#' @importFrom mirai daemons everywhere
 #' @import eDataDRF
 #' @noRd
 options(shiny.maxRequestSize = 20 * 1024^2) # TODO: Move this to the run call.
 
+# Set background processe for running tasks
+daemons(1)
+# make sure this process can access the llm extraction function, etc.
+everywhere(source("R/mod_llm_fct_extract.R"))
+everywhere(library(ellmer))
+everywhere(library(shiny))
+# Reset when the app is stopped
+onStop(function() daemons(0))
 
 # -----------------------
 # ---- userData ----
@@ -22,7 +31,6 @@ options(shiny.maxRequestSize = 20 * 1024^2) # TODO: Move this to the run call.
 initialise_userData <- function() {
   list(
     ENTERED_BY = character(0),
-    autosave_enabled = FALSE,
 
     # Standard validated data ----
     # All userData and module_state$data data is stored in a tabular (tibble) format centrally, even for campaign and reference (which currently only have one row)
@@ -75,8 +83,10 @@ initialise_userData <- function() {
     samplesDataLLM = tibble(NULL),
 
     # LLM extraction status flags ----
-    llmExtractionComplete = FALSE,
-    llmExtractionSuccessful = FALSE,
+    llmExtractionComplete = FALSE, # tracks if the LLM data extraction process has completed, or the user has pressed the dummy data button
+    llmExtractionSuccessful = FALSE, # tracks if the LLM data extraction process (or dummy data) returned a tibble in the expected format
+    llmPopulateModules = FALSE, # tracks if the user has sent LLM data to modukles
+
     llmExtractionComments = tibble(NULL),
 
     # Import data from save status flags ----
@@ -538,28 +548,6 @@ app_server <- function(input, output, session) {
     bindEvent(input$download_modal_cancel, ignoreInit = TRUE)
 
   # 4. Outputs ----
-
-  ## Output: db connection status (disabled) ----
-  # upstream: db_status() reactive
-  # downstream: UI element showing database connection status
-  output$db_connection <- renderUI({
-    status <- db_status()
-
-    if (status) {
-      # Connected - green circle
-      div(
-        style = "height: 20px; width: 20px; border-radius: 50%; background-color: #28a745;",
-        title = "Database Connected"
-      )
-    } else {
-      # Disconnected - red circle
-      div(
-        style = "height: 20px; width: 20px; border-radius: 50%; background-color: #dc3545;",
-        title = "Database Disconnected"
-      )
-    }
-  })
-
   ## Output: download handler for all CSV files ----
   # upstream: moduleState reactive values
   # downstream: ZIP file download containing all data as CSV
@@ -567,4 +555,17 @@ app_server <- function(input, output, session) {
     session = session,
     moduleState = moduleState
   )
+
+  # FIXME: Shiny browser button
+  # via https://rtask.thinkr.fr/a-little-trick-for-debugging-shiny/
+  observeEvent(input$browser, {
+    browser()
+  })
+
+  # FIXME: attempted auto email getter
+  observe(showNotification(
+    session$request$HTTP_X_AUTH_REQUEST_EMAIL,
+    type = "warning"
+  )) |>
+    bindEvent(session$request$HTTP_X_AUTH_REQUEST_EMAIL)
 }

@@ -5,7 +5,7 @@
 #' @noRd
 #'
 #' @importFrom shiny NS tagList fileInput textInput actionButton downloadButton downloadHandler
-#' @importFrom bslib card card_body accordion accordion_panel tooltip layout_column_wrap input_task_button accordion_panel_open
+#' @importFrom bslib card card_body accordion accordion_panel tooltip layout_column_wrap input_task_button accordion_panel_open bind_task_button
 #' @importFrom bsicons bs_icon
 #' @importFrom shinyjs useShinyjs disabled
 #' @import eDataDRF
@@ -48,7 +48,7 @@ mod_llm_ui <- function(id) {
             inputId = ns("pdf_file"),
             label = tooltip(
               list("Upload PDF", bs_icon("info-circle-fill")),
-              "Upload a research paper or report (pdf) containing environmental exposure data"
+              "Upload a research paper or report (pdf) containing environmental exposure data."
             ),
             accept = ".pdf",
             width = "100%",
@@ -130,7 +130,7 @@ mod_llm_ui <- function(id) {
               class = "btn-info"
             ) |>
               disabled(),
-            "Extract data from a .pdf using an LLM. A PDF must be uploaded to enable this function."
+            "Extract data from a .pdf using the Claude Sonnet 4.5 LLM. A PDF must be uploaded to enable this function."
           ),
 
           tooltip(
@@ -199,8 +199,10 @@ mod_llm_ui <- function(id) {
 #' LLM Extraction Server Functions ----
 #'
 #' @noRd
-#' @importFrom shiny moduleServer reactive reactiveValues observe renderText renderUI showNotification updateTextAreaInput
+#' @importFrom shiny moduleServer reactive reactiveValues observe renderText renderUI showNotification updateTextAreaInput ExtendedTask
+#' @importFrom mirai mirai
 #' @importFrom shinyjs enable disable
+#' @importFrom stringr str_replace str_extract
 #' @importFrom glue glue
 #' @importFrom golem print_dev
 #' @importFrom ellmer chat_anthropic params content_pdf_file type_object type_string type_integer type_number type_array
@@ -211,7 +213,7 @@ mod_llm_server <- function(id) {
     ns <- session$ns
 
     # 1. Module setup ----
-    ## ReactiveValues: moduleState ----
+    ## # ReactiveValues: moduleState -----
     moduleState <- reactiveValues(
       extraction_successful = FALSE,
       raw_extraction = NULL,
@@ -221,7 +223,7 @@ mod_llm_server <- function(id) {
 
     # 2. Observers and Reactives ----
 
-    ## observe: Reset configuration to defaults ----
+    ## # observe: Reset configuration to defaults ----
     observe({
       updateTextAreaInput(
         session,
@@ -237,7 +239,7 @@ mod_llm_server <- function(id) {
     }) |>
       bindEvent(input$reset_defaults)
 
-    ## observe: Enable extract button when PDF and API key available ----
+    ## # observe: Enable extract button when PDF and API key available ----
     # upstream: input$pdf_file, input$api_key
     # downstream: extract_data button state
     observe({
@@ -252,7 +254,7 @@ mod_llm_server <- function(id) {
       }
     })
 
-    ## observe: Load dummy data ----
+    ## # observe: Load dummy data ----
     # upstream: user clicks input$load_dummy_data
     # downstream: moduleState$*, session$userData$reactiveValues$*DataLLM
     observe({
@@ -263,8 +265,7 @@ mod_llm_server <- function(id) {
       dummy_data <- create_dummy_data(uppercase_columns = TRUE)
 
       # Store results in module state (for LLM-specific behavior)
-      session$userData$reactiveValues$llmExtractionComplete <- TRUE
-      moduleState$extraction_successful <- TRUE
+
       moduleState$structured_data <- dummy_data
       moduleState$raw_extraction <- dummy_data
       moduleState$error_message <- NULL
@@ -284,6 +285,10 @@ mod_llm_server <- function(id) {
         type = "default"
       )
 
+      # set success flags last
+      session$userData$reactiveValues$llmExtractionComplete <- TRUE
+      session$userData$reactiveValues$llmExtractionSuccessful <- TRUE
+
       # Enable extraction-dependent and extract_data button again
       enable("populate_forms")
       enable("clear_extraction")
@@ -291,165 +296,91 @@ mod_llm_server <- function(id) {
     }) |>
       bindEvent(input$load_dummy_data)
 
-    ## observe: PDF data extraction ----
+    ## # ExtendedTask: PDF data extraction ----
+    # upstream: user clicks input$extract_data
+    llm_task <- ExtendedTask$new(
+      function(
+        pdf_path,
+        api_key,
+        extraction_prompt,
+        extraction_schema,
+        max_tokens
+      ) {
+        mirai(
+          {
+            extract_pdf_with_llm(
+              pdf_path,
+              api_key,
+              extraction_prompt,
+              extraction_schema,
+              max_tokens
+            )
+          },
+          pdf_path = pdf_path,
+          api_key = api_key,
+          extraction_prompt = extraction_prompt,
+          extraction_schema = extraction_schema,
+          max_tokens = max_tokens
+        )
+      }
+    ) |>
+      # we need both this and to invoke in the below observer
+      bind_task_button("extract_data")
+
+    ## # observe: PDF data extraction ----
     # upstream: user clicks input$extract_data
     # downstream: moduleState$*, session$userData$reactiveValues$*DataLLM
+    # Create ExtendedTask at module initialization
     observe({
       req(input$pdf_file, input$api_key)
 
-      withProgress(message = "Processing PDF extraction", value = 0, {
-        # Step 1: Validate API key
-        incProgress(0.1, detail = "Validating API key...")
-        if (!grepl("^sk-ant-", input$api_key)) {
-          showNotification(
-            "API key should start with 'sk-ant-'. Please check your key.",
-            type = "warning"
-          )
-          return()
-        }
+      # Synchronous validation (fast)
+      # tryCatch(
+      #   {
+      #     validate_api_key(input$api_key)
+      #   },
+      #   error = function(e) {
+      #     showNotification(e$message, type = "warning")
+      #     return()
+      #   }
+      # )
 
-        tryCatch(
-          {
-            # Step 2: Set up environment and test connection
-            incProgress(0.01, detail = "Opening API connection...")
-            Sys.setenv(ANTHROPIC_API_KEY = input$api_key)
+      # # Optional: Test connection (also fast, but could be async too)
+      # tryCatch(
+      #   {
+      #     test_llm_connection(input$api_key)
+      #   },
+      #   error = function(e) {
+      #     showNotification(
+      #       paste("Connection failed:", e$message),
+      #       type = "error"
+      #     )
+      #     return()
+      #   }
+      # )
 
-            # Step 3: Test API connectivity
-            incProgress(0.01, detail = "Testing API connection...")
-            test_chat <- NULL
-            tryCatch(
-              {
-                test_chat <- chat_anthropic(
-                  model = "claude-sonnet-4-20250514",
-                  params = params(max_tokens = 50)
-                )
-                test_response <- test_chat$chat(
-                  "Hello, please respond with 'API connection successful'"
-                )
-              },
-              error = function(e) {
-                showNotification(
-                  paste("API connection failed:", e$message),
-                  type = "error"
-                )
-                return()
-              }
-            )
-
-            if (is.null(test_chat)) {
-              return()
-            }
-
-            # Step 4: Prepare extraction components
-            incProgress(0.01, detail = "Preparing extraction...")
-            chat <- chat_anthropic(
-              model = "claude-sonnet-4-20250514",
-              params = params(max_tokens = input$max_tokens) # Changed from 6000
-            )
-
-            extraction_schema <- create_extraction_schema()
-            pdf_content <- content_pdf_file(input$pdf_file$datapath)
-            session$userData$reactiveValues$pdfPath = input$pdf_file$datapath
-
-            # Step 5: Set up prompts
-            incProgress(0.01, detail = "Configuring extraction...")
-            # should be at 0.05 by now
-            extraction_prompt <- if (isTruthy(input$extraction_prompt)) {
-              input$extraction_prompt
-            } else {
-              create_extraction_prompt()
-            }
-
-            # Step 6: Extract data (this is the longest step)
-            incProgress(
-              0.01,
-              detail = "Extracting data (I haven't worked out how to fake progress yet so don't be alarmed if this sits at ~10% for 30 seconds)..."
-            )
-            result <- chat$chat_structured(
-              extraction_prompt,
-              pdf_content,
-              type = extraction_schema
-            )
-
-            # Step 7: Get API call metadata
-            incProgress(0.1, detail = "Storing results...")
-
-            # Capture cost information
-            api_metadata <- NULL
-            tryCatch(
-              {
-                cost_info <- chat$get_cost(include = "all")
-                api_metadata <- list(
-                  total_cost = cost_info
-                )
-              },
-              error = function(e) {
-                print_dev(paste("Could not retrieve cost info:", e$message))
-              }
-            )
-
-            # Store results
-            session$userData$reactiveValues$llmExtractionComplete <- TRUE
-            moduleState$extraction_successful <- TRUE
-            # TODO: Are we still getting results returned as lists containing NULL. This causes problems with as_tibble()
-            moduleState$structured_data <- result
-            moduleState$raw_extraction <- result
-            moduleState$error_message <- NULL
-            moduleState$api_metadata <- api_metadata
-
-            # Also save outputs to server data so we can download them later if needed
-            session$userData$reactiveValues$schemaLLM <- create_extraction_schema()
-            session$userData$reactiveValues$promptLLM <- extraction_prompt
-            session$userData$reactiveValues$rawLLM <- result
-
-            if (!is.null(moduleState$structured_data$comments)) {
-              session$userData$reactiveValues$llmExtractionComments <- moduleState$structured_data$comments
-            }
-
-            # Step 8: Update session data
-            incProgress(0.1, detail = "Updating data...")
-
-            # Step 9: Enable UI elements
-            incProgress(0.1, detail = "Finalising...")
-            enable("populate_forms")
-            enable("clear_extraction")
-
-            # Final success notification
-            showNotification(
-              "PDF extraction completed successfully!",
-              type = "message"
-            )
-
-            # Open extraction accordion for review
-            accordion_panel_open(
-              id = "results_accordion",
-              values = "extraction_results"
-            )
-          },
-          error = function(e) {
-            session$userData$reactiveValues$llmExtractionComplete <- TRUE
-            moduleState$extraction_successful <- FALSE
-            moduleState$error_message <- e$message
-            moduleState$structured_data <- NULL
-            moduleState$api_metadata <- NULL
-
-            showNotification(
-              paste("Extraction failed:", e$message),
-              type = "error"
-            )
-          }
-        )
-      })
+      # Launch async extraction
+      llm_task$invoke(
+        pdf_path = input$pdf_file$datapath,
+        api_key = input$api_key,
+        extraction_prompt = if (isTruthy(input$extraction_prompt)) {
+          input$extraction_prompt
+        } else {
+          create_extraction_prompt()
+        },
+        extraction_schema = create_extraction_schema(),
+        max_tokens = input$max_tokens
+      )
     }) |>
       bindEvent(input$extract_data)
 
-    ## observe: Enable download button when extraction is complete ----
-    # upstream: session$userData$reactiveValues$llmExtractionComplete, moduleState$extraction_successful
+    ## # observe: Enable download button when extraction is complete ----
+    # upstream: session$userData$reactiveValues$llmExtractionComplete, session$userData$reactiveValues$llmExtractionSuccessful
     # downstream: download_extraction button state
     observe({
       if (
         session$userData$reactiveValues$llmExtractionComplete &&
-          moduleState$extraction_successful
+          session$userData$reactiveValues$llmExtractionSuccessful
       ) {
         enable("download_extraction")
       } else {
@@ -458,14 +389,14 @@ mod_llm_server <- function(id) {
     }) |>
       bindEvent(
         session$userData$reactiveValues$llmExtractionComplete,
-        moduleState$extraction_successful
+        session$userData$reactiveValues$llmExtractionSuccessful
       )
 
-    ## observe: Populate forms with extracted data ----
+    ## # observe: Populate forms with extracted data ----
     # upstream: user clicks input$populate_forms
     # downstream: trigger form population in other modules
     observe({
-      req(moduleState$structured_data)
+      req(!is.null(moduleState$structured_data))
       tryCatch(
         {
           # Populate form fields directly
@@ -517,6 +448,7 @@ mod_llm_server <- function(id) {
             biota_data <- create_biota_from_llm(
               moduleState$structured_data$biota
             )
+            golem::print_dev(biota_data)
             session$userData$reactiveValues$biotaDataLLM <- biota_data
           }
 
@@ -536,8 +468,7 @@ mod_llm_server <- function(id) {
           }
 
           # Set extraction status flags
-          session$userData$reactiveValues$llmExtractionComplete <- TRUE
-          session$userData$reactiveValues$llmExtractionSuccessful <- TRUE
+          session$userData$reactiveValues$llmPopulateModules <- TRUE
 
           showNotification(
             "Forms populated with extracted data! Review and correct in each module.",
@@ -554,13 +485,11 @@ mod_llm_server <- function(id) {
     }) |>
       bindEvent(input$populate_forms)
 
-    ## observe: Clear extraction ----
+    ## # observe: Clear extraction ----
     # upstream: user clicks input$clear_extraction
     # downstream: reset module state and session data
     observe({
       # Clear module state
-      session$userData$reactiveValues$llmExtractionComplete <- FALSE
-      moduleState$extraction_successful <- FALSE
       moduleState$raw_extraction <- NULL
       moduleState$structured_data <- NULL
       moduleState$error_message <- NULL
@@ -570,6 +499,7 @@ mod_llm_server <- function(id) {
       clear_llm_data_from_session(session)
       session$userData$reactiveValues$llmExtractionComplete <- FALSE
       session$userData$reactiveValues$llmExtractionSuccessful <- FALSE
+      session$userData$reactiveValues$llmPopulateModules <- FALSE
 
       # Disable buttons
       disable("populate_forms")
@@ -580,7 +510,7 @@ mod_llm_server <- function(id) {
     }) |>
       bindEvent(input$clear_extraction)
 
-    ## observe ~ bindEvent: Set session username from ENTERED_BY ----
+    ## # observe ~ bindEvent: Set session username from ENTERED_BY ----
     observe({
       req(input$ENTERED_BY)
 
@@ -599,24 +529,53 @@ mod_llm_server <- function(id) {
 
     # 3. Outputs ----
 
-    ## output: extraction_status ----
+    ## # output: extraction_status ----
     # upstream: moduleState
     # downstream: UI status display
     output$extraction_status <- renderUI({
-      if (!session$userData$reactiveValues$llmExtractionComplete) {
+      # Changed from renderText to renderUI
+
+      # Check if task is still running
+      if (identical(llm_task$status(), "running")) {
+        return(div(
+          bs_icon("hourglass-split"),
+          "Extracting data from PDF... This may take 30-60 seconds.",
+          class = "validation-status validation-info"
+        ))
+      }
+
+      # Try to get result (won't block if not ready)
+      result <- llm_task$result()
+
+      if (is.null(result)) {
+        # No extraction attempted yet
         div(
           bs_icon("info-circle"),
           "Upload a PDF and provide your API key to begin extraction, or use dummy data for testing.",
           class = "validation-status validation-info"
         )
-      } else if (moduleState$extraction_successful) {
-        # Build status message with API metadata
-        status_text <- "Data extraction completed successfully. Review results and populate forms below."
+      } else if (!is.null(result$success) && result$success) {
+        # Store successful results
+        moduleState$structured_data <- result$result
+        moduleState$api_metadata <- result$metadata
+        moduleState$raw_extraction <- result$result
 
-        if (!is.null(moduleState$api_metadata)) {
+        # Update session data
+        session$userData$reactiveValues$rawLLM <- result$result
+        session$userData$reactiveValues$llmExtractionComplete <- TRUE
+        session$userData$reactiveValues$llmExtractionSuccessful <- TRUE
+
+        # Enable buttons
+        enable("populate_forms")
+        enable("clear_extraction")
+
+        # Build status message
+        status_text <- "Extraction successful."
+
+        if (!is.null(result$metadata$total_cost)) {
           metadata_text <- paste0(
-            " Extraction Cost: ~$",
-            moduleState$api_metadata$total_cost |> round(digits = 2)
+            " (Cost: $",
+            round(result$metadata$total_cost, 2)
           )
           status_text <- paste0(status_text, metadata_text)
         }
@@ -627,15 +586,26 @@ mod_llm_server <- function(id) {
           class = "validation-status validation-complete"
         )
       } else {
+        # Extraction failed
+        error_msg <- if (!is.null(result$error)) {
+          result$error
+        } else {
+          "Unknown error occurred"
+        }
+
+        moduleState$error_message <- error_msg
+        session$userData$reactiveValues$llmExtractionComplete <- TRUE
+        session$userData$reactiveValues$llmExtractionSuccessful <- FALSE
+
         div(
           bs_icon("exclamation-triangle"),
-          paste("Extraction failed:", moduleState$error_message),
+          paste("Extraction failed:", error_msg),
           class = "validation-status validation-warning"
         )
       }
     })
 
-    ## output: extraction_results ----
+    ## # output: extraction_results ----
     # upstream: moduleState$raw_extraction
     # downstream: UI results display
     output$extraction_results <- renderText({
@@ -647,7 +617,7 @@ mod_llm_server <- function(id) {
             moduleState$raw_extraction,
             max.level = 6,
             vec.len = 10,
-            nchar.max = 200
+            nchar.max = 5000
           )) |>
             paste(collapse = "\n")
         } else {
@@ -660,7 +630,7 @@ mod_llm_server <- function(id) {
       }
     })
 
-    ## output: download_extraction ----
+    ## # output: download_extraction ----
     # upstream: moduleState$raw_extraction
     # downstream: file download
     output$download_extraction <- downloadHandler(
@@ -789,11 +759,11 @@ render_extraction_comments <- function(named_list) {
       )
       tags$div(
         tags$strong(paste0(pretty_name[[nm]], ": ")),
-        score_emoji[[stringr::str_extract(
+        score_emoji[[str_extract(
           named_list[[nm]],
           pattern = "Score: [1-5]"
         )]],
-        stringr::str_replace(
+        str_replace(
           string = named_list[[nm]],
           pattern = "Score: [1-5]",
           replacement = ""

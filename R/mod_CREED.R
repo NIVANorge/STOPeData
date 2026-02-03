@@ -440,7 +440,11 @@ mod_CREED_server <- function(id) {
     # upstream: session$userData$reactiveValues$creedScores
     # downstream: UI display
     output$creed_scores_display <- renderUI({
-      scores <- moduleState$creed_scores_pretty
+      scores <- if (nrow(moduleState$creed_scores_pretty) > 0) {
+        moduleState$creed_scores_pretty
+      } else {
+        initialise_CREED_scores_tibble()
+      }
 
       tagList(
         h5("CREED Assessment Results"),

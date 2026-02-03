@@ -10,4 +10,4 @@ Since this app is exclusively being used for EXPECT's AEP copper data extraction
 6. You can work in Excel if easier, but use the controlled vocabulary.
 7. **Since the migration to NIVA's cloud server, entered data has started being retained between sessions. This can be useful, but hit Ctrl + Shift + R before starting a new extraction to clear existing data.**
 
-If something breaks, email saw@niva.no or log an issue [here](https://github.com/sawelch-NIVA/STOPeData/issues) with screenshots and your extraction file.
+If something breaks, email saw@niva.no or log an issue [here](https://github.com/NIVANorge/STOPeData/issues) with screenshots and your extraction file.

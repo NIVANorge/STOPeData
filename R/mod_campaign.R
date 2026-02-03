@@ -17,9 +17,9 @@ mod_campaign_ui <- function(id) {
     card(
       fill = TRUE,
       card_body(
-        ## Info accordion ----
+        ## # Info accordion ----
         info_accordion(content_file = "inst/app/www/md/intro_campaign.md"),
-        ## Input fields layout ----
+        ##  #Input fields layout ----
         layout_column_wrap(
           width = "300px",
           fill = FALSE,
@@ -84,49 +84,50 @@ mod_campaign_ui <- function(id) {
           ) |>
             suppressWarnings(), # suppress date NA warning
 
-          ### RELIABILITY_EVAL_SYS - Optional string, 50 char ----
-          selectInput(
-            inputId = ns("RELIABILITY_EVAL_SYS"),
-            label = tooltip(
-              list(
-                "Reliability Evaluation System",
-                bs_icon("info-circle-fill")
-              ),
-              "The system used to evaluate data quality."
-            ),
-            choices = c(
-              "Not relevant",
-              "Not reported",
-              "CREED",
-              "Other (add to comments)"
-            ),
-            width = "100%"
-          ),
+          # # Disabled reliability fields, as we don't use them and they're not really germaine.
+          # ### RELIABILITY_EVAL_SYS - Optional string, 50 char ----
+          # selectInput(
+          #   inputId = ns("RELIABILITY_EVAL_SYS"),
+          #   label = tooltip(
+          #     list(
+          #       "Reliability Evaluation System",
+          #       bs_icon("info-circle-fill")
+          #     ),
+          #     "The system used to evaluate data quality."
+          #   ),
+          #   choices = c(
+          #     "Not relevant",
+          #     "Not reported",
+          #     "CREED",
+          #     "Other (add to comments)"
+          #   ),
+          #   width = "100%"
+          # ),
 
-          ### RELIABILITY_SCORE - Optional int, 22 char ----
-          textInput(
-            inputId = ns("RELIABILITY_SCORE"),
-            label = tooltip(
-              list("Reliability Score", bs_icon("info-circle-fill")),
-              "The score given (numeric or categorical) under the Reliability Evaluation System, if relevant."
-            ),
-            value = NA,
-            placeholder = "Numeric or categorical",
-            width = "100%"
-          ),
+          # ### RELIABILITY_SCORE - Optional int, 22 char ----
+          # textInput(
+          #   inputId = ns("RELIABILITY_SCORE"),
+          #   label = tooltip(
+          #     list("Reliability Score", bs_icon("info-circle-fill")),
+          #     "The score given (numeric or categorical) under the Reliability Evaluation System, if relevant."
+          #   ),
+          #   value = NA,
+          #   placeholder = "Numeric or categorical",
+          #   width = "100%"
+          # ),
 
           ### CONFIDENTIALITY_EXPIRY_DATE - Optional date ----
-          dateInput(
-            inputId = ns("CONFIDENTIALITY_EXPIRY_DATE"),
-            label = tooltip(
-              list("Confidentiality Expiry Date", bs_icon("info-circle-fill")),
-              "The date at which the data leaves embargo or ceases to be confidential. Use ISO date format (YYYY-MM-DD)."
-            ),
-            value = NA,
-            format = "yyyy-mm-dd",
-            width = "100%"
-          ) |>
-            suppressWarnings(), # suppress date NA warning
+          # dateInput(
+          #   inputId = ns("CONFIDENTIALITY_EXPIRY_DATE"),
+          #   label = tooltip(
+          #     list("Confidentiality Expiry Date", bs_icon("info-circle-fill")),
+          #     "The date at which the data leaves embargo or ceases to be confidential. Use ISO date format (YYYY-MM-DD)."
+          #   ),
+          #   value = NA,
+          #   format = "yyyy-mm-dd",
+          #   width = "100%"
+          # ) |>
+          #   suppressWarnings(), # suppress date NA warning
 
           ### ENTERED_BY - Required string, 50 char ----
           textInput(
@@ -164,7 +165,7 @@ mod_campaign_ui <- function(id) {
           rows = 3
         ),
 
-        ## Validation status and raw data ----
+        ## # Validation status and raw data ----
         span(
           # prevent flex-grow validation element from growing vertically
           uiOutput(ns("validation_reporter"))
@@ -179,7 +180,7 @@ mod_campaign_ui <- function(id) {
           )
         ),
 
-        ## Action buttons ----
+        ## # Action buttons ----
         actionButton(
           inputId = ns("clear"),
           label = "Clear All Fields",
@@ -371,8 +372,8 @@ mod_campaign_server <- function(id) {
           updateTextInput(session, "CAMPAIGN_NAME", value = "")
           updateDateInput(session, "CAMPAIGN_START_DATE", value = as.Date(NA))
           updateDateInput(session, "CAMPAIGN_END_DATE", value = as.Date(NA))
-          updateNumericInput(session, "RELIABILITY_SCORE", value = NA)
-          updateTextInput(session, "RELIABILITY_EVAL_SYS", value = "")
+          # updateNumericInput(session, "RELIABILITY_SCORE", value = NA)
+          # updateTextInput(session, "RELIABILITY_EVAL_SYS", value = "")
           updateDateInput(
             session,
             "CONFIDENTIALITY_EXPIRY_DATE",
@@ -464,7 +465,7 @@ mod_campaign_server <- function(id) {
         ignoreInit = TRUE
       )
 
-    ## observe: update ENTERED_BY field with user_id ----
+    ## # observe: update ENTERED_BY field with user_id ----
     # upstream: session$userData$reactiveValues$ENTERED_BY
     # downstream: input$ENTERED_BY
     observe({
@@ -506,7 +507,7 @@ mod_campaign_server <- function(id) {
       )
 
     ## observe: Populate from LLM data when available ----
-    # upstream: session$userData$reactiveValues$campaignDataLLM
+    # upstream: session$userData$reactiveValues$llmPopulateModules
     # downstream: input fields
     observe({
       tryCatch(
@@ -514,7 +515,7 @@ mod_campaign_server <- function(id) {
           llm_data <- session$userData$reactiveValues$campaignDataLLM
           if (
             !is.null(llm_data) &&
-              session$userData$reactiveValues$llmExtractionComplete
+              session$userData$reactiveValues$llmPopulateModules
           ) {
             populate_campaign_from_llm(session, llm_data)
 
@@ -550,13 +551,12 @@ mod_campaign_server <- function(id) {
     }) |>
       bindEvent(
         label = "mod_campaign_populate_llm",
-        session$userData$reactiveValues$campaignDataLLM,
-        session$userData$reactiveValues$llmExtractionSuccessful,
+        session$userData$reactiveValues$llmPopulateModules,
         ignoreInit = TRUE,
         ignoreNULL = FALSE
       )
 
-    ## observer: receive data from session$userData$reactiveValues$campaignData (import) ----
+    ## # observer: receive data from session$userData$reactiveValues$campaignData (import) ----
     ## and update module inputs
     observe({
       tryCatch(
@@ -607,7 +607,7 @@ mod_campaign_server <- function(id) {
 
     # 3. Outputs ----
 
-    ## output: validation_reporter ----
+    ## # output: validation_reporter ----
     # upstream: session$userData$reactiveValues$campaignDataValid
     # downstream: UI update
     output$validation_reporter <- renderUI({
@@ -655,7 +655,7 @@ mod_campaign_server <- function(id) {
       )
     })
 
-    ## output: validated_data_display ----
+    ## # output: validated_data_display ----
     # upstream: session$userData$reactiveValues$campaignData (when valid)
     # downstream: UI update
     output$validated_data_display <- renderText({

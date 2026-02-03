@@ -9,7 +9,7 @@
 #' @importFrom bsicons bs_icon
 #' @importFrom shinyvalidate InputValidator sv_required
 #' @importFrom rhandsontable rHandsontableOutput
-#' @importFrom shinyWidgets pickerInput
+#' @importFrom shinyWidgets pickerInput pickerOptions
 #' @importFrom shinyjs useShinyjs
 #' @importFrom tibble tibble
 #' @import eDataDRF
@@ -60,7 +60,12 @@ mod_parameters_ui <- function(id) {
             choices = c("Show all" = "Show all"),
             selected = "Show all",
             width = "100%",
-            multiple = FALSE
+            multiple = FALSE,
+            options = pickerOptions(
+              actionsBox = TRUE,
+              liveSearch = TRUE,
+              virtualScroll = TRUE
+            )
           )
         ),
 
@@ -73,6 +78,11 @@ mod_parameters_ui <- function(id) {
           choices = c("Select parameter type first..."),
           width = "100%",
           selected = "Formaldehyde",
+          options = pickerOptions(
+            actionsBox = TRUE,
+            liveSearch = TRUE,
+            virtualScroll = TRUE
+          ),
           multiple = FALSE
         ),
 

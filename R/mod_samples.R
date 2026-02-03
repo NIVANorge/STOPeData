@@ -458,7 +458,7 @@ mod_samples_server <- function(id) {
     }) |>
       bindEvent(
         label = "mod_samples_populate_llm",
-        session$userData$reactiveValues$llmExtractionComplete,
+        # session$userData$reactiveValues$llmExtractionComplete,
         session$userData$reactiveValues$llmExtractionSuccessful,
         ignoreInit = TRUE,
         ignoreNULL = FALSE

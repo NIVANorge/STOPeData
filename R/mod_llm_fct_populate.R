@@ -339,36 +339,6 @@ create_parameters_from_llm <- function(
     return(tibble())
   }
 
-  # Helper function to find database match ----
-  find_db_match <- function(param_name, cas_rn, chemical_parameters) {
-    if (is.null(chemical_parameters)) {
-      return(NULL)
-    }
-
-    # Try exact name match first
-    if (param_name != "") {
-      exact_match <- chemical_parameters[
-        tolower(chemical_parameters$PARAMETER_NAME) == tolower(param_name),
-      ]
-      if (nrow(exact_match) > 0) {
-        return(exact_match[1, ]) # Take first match
-      }
-    }
-
-    # Try CAS lookup if no name match
-    if (cas_rn != "") {
-      cas_match <- chemical_parameters[
-        !is.na(chemical_parameters$CAS_RN) &
-          chemical_parameters$CAS_RN == cas_rn,
-      ]
-      if (nrow(cas_match) > 0) {
-        return(cas_match[1, ]) # Take first match
-      }
-    }
-
-    return(NULL)
-  }
-
   # Process each parameter row ----
   params_tibble <- map_dfr(seq_len(nrow(llm_parameters_data)), function(i) {
     param <- llm_parameters_data[i, ]
@@ -378,7 +348,11 @@ create_parameters_from_llm <- function(
     param_comment <- safe_extract_field(param, "parameter_comment", "")
 
     # Try to get data from chemical database
-    db_match <- find_db_match(param_name, cas_rn, chemical_parameters)
+    db_match <- find_parameter_lookup_match(
+      param_name,
+      cas_rn,
+      chemical_parameters
+    )
 
     # Build parameter row
     tibble(
@@ -441,6 +415,40 @@ safe_extract_field <- function(data_obj, field_name, default = NA) {
       return(default)
     }
   )
+}
+
+# Helper function to find database match ----
+find_parameter_lookup_match <- function(
+  param_name,
+  cas_rn,
+  chemical_parameters
+) {
+  if (is.null(chemical_parameters) | nrow(chemical_parameters) == 0) {
+    stop("Chemical parameters not found.")
+  }
+
+  # Try exact name match first
+  if (param_name != "") {
+    exact_match <- chemical_parameters[
+      tolower(chemical_parameters$PARAMETER_NAME) == tolower(param_name),
+    ]
+    if (nrow(exact_match) > 0) {
+      return(exact_match[1, ]) # Take first match
+    }
+  }
+
+  # Try CAS lookup if no name match
+  if (cas_rn != "") {
+    cas_match <- chemical_parameters[
+      !is.na(chemical_parameters$CAS_RN) &
+        chemical_parameters$CAS_RN == cas_rn,
+    ]
+    if (nrow(cas_match) > 0) {
+      return(cas_match[1, ]) # Take first match
+    }
+  }
+
+  return(NULL)
 }
 
 # mod_compartment ----
@@ -670,6 +678,7 @@ validate_longitude <- function(lon) {
 #' @noRd
 # ! FORMAT-BASED
 create_biota_from_llm <- function(llm_biota_data) {
+  browser()
   if (is.null(llm_biota_data) || nrow(llm_biota_data) == 0) {
     return(tibble())
   }
@@ -696,24 +705,28 @@ create_biota_from_llm <- function(llm_biota_data) {
       REP = 1L, # Default
       SPECIES_GROUP = map_species_group_strict(safe_extract_field(
         biota_entry,
-        "species_group",
+        "SPECIES_GROUP",
         ""
       )),
-      SAMPLE_SPECIES = safe_extract_field(biota_entry, "sample_species", ""),
+      SAMPLE_SPECIES = safe_extract_field(
+        biota_entry,
+        "sample_species",
+        "ERROR: safe_extract_field() has messed up"
+      ),
       SAMPLE_TISSUE = map_tissue_type_strict(safe_extract_field(
         biota_entry,
         "sample_tissue",
-        ""
+        "ERROR: safe_extract_field() has messed up"
       )),
       SAMPLE_SPECIES_LIFESTAGE = map_lifestage_strict(safe_extract_field(
         biota_entry,
         "sample_species_lifestage",
-        ""
+        "ERROR: safe_extract_field() has messed up"
       )),
       SAMPLE_SPECIES_GENDER = map_gender_strict(safe_extract_field(
         biota_entry,
         "sample_species_gender",
-        ""
+        "ERROR: safe_extract_field() has messed up"
       ))
     )
 
@@ -721,6 +734,7 @@ create_biota_from_llm <- function(llm_biota_data) {
   }
 
   print_dev(glue("Created {nrow(biota_tibble)} biota entries from LLM data"))
+  # FIXME: Warning: Unknown or uninitialised column: `REFERENCE_ID`.
   return(biota_tibble)
 }
 #' Validate Species Against Database

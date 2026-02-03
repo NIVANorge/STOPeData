@@ -642,7 +642,7 @@ mod_sites_server <- function(id) {
         hot_cell(
           1,
           9,
-          comment = 'Ocean (IHO): The IHO ocean or sea sampled, if relevant..'
+          comment = 'Ocean (IHO): The IHO ocean or sea sampled, if relevant.'
         ) |>
         hot_col(
           "ALTITUDE_VALUE",
@@ -653,7 +653,7 @@ mod_sites_server <- function(id) {
         hot_cell(
           1,
           10,
-          comment = "Altitude: The sampling site's altitude above or below sea level."
+          comment = "Altitude: The sampling site's numerical altitude above or below sea level."
         ) |>
         hot_col(
           "ALTITUDE_UNIT",

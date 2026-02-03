@@ -21,14 +21,20 @@ mod_landing_ui <- function(id) {
             title = "Getting Started",
             content_file = "inst/app/www/md/intro_landing.md",
             div(
-              "Instructions and tooltips (",
+              "Most sections can be expanded to fill the full screen with the ",
+              tooltip(
+                bs_icon("arrows-angle-expand"),
+                "The actual icons don't quite look identical to this one. If you can tell me why you will win a prize."
+              ),
+              "Expand button in the bottom right of the section.",
+              "Mouse over icons like this for more information",
               tooltip(
                 bs_icon("info-circle-fill"),
-                "Mouse over icons like this for more information"
+                "This type of mouse-over element is often called a 'tooltip'"
               ),
-              ", mouse over for more information) are available on each page. For an FAQ and more details instructions, go to the Info tab (",
+              " are available on each page. For an FAQ and more details instructions, go to the",
               bs_icon("info-circle"),
-              ")."
+              "Info tab."
             )
           ),
           h5("Quick Start Buttons"),

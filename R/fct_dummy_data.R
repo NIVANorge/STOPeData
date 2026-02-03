@@ -531,7 +531,7 @@ create_dummy_data <- function(uppercase_columns = FALSE) {
       protocol_comment = c(
         "Adult copepods collected between January and March 1997, acclimated to 15 degrees C for 12 days",
         "Radioactivity measured with NaI(Tl) gamma detectors at specific energy levels for each isotope",
-        ""
+        "Not sure."
       )
     ),
     samples = tibble(
