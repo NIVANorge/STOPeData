@@ -13,31 +13,12 @@ validate_and_parse_bibtex(bibtex_string, allow_multiple = FALSE)
 If FALSE (default), will return an error for multiple entries.}
 }
 \value{
-A list with components:
-  - success: Logical indicating whether parsing succeeded
-  - data: Parsed data frame (if success = TRUE) or NULL
-  - message: Success/error message for user feedback
-  - warning: Additional warning message (if applicable)
+
 }
 \description{
 Wrapper function that validates BibTeX syntax, parses the string using
 bib_string2df_alt, and provides detailed error handling with user-friendly
 error messages.
-}
-\examples{
-\dontrun{
-bibtex_string <- "@article{example2023,
-  title={Example Article},
-  author={Smith, John},
-  year={2023}
-}"
-
-result <- validate_and_parse_bibtex(bibtex_string)
-if (result$success) {
-  mapped_fields <- map_bibtex_to_reference_fields(result$data)
-}
-}
-
 }
 \seealso{
 \code{\link{bib_string2df_alt}}, \code{\link{map_bibtex_to_reference_fields}}

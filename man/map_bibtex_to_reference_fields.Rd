@@ -22,35 +22,6 @@ that correspond to the reference module input fields. Handles field
 mapping between BibTeX conventions and the reference data structure.
 }
 \details{
-The function maps BibTeX reference types to the four supported reference types:
-- article -> journal
-- book -> book
-- techreport/report/manual -> report
-- misc -> dataset
-- Other types (inproceedings, incollection, theses, etc.) are mapped to closest equivalent
-
-Field mappings follow standard BibTeX conventions:
-- JOURNAL/BOOKTITLE -> PERIODICAL_JOURNAL
-- NUMBER -> ISSUE
-- ADDRESS -> PUBLISHED_PLACE
-- SCHOOL -> INSTITUTION (for theses)
-- EDITOR -> SERIES_EDITOR
-}
-\examples{
-\dontrun{
-# Parse BibTeX string and map to reference fields
-bibtex_string <- "@article{example2023,
-  title={Example Article},
-  author={Smith, John},
-  journal={Nature},
-  year={2023},
-  volume={123},
-  number={4}
-}"
-
-bibtex_df <- bib_string2df_alt(bibtex_string)
-mapped_fields <- map_bibtex_to_reference_fields(bibtex_df)
-}
 
 }
 \seealso{

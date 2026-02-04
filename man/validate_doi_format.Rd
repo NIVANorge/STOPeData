@@ -21,11 +21,3 @@ DOI format follows the pattern: 10.{registrant}/{suffix}
 Where registrant is typically 4+ digits and suffix can contain various characters.
 This function validates format only, not whether the DOI actually exists.
 }
-\examples{
-\dontrun{
-validate_doi_format("10.1038/nature12373")  # TRUE
-validate_doi_format("https://doi.org/10.1038/nature12373")  # TRUE
-validate_doi_format("invalid")  # FALSE
-}
-
-}

@@ -6,9 +6,6 @@
 \usage{
 mod_CREED_details_ui(id)
 }
-\arguments{
-\item{id, input, output, session}{Internal parameters for {shiny}.}
-}
 \description{
 CREED_details UI Function
 }

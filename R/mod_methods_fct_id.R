@@ -32,18 +32,6 @@
 #' - Names are cleaned of special characters and spaces
 #' - Empty components are omitted from the final ID
 #'
-#' @examples
-#' # Single protocol
-#' generate_protocol_id("Sampling Protocol", "Water Sample", 1, "MyStudy")
-#' # Returns: "S01_WaterSample_MyStudy"
-#'
-#' # Multiple protocols (vectorised)
-#' types <- c("Sampling Protocol", "Analytical Protocol")
-#' names <- c("Water Sample", "LC-MS Analysis")
-#' sequences <- c(1, 2)
-#' generate_protocol_id(types, names, sequences, "Study2024")
-#' # Returns: c("S01_WaterSample_Study2024", "A02_LCMSAnalysis_Study2024")
-#'
 #' @family protocol_functions
 #' @importFrom stringr str_trim str_split str_to_upper str_to_lower str_sub
 #'   str_remove_all str_c

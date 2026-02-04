@@ -131,11 +131,6 @@ info_accordion <- function(title = "Instructions", content_file, ...) {
 #'
 #' @importFrom stringr str_to_title str_split
 #'
-#' @examples
-#' abbreviate_string("Total Phosphorus Concentration", n_words = 2L, "snake")
-#' abbreviate_string("dogs and cats", n_words = 3L, "title")
-#' abbreviate_string("Water Quality Index", n_words = 3L, "camel")
-#'
 #' @export
 abbreviate_string <- function(
   string,

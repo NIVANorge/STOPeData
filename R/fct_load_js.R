@@ -13,11 +13,6 @@
 #'   between missing and valid data in mandatory columns. Use for high-priority
 #'   data validation scenarios.
 #'
-#' @examples
-#' \dontrun{
-#' rhandsontable(data) |>
-#'   hot_col("mandatory_column", renderer = mandatory_highlight_text())
-#' }
 #'
 #' @noRd
 mandatory_highlight_text <- function() {
@@ -52,11 +47,6 @@ mandatory_highlight_text <- function() {
 #'   between missing and valid data in mandatory columns. Use for high-priority
 #'   data validation scenarios.
 #'
-#' @examples
-#' \dontrun{
-#' rhandsontable(data) |>
-#'   hot_col("mandatory_column", type = "dropdown", renderer = mandatory_highlight_dropdown())
-#' }
 #'
 #' @noRd
 mandatory_highlight_dropdown <- function() {
@@ -93,11 +83,6 @@ mandatory_highlight_dropdown <- function() {
 #'   Suitable for dense data tables where full background highlighting might be
 #'   too distracting.
 #'
-#' @examples
-#' \dontrun{
-#' rhandsontable(data) |>
-#'   hot_col("mandatory_column", renderer = mandatory_highlight_subtle())
-#' }
 #'
 #' @noRd
 mandatory_highlight_subtle <- function() {

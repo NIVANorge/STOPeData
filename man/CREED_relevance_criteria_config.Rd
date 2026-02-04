@@ -27,12 +27,6 @@ Relevance criteria assess the fitness-for-purpose of the data:
 - RV10: Data handling (summary statistics)
 - RV11: Supporting parameters
 }
-\examples{
-config <- CREED_relevance_criteria_config()
-config$RV3$type
-# [1] "Required"
-
-}
 \seealso{
 [CREED_reliability_criteria_config()], [collect_CREED_data()]
 }

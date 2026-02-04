@@ -25,21 +25,8 @@ This approach uses temporary files to work around the limitation that
 The temporary file is created in the system temp directory and removed
 automatically, even if an error occurs.
 }
-\examples{
-\dontrun{
-bibtex_string <- "@article{example2023,
-  title={Example Article},
-  author={Smith, John},
-  year={2023}
-}"
-
-df <- bib_string2df_alt(bibtex_string)
-print(df)
-}
-
-}
 \seealso{
-\code{\link[bib2df]{bib2df}}
+
 }
 \author{
 Philipp Ottolinger (original function), Sam Welch (added string wrapper)

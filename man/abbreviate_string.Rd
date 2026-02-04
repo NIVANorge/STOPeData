@@ -33,9 +33,3 @@ Character. The abbreviated and formatted string.
 Takes a string, extracts the first n words (removing special characters),
 and formats them according to the specified case style.
 }
-\examples{
-abbreviate_string("Total Phosphorus Concentration", n_words = 2L, "snake")
-abbreviate_string("dogs and cats", n_words = 3L, "title")
-abbreviate_string("Water Quality Index", n_words = 3L, "camel")
-
-}

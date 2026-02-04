@@ -59,8 +59,8 @@ app_ui <- function(request) {
       ),
       nav_panel(
         title = tooltip(
-          "0. LLM Extract",
-          "Extract data from a PDF using the Claude Large Language Model"
+          "Extraction",
+          "Automatically extract data from a pdf."
         ),
         value = "00-llm-extract",
         mod_llm_ui("llm_extract"),
@@ -160,12 +160,6 @@ app_ui <- function(request) {
         mod_review_ui("review"),
         icon = bs_icon("clipboard-data-fill")
       ),
-      # nav_panel(
-      #   title = "11. Export",
-      #   value = "11-export",
-      #   mod_export_ui("export"),
-      #   icon = bs_icon("box-arrow-right")
-      # ),
       nav_panel(
         title = tooltip(
           "11. Quality",
@@ -185,13 +179,16 @@ app_ui <- function(request) {
         )
       ),
       nav_spacer(),
-      nav_item(input_dark_mode(id = "darkmode")),
+      nav_item(tooltip(input_dark_mode(id = "darkmode"), "Dark/Light Mode")),
       nav_item(
-        tags$a(
-          bsicons::bs_icon("github"),
-          href = "https://github.com/NIVANorge/STOPeData",
-          target = "_blank",
-          class = "nav-link"
+        tooltip(
+          tags$a(
+            bsicons::bs_icon("github"),
+            href = "https://github.com/NIVANorge/STOPeData",
+            target = "_blank",
+            class = "nav-link"
+          ),
+          "Go to GitHub repo"
         )
       ),
       # FIXME: Remove this button

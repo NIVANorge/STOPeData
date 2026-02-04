@@ -997,11 +997,6 @@ collect_CREED_data <- function(criteria_config, input) {
 #'
 #' RB8 (Accreditation/QMS) is a shortcut criterion: if fully met, RB9-RB12 may be skipped.
 #'
-#' @examples
-#' config <- CREED_reliability_criteria_config()
-#' config$RB1$title
-#' # [1] "Sample Medium/Matrix"
-#'
 #' @seealso [CREED_relevance_criteria_config()], [collect_CREED_data()]
 #' @export
 CREED_reliability_criteria_config <- function() {
@@ -1055,11 +1050,6 @@ CREED_reliability_criteria_config <- function() {
 #' - RV8-RV9: Analytical (analyte, sensitivity)
 #' - RV10: Data handling (summary statistics)
 #' - RV11: Supporting parameters
-#'
-#' @examples
-#' config <- CREED_relevance_criteria_config()
-#' config$RV3$type
-#' # [1] "Required"
 #'
 #' @seealso [CREED_reliability_criteria_config()], [collect_CREED_data()]
 #' @export

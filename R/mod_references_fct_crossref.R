@@ -16,13 +16,7 @@
 #' Where registrant is typically 4+ digits and suffix can contain various characters.
 #' This function validates format only, not whether the DOI actually exists.
 #'
-#' @examples
-#' \dontrun{
-#' validate_doi_format("10.1038/nature12373")  # TRUE
-#' validate_doi_format("https://doi.org/10.1038/nature12373")  # TRUE
-#' validate_doi_format("invalid")  # FALSE
-#' }
-#'
+
 #' @export
 validate_doi_format <- function(input_string) {
   if (
@@ -58,13 +52,6 @@ validate_doi_format <- function(input_string) {
 #' @param input_string Character string to validate as PMID
 #'
 #' @return Logical indicating whether the input is a valid PMID format
-#'
-#' @examples
-#' \dontrun{
-#' validate_pmid_format("12345678")  # TRUE
-#' validate_pmid_format("PMID:12345678")  # TRUE
-#' validate_pmid_format("invalid")  # FALSE
-#' }
 #'
 #' @export
 validate_pmid_format <- function(input_string) {

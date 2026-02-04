@@ -24,11 +24,4 @@ Score values are converted from numeric to text:
 - 2 = "Partly Met"
 - 3 = "Not Reported"
 - 4 = "Not Met"
-
-RB8 uses _justification instead of _limitations per CREED module convention.
-}
-\examples{
-mock_input <- creed_tibble_to_mock_input(dummy_CREED_relevance_tibble())
-result <- collect_CREED_data(relevance_criteria_config, mock_input)
-
 }

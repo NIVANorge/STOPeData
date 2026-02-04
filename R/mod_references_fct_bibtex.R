@@ -21,14 +21,6 @@
 #'
 #' @seealso \code{\link[bib2df]{bib2df}}
 #'
-#' @examples
-#' \dontrun{
-#' bibtex_string <- "@article{example2023,
-#'   title={Example Article},
-#'   author={Smith, John},
-#'   year={2023}
-#' }"
-#'
 #' df <- bib_string2df_alt(bibtex_string)
 #' print(df)
 #' }
@@ -72,18 +64,6 @@ bib_string2df_alt <- function(string, ...) {
 #' - ADDRESS -> PUBLISHED_PLACE
 #' - SCHOOL -> INSTITUTION (for theses)
 #' - EDITOR -> SERIES_EDITOR
-#'
-#' @examples
-#' \dontrun{
-#' # Parse BibTeX string and map to reference fields
-#' bibtex_string <- "@article{example2023,
-#'   title={Example Article},
-#'   author={Smith, John},
-#'   journal={Nature},
-#'   year={2023},
-#'   volume={123},
-#'   number={4}
-#' }"
 #'
 #' bibtex_df <- bib_string2df_alt(bibtex_string)
 #' mapped_fields <- map_bibtex_to_reference_fields(bibtex_df)
@@ -202,14 +182,6 @@ map_bibtex_to_reference_fields <- function(
 #'   - data: Parsed data frame (if success = TRUE) or NULL
 #'   - message: Success/error message for user feedback
 #'   - warning: Additional warning message (if applicable)
-#'
-#' @examples
-#' \dontrun{
-#' bibtex_string <- "@article{example2023,
-#'   title={Example Article},
-#'   author={Smith, John},
-#'   year={2023}
-#' }"
 #'
 #' result <- validate_and_parse_bibtex(bibtex_string)
 #' if (result$success) {

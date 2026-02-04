@@ -16,11 +16,3 @@ Logical indicating whether the input is a valid PMID format
 Validates whether a string contains a valid PubMed ID (PMID) format.
 PMIDs are numeric identifiers, typically 1-8 digits.
 }
-\examples{
-\dontrun{
-validate_pmid_format("12345678")  # TRUE
-validate_pmid_format("PMID:12345678")  # TRUE
-validate_pmid_format("invalid")  # FALSE
-}
-
-}
