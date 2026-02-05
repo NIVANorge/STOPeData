@@ -524,7 +524,7 @@ mod_data_server <- function(id, parent_session) {
         ignoreInit = TRUE
       )
 
-    ## observe: Check upstream modules validation status continuously ----
+    ## # observe: Check upstream modules validation status continuously ----
     # upstream: all session$userData$reactiveValues validation flags
     # downstream: moduleState$data_entry_ready, session$userData$reactiveValues$measurementsData
     observe({
@@ -533,28 +533,30 @@ mod_data_server <- function(id, parent_session) {
       if (modulesStatus()) {
         moduleState$data_entry_ready <- TRUE
 
-        # CHANGED: Create measurement combinations and store in userData
-        # Use add_row() rather than recreate from scratch to preserve entered data
-        new_combinations <- session$userData$reactiveValues$measurementsData |>
-          mutate(SUBSAMPLE = as.character(SUBSAMPLE)) |>
-          add_row(create_measurement_combinations()) |>
-          distinct(.keep_all = FALSE) # TODO: All very clever, but doesn't catch imported rows that have entered data (see req above)
+        # only add combinations if the user isn't exporting their own data
+        if (isFALSE(session$userData$reactiveValues$saveExtractionSuccessful)) {
+          new_combinations <- session$userData$reactiveValues$measurementsData |>
+            mutate(SUBSAMPLE = as.character(SUBSAMPLE)) |>
+            add_row(create_measurement_combinations()) |>
+            distinct(.keep_all = FALSE)
 
-        session$userData$reactiveValues$measurementsData <- new_combinations
-
-        # TODO: This also fires way too often, when modulesStatus() definitely shouldn't be returning true. Why?
-        print_dev(glue(
-          "mod_data: All modules validated, created {nrow(session$userData$reactiveValues$measurementsData)} measurement combinations"
-        ))
-      } else {
+          session$userData$reactiveValues$measurementsData <- new_combinations
+          print_dev(glue(
+            "mod_data: All modules validated, created {nrow(session$userData$reactiveValues$measurementsData)} measurement combinations"
+          ))
+        }
+      } else if (
+        isFALSE(session$userData$reactiveValues$saveExtractionSuccessful)
+      ) {
         moduleState$data_entry_ready <- FALSE
         session$userData$reactiveValues$measurementsData <- initialise_measurements_tibble()
-
         print_dev("mod_data: Some modules pending, data entry disabled")
       }
+      # We shouldn't need an explicit case for when all modules validate and a save extraction was successful, because
+      # that should be covered by the existing code in fct_import.R. hopefully...
     }) |>
       bindEvent(
-        modulesStatus(),
+        isTRUE(modulesStatus()),
         ignoreInit = TRUE,
         ignoreNULL = TRUE
       )

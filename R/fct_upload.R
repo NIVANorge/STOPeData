@@ -298,7 +298,10 @@ detect_dataset_type <- function(filename) {
     "Methods",
     "Samples",
     "Biota",
-    "Measurements"
+    "Measurements",
+    "CREED_RB", # Must come before checking individual words
+    "CREED_RV", # Must come before checking individual words
+    "CREED_Score" # Must come before checking individual words
   )
 
   # Check each pattern
@@ -334,7 +337,10 @@ get_reactiveValues_key <- function(dataset_type) {
     "Methods" = "methodsData",
     "Samples" = "samplesData",
     "Biota" = "biotaData",
-    "Measurements" = "measurementsData"
+    "Measurements" = "measurementsData",
+    "CREED_RB" = "creedReliability",
+    "CREED_RV" = "creedRelevance",
+    "CREED_Score" = "creedScores"
   )
 
   return(key_mapping[[dataset_type]])
