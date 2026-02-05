@@ -27,6 +27,7 @@ Imports:
     logger,
     mirai,
     openxlsx2,
+    pkgload,
     plotly,
     purrr,
     rcrossref (>= 1.2.0),
