@@ -18,13 +18,6 @@ run_app <- function(
 ) {
   # set up logger logging for gcp
 
-  logger::log_appender(logger::appender_stdout)
-  logger::log_layout(logger::layout_json())
-  logger::log_threshold(logger::INFO)
-
-  logger::log_messages()
-  logger::log_warnings()
-
   with_golem_options(
     app = shinyApp(
       ui = app_ui,

@@ -6,6 +6,12 @@
 # (otherwise it searches CRAN and crashes...)
 
 # THIS IS HOW WE RUN THE APP IN THE CONTAINER
+logger::log_appender(logger::appender_stdout)
+logger::log_layout(logger::layout_json())
+logger::log_threshold(logger::INFO)
+
+logger::log_messages()
+logger::log_warnings()
 
 pkgload::load_all(export_all = FALSE, helpers = FALSE, attach_testthat = FALSE)
 options(golem.app.prod = TRUE) # TODO: make a comment on what this actually does?

@@ -25,6 +25,7 @@ Imports:
     jsonlite,
     leaflet,
     logger,
+    markdown,
     mirai,
     openxlsx2,
     pkgload,
