@@ -27,11 +27,8 @@ write_metadata_txt <- function(metadata_list, file_path) {
     "Application Information:",
     glue("  App Name: {metadata_list$app_name}"),
     glue("  App Version: {metadata_list$app_version}"),
-    glue("  Git Commit: {metadata_list$git_commit}"),
-    glue("  App URL: {metadata_list$app_url}"),
+    glue("  Client Data: {metadata_list$clientData}"),
     "",
-    "Technical Information:",
-    glue("  Browser: {metadata_list$browser}"),
     "",
     "=" %r% 50,
     "",
@@ -75,10 +72,25 @@ get_export_metadata <- function(session = NULL) {
     campaign_name = rv$campaignData$CAMPAIGN_NAME,
     export_datetime = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"),
     app_name = "STOPeData",
-    app_url = "https://github.com/sawelch-NIVA/STOPedata",
+    clientData = paste(
+      sep = "",
+      "protocol: ",
+      session$clientData$url_protocol,
+      "\n",
+      "hostname: ",
+      session$clientData$url_hostname,
+      "\n",
+      "pathname: ",
+      session$clientData$url_pathname,
+      "\n",
+      "port: ",
+      session$clientData$url_port,
+      "\n",
+      "search: ",
+      session$clientData$url_search,
+      "\n"
+    ),
     app_version = get_golem_version() %||% "Version not available",
-    git_commit = get_git_commit(),
-    browser = session$clientData$user_agent %||% "Unknown browser",
     user = rv$ENTERED_BY %||% "Unknown user"
   )
 }
@@ -128,8 +140,7 @@ get_dataset_display_name <- function(dataset_name) {
 # Function: Check Available Datasets ----
 #' Check which datasets contain data and get their dimensions
 #'
-#' @param dataset_names Character vector of dataset names to check
-#' @param rv Reactive values object (or named list) containing the datasets
+#' @param rv standard reactiveValues object from the app
 #'
 #' @return List with three elements:
 #'   - available_datasets: character vector of dataset names with data

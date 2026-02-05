@@ -148,7 +148,7 @@ pre,
 
 .navigation-buttons-container {
     border-radius: var(--radius-sm);
-    padding: 15px;
+    padding: 5px 15px 15px 15px;
     background-color: var(--bg-light);
     border: 1px solid var(--border-light);
 }

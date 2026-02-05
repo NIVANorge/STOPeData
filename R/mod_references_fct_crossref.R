@@ -12,7 +12,7 @@
 #' @return Logical indicating whether the input is a valid DOI format
 #'
 #' @details
-#' DOI format follows the pattern: 10.{registrant}/{suffix}
+#' DOI format follows the pattern: 10.registrant/suffix
 #' Where registrant is typically 4+ digits and suffix can contain various characters.
 #' This function validates format only, not whether the DOI actually exists.
 #'

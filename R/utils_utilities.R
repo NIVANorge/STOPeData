@@ -1,5 +1,6 @@
 #' utilities
 #' @title isTruthy switch operator
+#' @name isTruthy switch operator
 #'
 #' @description isTruthy switch operator
 #'
@@ -33,8 +34,7 @@
 #' Check if a user has entered "Not relevant" or "Not reported" in selectInput
 #' for the purpose of including conditional fields, validation, etc.
 #'
-#' @param first The first argument, a value we want to use only if it isTruthy
-#' @param second The second argument, a safe alternative if first isn't Truthy
+#' @param input the variable to check
 #'
 #'
 isRelevant <- function(input) {
@@ -78,6 +78,7 @@ printreactiveValues <- function(data) {
 #'
 #' @param title the desired title of the accordion panel
 #' @param content_file the path to a markdown file
+#' @param ... other arguments to accordion()
 #'
 #' @returns a bslib::accordion html element
 #'

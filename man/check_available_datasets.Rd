@@ -7,9 +7,7 @@
 check_available_datasets(rv)
 }
 \arguments{
-\item{rv}{Reactive values object (or named list) containing the datasets}
-
-\item{dataset_names}{Character vector of dataset names to check}
+\item{rv}{standard reactiveValues object from the app}
 }
 \value{
 List with three elements:

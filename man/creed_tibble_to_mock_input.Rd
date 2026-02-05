@@ -9,10 +9,6 @@ creed_tibble_to_mock_input(creed_tibble)
 \arguments{
 \item{creed_tibble}{A tibble with columns: criterion_id, relevant_data, score, limitations}
 }
-\value{
-A named list shaped like a shiny input reactiveValues with {criterion_id}_score,
-{criterion_id}_relevant_data, and {criterion_id}_limitations (or _justification for RB8)
-}
 \description{
 Converts a CREED data tibble (from dummy_CREED_reliability_tibble()
 or dummy_CREED_relevance_tibble()) into a mock shiny input list object suitable for testing

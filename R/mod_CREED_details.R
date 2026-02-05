@@ -1,6 +1,4 @@
-#' CREED_details UI Function
-#'
-#'
+#' @noRd
 #' @importFrom shiny NS tagList textAreaInput
 #' @importFrom bslib input_task_button tooltip
 mod_CREED_details_ui <- function(id) {
@@ -229,6 +227,7 @@ mod_CREED_details_ui <- function(id) {
 
 
 #' CREED_details Server Functions
+#' @noRd
 #' @importFrom golem print_dev
 #' @importFrom shiny updateTextAreaInput bindEvent isTruthy
 #' @importFrom tibble tibble

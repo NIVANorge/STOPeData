@@ -678,7 +678,6 @@ validate_longitude <- function(lon) {
 #' @noRd
 # ! FORMAT-BASED
 create_biota_from_llm <- function(llm_biota_data) {
-  browser()
   if (is.null(llm_biota_data) || nrow(llm_biota_data) == 0) {
     return(tibble())
   }
@@ -1025,7 +1024,7 @@ create_samples_from_llm <- function(llm_samples_data) {
     dates_vector <- c()
 
     for (row in 1:nrow(llm_samples_data)) {
-      date <- llm_samples_data$sampling_date[row]
+      date <- llm_samples_data$sampling_dates[row]
       print(date)
       dates_vector <- append(dates_vector, date)
     }

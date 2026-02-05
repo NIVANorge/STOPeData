@@ -1002,9 +1002,6 @@ populate_session_with_dummy_data <- function(
 #'
 #' @param creed_tibble A tibble with columns: criterion_id, relevant_data, score, limitations
 #'
-#' @return A named list shaped like a shiny input reactiveValues with {criterion_id}_score,
-#' {criterion_id}_relevant_data, and {criterion_id}_limitations (or _justification for RB8)
-#'
 #' @details
 #' Score values are converted from numeric to text:
 #' - 1 = "Fully Met" (or "Not Relevant")

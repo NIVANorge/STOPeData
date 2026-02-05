@@ -35,7 +35,7 @@ app_ui <- function(request) {
       title = div(
         style = "display: flex; align-items: center;",
         tags$img(
-          style = "width: 70px; height: 70px; margin: 0 3px 0 1px;",
+          style = "width: 50px; height: 50px; margin: 0 3px 0 1px;",
           src = "www/eData_DRF_logo.svg",
           alt = "eData Logo"
         ),
@@ -169,16 +169,16 @@ app_ui <- function(request) {
         mod_CREED_ui("CREED"),
         icon = bs_icon("award-fill")
       ),
+      nav_spacer(),
       nav_panel(
         title = "",
         value = "info",
         mod_information_ui("information"),
         icon = tooltip(
           bs_icon("info-circle"),
-          "FAQ and References"
+          "Help and Docs"
         )
       ),
-      nav_spacer(),
       nav_item(tooltip(input_dark_mode(id = "darkmode"), "Dark/Light Mode")),
       nav_item(
         tooltip(
@@ -201,7 +201,7 @@ app_ui <- function(request) {
         ## Navigation buttons ----
         div(
           class = "navigation-buttons-container",
-          style = "display: flex; justify-content: space-between; align-items: center; margin: 20px;",
+          style = "display: flex; justify-content: space-between; align-items: center; margin: 0 20px 10px 20px;",
 
           input_task_button(
             id = "previous_section",

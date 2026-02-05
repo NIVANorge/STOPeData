@@ -149,48 +149,50 @@ mod_llm_ui <- function(id) {
           uiOutput(ns("extraction_status"))
         ),
 
+        # Extraction self-appraisal
+        div(
+          h5(
+            "Extraction Self-Appraisal"
+          ),
+          htmlOutput(ns("extraction_comments"))
+        ),
+
         ## Extraction results accordion ----
         accordion(
           id = ns("results_accordion"),
           open = FALSE,
           accordion_panel(
-            title = "Extraction Results and Comments",
+            title = "Extraction Raw Data",
             value = "extraction_results",
             icon = bs_icon("cpu"),
             div(
-              verbatimTextOutput(ns("extraction_results")),
-              div(
-                h5(
-                  "This is an experiment in getting the LLM to report on its own opinion of the extraction. I don't yet know how good its assessment is, but I'm interested to hear your feedback."
-                ),
-                htmlOutput(ns("extraction_comments"))
-              )
+              verbatimTextOutput(ns("extraction_results"))
             )
           )
-        ),
-
-        ## Action buttons for extracted data  ----
-        layout_columns(
-          fill = FALSE,
-          tooltip(
-            (input_task_button(
-              id = ns("populate_forms"),
-              label = "Populate Modules",
-              icon = icon("download"),
-              class = "btn-primary"
-            ) |>
-              disabled()),
-            "Send extracted data to the data entry modules for checking and validation."
-          ),
-
-          input_task_button(
-            id = ns("clear_extraction"),
-            label = "Clear Extraction",
-            icon = icon("trash"),
-            class = "btn-danger"
-          ) |>
-            disabled()
         )
+
+        # ## Action buttons for extracted data  ----
+        # layout_columns(
+        #   fill = FALSE,
+        #   tooltip(
+        #     (input_task_button(
+        #       id = ns("populate_forms"),
+        #       label = "Populate Modules",
+        #       icon = icon("download"),
+        #       class = "btn-primary"
+        #     ) |>
+        #       disabled()),
+        #     "Send extracted data to the data entry modules for checking and validation."
+        #   ),
+
+        #   input_task_button(
+        #     id = ns("clear_extraction"),
+        #     label = "Clear Extraction",
+        #     icon = icon("trash"),
+        #     class = "btn-danger"
+        #   ) |>
+        #     disabled()
+        # )
       )
     )
   )
@@ -397,29 +399,43 @@ mod_llm_server <- function(id) {
     # downstream: trigger form population in other modules
     observe({
       req(!is.null(moduleState$structured_data))
+
+      # Campaign data
       tryCatch(
         {
-          # Populate form fields directly
-          # TODO: The code for campaign and references is rather messy
-          # and could perhaps do with some rationalisation.
           if (!is.null(moduleState$structured_data$campaign)) {
-            # campaign_data <- populate_campaign_from_llm(
-            #   session,
-            #   moduleState$structured_data$campaign
-            # )
             session$userData$reactiveValues$campaignDataLLM <- moduleState$structured_data$campaign
           }
+        },
+        error = function(e) {
+          showNotification(
+            paste("Error populating campaign data:", e$message),
+            type = "error",
+            duration = 10
+          )
+        }
+      )
 
+      # References data
+      tryCatch(
+        {
           if (!is.null(moduleState$structured_data$references)) {
-            # reference_data <- populate_references_from_llm(
-            #   session,
-            #   moduleState$structured_data$references
-            # )
             session$userData$reactiveValues$referenceDataLLM <- moduleState$structured_data$references |>
               as_tibble()
           }
+        },
+        error = function(e) {
+          showNotification(
+            paste("Error populating references data:", e$message),
+            type = "error",
+            duration = 10
+          )
+        }
+      )
 
-          # Create structured data for table-based modules and store in session
+      # Sites data
+      tryCatch(
+        {
           if (!is.null(moduleState$structured_data$sites)) {
             sites_data <- create_sites_from_llm(
               moduleState$structured_data$sites,
@@ -428,7 +444,19 @@ mod_llm_server <- function(id) {
             )
             session$userData$reactiveValues$sitesDataLLM <- sites_data
           }
+        },
+        error = function(e) {
+          showNotification(
+            paste("Error populating sites data:", e$message),
+            type = "error",
+            duration = 10
+          )
+        }
+      )
 
+      # Parameters data
+      tryCatch(
+        {
           if (!is.null(moduleState$structured_data$parameters)) {
             parameters_data <- create_parameters_from_llm(
               moduleState$structured_data$parameters,
@@ -436,22 +464,58 @@ mod_llm_server <- function(id) {
             )
             session$userData$reactiveValues$parametersDataLLM <- parameters_data
           }
+        },
+        error = function(e) {
+          showNotification(
+            paste("Error populating parameters data:", e$message),
+            type = "error",
+            duration = 10
+          )
+        }
+      )
 
+      # Compartments data
+      tryCatch(
+        {
           if (!is.null(moduleState$structured_data$compartments)) {
             compartments_data <- create_compartments_from_llm(
               moduleState$structured_data$compartments
             )
             session$userData$reactiveValues$compartmentsDataLLM <- compartments_data
           }
+        },
+        error = function(e) {
+          showNotification(
+            paste("Error populating compartments data:", e$message),
+            type = "error",
+            duration = 10
+          )
+        }
+      )
 
+      # Biota data
+      tryCatch(
+        {
+          browser()
           if (!is.null(moduleState$structured_data$biota)) {
             biota_data <- create_biota_from_llm(
               moduleState$structured_data$biota
             )
-            golem::print_dev(biota_data)
             session$userData$reactiveValues$biotaDataLLM <- biota_data
           }
+        },
+        error = function(e) {
+          showNotification(
+            paste("Error populating biota data:", e$message),
+            type = "error",
+            duration = 10
+          )
+        }
+      )
 
+      # Methods data
+      tryCatch(
+        {
           if (!is.null(moduleState$structured_data$methods)) {
             methods_data <- create_methods_from_llm(
               moduleState$structured_data$methods,
@@ -459,31 +523,44 @@ mod_llm_server <- function(id) {
             )
             session$userData$reactiveValues$methodsDataLLM <- methods_data
           }
+        },
+        error = function(e) {
+          showNotification(
+            paste("Error populating methods data:", e$message),
+            type = "error",
+            duration = 10
+          )
+        }
+      )
 
+      # Samples data
+      tryCatch(
+        {
           if (!is.null(moduleState$structured_data$samples)) {
             samples_data <- create_samples_from_llm(
               moduleState$structured_data$samples
             )
             session$userData$reactiveValues$samplesDataLLM <- samples_data
           }
-
-          # Set extraction status flags
-          session$userData$reactiveValues$llmPopulateModules <- TRUE
-
-          showNotification(
-            "Forms populated with extracted data! Review and correct in each module.",
-            type = "message"
-          )
         },
         error = function(e) {
           showNotification(
-            paste("Error populating forms:", e$message),
-            type = "error"
+            paste("Error populating samples data:", e$message),
+            type = "error",
+            duration = 10
           )
         }
       )
+
+      # Set extraction status flags
+      session$userData$reactiveValues$llmPopulateModules <- TRUE
+
+      showNotification(
+        "Forms populated with extracted data! Review and correct in each module.",
+        type = "message"
+      )
     }) |>
-      bindEvent(input$populate_forms)
+      bindEvent(isTRUE(session$userData$reactiveValues$llmExtractionSuccessful))
 
     ## # observe: Clear extraction ----
     # upstream: user clicks input$clear_extraction
@@ -502,7 +579,7 @@ mod_llm_server <- function(id) {
       session$userData$reactiveValues$llmPopulateModules <- FALSE
 
       # Disable buttons
-      disable("populate_forms")
+      # disable("populate_forms")
       disable("clear_extraction")
       disable("download_extraction")
 
@@ -556,6 +633,7 @@ mod_llm_server <- function(id) {
         )
       } else if (!is.null(result$success) && result$success) {
         # Store successful results
+        # TODO: This probably shouldn't be in an output block...
         moduleState$structured_data <- result$result
         moduleState$api_metadata <- result$metadata
         moduleState$raw_extraction <- result$result
@@ -564,9 +642,12 @@ mod_llm_server <- function(id) {
         session$userData$reactiveValues$rawLLM <- result$result
         session$userData$reactiveValues$llmExtractionComplete <- TRUE
         session$userData$reactiveValues$llmExtractionSuccessful <- TRUE
+        if (!is.null(result$result$comments)) {
+          session$userData$reactiveValues$llmExtractionComments <- result$result$comments
+        }
 
         # Enable buttons
-        enable("populate_forms")
+        # enable("populate_forms")
         enable("clear_extraction")
 
         # Build status message
@@ -575,7 +656,8 @@ mod_llm_server <- function(id) {
         if (!is.null(result$metadata$total_cost)) {
           metadata_text <- paste0(
             " (Cost: $",
-            round(result$metadata$total_cost, 2)
+            round(result$metadata$total_cost, 2),
+            ")"
           )
           status_text <- paste0(status_text, metadata_text)
         }
@@ -701,13 +783,26 @@ mod_llm_server <- function(id) {
       }
     )
 
-    ## output: extraction commentary ----
+    ## # output: extraction commentary ----
     output$extraction_comments <- renderUI({
-      req(session$userData$reactiveValues$llmExtractionComments)
-      render_extraction_comments(
-        session$userData$reactiveValues$llmExtractionComments
+      if (
+        !is.null(
+          session$userData$reactiveValues$llmExtractionComments
+        ) &&
+          length(session$userData$reactiveValues$llmExtractionComments) != 0
+      ) {
+        render_extraction_comments(
+          session$userData$reactiveValues$llmExtractionComments
+        )
+      } else {
+        "The LLM's self-appraisal of its performance will appear here once you extract data."
+      }
+    }) |>
+      bindEvent(
+        session$userData$reactiveValues$llmExtractionComments,
+        ignoreNULL = TRUE,
+        ignoreInit = FALSE
       )
-    })
   })
 }
 

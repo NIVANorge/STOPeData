@@ -174,6 +174,7 @@ mod_CREED_ui <- function(id) {
 #' @importFrom golem print_dev
 #' @importFrom shinyjs enable disable
 #' @importFrom dplyr add_row
+
 mod_CREED_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -194,6 +195,91 @@ mod_CREED_server <- function(id) {
     mod_CREED_relevance_server("CREED_relevance")
 
     # 2. Helper functions ----
+
+    # Create CREED Scores Display Table ----
+    # Generates HTML table for CREED assessment results
+    create_creed_scores_table <- function(scores_data) {
+      # Check if we have valid data ----
+      has_data <- !is.null(scores_data) &&
+        nrow(scores_data) > 0 &&
+        all(
+          c("reliability_category", "relevance_category") %in%
+            names(scores_data)
+        )
+
+      # Define placeholder values for empty state ----
+      placeholder <- "Not yet assessed"
+
+      # Extract values with fallback to placeholder ----
+      silver_reliability <- if (has_data && nrow(scores_data) >= 1) {
+        scores_data$reliability_category[1]
+      } else {
+        placeholder
+      }
+
+      silver_relevance <- if (has_data && nrow(scores_data) >= 1) {
+        scores_data$relevance_category[1]
+      } else {
+        placeholder
+      }
+
+      gold_reliability <- if (has_data && nrow(scores_data) >= 2) {
+        scores_data$reliability_category[2]
+      } else {
+        placeholder
+      }
+
+      gold_relevance <- if (has_data && nrow(scores_data) >= 2) {
+        scores_data$relevance_category[2]
+      } else {
+        placeholder
+      }
+
+      # Build table ----
+      tagList(
+        h5("CREED Assessment Results"),
+        tags$table(
+          class = "table table-sm",
+          tags$thead(
+            tags$tr(
+              tags$th("Level"),
+              tags$th("Reliability"),
+              tags$th("Relevance")
+            )
+          ),
+          tags$tbody(
+            tags$tr(
+              tags$td(
+                bs_icon("award-fill", class = "CREED-required"),
+                strong("Silver")
+              ),
+              tags$td(
+                silver_reliability,
+                class = if (!has_data) "text-muted" else NULL
+              ),
+              tags$td(
+                silver_relevance,
+                class = if (!has_data) "text-muted" else NULL
+              )
+            ),
+            tags$tr(
+              tags$td(
+                bs_icon("award-fill", class = "CREED-recommended"),
+                strong("Gold")
+              ),
+              tags$td(
+                gold_reliability,
+                class = if (!has_data) "text-muted" else NULL
+              ),
+              tags$td(
+                gold_relevance,
+                class = if (!has_data) "text-muted" else NULL
+              )
+            )
+          )
+        )
+      )
+    }
 
     # 3. Observers and Reactives ----
 
@@ -437,46 +523,10 @@ mod_CREED_server <- function(id) {
     })
 
     ## output: Display CREED scores ----
-    # upstream: session$userData$reactiveValues$creedScores
+    # upstream: moduleState$creed_scores_pretty
     # downstream: UI display
     output$creed_scores_display <- renderUI({
-      scores <- if (nrow(moduleState$creed_scores_pretty) > 0) {
-        moduleState$creed_scores_pretty
-      } else {
-        initialise_CREED_scores_tibble()
-      }
-
-      tagList(
-        h5("CREED Assessment Results"),
-        tags$table(
-          class = "table table-sm",
-          tags$thead(
-            tags$tr(
-              tags$th("Level"),
-              tags$th("Reliability"),
-              tags$th("Relevance")
-            )
-          ),
-          tags$tbody(
-            tags$tr(
-              tags$td(
-                bs_icon("award-fill", class = "CREED-required"),
-                strong("Silver")
-              ),
-              tags$td(scores$reliability_category[1]),
-              tags$td(scores$relevance_category[1])
-            ),
-            tags$tr(
-              tags$td(
-                bs_icon("award-fill", class = "CREED-recommended"),
-                strong("Gold")
-              ),
-              tags$td(scores$reliability_category[2]),
-              tags$td(scores$relevance_category[2])
-            )
-          )
-        )
-      )
+      create_creed_scores_table(moduleState$creed_scores_pretty)
     })
   })
 }

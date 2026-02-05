@@ -913,22 +913,8 @@ autopop_relevance_fields <- function(sessionData) {
 #' from Shiny inputs into a standardised tibble. Works for both reliability and
 #' relevance criteria.
 #'
-#' @param criteria_config Named list of criteria configurations. Each element
-#'   should be a list with `title` and `type` (Required/Recommended) fields.
-#' @param input Shiny input object containing score, relevant_data, and
-#'   limitations inputs for each criterion.
-#'
-#' @return A tibble with columns: criterion_id, criterion_title,
-#'   required_recommended, relevant_data, score, limitations
-#'
-#' @details
-#' Expects input IDs to follow the pattern:
-#' - `{criterion_id}_score`
-#' - `{criterion_id}_relevant_data`
-#' - `{criterion_id}_limitations`
-#'
-#' Special case: RB8 uses `_justification` instead of `_limitations`,
-#' and the value is prefixed with "Justification: " in the output.
+#' @param input the shiny input object for the module
+#' @param criteria_config the CREED criteria for either reliability or relevance
 #'
 #' @importFrom tibble add_row
 #' @importFrom shiny isTruthy

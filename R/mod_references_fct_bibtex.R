@@ -19,12 +19,6 @@
 #'
 #' @author Philipp Ottolinger (original function), Sam Welch (added string wrapper)
 #'
-#' @seealso \code{\link[bib2df]{bib2df}}
-#'
-#' df <- bib_string2df_alt(bibtex_string)
-#' print(df)
-#' }
-#'
 #' @export
 bib_string2df_alt <- function(string, ...) {
   temp_file <- tempfile(fileext = ".bib")
@@ -50,26 +44,6 @@ bib_string2df_alt <- function(string, ...) {
 #' @return A named list containing mapped field values for all reference input fields.
 #'   Values are NA for fields not present in the BibTeX entry.
 #'
-#' @details
-#' The function maps BibTeX reference types to the four supported reference types:
-#' - article -> journal
-#' - book -> book
-#' - techreport/report/manual -> report
-#' - misc -> dataset
-#' - Other types (inproceedings, incollection, theses, etc.) are mapped to closest equivalent
-#'
-#' Field mappings follow standard BibTeX conventions:
-#' - JOURNAL/BOOKTITLE -> PERIODICAL_JOURNAL
-#' - NUMBER -> ISSUE
-#' - ADDRESS -> PUBLISHED_PLACE
-#' - SCHOOL -> INSTITUTION (for theses)
-#' - EDITOR -> SERIES_EDITOR
-#'
-#' bibtex_df <- bib_string2df_alt(bibtex_string)
-#' mapped_fields <- map_bibtex_to_reference_fields(bibtex_df)
-#' }
-#'
-#' @seealso \code{\link{bib_string2df_alt}}
 #'
 #' @export
 map_bibtex_to_reference_fields <- function(
@@ -183,13 +157,6 @@ map_bibtex_to_reference_fields <- function(
 #'   - message: Success/error message for user feedback
 #'   - warning: Additional warning message (if applicable)
 #'
-#' result <- validate_and_parse_bibtex(bibtex_string)
-#' if (result$success) {
-#'   mapped_fields <- map_bibtex_to_reference_fields(result$data)
-#' }
-#' }
-#'
-#' @seealso \code{\link{bib_string2df_alt}}, \code{\link{map_bibtex_to_reference_fields}}
 #'
 #' @export
 validate_and_parse_bibtex <- function(bibtex_string, allow_multiple = FALSE) {

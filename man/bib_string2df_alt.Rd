@@ -25,9 +25,6 @@ This approach uses temporary files to work around the limitation that
 The temporary file is created in the system temp directory and removed
 automatically, even if an error occurs.
 }
-\seealso{
-
-}
 \author{
 Philipp Ottolinger (original function), Sam Welch (added string wrapper)
 }

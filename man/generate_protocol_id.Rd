@@ -23,18 +23,15 @@ the protocol category. Will be abbreviated and cleaned for ID generation.}
 within the same category. Defaults to 1. Will be zero-padded to 2 digits.}
 
 \item{campaign_name}{Character vector. Name of the campaign/study.
-Will be abbreviated to first 10 alphanumeric characters. Defaults to "".}
-}
-\value{
-Character vector of protocol IDs with format:
-  `{TypeCode}{SequenceNumber}_{AbbreviatedName}_{CampaignAbbrev}`
+  Will be abbreviated to first 10 alphanumeric characters. Defaults to "".
+
 
   Where:
   - TypeCode: S (Sampling), F (Fractionation), E (Extraction),
     A (Analytical), X (Unknown)
   - SequenceNumber: Zero-padded 2-digit number
   - AbbreviatedName: Up to 15 alphanumeric characters (optional)
-  - CampaignAbbrev: Up to 10 alphanumeric characters (optional)
+  - CampaignAbbrev: Up to 10 alphanumeric characters (optional)}
 }
 \description{
 Generates a standardised protocol identifier based on protocol type, name,

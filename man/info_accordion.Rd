@@ -10,6 +10,8 @@ info_accordion(title = "Instructions", content_file, ...)
 \item{title}{the desired title of the accordion panel}
 
 \item{content_file}{the path to a markdown file}
+
+\item{...}{other arguments to accordion()}
 }
 \value{
 a bslib::accordion html element

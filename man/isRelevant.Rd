@@ -7,9 +7,7 @@
 isRelevant(input)
 }
 \arguments{
-\item{first}{The first argument, a value we want to use only if it isTruthy}
-
-\item{second}{The second argument, a safe alternative if first isn't Truthy}
+\item{input}{the variable to check}
 }
 \value{
 Boolean

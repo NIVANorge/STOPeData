@@ -17,7 +17,7 @@ Validates whether a string contains a valid DOI format. Accepts DOIs with or
 without URL prefixes (https://doi.org/ or http://dx.doi.org/).
 }
 \details{
-DOI format follows the pattern: 10.{registrant}/{suffix}
+DOI format follows the pattern: 10.registrant/suffix
 Where registrant is typically 4+ digits and suffix can contain various characters.
 This function validates format only, not whether the DOI actually exists.
 }

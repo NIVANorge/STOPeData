@@ -21,9 +21,3 @@ Converts parsed BibTeX data from bib2df format into a list of values
 that correspond to the reference module input fields. Handles field
 mapping between BibTeX conventions and the reference data structure.
 }
-\details{
-
-}
-\seealso{
-\code{\link{bib_string2df_alt}}
-}
