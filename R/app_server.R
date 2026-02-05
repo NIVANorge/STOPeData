@@ -562,10 +562,32 @@ app_server <- function(input, output, session) {
     browser()
   })
 
-  # FIXME: attempted auto email getter
-  observe(showNotification(
-    session$request$HTTP_X_AUTH_REQUEST_EMAIL,
-    type = "warning"
-  )) |>
-    bindEvent(session$request$HTTP_X_AUTH_REQUEST_EMAIL)
+  ## # observe: set username automatically based on email from auth
+  observe({
+    tryCatch(
+      {
+        email <- session$request$HTTP_X_AUTH_REQUEST_EMAIL
+
+        if (!is.null(email) && !is.na(email) && nchar(email) > 0) {
+          session$userData$reactiveValues$ENTERED_BY <- email
+          showNotification(
+            glue("Set username to {email}."),
+            type = "message"
+          )
+        } else {
+          showNotification(
+            glue("Email not detected from session. Please set manually."),
+            type = "message"
+          )
+        }
+      },
+      error = function(e) {
+        showNotification(
+          "Could not retrieve email from session headers.",
+          type = "warning"
+        )
+      }
+    )
+  }) |>
+    bindEvent(session$request$HTTP_X_AUTH_REQUEST_EMAIL, ignoreNULL = FALSE)
 }
