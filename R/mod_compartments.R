@@ -50,7 +50,9 @@ mod_compartments_ui <- function(id) {
                 "Environmental Sub-Compartment",
                 bs_icon("info-circle-fill")
               ),
-              "Specific subset within the environmental compartment"
+              "Specific subset within the environmental compartment. 
+              For biota, only species that reproduce in a compartment
+              should be included (e.g. dolphins are aquatic, seals are terrestrial)"
             ),
             choices = environ_compartments_sub_vocabulary()$Aquatic,
             width = "100%"
@@ -60,7 +62,8 @@ mod_compartments_ui <- function(id) {
             inputId = ns("measured_category_select"),
             label = tooltip(
               list("Measured Category", bs_icon("info-circle-fill")),
-              "Type of exposure measurement"
+              "Type of exposure measurement (for biota): was sample measured inside, outside,
+              or on the surface of the organism. For non-biota compartments, use 'External'."
             ),
             choices = measured_categories_vocabulary(),
             selected = "External",
