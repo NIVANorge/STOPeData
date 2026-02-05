@@ -13,7 +13,12 @@ logger::log_threshold(logger::INFO)
 logger::log_messages()
 logger::log_warnings()
 
-pkgload::load_all(export_all = FALSE, helpers = FALSE, attach_testthat = FALSE)
-options(golem.app.prod = TRUE) # TODO: make a comment on what this actually does?
+pkgload::load_all(
+  export_all = FALSE,
+  helpers = FALSE,
+  attach_testthat = FALSE,
+  quiet = TRUE
+)
+options(golem.app.prod = FALSE) # TODO: make a comment on what this actually does?
 options(bslib.color_contrast_warnings = FALSE)
 STOPeData::run_app() # add parameters here (if any)
