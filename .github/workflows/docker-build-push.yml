@@ -60,6 +60,8 @@ jobs:
         push: true
         context: .
         tags: ${{ steps.meta.outputs.tags }}
+        cache-from: type=registry,ref=europe-west1-docker.pkg.dev/niva-cd/images/${{ env.IMAGE_NAME }}:latest
+        cache-to: type=inline
 
     - id: image_tag
       name: Show image tag
