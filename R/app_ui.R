@@ -169,6 +169,15 @@ app_ui <- function(request) {
         mod_CREED_ui("CREED"),
         icon = bs_icon("award-fill")
       ),
+      nav_panel(
+        title = tooltip(
+          "12. Zenodo",
+          "Upload your data to Zenodo, the EU's preferred data repository."
+        ),
+        value = "13-Zenodo",
+        mod_Zenodo_ui("Zenodo"),
+        icon = bs_icon("database-add")
+      ),
       nav_spacer(),
       nav_panel(
         title = "",
