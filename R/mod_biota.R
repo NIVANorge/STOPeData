@@ -628,13 +628,14 @@ mod_biota_server <- function(id) {
         species_groups <- sort(unique(
           moduleState$species_options$SPECIES_GROUP
         ))
-
+        tbl = session$userData$reactiveValues$biotaData
+        dynamic_height = rHandsontableGetHeight(dataTable = tbl)
         rhandsontable(
-          session$userData$reactiveValues$biotaData,
+          tbl,
           stretchH = "all",
           selectCallback = TRUE,
           width = NULL,
-          height = 500
+          height = dynamic_height
         ) |>
           hot_table(overflow = "visible", stretchH = "all") |>
           # Make sample info columns read-only

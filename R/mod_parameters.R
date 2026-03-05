@@ -611,10 +611,13 @@ mod_parameters_server <- function(id) {
             )
           )
       } else {
+
+        tbl =  session$userData$reactiveValues$parametersData
+        dynamic_height = rHandsontableGetHeight(dataTable = tbl)
         rhandsontable(
-          session$userData$reactiveValues$parametersData,
+          tbl,
           stretchH = "all",
-          height = 500,
+          height = dynamic_height,
           selectCallback = TRUE,
           width = NULL,
         ) |>
