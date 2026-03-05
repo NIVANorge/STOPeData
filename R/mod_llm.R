@@ -496,7 +496,7 @@ mod_llm_server <- function(id) {
       # Biota data
       tryCatch(
         {
-          browser()
+
           if (!is.null(moduleState$structured_data$biota)) {
             biota_data <- create_biota_from_llm(
               moduleState$structured_data$biota
