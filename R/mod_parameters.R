@@ -195,7 +195,7 @@ mod_parameters_server <- function(id) {
       llm_lookup_validation = FALSE
     )
 
-    chemical_parameters <- dummy_parameters_vocabulary()
+    chemical_parameters <- parameters_vocabulary()
 
     ## InputValidator for table-level validation ----
     iv <- InputValidator$new()
@@ -299,7 +299,7 @@ mod_parameters_server <- function(id) {
 
       if (isTruthy(param_type)) {
         # Get available subtypes for this parameter type
-        type_filtered_data <- dummy_parameters_vocabulary() |>
+        type_filtered_data <- parameters_vocabulary() |>
           filter(PARAMETER_TYPE == param_type)
 
         available_subtypes <- if (nrow(type_filtered_data) > 0) {
@@ -338,7 +338,7 @@ mod_parameters_server <- function(id) {
         available_names <- get_parameters_filtered(
           param_type = param_type,
           param_subtype = param_subtype,
-          dummy_parameters = dummy_parameters_vocabulary(),
+          dummy_parameters = parameters_vocabulary(),
           session_parameters = moduleState$session_parameters
         )
 
@@ -437,7 +437,7 @@ mod_parameters_server <- function(id) {
         new_param <- create_existing_parameter(
           param_type,
           param_name,
-          dummy_parameters = dummy_parameters_vocabulary()
+          dummy_parameters = parameters_vocabulary()
         )
 
         if (!is.null(new_param)) {
@@ -514,10 +514,8 @@ mod_parameters_server <- function(id) {
           param_name <- updated_data[i, "PARAMETER_NAME"]
 
           if (isTruthy(param_type) && isTruthy(param_name)) {
-            # Check if this is a new parameter (not in dummy_parameters_vocabulary())
-            if (
-              is.null(dummy_parameters_vocabulary()[[param_type]][[param_name]])
-            ) {
+            # Check if this is a new parameter (not in parameters_vocabulary())
+            if (is.null(parameters_vocabulary()[[param_type]][[param_name]])) {
               # Store in session parameters
               if (is.null(moduleState$session_parameters[[param_type]])) {
                 moduleState$session_parameters[[param_type]] <- list()
