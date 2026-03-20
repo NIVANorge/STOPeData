@@ -12,7 +12,6 @@
 #' @importFrom mirai daemons everywhere
 #' @import eDataDRF
 #' @noRd
-options(shiny.maxRequestSize = 20 * 1024^2) # TODO: Move this to the run call.
 
 # Set background processe for running tasks
 daemons(1)
