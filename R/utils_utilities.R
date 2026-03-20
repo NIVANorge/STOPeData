@@ -24,6 +24,61 @@
   }
 }
 
+
+#' Reference field character limits
+#'
+#' Returns maximum character lengths for text fields in the references table.
+#'
+#' @details
+#' Provides a named list of character limits for reference metadata fields to ensure
+#' data quality and database compatibility. Limits include:
+#'
+#' DOCUMENT_NUMBER: 200 characters
+#'
+#' DOI: 200 characters
+#'
+#' EDITION: 200 characters
+#'
+#' INSTITUTION: 200 characters
+#'
+#' ISBN_ISSN: 200 characters
+#'
+#' PERIODICAL_JOURNAL: 200 characters
+#'
+#' PUBLISHER: 200 characters
+#'
+#' REF_COMMENT: 1000 characters
+#'
+#' URL: 200 characters
+#'
+#' @return A named list of character limits for reference fields
+#' @family limits
+#' @family reference
+#' @export
+reference_character_limits <- function() {
+  list(
+    # ACCESSION_NUMBER = 200,  # COMMENTED OUT
+    # DB_NAME = 200,           # COMMENTED OUT
+    # DB_PROVIDER = 200,       # COMMENTED OUT
+    DOCUMENT_NUMBER = 200,
+    DOI = 200,
+    EDITION = 200,
+    INSTITUTION = 200,
+    ISBN_ISSN = 200,
+    # NUMBER_OF_PAGES = 50,    # COMMENTED OUT
+    # NUMBER_OF_VOLUMES = 100, # COMMENTED OUT
+    # PAGES = 200,             # COMMENTED OUT
+    PERIODICAL_JOURNAL = 200,
+    # PMCID = 200,             # COMMENTED OUT
+    # PUBLISHED_PLACE = 200,   # COMMENTED OUT
+    PUBLISHER = 200,
+    REF_COMMENT = 1000,
+    # SERIES_EDITOR = 200,     # COMMENTED OUT
+    # SERIES_TITLE = 200,      # COMMENTED OUT
+    URL = 200
+  )
+}
+
 #' @title isRelevant
 #'
 #' @description Check if a categorical variable is "Not relevant" or "Not reported"
