@@ -16,7 +16,6 @@
 #' Where registrant is typically 4+ digits and suffix can contain various characters.
 #' This function validates format only, not whether the DOI actually exists.
 #'
-
 #' @export
 validate_doi_format <- function(input_string) {
   if (

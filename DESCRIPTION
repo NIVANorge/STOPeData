@@ -57,4 +57,4 @@ Config/testthat/edition: 3
 URL: https://github.com/sawelch-NIVA/STOPeData
 BugReports: https://github.com/sawelch-NIVA/STOPeData/issues
 Remotes: 
-    sawelch-NIVA/eDataDRF
+    NIVANorge/eDataDRF

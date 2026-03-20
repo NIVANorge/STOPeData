@@ -165,6 +165,7 @@ parse_compartment_selections <- function(
   return(parsed)
 }
 
+# TODO: Transferred to eDataDRFr
 #' Generate Sample ID with Components ----
 #' @param site_code Site code (vectorized)
 #' @param parameter_name Parameter name (vectorized)
