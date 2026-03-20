@@ -108,8 +108,6 @@ populate_session_with_dummy_data <- function(
       selected = navigate_to
     )
   }
-
-  print_dev("Dummy data population complete")
 }
 
 
