@@ -263,14 +263,7 @@ mod_llm_server <- function(id) {
       # disable buttons where simultaneous running could cause problems
       disable("extract_data")
 
-      # Create dummy data structure using external function
-      dummy_data <- create_dummy_data(uppercase_columns = TRUE)
-
-      # Store results in module state (for LLM-specific behavior)
-
-      moduleState$structured_data <- dummy_data
-      moduleState$raw_extraction <- dummy_data
-      moduleState$error_message <- NULL
+      populate_session_with_dummy_data(session = session)
 
       # Also save outputs to server data so we can download them later if needed
       session$userData$reactiveValues$promptLLM <- if (
@@ -280,7 +273,7 @@ mod_llm_server <- function(id) {
       } else {
         create_extraction_prompt()
       }
-      session$userData$reactiveValues$rawLLM <- dummy_data
+      # session$userData$reactiveValues$rawLLM <- dummy_data
 
       showNotification(
         "Dummy data loaded successfully!",
@@ -496,7 +489,6 @@ mod_llm_server <- function(id) {
       # Biota data
       tryCatch(
         {
-
           if (!is.null(moduleState$structured_data$biota)) {
             biota_data <- create_biota_from_llm(
               moduleState$structured_data$biota

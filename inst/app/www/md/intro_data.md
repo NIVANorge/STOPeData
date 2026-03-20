@@ -1,4 +1,4 @@
-- Entered data can be downloaded at any time, even if not fully complete or valid. Click "Save Table Data" to make it available for download.
-- Enter measured concentrations, detection limits, and associated metadata for each combination. Where levels below detection or quantification (LOD, LOQ) limits are reported, use the MEASURED_FLAG dropdowns and dedicated LOD/LOQ columns.
-- Numbers default to displaying 4 d.p., but full precision is retained (e.g. a lot more than 4 d.p.)
+- Click "Save Table Data" to make this table available for download.
+- Enter measured concentrations, detection limits, etc. for each combination. Where levels below detection/ quantification (LOD, LOQ) limits, use the `MEASURED_FLAG` dropdowns and dedicated LOD/LOQ columns.
+- Numbers default to displaying 4 d.p., but full precision is retained
 - Columns can be sorted by clicking the column name (numeric, chronological, alphabetical order).
