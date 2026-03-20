@@ -23,138 +23,123 @@ mod_biota_ui <- function(id) {
       full_screen = TRUE,
       fill = FALSE,
       card_body(
-        ## Info accordion ----
-        info_accordion(
-          content_file = "inst/app/www/md/intro_biota.md"
-        ),
+        layout_columns(
+          col_widths = c(8, 4),
 
-        ## Species selection controls ----
-        div(
-          style = "margin: 0 0; padding: 15px 15px 0 15px;",
-          h5("Study Species Selection"),
-          p(
-            "First select a species group, then choose specific species for your study. Selected species will be available in the sample table below.",
-            class = "text-muted"
-          ),
-
-          layout_columns(
-            col_widths = c(4, 8),
-
-            pickerInput(
-              ns("species_group_filter"),
-              label = tooltip(
-                list(
-                  "Filter by species group",
-                  bs_icon("info-circle-fill")
-                ),
-                "Filter the Select species field to a species group or other indicator (e.g. ecosystem)",
-              ),
-              ":",
-              choices = species_groups_vocabulary(),
-              selected = NULL,
-              multiple = FALSE
+          ## Column 1: Species selection controls ----
+          div(
+            style = "margin: 0 0; padding: 15px 15px 0 15px;",
+            h5("Study Species Selection"),
+            p(
+              "First select a species group, then choose specific species for your study. Selected species will be available in the sample table below.",
+              class = "text-muted"
             ),
 
-            selectizeInput(
-              ns("study_species_selector"),
-              label = tooltip(
-                list(
-                  "Select species sampled in dataset",
-                  bs_icon("info-circle-fill")
-                ),
-                "Choose all species that were sampled in your study. These will be available as options in the sample table below.",
-              ),
-              choices = NULL,
-              selected = NULL,
-              multiple = TRUE,
-            )
-          ),
-
-          ## Selected species display and clear button ----
-          div(
-            style = "margin-top: 10px;",
             layout_columns(
-              col_widths = c(10, 2),
-              style = "margin-bottom: 0px;",
-              div(
-                style = "display: block;",
-                tooltip(
-                  style = "display: flex; gap: 0.5em;",
-                  list(
-                    h6("Species sampled in dataset"),
-                    bs_icon("info-circle-fill")
-                  ),
-                  "This shows the species that will be available in the table dropdown."
+              col_widths = c(4, 8),
+              pickerInput(
+                ns("species_group_filter"),
+                label = tooltip(
+                  list("Filter by species group", bs_icon("info-circle-fill")),
+                  "Filter the Select species field to a species group or other indicator (e.g. ecosystem)"
                 ),
-
-                verbatimTextOutput(
-                  ns("selected_species_display"),
-                  placeholder = TRUE
-                )
+                ":",
+                choices = species_groups_vocabulary(),
+                selected = NULL,
+                multiple = FALSE
               ),
-              div(
-                style = "display: flex; align-items: end; margin-top: calc(1em + 10px);",
-                actionButton(
-                  ns("clear_species"),
-                  "Clear All",
-                  class = "btn-danger btn-sm",
-                  style = "margin-bottom: 15px;"
+              selectizeInput(
+                ns("study_species_selector"),
+                label = tooltip(
+                  list("Select species sampled in dataset", bs_icon("info-circle-fill")),
+                  "Choose all species that were sampled in your study. These will be available as options in the sample table below."
+                ),
+                choices = NULL,
+                selected = NULL,
+                multiple = TRUE
+              )
+            ),
+
+            div(
+              style = "margin-top: 10px;",
+              layout_columns(
+                col_widths = c(10, 2),
+                style = "margin-bottom: 0px;",
+                div(
+                  style = "display: block;",
+                  tooltip(
+                    style = "display: flex; gap: 0.5em;",
+                    list(h6("Species sampled in dataset"), bs_icon("info-circle-fill")),
+                    "This shows the species that will be available in the table dropdown."
+                  ),
+                  verbatimTextOutput(ns("selected_species_display"), placeholder = TRUE)
+                ),
+                div(
+                  style = "display: flex; align-items: end; margin-top: calc(1em + 10px);",
+                  actionButton(
+                    ns("clear_species"), "Clear All",
+                    class = "btn-danger btn-sm",
+                    style = "margin-bottom: 15px;"
+                  )
                 )
               )
-            )
-          ),
-          tooltip(
-            input_task_button(
-              id = ns("update_biota_manual"),
-              label = "Update Biota from Samples",
-              type = "primary"
             ),
-            "Refresh the available Sample rows where ENVIRON_COMPARTMENT = Biota. Will wipe existing data, so be a little careful."
-          )
-        ),
 
-        ## Validation status ----
-        div(
-          style = "display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 15px 0;",
+            tooltip(
+              input_task_button(
+                id = ns("update_biota_manual"),
+                label = "Update Biota from Samples",
+                type = "primary"
+              ),
+              "Refresh the available Sample rows where ENVIRON_COMPARTMENT = Biota. Will wipe existing data, so be a little careful."
+            ),
 
-          ### Validation status ----
-          uiOutput(ns("validation_reporter"))
-        ),
+            div(
+              style = "display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 15px 0;",
+              uiOutput(ns("validation_reporter"))
+            ),
 
-        conditionalPanel(
-          condition = "output.llm_lookup_validation",
-          ns = ns,
-          accordion(
-            open = TRUE,
-            accordion_panel(
-              title = "LLM extracted data validation",
-              icon = bs_icon("cpu"),
-              verbatimTextOutput(ns("parameter_llm_validation_results"))
+            conditionalPanel(
+              condition = "output.llm_lookup_validation",
+              ns = ns,
+              accordion(
+                open = TRUE,
+                accordion_panel(
+                  title = "LLM extracted data validation",
+                  icon = bs_icon("cpu"),
+                  verbatimTextOutput(ns("parameter_llm_validation_results"))
+                )
+              )
+            ),
+
+            accordion(
+              id = ns("data_accordion"),
+              open = FALSE,
+              accordion_panel(
+                title = "Click to view raw validated biota data",
+                icon = bs_icon("code"),
+                verbatimTextOutput(ns("validated_data_display"))
+              )
             )
-          )
-        ),
+          ),  # <-- end of Column 1
 
-        ## Raw data accordion ----
-        accordion(
-          id = ns("data_accordion"),
-          open = FALSE,
-          accordion_panel(
-            title = "Click to view raw validated biota data",
-            icon = bs_icon("code"),
-            verbatimTextOutput(ns("validated_data_display"))
-          )
+          ## Column 2: Instructions accordion ----
+          info_accordion(
+            content_file = "inst/app/www/md/intro_biota.md"
+          )   # <-- this is now the second child of layout_columns
         )
       )
     ),
 
     ## Biota table card ----
+
     card(
       full_screen = TRUE,
-      div(
-        rHandsontableOutput(
-          ns("biota_table")
-        ),
-        style = "margin-bottom: 10px;"
+      style = "overflow: visible;",
+      card_body(
+        padding = 0,
+        style = "overflow-x: auto;",
+        rHandsontableOutput(ns("biota_table"))
       )
     )
   )
@@ -643,13 +628,14 @@ mod_biota_server <- function(id) {
         species_groups <- sort(unique(
           moduleState$species_options$SPECIES_GROUP
         ))
-
+        tbl = session$userData$reactiveValues$biotaData
+        dynamic_height = rHandsontableGetHeight(dataTable = tbl)
         rhandsontable(
-          session$userData$reactiveValues$biotaData,
+          tbl,
           stretchH = "all",
           selectCallback = TRUE,
           width = NULL,
-          height = 500
+          height = dynamic_height
         ) |>
           hot_table(overflow = "visible", stretchH = "all") |>
           # Make sample info columns read-only

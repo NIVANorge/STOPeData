@@ -23,16 +23,14 @@ mod_parameters_ui <- function(id) {
     # Main content card ----
     card(
       full_screen = TRUE,
-      fill = TRUE,
+      fill = FALSE,
       card_body(
-        ## Info accordion ----
-        info_accordion(content_file = "inst/app/www/md/intro_parameters.md"),
+        layout_columns(
+          col_widths = c(8, 4),
 
         ## Parameter selection controls ----
-        layout_column_wrap(
-          width = "300px",
-          fill = FALSE,
-          fillable = FALSE,
+        layout_columns(
+          col_widths = c(6, 6,12,12),
 
           pickerInput(
             inputId = ns("parameter_type_select"),
@@ -66,36 +64,39 @@ mod_parameters_ui <- function(id) {
               liveSearch = TRUE,
               virtualScroll = TRUE
             )
+          ),
+          pickerInput(
+            inputId = ns("parameter_name_select"),
+            label = tooltip(
+              list("Parameter Name", bs_icon("info-circle-fill")),
+              "Press backspace to remove existing parameters. Start typing a name to search for parameters."
+            ),
+            choices = c("Select parameter type first..."),
+            width = "100%",
+            selected = "Formaldehyde",
+            options = pickerOptions(
+              actionsBox = TRUE,
+              liveSearch = TRUE,
+              virtualScroll = TRUE
+            ),
+            multiple = FALSE
+          ),
+          textAreaInput(
+            inputId = ns("parameter_comment"),
+            label = tooltip(
+              list("Parameter Comments", bs_icon("info-circle-fill")),
+              "Use this space to enter any potentially relevant or noteworthy comments or remarks about the measured parameter."
+            ),
+            placeholder = "Parameter notes (optional)",
+            width = "100%",
+            rows = 1
           )
         ),
+        ## Info accordion ----
+        info_accordion(content_file = "inst/app/www/md/intro_parameters.md")
 
-        pickerInput(
-          inputId = ns("parameter_name_select"),
-          label = tooltip(
-            list("Parameter Name", bs_icon("info-circle-fill")),
-            "Press backspace to remove existing parameters. Start typing a name to search for parameters."
-          ),
-          choices = c("Select parameter type first..."),
-          width = "100%",
-          selected = "Formaldehyde",
-          options = pickerOptions(
-            actionsBox = TRUE,
-            liveSearch = TRUE,
-            virtualScroll = TRUE
-          ),
-          multiple = FALSE
         ),
 
-        textAreaInput(
-          inputId = ns("parameter_comment"),
-          label = tooltip(
-            list("Parameter Comments", bs_icon("info-circle-fill")),
-            "Use this space to enter any potentially relevant or noteworthy comments or remarks about the measured parameter."
-          ),
-          placeholder = "Parameter notes (optional)",
-          width = "100%",
-          rows = 1
-        ),
 
         ## Action buttons and validation status ----
         div(
@@ -608,10 +609,13 @@ mod_parameters_server <- function(id) {
             )
           )
       } else {
+
+        tbl =  session$userData$reactiveValues$parametersData
+        dynamic_height = rHandsontableGetHeight(dataTable = tbl)
         rhandsontable(
-          session$userData$reactiveValues$parametersData,
+          tbl,
           stretchH = "all",
-          height = 500,
+          height = dynamic_height,
           selectCallback = TRUE,
           width = NULL,
         ) |>

@@ -248,3 +248,19 @@ abbreviate_string <- function(
 
   return(result)
 }
+
+rHandsontableGetHeight <- function(minHeight = 200,
+                                   maxHeight = 700,
+                                   defaultRowHeight = 23,
+                                   defaultHeaderHeight = 25,
+                                   dataTable){
+  calculated_height <- (nrow(dataTable) * defaultRowHeight) + defaultHeaderHeight
+
+  if (calculated_height > maxHeight) {
+    calculated_height = maxHeight
+  }
+
+  final_height <- max(minHeight, calculated_height)
+  final_height <- as.integer(final_height)
+  final_height
+}
