@@ -80,10 +80,10 @@ test_that("collect_CREED_data returns valid tibble with correct structure", {
 
   # Mock inputs  ----
   mock_relevance_config <- CREED_relevance_criteria_config()
-  mock_relevance_input <- creed_tibble_to_mock_input(dummy_CREED_relevance_tibble())
+  mock_relevance_input <- creed_tibble_to_mock_input(example_CREED_relevance_tibble())
 
   mock_reliability_config <- CREED_reliability_criteria_config()
-  mock_reliability_input <- creed_tibble_to_mock_input(dummy_CREED_reliability_tibble())
+  mock_reliability_input <- creed_tibble_to_mock_input(example_CREED_reliability_tibble())
 
   expect_no_error(
     result <- collect_CREED_data(mock_relevance_config, mock_relevance_input) |>
@@ -99,8 +99,8 @@ test_that("collect_CREED_data returns valid tibble with correct structure", {
   # check we have as many rows as we started with
   expect_equal(
     !!nrow(result),
-    !!nrow(dummy_CREED_relevance_tibble()) +
-      !!nrow(dummy_CREED_reliability_tibble())
+    !!nrow(example_CREED_relevance_tibble()) +
+      !!nrow(example_CREED_reliability_tibble())
   )
 })
 
