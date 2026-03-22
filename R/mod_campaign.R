@@ -30,7 +30,7 @@ mod_campaign_ui <- function(id) {
             inputId = ns("CAMPAIGN_NAME"),
             label = tooltip(
               list("Campaign Name", bs_icon("info-circle-fill")),
-              "Text string used to identify the sampling campaign or project. Ensure a consistent Campaign string is used."
+              "Text string used to identify the sampling campaign or project."
             ),
             placeholder = "e.g., 'Vannmiljo Mitigation Monitoring 2025'",
             width = "100%"
@@ -118,30 +118,30 @@ mod_campaign_ui <- function(id) {
           placeholder = "Campaign-level notes (optional)",
           width = "100%",
           rows = 3
-        ),
-
-        ## # Validation status and raw data ----
-        span(
-          # prevent flex-grow validation element from growing vertically
-          uiOutput(ns("validation_reporter"))
-        ),
-        accordion(
-          id = ns("data_accordion"),
-          open = FALSE,
-          accordion_panel(
-            title = "Click to view raw validated data",
-            icon = bs_icon("code"),
-            verbatimTextOutput(ns("validated_data_display"))
-          )
-        ),
-
-        ## # Action buttons ----
-        actionButton(
-          inputId = ns("clear"),
-          label = "Clear All Fields",
-          class = "btn-danger",
-          width = "300px"
         )
+      ),
+
+      ## # Validation status and raw data ----
+      span(
+        # prevent flex-grow validation element from growing vertically
+        uiOutput(ns("validation_reporter"))
+      ),
+      accordion(
+        id = ns("data_accordion"),
+        open = FALSE,
+        accordion_panel(
+          title = "Click to view raw validated data",
+          icon = bs_icon("code"),
+          verbatimTextOutput(ns("validated_data_display"))
+        )
+      ),
+
+      ## # Action buttons ----
+      actionButton(
+        inputId = ns("clear"),
+        label = "Clear All Fields",
+        class = "btn-danger",
+        width = "300px"
       )
     )
   )
@@ -436,6 +436,7 @@ mod_campaign_server <- function(id) {
     # upstream: session$userData$reactiveValues$llmPopulateModules
     # downstream: input fields
     observe({
+      browser()
       tryCatch(
         {
           llm_data <- session$userData$reactiveValues$campaignDataLLM
