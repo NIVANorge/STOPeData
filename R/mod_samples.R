@@ -1032,15 +1032,6 @@ mod_samples_server <- function(id) {
           dates <- input$sampling_date
           subsamples <- input$subsample |> as.character()
 
-          # do some fairly careful checking of subsamples to see if it's empty
-          subsamples <- if (
-            length(trimws(strsplit(subsamples, split = ",")[[1]])) > 1
-          ) {
-            subsamples
-          } else {
-            "1"
-          }
-
           if (
             length(sites) == 0 ||
               length(parameters) == 0 ||

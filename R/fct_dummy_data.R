@@ -97,9 +97,6 @@ populate_session_with_dummy_data <- function(
   session$userData$reactiveValues$methodsData <- eDataDRF::example_methods_tibble()
   print_dev("Populated methods data with dummy data")
 
-  # Set status flags
-  session$userData$reactiveValues$dummyDataLoaded <- TRUE
-
   # Also signal that "save extraction" is complete so that campaign/references
   # form-population observers (which listen on saveExtractionComplete) fire
   session$userData$reactiveValues$saveExtractionComplete <- TRUE

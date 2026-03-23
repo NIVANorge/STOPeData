@@ -444,7 +444,7 @@ mod_campaign_server <- function(id) {
               session$userData$reactiveValues$llmPopulateModules
           ) {
             populate_campaign_from_llm(session, llm_data)
-
+            browser() # TODO: #32 warning here when loading campaign example data. still works though. #
             # showNotification(
             #   "Campaign form populated.",
             #   type = "message"
