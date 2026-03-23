@@ -1,6 +1,3 @@
-# Biota Data Module ----
-# A Shiny module for entering biota-specific sample details
-
 #' Biota UI Function ----
 #' @noRd
 #'
@@ -51,7 +48,10 @@ mod_biota_ui <- function(id) {
               selectizeInput(
                 ns("study_species_selector"),
                 label = tooltip(
-                  list("Select species sampled in dataset", bs_icon("info-circle-fill")),
+                  list(
+                    "Select species sampled in dataset",
+                    bs_icon("info-circle-fill")
+                  ),
                   "Choose all species that were sampled in your study. These will be available as options in the sample table below."
                 ),
                 choices = NULL,
@@ -69,15 +69,22 @@ mod_biota_ui <- function(id) {
                   style = "display: block;",
                   tooltip(
                     style = "display: flex; gap: 0.5em;",
-                    list(h6("Species sampled in dataset"), bs_icon("info-circle-fill")),
+                    list(
+                      h6("Species sampled in dataset"),
+                      bs_icon("info-circle-fill")
+                    ),
                     "This shows the species that will be available in the table dropdown."
                   ),
-                  verbatimTextOutput(ns("selected_species_display"), placeholder = TRUE)
+                  verbatimTextOutput(
+                    ns("selected_species_display"),
+                    placeholder = TRUE
+                  )
                 ),
                 div(
                   style = "display: flex; align-items: end; margin-top: calc(1em + 10px);",
                   actionButton(
-                    ns("clear_species"), "Clear All",
+                    ns("clear_species"),
+                    "Clear All",
                     class = "btn-danger btn-sm",
                     style = "margin-bottom: 15px;"
                   )
@@ -121,12 +128,12 @@ mod_biota_ui <- function(id) {
                 verbatimTextOutput(ns("validated_data_display"))
               )
             )
-          ),  # <-- end of Column 1
+          ), # <-- end of Column 1
 
           ## Column 2: Instructions accordion ----
           info_accordion(
             content_file = "inst/app/www/md/intro_biota.md"
-          )   # <-- this is now the second child of layout_columns
+          ) # <-- this is now the second child of layout_columns
         )
       )
     ),
@@ -451,11 +458,19 @@ mod_biota_server <- function(id) {
     # upstream: session$userData$reactiveValues$llmPopulateModules
     # downstream: session$userData$reactiveValues$biotaData, moduleState$llm_lookup_validation, moduleState$llm_validation_results
     observe({
-      llm_biota <- session$userData$reactiveValues$biotaDataLLM |> na.omit() # LLM returns a column of all NAs if there are no hits
+      # na.omit() would drop rows with *any* NA column; instead filter to only
+      # remove all-NA rows (what the LLM returns when there are no biota hits)
+      raw_biota <- session$userData$reactiveValues$biotaDataLLM
+      llm_biota <- if (!is.null(raw_biota) && nrow(raw_biota) > 0) {
+        raw_biota[rowSums(!is.na(raw_biota)) > 0, ]
+      } else {
+        raw_biota
+      }
+
       if (
         !is.null(llm_biota) &&
           nrow(llm_biota) > 0 &&
-          session$userData$reactiveValues$llmPopulateModules
+          isTRUE(session$userData$reactiveValues$llmPopulateModules)
       ) {
         session$userData$reactiveValues$biotaData <- llm_biota
 
@@ -475,44 +490,17 @@ mod_biota_server <- function(id) {
             append(c("Not reported", "Not relevant"), after = 0)
 
           moduleState$llm_lookup_validation <- TRUE
-
-          # Show notification based on validation
-          #   if (validation_result$has_warnings) {
-          #     showNotification(
-          #       paste(
-          #         "Added",
-          #         nrow(llm_biota),
-          #         "biota to options (validation warning)"
-          #       ),
-          #       type = "warning"
-          #     )
-          #   } else {
-          #     showNotification(
-          #       paste(
-          #         "Added",
-          #         nrow(llm_biota),
-          #         "biota to options (validated))"
-          #       ),
-          #       type = "message"
-          #     )
-          #   }
-          # } else {
-          #   showNotification(
-          #     paste(
-          #       "Added",
-          #       nrow(llm_biota),
-          #       "biota to options (validation not available)"
-          #     ),
-          #     type = "message"
-          #   )
-          moduleState$llm_lookup_validation <- FALSE
         }
-      } else {
+        # species_options not available: biota data loaded but no lookup validation
+      } else if (isTRUE(session$userData$reactiveValues$llmPopulateModules)) {
+        # Flag is TRUE but no usable biota data — genuine unexpected state
         showNotification(
           "llmPopulateModules triggered but llm biota data null or empty",
           type = "error"
         )
+        moduleState$llm_lookup_validation <- FALSE
       }
+      # else: llmPopulateModules is FALSE (clear/reset) — silent no-op
     }) |>
       bindEvent(
         session$userData$reactiveValues$llmPopulateModules,
