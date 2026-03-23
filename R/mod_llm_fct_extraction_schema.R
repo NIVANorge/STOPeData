@@ -147,7 +147,7 @@ create_parameters_schema <- function() {
       .description = "A measured parameter/stressor",
       parameter_name = type_string(
         description = "Name of the parameter/chemical/stressor measured. If a parameter is reported under multiple names
-         (e.g. Copper and Cu, Paracetamol and Acetaminophen), only return one entry. ONLY RETURN COPPER OR COPPER-CONTAINING MOLECULES", # FIXME: Obviously, remove this before trying to use it for other stuff
+         (e.g. Copper and Cu, Paracetamol and Acetaminophen), only return one entry. Most obviously chemicals, but also include water quality parameters, etc., if not otherwise specified.",
         required = FALSE
       ),
       parameter_type = type_string(
@@ -159,7 +159,7 @@ create_parameters_schema <- function() {
         required = FALSE
       ),
       parameter_comment = type_string(
-        description = "Any other comments relevant to undderstanding/interpreting measured parameters.",
+        description = "Any other comments relevant to understanding/interpreting measured parameters.",
         required = FALSE
       )
     )
