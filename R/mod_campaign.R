@@ -436,7 +436,6 @@ mod_campaign_server <- function(id) {
     # upstream: session$userData$reactiveValues$llmPopulateModules
     # downstream: input fields
     observe({
-      browser()
       tryCatch(
         {
           llm_data <- session$userData$reactiveValues$campaignDataLLM

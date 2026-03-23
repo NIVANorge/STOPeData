@@ -89,8 +89,8 @@ populate_session_with_dummy_data <- function(
   session$userData$reactiveValues$compartmentsData <- eDataDRF::example_compartments_tibble()
   print_dev("Populated compartments data with dummy data")
 
-  # Biota data
-  session$userData$reactiveValues$biotaData <- eDataDRF::example_biota_tibble()
+  # Biota data # uses LLM data to trigger lookup
+  session$userData$reactiveValues$biotaDataLLM <- eDataDRF::example_biota_tibble()
   print_dev("Populated biota data with dummy data")
 
   # Methods data
@@ -99,6 +99,11 @@ populate_session_with_dummy_data <- function(
 
   # Set status flags
   session$userData$reactiveValues$dummyDataLoaded <- TRUE
+
+  # Also signal that "save extraction" is complete so that campaign/references
+  # form-population observers (which listen on saveExtractionComplete) fire
+  session$userData$reactiveValues$saveExtractionComplete <- TRUE
+  session$userData$reactiveValues$saveExtractionSuccessful <- TRUE
 
   # Navigate if requested
   if (!is.null(navigate_to) && !is.null(parent_session)) {

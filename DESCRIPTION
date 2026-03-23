@@ -14,7 +14,7 @@ Imports:
     bslib,
     config,
     dplyr,
-    eDataDRF (>= 0.0.0.9000),
+    eDataDRF (>= 0.0.0.9005),
     ellmer,
     ggplot2,
     glue,
