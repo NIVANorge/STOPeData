@@ -202,6 +202,7 @@ mod_llm_ui <- function(id) {
 #'
 #' @noRd
 #' @importFrom shiny moduleServer reactive reactiveValues observe renderText renderUI showNotification updateTextAreaInput ExtendedTask
+#' @importFrom shinyvalidate InputValidator sv_required
 #' @importFrom mirai mirai
 #' @importFrom shinyjs enable disable
 #' @importFrom stringr str_replace str_extract
@@ -215,6 +216,37 @@ mod_llm_server <- function(id) {
     ns <- session$ns
 
     # 1. Module setup ----
+    ## InputValidator$new: iv ----
+    iv <- InputValidator$new()
+
+    iv$add_rule("ENTERED_BY", sv_required())
+    iv$add_rule("ENTERED_BY", function(value) {
+      if (isTruthy(value) && nchar(value) < 2) {
+        "Entered By must be at least 2 characters"
+      }
+    })
+
+    iv$add_rule("pdf_file", function(value) {
+      if (is.null(value)) {
+        "Please upload a PDF"
+      }
+    })
+
+    iv$add_rule("api_key", sv_required())
+    iv$add_rule("api_key", function(value) {
+      if (isTruthy(value) && !startsWith(value, "sk-ant")) {
+        "API key must start with 'sk-ant'"
+      }
+    })
+    iv$add_rule("api_key", function(value) {
+      if (isTruthy(value) && nchar(value) < 20) {
+        "API key must be at least 20 characters long"
+      }
+    })
+
+    ## InputValidator$enable() ----
+    iv$enable()
+
     ## # ReactiveValues: moduleState -----
     moduleState <- reactiveValues(
       extraction_successful = FALSE,
@@ -242,14 +274,10 @@ mod_llm_server <- function(id) {
       bindEvent(input$reset_defaults)
 
     ## # observe: Enable extract button when PDF and API key available ----
-    # upstream: input$pdf_file, input$api_key
+    # upstream: input$pdf_file, input$api_key, iv
     # downstream: extract_data button state
     observe({
-      if (
-        !is.null(input$pdf_file) &&
-          isTruthy(input$api_key) &&
-          nchar(input$api_key) > 10
-      ) {
+      if (!is.null(input$pdf_file) && iv$is_valid()) {
         enable("extract_data")
       } else {
         disable("extract_data")
@@ -283,6 +311,9 @@ mod_llm_server <- function(id) {
       # set success flags last
       session$userData$reactiveValues$llmExtractionComplete <- TRUE
       session$userData$reactiveValues$llmExtractionSuccessful <- TRUE
+
+      # need to set populate modules to trigger some downstream logic (why?)
+      session$userData$reactiveValues$llmPopulateModules <- TRUE
 
       # Enable extraction-dependent and extract_data button again
       enable("populate_forms")
@@ -329,16 +360,25 @@ mod_llm_server <- function(id) {
     observe({
       req(input$pdf_file, input$api_key)
 
+      # Validate inputs before proceeding
+      if (!iv$is_valid()) {
+        showNotification(
+          "Please fix validation errors before extracting data.",
+          type = "warning"
+        )
+        return()
+      }
+
       # Synchronous validation (fast)
-      # tryCatch(
-      #   {
-      #     validate_api_key(input$api_key)
-      #   },
-      #   error = function(e) {
-      #     showNotification(e$message, type = "warning")
-      #     return()
-      #   }
-      # )
+      tryCatch(
+        {
+          validate_api_key(input$api_key)
+        },
+        error = function(e) {
+          showNotification(e$message, type = "warning")
+          return()
+        }
+      )
 
       # # Optional: Test connection (also fast, but could be async too)
       # tryCatch(
