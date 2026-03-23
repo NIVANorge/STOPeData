@@ -24,7 +24,7 @@ mod_landing_ui <- function(id) {
               "Most sections can be expanded to fill the full screen with the ",
               tooltip(
                 bs_icon("arrows-angle-expand"),
-                "The actual icons don't quite look identical to this one. If you can tell me why you will win a prize."
+                "The actual icons don't quite look identical to this one."
               ),
               "Expand button in the bottom right of the section.",
               "Mouse over icons like this for more information",
@@ -32,9 +32,9 @@ mod_landing_ui <- function(id) {
                 bs_icon("info-circle-fill"),
                 "This type of mouse-over element is often called a 'tooltip'"
               ),
-              " are available on each page. For an FAQ and more details instructions, go to the",
+              " are available on each page. For more details, go to the",
               bs_icon("info-circle"),
-              "Info tab."
+              "Info tab (top right)."
             )
           ),
           h5("Quick Start Buttons"),
