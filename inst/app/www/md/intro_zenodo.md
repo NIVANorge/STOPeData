@@ -1,0 +1,3 @@
+- Upload your extracted data to [Zenodo](https://zenodo.org/) with automated metadata
+- Use Sandbox mode for testing and Production mode once you're ready to upload
+- Make sure you have permission to share any data made public on Zenodo

@@ -22,29 +22,7 @@ mod_Zenodo_ui <- function(id) {
         style = "padding-bottom: 80px;",
 
         # ===== Info accordion =====
-        accordion(
-          id = ns("info_accordion"),
-          accordion_panel(
-            title = "Zenodo Upload Information",
-            icon = bs_icon("info-circle"),
-            "Upload your campaign dataset directly to ",
-            tags$a(href = "https://zenodo.org", target = "_blank", "Zenodo"),
-            " with appropriate metadata. You can upload a file manually, generate a README template for an EMODnet record, or push the current session data directly without downloading first."
-          )
-        ),
-
-        # ===== Input Mode =====
-        radioButtons(
-          ns("inputMode"),
-          label = NULL,
-          choices = c(
-            "Upload file (.xlsx)" = "upload",
-            "Use README template" = "template",
-            "Use current session data" = "session"
-          ),
-          selected = "upload",
-          inline = TRUE
-        ),
+        info_accordion(content_file = "inst/app/www/md/intro_zenodo.md"),
 
         # ===== Environment card =====
         div(
@@ -82,22 +60,6 @@ mod_Zenodo_ui <- function(id) {
 
           # ---------- LEFT COLUMN: all form fields ----------
           div(
-            # Section 1a: File Upload (upload mode only)
-            conditionalPanel(
-              condition = sprintf("input['%s'] == 'upload'", ns("inputMode")),
-              h5(bs_icon("upload"), " 1. Upload Your Data"),
-              fileInput(
-                ns("zenUpload"),
-                tooltip(
-                  list("Select your file*", bs_icon("info-circle-fill")),
-                  "Upload a file (e.g. an Excel workbook) to attach to the Zenodo record."
-                ),
-                accept = ".xlsx",
-                buttonLabel = "Browse...",
-                placeholder = "No file selected"
-              )
-            ),
-
             # Section 1b: Session data (session mode only)
             conditionalPanel(
               condition = sprintf("input['%s'] == 'session'", ns("inputMode")),
@@ -125,20 +87,6 @@ mod_Zenodo_ui <- function(id) {
               ),
               placeholder = "Enter a descriptive title for your dataset",
               width = "600px"
-            ),
-
-            # EMODnet URL (template mode only)
-            conditionalPanel(
-              condition = sprintf("input['%s'] == 'template'", ns("inputMode")),
-              textInput(
-                ns("emodnetUrl"),
-                tooltip(
-                  list("EMODnet Dataset URL*", bs_icon("info-circle-fill")),
-                  "The canonical EMODnet URL for this dataset, used in the README."
-                ),
-                placeholder = "https://emodnet.ec.europa.eu/...",
-                width = "600px"
-              )
             ),
 
             textAreaInput(
@@ -273,45 +221,6 @@ mod_Zenodo_ui <- function(id) {
                   icon = bs_icon("cloud-upload"),
                   size = "md"
                 )
-              )
-            )
-          ),
-
-          # ---------- RIGHT COLUMN: README preview (template mode only) ----------
-          conditionalPanel(
-            condition = sprintf("input['%s'] == 'template'", ns("inputMode")),
-            div(
-              style = "
-              position: sticky; top: 12px;
-              background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;
-            ",
-
-              selectInput(
-                ns("templateChoice"),
-                label = "README template",
-                choices = c("EMODnet basic" = "emodnet_basic"),
-                selected = "emodnet_basic"
-              ),
-
-              div(
-                style = "display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px;",
-                radioButtons(
-                  ns("viewMode"),
-                  NULL,
-                  choices = c("Preview" = "rich", "Markdown Code" = "raw"),
-                  inline = TRUE
-                ),
-                actionButton(
-                  ns("copyReadme"),
-                  "Copy README",
-                  class = "btn-sm",
-                  icon = bs_icon("copy")
-                )
-              ),
-
-              div(
-                style = "flex: 1 1 auto; min-height: 0; overflow: auto;",
-                uiOutput(ns("readmePreview"))
               )
             )
           )
