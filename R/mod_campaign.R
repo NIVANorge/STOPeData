@@ -432,19 +432,20 @@ mod_campaign_server <- function(id) {
         session$userData$reactiveValues$ENTERED_BY
       )
 
-    ## observe: Populate from LLM data when available ----
-    # upstream: session$userData$reactiveValues$llmPopulateModules
-    # downstream: input fields
+    # observe: Populate from LLM data when available ----
+    # upstream:session$userData$reactiveValues$llmPopulateModules
+    # downstream:input fields
     observe({
       tryCatch(
         {
           llm_data <- session$userData$reactiveValues$campaignDataLLM
+          # don't trigger if dummy data, because that triggers via another observer (somehow)
           if (
             !is.null(llm_data) &&
+              nrow(llm_data) != 0 &&
               session$userData$reactiveValues$llmPopulateModules
           ) {
             populate_campaign_from_llm(session, llm_data)
-            browser() # TODO: #32 warning here when loading campaign example data. still works though. #
             # showNotification(
             #   "Campaign form populated.",
             #   type = "message"
