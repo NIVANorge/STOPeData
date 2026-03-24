@@ -11,7 +11,7 @@ An object of class \code{tbl_df} (inherits from \code{tbl}, \code{data.frame}) w
 zenodo_licenses
 }
 \description{
-Returns a 444x10 tibble of Zenodo license options as of March 2026.
+Returns a tibble of Zenodo license options as of March 2026.
 Includes `id`, `title`, `description`, `url`, `schema`, `osi_approved`, `revision_id`,
 `created`, `updated`, and `popular`, a custom boolean highlighting the most commonly
 used licenses.
