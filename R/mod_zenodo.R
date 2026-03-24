@@ -34,47 +34,50 @@ mod_Zenodo_ui <- function(id) {
 
         # ===== Dataset Information =====
         h5(bs_icon("info-circle"), " 1. Dataset Information"),
-        textInput(
-          ns("zenTitle"),
-          label = tooltip(
-            list("Dataset Title", bs_icon("info-circle-fill")),
-            "A descriptive title for your dataset on Zenodo."
+        layout_column_wrap(
+          width = "300px",
+          fill = FALSE,
+          fillable = FALSE,
+          div(
+            actionButton(
+              ns("get_session_data"),
+              label = list(
+                "Get Data from Modules",
+                bs_icon("arrow-down-circle-fill")
+              ),
+              class = "btn-primary"
+            ),
+            uiOutput(ns("session_data_summary"))
           ),
-          placeholder = "Enter a descriptive title for your dataset",
-          width = "600px"
+          div(
+            textInput(
+              ns("zenTitle"),
+              label = tooltip(
+                list("Dataset Title", bs_icon("info-circle-fill")),
+                "A descriptive title for your dataset on Zenodo."
+              ),
+              placeholder = "Enter a descriptive title for your dataset",
+              width = "800px"
+            ),
+            textAreaInput(
+              ns("zenDescription"),
+              label = tooltip(
+                list("Description", bs_icon("info-circle-fill")),
+                "Explain what the dataset contains, how it was collected, and its scientific context."
+              ),
+              placeholder = "Provide a detailed description of your dataset",
+              width = "800px",
+              height = "100px"
+            )
+          )
         ),
-        textAreaInput(
-          ns("zenDescription"),
-          label = tooltip(
-            list("Description", bs_icon("info-circle-fill")),
-            "Explain what the dataset contains, how it was collected, and its scientific context."
-          ),
-          placeholder = "Provide a detailed description of your dataset",
-          width = "600px",
-          height = "100px"
-        ),
-
-        # ===== Session Data =====
-        h5(bs_icon("database"), " 2. Session Data"),
-        p(
-          style = "color: #6c757d; font-size: 0.9em;",
-          "The current session data will be bundled as a ZIP archive (the same as the Download button) and uploaded directly to Zenodo."
-        ),
-        actionButton(
-          ns("get_session_data"),
-          "Check Session Data",
-          icon = bs_icon("arrow-clockwise"),
-          class = "btn-primary"
-        ),
-        uiOutput(ns("session_data_summary")),
-
         hr(),
 
-        # ===== Author Information =====
-        h5(bs_icon("person"), " 3. Author Information"),
+        # ===== Authors =====
+        h5(bs_icon("person"), " 2. Authors"),
         p(
           style = "color: #6c757d; font-size: 0.9em;",
-          "Author names are pre-filled from the Reference module where available. Affiliation and ORCID must be entered manually."
+          "Author names are auto-filled from the Reference module where available. Affiliation and ORCID must be entered manually."
         ),
 
         # Dynamic author rows
@@ -82,7 +85,7 @@ mod_Zenodo_ui <- function(id) {
 
         actionButton(
           ns("addAuthor"),
-          "Add Another Author",
+          "Add Author",
           icon = bs_icon("plus-circle"),
           class = "btn-primary"
         ),
@@ -90,71 +93,75 @@ mod_Zenodo_ui <- function(id) {
         hr(),
 
         # ===== Contact Information =====
-        h5(bs_icon("envelope"), " 4. Contact Information"),
-        textInput(
-          ns("contactName"),
-          label = tooltip(
-            list("Contact Name/Role", bs_icon("info-circle-fill")),
-            "Name or role of the person to contact about this dataset, e.g. 'Dr. Jane Smith' or 'Data Curator'."
+        h5(bs_icon("envelope"), " 4. User Information"),
+        layout_column_wrap(
+          width = "300px",
+          fill = FALSE,
+          fillable = FALSE,
+          textInput(
+            ns("contactName"),
+            label = tooltip(
+              list("Contact Name/Role", bs_icon("info-circle-fill")),
+              "Name or role of the person to contact about this dataset, e.g. 'Dr. Jane Smith' or 'Data Curator'."
+            ),
+            width = "800px",
+
+            placeholder = "e.g., Dr. Jane Smith or Data Curator",
           ),
-          placeholder = "e.g., Dr. Jane Smith or Data Curator"
-        ),
-        textInput(
-          ns("contactEmail"),
-          label = tooltip(
-            list("Contact Email", bs_icon("info-circle-fill")),
-            "Email address shown on the Zenodo record for data enquiries."
-          ),
-          placeholder = "contact@example.com"
+          textInput(
+            ns("contactEmail"),
+            label = tooltip(
+              list("Contact Email", bs_icon("info-circle-fill")),
+              "Email address shown on the Zenodo record for data enquiries."
+            ),
+            width = "800px",
+
+            placeholder = "contact@example.com",
+          )
         ),
 
         hr(),
 
         # ===== Metadata & Licensing =====
         h5(bs_icon("tags"), " 5. Metadata & Licensing"),
-        selectizeInput(
-          ns("zenResourceType"),
-          label = tooltip(
-            list("Resource type", bs_icon("info-circle-fill")),
-            "The type of research output. Choose 'Dataset' for environmental monitoring data."
+        layout_column_wrap(
+          width = "300px",
+          fill = FALSE,
+          fillable = FALSE,
+          selectizeInput(
+            ns("zenResourceType"),
+            label = tooltip(
+              list("Resource type", bs_icon("info-circle-fill")),
+              "The type of research output. Choose 'Dataset' for environmental monitoring data."
+            ),
+            choices = zenodo_resource_types,
+            selected = "dataset"
           ),
-          choices = zenodo_resource_types,
-          selected = "dataset"
-        ),
-        selectizeInput(
-          ns("zenLicense"),
-          label = tooltip(
-            list("License", bs_icon("info-circle-fill")),
-            "CC BY 4.0 is recommended for open research data \u2014 it allows reuse with attribution."
+          selectizeInput(
+            ns("zenLicense"),
+            label = tooltip(
+              list("License", bs_icon("info-circle-fill")),
+              "CC BY 4.0 is recommended for open research data \u2014 it allows reuse with attribution."
+            ),
+            choices = zenodo_licenses |>
+              arrange(desc(popular)) |>
+              pull(id, name = title),
+            selected = "cc-by-4.0"
           ),
-          choices = zenodo_licenses |>
-            arrange(desc(popular)) |>
-            pull(id, name = title),
-          selected = "cc-by-4.0"
-        ),
-        tags$small(
-          style = "color: #6c757d; display: block; margin-top: -10px; margin-bottom: 15px;",
-          bs_icon("question-circle"),
-          " ",
-          tags$a(
-            href = "https://creativecommons.org/licenses/",
-            target = "_blank",
-            "Learn about licenses"
+          selectizeInput(
+            ns("zenAccess"),
+            label = tooltip(
+              list("Access rights", bs_icon("info-circle-fill")),
+              "Open access makes your data findable and reusable. Embargoed allows you to set a future release date."
+            ),
+            choices = c(
+              "Open access" = "open",
+              "Embargoed" = "embargoed",
+              "Restricted" = "restricted",
+              "Closed" = "closed"
+            ),
+            selected = "open"
           )
-        ),
-        selectizeInput(
-          ns("zenAccess"),
-          label = tooltip(
-            list("Access rights", bs_icon("info-circle-fill")),
-            "Open access makes your data findable and reusable. Embargoed allows you to set a future release date."
-          ),
-          choices = c(
-            "Open access" = "open",
-            "Embargoed" = "embargoed",
-            "Restricted" = "restricted",
-            "Closed" = "closed"
-          ),
-          selected = "open"
         ),
 
         hr(),
@@ -165,73 +172,75 @@ mod_Zenodo_ui <- function(id) {
           bs_icon("three-dots"),
           " 6. Optional Information"
         ),
-        textInput(
-          ns("zenGrant"),
-          label = tooltip(
-            list("Grant agreement ID", bs_icon("info-circle-fill")),
-            "EU or other funder grant agreement ID, e.g. 101057014 for EU Horizon PARC."
-          ),
-          placeholder = "e.g., 101057014"
-        ),
-        textAreaInput(
-          ns("zenComment"),
-          label = tooltip(
-            list("Comment to curator", bs_icon("info-circle-fill")),
-            "Optional note for the Zenodo community curator reviewing this submission."
-          ),
-          placeholder = "Any additional information (optional)",
-          rows = 2
-        ),
-
-        # ===== Submit row =====
-        div(
-          style = "margin-top: 30px; padding-top: 20px; border-top: 2px solid #dee2e6;",
-          div(
-            style = "display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;",
-
-            # Left: environment switch + badge
-            div(
-              style = "display: flex; align-items: center; gap: 10px;",
-              materialSwitch(
-                inputId = ns("zenEnvironment"),
-                label = NULL,
-                value = TRUE,
-                status = "success",
-                right = TRUE
-              ),
-              tags$span(
-                id = ns("envLabel"),
-                style = "font-weight: 500;",
-                "Sandbox (Testing)"
-              ),
-              tags$span(
-                id = ns("envBadge"),
-                style = "background-color: #ffc107; color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: bold; letter-spacing: 0.5px;",
-                "TEST MODE"
-              )
+        layout_column_wrap(
+          width = "300px",
+          fill = FALSE,
+          fillable = FALSE,
+          textInput(
+            ns("zenGrant"),
+            label = tooltip(
+              list("Grant agreement ID", bs_icon("info-circle-fill")),
+              "EU or other funder grant agreement ID, e.g. 101057014 for EU Horizon PARC."
             ),
-
-            # Right: Preview README + Submit buttons
-            div(
-              style = "display: flex; gap: 10px; align-items: center;",
-              actionButton(
-                ns("previewReadme"),
-                "Preview README",
-                icon = bs_icon("eye"),
-                class = "btn-outline-secondary"
-              ),
-              input_task_button(
-                ns("submitZen"),
-                "Submit to Zenodo",
-                color = "primary",
-                style = "material-flat",
-                icon = bs_icon("cloud-upload"),
-                size = "md"
-              )
-            )
+            placeholder = "e.g., 101057014"
           ),
-          uiOutput(ns("environmentWarning"))
+          textAreaInput(
+            ns("zenComment"),
+            label = tooltip(
+              list("Comment to curator", bs_icon("info-circle-fill")),
+              "Optional note for the Zenodo community curator reviewing this submission."
+            ),
+            placeholder = "Any additional information (optional)",
+            rows = 2
+          )
         )
+      ),
+
+      # ===== Submit row =====
+      div(
+        style = "display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;",
+
+        # Left: environment switch + badge
+        div(
+          style = "display: flex; align-items: center; gap: 10px;",
+          materialSwitch(
+            inputId = ns("zenEnvironment"),
+            label = NULL,
+            value = TRUE,
+            status = "success",
+            right = TRUE
+          ),
+          tags$span(
+            id = ns("envLabel"),
+            style = "font-weight: 500;",
+            "Sandbox (Testing)"
+          ),
+          tags$span(
+            id = ns("envBadge"),
+            style = "background-color: #ffc107; color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: bold; letter-spacing: 0.5px;",
+            "TEST MODE"
+          )
+        ),
+
+        # Right: Preview README + Submit buttons
+        div(
+          style = "display: flex; gap: 10px; align-items: center;",
+          actionButton(
+            ns("previewReadme"),
+            "Preview README",
+            icon = bs_icon("eye"),
+            class = "btn-outline-secondary"
+          ),
+          input_task_button(
+            ns("submitZen"),
+            "Submit to Zenodo",
+            color = "primary",
+            style = "material-flat",
+            icon = bs_icon("cloud-upload"),
+            size = "md"
+          )
+        ),
+        uiOutput(ns("environmentWarning"))
       )
     )
   )
@@ -430,29 +439,31 @@ mod_Zenodo_server <- function(id) {
               ns(paste0("zenLastName_", i)),
               "Last name",
               placeholder = "e.g., Smith"
-            )
-          ),
-          textInput(
-            ns(paste0("zenAffiliation_", i)),
-            "Affiliation/Institution",
-            placeholder = "e.g., University of Example"
-          ),
-          textInput(
-            ns(paste0("zenAuthorOrcid_", i)),
-            tooltip(
-              list("ORCID iD", bs_icon("info-circle-fill")),
-              "A persistent digital identifier for researchers. Register free at orcid.org."
             ),
-            placeholder = "e.g., 0000-0002-1825-0097"
-          ),
-          tags$small(
-            style = "color: #6c757d; display: block; margin-top: -10px; margin-bottom: 5px;",
-            bs_icon("question-circle"),
-            " Don't have an ORCID? ",
-            tags$a(
-              href = "https://orcid.org/register",
-              target = "_blank",
-              "Register here"
+            textInput(
+              ns(paste0("zenAffiliation_", i)),
+              "Affiliation/Institution",
+              placeholder = "e.g., University of Example"
+            ),
+            div(
+              textInput(
+                ns(paste0("zenAuthorOrcid_", i)),
+                tooltip(
+                  list("ORCID iD", bs_icon("info-circle-fill")),
+                  "A persistent digital identifier for researchers. Register free at orcid.org."
+                ),
+                placeholder = "e.g., 0000-0002-1825-0097"
+              ),
+              tags$small(
+                style = "color: #6c757d; display: block; margin-top: -10px; margin-bottom: 5px;",
+                bs_icon("question-circle"),
+                " Don't have an ORCID? ",
+                tags$a(
+                  href = "https://orcid.org/register",
+                  target = "_blank",
+                  "Register here"
+                )
+              )
             )
           )
         )
