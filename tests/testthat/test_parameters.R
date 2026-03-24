@@ -154,7 +154,7 @@ test_that("all three functions produce compatible structures", {
   new_param <- create_new_parameter("Test", "User")
 
   setwd("../../") # set to root so that we can load source data from the right dir
-  dummy_params <- dummy_parameters_vocabulary()
+  dummy_params <- parameters_vocabulary()
   existing_param <- create_existing_parameter(
     "Quality parameter",
     "Chlorophyll a",

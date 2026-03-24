@@ -39,7 +39,16 @@ app_ui <- function(request) {
           src = "www/eData_DRF_logo.svg",
           alt = "eData Logo"
         ),
-        paste0("(", Sys.getenv("EDATA_BUILD"), ")"),
+        # Dev, test, or running locally?
+        paste0(
+          "(",
+          if (Sys.getenv("EDATA_BUILD") != "") {
+            Sys.getenv("EDATA_BUILD")
+          } else {
+            "Local"
+          },
+          ")"
+        ),
       ),
       lang = "en",
       id = "main-page",

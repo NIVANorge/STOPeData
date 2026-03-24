@@ -12,7 +12,6 @@
 #' @importFrom mirai daemons everywhere
 #' @import eDataDRF
 #' @noRd
-options(shiny.maxRequestSize = 20 * 1024^2) # TODO: Move this to the run call.
 
 # Set background processe for running tasks
 daemons(1)
@@ -121,17 +120,6 @@ app_server <- function(input, output, session) {
     dataset_dimensions = list()
   )
 
-  ## reactiveTimer: Autosave periodicity
-  # Update autoInvalidate based on settings ----
-  # autoInvalidate <<- reactive({
-  #   if ((input$input_switch %|truthy|% 0) != 0) {
-  #     invalidateLater(input$autosave_interval * 60000) # Convert minutes to milliseconds
-  #     Sys.time()
-  #   } else {
-  #     NULL
-  #   }
-  # })
-
   ## Module servers ----
   # upstream: session start
   # downstream: module server instances
@@ -174,7 +162,6 @@ app_server <- function(input, output, session) {
     "08-biota",
     "09-data",
     "10-review",
-    # "11-export",
     "12-CREED",
     "13-Zenodo",
     "info"
@@ -186,15 +173,6 @@ app_server <- function(input, output, session) {
   session$allowReconnect(TRUE)
 
   # 2. Helper Functions ----
-
-  ## Reactive: DB status (DISABLED) ----
-  # upstream: session start (with optional invalidateLater)
-  # downstream: db_status value for UI display
-  db_status <- reactive({
-    # Add invalidateLater if you want periodic checks
-    # invalidateLater(5000)
-    FALSE
-  })
 
   ## Reactive: Track current module position ----
   # upstream: input$`main-page` (navbar tab selection)
@@ -585,7 +563,7 @@ app_server <- function(input, output, session) {
       },
       error = function(e) {
         showNotification(
-          "Could not retrieve email from session headers.",
+          "Could not retrieve email from session headers. Please set manually.",
           type = "warning"
         )
       }

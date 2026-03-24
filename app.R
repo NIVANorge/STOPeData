@@ -19,6 +19,7 @@ pkgload::load_all(
   attach_testthat = FALSE,
   quiet = TRUE
 )
-options(golem.app.prod = FALSE) # TODO: make a comment on what this actually does?
+options(shiny.maxRequestSize = 20 * 1024^2) # increase permitted file upload size
+options(golem.app.prod = FALSE)
 options(bslib.color_contrast_warnings = FALSE)
 STOPeData::run_app() # add parameters here (if any)

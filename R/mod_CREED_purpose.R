@@ -22,7 +22,7 @@ mod_CREED_purpose_ui <- function(id) {
     ),
     textAreaInput(
       inputId = ns("purpose_statement"),
-      label = "Purpose Statement (Pre-made copper statement/thresholds):",
+      label = "Purpose Statement:",
       placeholder = "Enter the assessment purpose and any specific requirements...",
       rows = 6,
       width = "100%",
@@ -33,34 +33,36 @@ mod_CREED_purpose_ui <- function(id) {
 
     # Import/Export section ----
     div(
-      "You can usually import/export purpose statements here, but since we're just doing a copper AEP for now I've hard-coded it.",
+      "Import a YML-formatted CREED purpose and threshold file, or download the template file. 
+      View the current values below.",
       class = "text-muted"
     ),
-    # layout_column_wrap(
-    #   width = "300px",
-
-    #   fileInput(
-    #     inputId = ns("import_file"),
-    #     label = "Import Purpose & Thresholds (YAML)",
-    #     accept = c(".yaml", ".yml")
-    #   ),
-    #   input_task_button(
-    #     id = ns("import_btn"),
-    #     label = "Load Imported Data",
-    #     icon = bs_icon("upload")
-    #   ),
-    #   downloadButton(
-    #     outputId = ns("export_btn"),
-    #     label = "Export Purpose & Thresholds",
-    #     icon = icon("download")
-    #   ),
-    #   input_task_button(
-    #     id = ns("clear_all"),
-    #     label = "Clear All Fields",
-    #     icon = bs_icon("trash"),
-    #     class = "btn-outline-danger"
-    #   )
-    # ),
+    layout_column_wrap(
+      width = "300px",
+      style = "align-items: flex-end;",
+      fileInput(
+        inputId = ns("import_file"),
+        label = "Upload File",
+        accept = c(".yaml", ".yml")
+      ),
+      input_task_button(
+        id = ns("import_btn"),
+        label = "Import from File",
+        icon = bs_icon("upload")
+      ),
+      downloadButton(
+        outputId = ns("export_btn"),
+        label = "Export & Download File",
+        icon = icon("download"),
+        class = "btn-success"
+      ),
+      input_task_button(
+        id = ns("clear_all"),
+        label = "Clear All Fields",
+        icon = bs_icon("trash"),
+        class = "btn-outline-danger"
+      )
+    ),
 
     hr(),
 
@@ -904,64 +906,64 @@ mod_CREED_purpose_server <- function(id) {
         ignoreNULL = FALSE
       )
 
-    ## observe: Import data: DISABLED YAMLs ----
+    # observe: Import data: YAMLs ----
     # upstream: input$import_btn, input$import_file
     # downstream: UI field updates
-    # observe({
-    #   req(input$import_file)
+    observe({
+      req(input$import_file)
 
-    #   tryCatch(
-    #     {
-    #       imported_data <- yaml::read_yaml(input$import_file$datapath)
+      tryCatch(
+        {
+          imported_data <- yaml::read_yaml(input$import_file$datapath)
 
-    #       # Update purpose statement
-    #       if (!is.null(imported_data$purpose_statement)) {
-    #         updateTextAreaInput(
-    #           session,
-    #           "purpose_statement",
-    #           value = imported_data$purpose_statement
-    #         )
-    #       }
+          # Update purpose statement
+          if (!is.null(imported_data$purpose_statement)) {
+            updateTextAreaInput(
+              session,
+              "purpose_statement",
+              value = imported_data$purpose_statement
+            )
+          }
 
-    #       # Update thresholds
-    #       if (!is.null(imported_data$thresholds)) {
-    #         for (criterion_id in criterion_ids) {
-    #           if (!is.null(imported_data$thresholds[[criterion_id]])) {
-    #             criterion_data <- imported_data$thresholds[[criterion_id]]
+          # Update thresholds
+          if (!is.null(imported_data$thresholds)) {
+            for (criterion_id in criterion_ids) {
+              if (!is.null(imported_data$thresholds[[criterion_id]])) {
+                criterion_data <- imported_data$thresholds[[criterion_id]]
 
-    #             if (!is.null(criterion_data$partly_met)) {
-    #               updateTextAreaInput(
-    #                 session,
-    #                 paste0(criterion_id, "_partly_met"),
-    #                 value = criterion_data$partly_met
-    #               )
-    #             }
+                if (!is.null(criterion_data$partly_met)) {
+                  updateTextAreaInput(
+                    session,
+                    paste0(criterion_id, "_partly_met"),
+                    value = criterion_data$partly_met
+                  )
+                }
 
-    #             if (!is.null(criterion_data$fully_met)) {
-    #               updateTextAreaInput(
-    #                 session,
-    #                 paste0(criterion_id, "_fully_met"),
-    #                 value = criterion_data$fully_met
-    #               )
-    #             }
-    #           }
-    #         }
-    #       }
+                if (!is.null(criterion_data$fully_met)) {
+                  updateTextAreaInput(
+                    session,
+                    paste0(criterion_id, "_fully_met"),
+                    value = criterion_data$fully_met
+                  )
+                }
+              }
+            }
+          }
 
-    #       showNotification(
-    #         "Purpose data imported successfully",
-    #         type = "message"
-    #       )
-    #     },
-    #     error = function(e) {
-    #       showNotification(
-    #         paste("Import failed:", e$message),
-    #         type = "error"
-    #       )
-    #     }
-    #   )
-    # }) |>
-    #   bindEvent(input$import_btn)
+          showNotification(
+            "Purpose data imported successfully",
+            type = "message"
+          )
+        },
+        error = function(e) {
+          showNotification(
+            paste("Import failed:", e$message),
+            type = "error"
+          )
+        }
+      )
+    }) |>
+      bindEvent(input$import_btn)
 
     ## observe: Clear all fields ----
     # upstream: input$clear_all
@@ -993,19 +995,19 @@ mod_CREED_purpose_server <- function(id) {
 
     # 4. Outputs ----
 
-    ## output: Export handler: DISABLED ----
+    ## output: Export handler ----
     # upstream: collect_purpose_data() Do we actually want to use YAML here?
     # downstream: YAML download
-    # output$export_btn <- downloadHandler(
-    #   filename = function() {
-    #     paste0("CREED_purpose_", Sys.Date(), ".yaml")
-    #   },
-    #   content = function(file) {
-    #     data <- collect_purpose_data()
-    #     yaml::write_yaml(data, file)
-    #   },
-    #   contentType = "application/x-yaml"
-    # )
+    output$export_btn <- downloadHandler(
+      filename = function() {
+        paste0("CREED_purpose_", Sys.Date(), ".yaml")
+      },
+      content = function(file) {
+        data <- collect_purpose_data()
+        yaml::write_yaml(data, file)
+      },
+      contentType = "application/x-yaml"
+    )
 
     ## output: purpose_status ----
     # upstream: purpose_data$current

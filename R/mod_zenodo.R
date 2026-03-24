@@ -1,69 +1,209 @@
-# Setup token for Zenodo API connection
-
-# Initialize Zenodo managers and get options
-library(zen4R) # FIXME: Better practice pls.
-zenodo_sandbox <- ZenodoManager$new(
-  url = "http://sandbox.zenodo.org/api",
-  sandbox = TRUE,
-  token = Sys.getenv('ZENSANDTOKEN'),
-  logger = "DEBUG"
-)
-
-zenodo_production <- ZenodoManager$new(
-  url = "https://zenodo.org/api",
-  sandbox = FALSE,
-  token = Sys.getenv('ZENTOKEN'),
-  logger = "INFO"
-)
-
-# Get licenses and resource types
-licenses_list <- zenodo_sandbox$getLicenses(pretty = TRUE)
-licenses <- licenses_list[[1]]
-resourceType <- zenodo_sandbox$getResourceTypes()
-
-# fixme: import tags
-
-#' zenodo UI Function
+#' Zenodo Upload UI Function
 #'
-#' @description A shiny Module.
+#' @description A shiny Module for uploading datasets to Zenodo.
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
 #' @noRd
 #'
 #' @import shiny
-#' @import bslib
+#' @import zen4R
+#' @importFrom bslib card card_body layout_columns accordion accordion_panel
+#' @importFrom bsicons bs_icon
+#' @importFrom shinyvalidate InputValidator sv_required
+#' @importFrom shinyWidgets materialSwitch
+#' @importFrom shinyjs html runjs
+#' @importFrom glue glue
+#' @importFrom stringr str_split str_trim
+#' @importFrom purrr map walk2 map_chr
+#' @importFrom dplyr arrange pull desc
 mod_Zenodo_ui <- function(id) {
   ns <- NS(id)
-  tagList(bslib::card_body(
-    fillable = FALSE,
 
-    # ===== Input Mode (Upload vs Template) =====
-    tags$h5(
-      style = "margin-top: 0; margin-bottom: 15px; color: #0d6efd; border-bottom: 2px solid #0d6efd; padding-bottom: 5px;",
-      icon("toggle-on"),
-      " Choose Input Mode"
-    ),
-    radioButtons(
-      ns("inputMode"),
-      label = NULL,
-      choices = c(
-        "Upload file (.xlsx)" = "upload",
-        "Use README template" = "template"
+  tagList(
+    card(
+      full_screen = TRUE,
+      card_body(
+        fillable = FALSE,
+        style = "padding-bottom: 80px;",
+
+        # ===== Info accordion =====
+        info_accordion(content_file = "inst/app/www/md/intro_zenodo.md"),
+
+        hr(),
+
+        # ===== Dataset Information =====
+        h5(bs_icon("info-circle"), " 1. Dataset Information"),
+        layout_column_wrap(
+          width = "300px",
+          fill = FALSE,
+          fillable = FALSE,
+          div(
+            actionButton(
+              ns("get_session_data"),
+              label = list(
+                "Get Data from Modules",
+                bs_icon("arrow-down-circle-fill")
+              ),
+              class = "btn-primary"
+            ),
+            uiOutput(ns("session_data_summary"))
+          ),
+          div(
+            textInput(
+              ns("zenTitle"),
+              label = tooltip(
+                list("Dataset Title", bs_icon("info-circle-fill")),
+                "A descriptive title for your dataset on Zenodo."
+              ),
+              placeholder = "Enter a descriptive title for your dataset",
+              width = "800px"
+            ),
+            textAreaInput(
+              ns("zenDescription"),
+              label = tooltip(
+                list("Description", bs_icon("info-circle-fill")),
+                "Explain what the dataset contains, how it was collected, and its scientific context."
+              ),
+              placeholder = "Provide a detailed description of your dataset",
+              width = "800px",
+              height = "100px"
+            )
+          )
+        ),
+        hr(),
+
+        # ===== Authors =====
+        h5(bs_icon("person"), " 2. Authors"),
+        p(
+          style = "color: #6c757d; font-size: 0.9em;",
+          "Author names are auto-filled from the Reference module where available. Affiliation and ORCID must be entered manually."
+        ),
+
+        # Dynamic author rows
+        uiOutput(ns("authorFields")),
+
+        actionButton(
+          ns("addAuthor"),
+          "Add Author",
+          icon = bs_icon("plus-circle"),
+          class = "btn-primary"
+        ),
+
+        hr(),
+
+        # ===== Contact Information =====
+        h5(bs_icon("envelope"), " 4. User Information"),
+        layout_column_wrap(
+          width = "300px",
+          fill = FALSE,
+          fillable = FALSE,
+          textInput(
+            ns("contactName"),
+            label = tooltip(
+              list("Contact Name/Role", bs_icon("info-circle-fill")),
+              "Name or role of the person to contact about this dataset, e.g. 'Dr. Jane Smith' or 'Data Curator'."
+            ),
+            width = "800px",
+
+            placeholder = "e.g., Dr. Jane Smith or Data Curator",
+          ),
+          textInput(
+            ns("contactEmail"),
+            label = tooltip(
+              list("Contact Email", bs_icon("info-circle-fill")),
+              "Email address shown on the Zenodo record for data enquiries."
+            ),
+            width = "800px",
+
+            placeholder = "contact@example.com",
+          )
+        ),
+
+        hr(),
+
+        # ===== Metadata & Licensing =====
+        h5(bs_icon("tags"), " 5. Metadata & Licensing"),
+        layout_column_wrap(
+          width = "300px",
+          fill = FALSE,
+          fillable = FALSE,
+          selectizeInput(
+            ns("zenResourceType"),
+            label = tooltip(
+              list("Resource type", bs_icon("info-circle-fill")),
+              "The type of research output. Choose 'Dataset' for environmental monitoring data."
+            ),
+            choices = zenodo_resource_types,
+            selected = "dataset"
+          ),
+          selectizeInput(
+            ns("zenLicense"),
+            label = tooltip(
+              list("License", bs_icon("info-circle-fill")),
+              "CC BY 4.0 is recommended for open research data \u2014 it allows reuse with attribution."
+            ),
+            choices = zenodo_licenses |>
+              arrange(desc(popular)) |>
+              pull(id, name = title),
+            selected = "cc-by-4.0"
+          ),
+          selectizeInput(
+            ns("zenAccess"),
+            label = tooltip(
+              list("Access rights", bs_icon("info-circle-fill")),
+              "Open access makes your data findable and reusable. Embargoed allows you to set a future release date."
+            ),
+            choices = c(
+              "Open access" = "open",
+              "Embargoed" = "embargoed",
+              "Restricted" = "restricted",
+              "Closed" = "closed"
+            ),
+            selected = "open"
+          )
+        ),
+
+        hr(),
+
+        # ===== Optional Information =====
+        h5(
+          style = "color: #6c757d;",
+          bs_icon("three-dots"),
+          " 6. Optional Information"
+        ),
+        layout_column_wrap(
+          width = "300px",
+          fill = FALSE,
+          fillable = FALSE,
+          textInput(
+            ns("zenGrant"),
+            label = tooltip(
+              list("Grant agreement ID", bs_icon("info-circle-fill")),
+              "EU or other funder grant agreement ID, e.g. 101057014 for EU Horizon PARC."
+            ),
+            placeholder = "e.g., 101057014"
+          ),
+          textAreaInput(
+            ns("zenComment"),
+            label = tooltip(
+              list("Comment to curator", bs_icon("info-circle-fill")),
+              "Optional note for the Zenodo community curator reviewing this submission."
+            ),
+            placeholder = "Any additional information (optional)",
+            rows = 2
+          )
+        )
       ),
-      selected = "upload",
-      inline = TRUE
-    ),
 
-    # ===== Environment card =====
-    div(
-      style = "background-color: #f8f9fa; border: 2px solid #dee2e6; border-radius: 6px; padding: 15px; margin-bottom: 20px;",
+      # ===== Submit row =====
       div(
         style = "display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;",
+
+        # Left: environment switch + badge
         div(
           style = "display: flex; align-items: center; gap: 10px;",
-          tags$strong("Environment:"),
-          shinyWidgets::materialSwitch(
+          materialSwitch(
             inputId = ns("zenEnvironment"),
             label = NULL,
             value = TRUE,
@@ -74,231 +214,39 @@ mod_Zenodo_ui <- function(id) {
             id = ns("envLabel"),
             style = "font-weight: 500;",
             "Sandbox (Testing)"
-          )
-        ),
-        tags$span(
-          id = ns("envBadge"),
-          style = "background-color: #ffc107; color: #000; padding: 6px 16px; border-radius: 20px; font-size: 0.8em; font-weight: bold; letter-spacing: 0.5px;",
-          "TEST MODE"
-        )
-      ),
-      uiOutput(ns("environmentWarning"))
-    ),
-
-    # ===== Two-column layout: left (fields) | right (preview) =====
-    bslib::layout_columns(
-      col_widths = c(8, 4),
-
-      # ---------- LEFT COLUMN: all form fields ----------
-      div(
-        # Section 1: File Upload (only if "upload" mode)
-        conditionalPanel(
-          condition = sprintf("input['%s'] == 'upload'", ns("inputMode")),
-          tags$h5(
-            style = "margin-top: 0; margin-bottom: 15px; color: #0d6efd; border-bottom: 2px solid #0d6efd; padding-bottom: 5px;",
-            icon("upload"),
-            " 1. Upload Your Data"
           ),
-          fileInput(
-            ns('zenUpload'),
-            "Select your file*",
-            accept = ".xlsx",
-            buttonLabel = "Browse...",
-            placeholder = "No file selected"
+          tags$span(
+            id = ns("envBadge"),
+            style = "background-color: #ffc107; color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: bold; letter-spacing: 0.5px;",
+            "TEST MODE"
           )
         ),
 
-        # Section 2: Dataset Information
-        tags$h5(
-          style = "margin-top: 25px; margin-bottom: 15px; color: #0d6efd; border-bottom: 2px solid #0d6efd; padding-bottom: 5px;",
-          icon("info-circle"),
-          " 2. Dataset Information"
-        ),
-        textInput(
-          ns("zenTitle"),
-          "Dataset Title*",
-          placeholder = "Enter a descriptive title for your dataset",
-          width = '600px'
-        ),
-
-        # EMODnet URL (only shown in template mode)
-        conditionalPanel(
-          condition = sprintf("input['%s'] == 'template'", ns("inputMode")),
-          textInput(
-            ns("emodnetUrl"),
-            "EMODnet Dataset URL*",
-            placeholder = "https://emodnet.ec.europa.eu/...",
-            width = '600px'
-          )
-        ),
-
-        textAreaInput(
-          ns("zenDescription"),
-          "Description*",
-          placeholder = "Provide a detailed description of your dataset",
-          width = '600px',
-          height = '100px'
-        ),
-
-        # Section 3: Author Information
-        # Section 3: Author Information
-        tags$h5(
-          style = "margin-top: 25px; margin-bottom: 15px; color: #0d6efd; border-bottom: 2px solid #0d6efd; padding-bottom: 5px;",
-          icon("user"),
-          " 3. Author Information"
-        ),
-
-        # Dynamic author rows
-        uiOutput(ns("authorFields")),
-
-        # Add author button
-        actionButton(
-          ns("addAuthor"),
-          "Add Another Author",
-          icon = icon("plus-circle"),
-          class = "btn-primary"
-        ),
-
-        # Section 4: Contact Information
-        tags$h5(
-          style = "margin-top: 25px; margin-bottom: 15px; color: #0d6efd; border-bottom: 2px solid #0d6efd; padding-bottom: 5px;",
-          icon("envelope"),
-          " 4. Contact Information"
-        ),
-        textInput(
-          ns("contactName"),
-          "Contact Name/Role",
-          placeholder = "e.g., Dr. Jane Smith or Data Curator"
-        ),
-        textInput(
-          ns("contactEmail"),
-          "Contact Email*",
-          placeholder = "contact@example.com"
-        ),
-
-        # Section 5: Metadata
-        tags$h5(
-          style = "margin-top: 25px; margin-bottom: 15px; color: #0d6efd; border-bottom: 2px solid #0d6efd; padding-bottom: 5px;",
-          icon("tags"),
-          " 5. Metadata & Licensing"
-        ),
-        selectizeInput(
-          ns("zenResourceType"),
-          "Resource type*",
-          choices = resourceType,
-          selected = "dataset"
-        ),
-        selectizeInput(
-          ns("zenLicense"),
-          "License*",
-          choices = licenses,
-          selected = "cc-by-4.0"
-        ),
-        tags$small(
-          style = "color: #6c757d; display: block; margin-top: -10px; margin-bottom: 15px;",
-          icon("question-circle"),
-          " ",
-          tags$a(
-            href = "https://creativecommons.org/licenses/",
-            target = "_blank",
-            "Learn about licenses"
-          )
-        ),
-        selectizeInput(
-          ns("zenAccess"),
-          "Access rights*",
-          choices = c(
-            "Open access" = "open",
-            "Embargoed" = "embargoed",
-            "Restricted" = "restricted",
-            "Closed" = "closed"
-          ),
-          selected = "open"
-        ),
-
-        # Section 6: Optional Information
-        tags$h5(
-          style = "margin-top: 25px; margin-bottom: 15px; color: #6c757d; border-bottom: 2px solid #dee2e6; padding-bottom: 5px;",
-          icon("ellipsis-h"),
-          " 6. Optional Information"
-        ),
-        textInput(
-          ns("zenGrant"),
-          "Grant agreement ID",
-          placeholder = "e.g., 101057014",
-          value = "101057014"
-        ),
-        textAreaInput(
-          ns("zenComment"),
-          "Comment to curator",
-          placeholder = "Any additional information (optional)",
-          rows = 2
-        ),
-
-        # Submit section
+        # Right: Preview README + Submit buttons
         div(
-          style = "margin-top: 30px; padding-top: 20px; border-top: 2px solid #dee2e6;",
-          div(
-            style = "display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;",
-            tags$small(
-              style = "color: #6c757d; font-style: italic;",
-              "* Required fields"
-            ),
-            input_task_button(
-              ns('submitZen'),
-              "Submit to Zenodo",
-              color = "primary",
-              style = "material-flat",
-              icon = icon("cloud-upload-alt"),
-              size = 'md'
-            )
-          )
-        )
-      ),
-
-      # ---------- RIGHT COLUMN: README preview (only if "template" mode) ----------
-      conditionalPanel(
-        condition = sprintf("input['%s'] == 'template'", ns("inputMode")),
-        div(
-          style = "
-          position: sticky; top: 12px;
-          background: #fff; border: 1px solid #e5e7eb; border-radius: 8px; padding: 12px;
-        ",
-
-          selectInput(
-            ns('templateChoice'),
-            label = 'README template',
-            choices = c('EMODnet basic' = 'emodnet_basic'),
-            selected = 'emodnet_basic'
+          style = "display: flex; gap: 10px; align-items: center;",
+          actionButton(
+            ns("previewReadme"),
+            "Preview README",
+            icon = bs_icon("eye"),
+            class = "btn-outline-secondary"
           ),
-
-          div(
-            style = "display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px;",
-            radioButtons(
-              ns("viewMode"),
-              NULL,
-              choices = c("Preview" = "rich", "Markdown Code" = "raw"),
-              inline = TRUE
-            ),
-            actionButton(
-              ns("copyReadme"),
-              "Copy README",
-              class = "btn-sm",
-              icon = icon("copy")
-            )
-          ),
-
-          div(
-            style = "flex: 1 1 auto; min-height: 0; overflow: auto;",
-            uiOutput(ns("readmePreview"))
+          input_task_button(
+            ns("submitZen"),
+            "Submit to Zenodo",
+            color = "primary",
+            style = "material-flat",
+            icon = bs_icon("cloud-upload"),
+            size = "md"
           )
-        )
+        ),
+        uiOutput(ns("environmentWarning"))
       )
     )
-  ))
+  )
 }
 
-#' zenodo Server Functions
+#' Zenodo Server Functions
 #'
 #' @noRd
 mod_Zenodo_server <- function(id) {
@@ -308,13 +256,83 @@ mod_Zenodo_server <- function(id) {
     # ── Null-coalescing helper ─────────────────────────────────────────────────
     `%||%` <- function(a, b) if (!is.null(a) && nzchar(a)) a else b
 
-    # ── Reactive to get current Zenodo manager ────────────────────────────────
+    # ── Initialise Zenodo managers once per session ───────────────────────────
+    zenodo_sandbox <- ZenodoManager$new(
+      url = "http://sandbox.zenodo.org/api",
+      sandbox = TRUE,
+      token = Sys.getenv("ZENSANDTOKEN"),
+      logger = "DEBUG"
+    )
+    zenodo_production <- ZenodoManager$new(
+      url = "https://zenodo.org/api",
+      sandbox = FALSE,
+      token = Sys.getenv("ZENTOKEN"),
+      logger = "INFO"
+    )
+
     current_zenodo <- reactive({
       if (input$zenEnvironment) zenodo_sandbox else zenodo_production
     })
 
+    # ── Shinyvalidate ─────────────────────────────────────────────────────────
+    iv <- InputValidator$new()
+    iv$add_rule("zenTitle", sv_required())
+    iv$add_rule("zenDescription", sv_required())
+    iv$add_rule("contactEmail", sv_required())
+    iv$enable()
+
     # ═════════════════════════════════════════════════════════════════════════
-    # SECTION 3 — Multi-author state & UI
+    # Pre-fill title + description from campaign data
+    # ═════════════════════════════════════════════════════════════════════════
+
+    observe({
+      rv <- session$userData$reactiveValues
+      campaign <- rv$campaignData
+
+      if (is.null(campaign) || nrow(campaign) == 0) {
+        return()
+      }
+
+      if (
+        !nzchar(input$zenTitle %||% "") &&
+          !is.na(campaign$CAMPAIGN_NAME[1]) &&
+          nzchar(campaign$CAMPAIGN_NAME[1])
+      ) {
+        updateTextInput(session, "zenTitle", value = campaign$CAMPAIGN_NAME[1])
+      }
+
+      if (
+        !nzchar(input$zenDescription %||% "") &&
+          !is.na(campaign$CAMPAIGN_COMMENT[1]) &&
+          nzchar(campaign$CAMPAIGN_COMMENT[1] %||% "")
+      ) {
+        updateTextAreaInput(
+          session,
+          "zenDescription",
+          value = campaign$CAMPAIGN_COMMENT[1]
+        )
+      }
+    }) |>
+      bindEvent(session$userData$reactiveValues$campaignData, ignoreNULL = TRUE)
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # Pre-fill contact email from ENTERED_BY
+    # ═════════════════════════════════════════════════════════════════════════
+
+    observe({
+      entered_by <- session$userData$reactiveValues$ENTERED_BY
+      if (
+        length(entered_by) > 0 &&
+          nzchar(entered_by) &&
+          !nzchar(input$contactEmail)
+      ) {
+        updateTextInput(session, "contactEmail", value = entered_by)
+      }
+    }) |>
+      bindEvent(session$userData$reactiveValues$ENTERED_BY, ignoreNULL = TRUE)
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # Multi-author state & UI
     # ═════════════════════════════════════════════════════════════════════════
 
     author_count <- reactiveVal(1)
@@ -322,6 +340,66 @@ mod_Zenodo_server <- function(id) {
     observeEvent(input$addAuthor, {
       author_count(author_count() + 1)
     })
+
+    # Pre-fill author rows from referenceData$AUTHOR ("Last, First; Last, First")
+    # upstream: referenceData change
+    # downstream: author_count, zenFirstName_i, zenLastName_i inputs
+    observe({
+      rv <- session$userData$reactiveValues
+      ref <- rv$referenceData
+
+      if (is.null(ref) || nrow(ref) == 0) {
+        return()
+      }
+      if (is.na(ref$AUTHOR[1]) || !nzchar(ref$AUTHOR[1] %||% "")) {
+        return()
+      }
+      # Only pre-fill if first author first name is still empty
+      if (nzchar(input$zenFirstName_1 %||% "")) {
+        return()
+      }
+
+      parsed <- str_split(ref$AUTHOR[1], ";")[[1]] |>
+        str_trim() |>
+        map(
+          ~ {
+            parts <- str_split(.x, ",")[[1]] |> str_trim()
+            list(
+              last = if (length(parts) >= 1) parts[1] else "",
+              first = if (length(parts) >= 2) parts[2] else ""
+            )
+          }
+        )
+
+      author_count(length(parsed))
+
+      # Wait for renderUI to process the new author_count before updating inputs
+      session$onFlushed(
+        function() {
+          walk2(
+            parsed,
+            seq_along(parsed),
+            ~ {
+              updateTextInput(
+                session,
+                paste0("zenFirstName_", .y),
+                value = .x$first
+              )
+              updateTextInput(
+                session,
+                paste0("zenLastName_", .y),
+                value = .x$last
+              )
+            }
+          )
+        },
+        once = TRUE
+      )
+    }) |>
+      bindEvent(
+        session$userData$reactiveValues$referenceData,
+        ignoreNULL = TRUE
+      )
 
     # Render one row per author
     output$authorFields <- renderUI({
@@ -339,7 +417,7 @@ mod_Zenodo_server <- function(id) {
               actionButton(
                 ns(paste0("removeAuthor_", i)),
                 NULL,
-                icon = icon("times"),
+                icon = bs_icon("x"),
                 class = "btn-sm btn-outline-danger",
                 style = "padding: 2px 8px; font-size: 0.75rem;",
                 title = paste("Remove author", i)
@@ -354,55 +432,58 @@ mod_Zenodo_server <- function(id) {
             style = "display: grid; grid-template-columns: 1fr 1fr; gap: 10px;",
             textInput(
               ns(paste0("zenFirstName_", i)),
-              "First name*",
+              "First name",
               placeholder = "e.g., Jane"
             ),
             textInput(
               ns(paste0("zenLastName_", i)),
-              "Last name*",
+              "Last name",
               placeholder = "e.g., Smith"
-            )
-          ),
-          textInput(
-            ns(paste0("zenAffiliation_", i)),
-            "Affiliation/Institution*",
-            placeholder = "e.g., University of Example"
-          ),
-          textInput(
-            ns(paste0("zenAuthorOrcid_", i)),
-            "ORCID iD",
-            placeholder = "e.g., 0000-0002-1825-0097"
-          ),
-          tags$small(
-            style = "color: #6c757d; display: block; margin-top: -10px; margin-bottom: 5px;",
-            icon("question-circle"),
-            " Don't have an ORCID? ",
-            tags$a(
-              href = "https://orcid.org/register",
-              target = "_blank",
-              "Register here"
+            ),
+            textInput(
+              ns(paste0("zenAffiliation_", i)),
+              "Affiliation/Institution",
+              placeholder = "e.g., University of Example"
+            ),
+            div(
+              textInput(
+                ns(paste0("zenAuthorOrcid_", i)),
+                tooltip(
+                  list("ORCID iD", bs_icon("info-circle-fill")),
+                  "A persistent digital identifier for researchers. Register free at orcid.org."
+                ),
+                placeholder = "e.g., 0000-0002-1825-0097"
+              ),
+              tags$small(
+                style = "color: #6c757d; display: block; margin-top: -10px; margin-bottom: 5px;",
+                bs_icon("question-circle"),
+                " Don't have an ORCID? ",
+                tags$a(
+                  href = "https://orcid.org/register",
+                  target = "_blank",
+                  "Register here"
+                )
+              )
             )
           )
         )
       })
     })
 
-    # Observers for each remove button — recreated whenever author_count changes
+    # Observers for remove buttons — recreated whenever author_count changes
     observe({
       n <- author_count()
       lapply(seq_len(n), function(i) {
         if (i == 1) {
           return()
-        } # no remove button on row 1
-        btn_id <- paste0("removeAuthor_", i)
+        }
         observeEvent(
-          input[[btn_id]],
+          input[[paste0("removeAuthor_", i)]],
           {
             new_n <- author_count() - 1
             if (new_n < 1) {
               return()
             }
-            # Shift all rows above i down by one to fill the gap
             for (j in i:new_n) {
               updateTextInput(
                 session,
@@ -447,198 +528,114 @@ mod_Zenodo_server <- function(id) {
     })
 
     # ═════════════════════════════════════════════════════════════════════════
-    # README generator
+    # Session data check
     # ═════════════════════════════════════════════════════════════════════════
 
-    generateReadme <- reactive({
-      authors <- all_authors()
-      current_year <- format(Sys.Date(), "%Y")
-      license_display <- if (input$zenLicense == "cc-by-4.0") {
-        "CC BY 4.0"
-      } else {
-        input$zenLicense
-      }
-
-      # Per-author block shown in the Authors section
-      author_lines <- vapply(
-        seq_along(authors),
-        function(i) {
-          a <- authors[[i]]
-          name <- paste(
-            if (nzchar(a$first)) a$first else "[First]",
-            if (nzchar(a$last)) a$last else "[Last]"
-          )
-          label <- if (i == 1) "Primary Author" else paste0("Author ", i)
-          parts <- c(
-            paste0("**", label, ":** ", name),
-            if (nzchar(a$affiliation)) {
-              paste0("  **Institution:** ", a$affiliation)
-            },
-            if (nzchar(a$orcid)) paste0("  **ORCID:** ", a$orcid)
-          )
-          paste(parts, collapse = "\n")
-        },
-        character(1)
-      )
-
-      # Citation line — "Smith J., Jones A., …"
-      citation_authors <- paste(
-        vapply(
-          authors,
-          function(a) {
-            ln <- if (nzchar(a$last)) a$last else "[Last]"
-            fn <- if (nzchar(a$first)) substr(a$first, 1, 1) else ""
-            if (nzchar(fn)) paste0(ln, " ", fn, ".") else ln
-          },
-          character(1)
-        ),
-        collapse = ", "
-      )
-
-      # Contact block (uses primary author ORCID / affiliation)
-      contact_parts <- c()
-      if (nzchar(input$contactName)) {
-        contact_parts <- c(
-          contact_parts,
-          paste0("**Name:** ", input$contactName)
-        )
-      }
-      if (nzchar(input$contactEmail)) {
-        contact_parts <- c(
-          contact_parts,
-          paste0("**Email:** ", input$contactEmail)
-        )
-      }
-      if (nzchar(authors[[1]]$orcid)) {
-        contact_parts <- c(
-          contact_parts,
-          paste0("**ORCID:** ", authors[[1]]$orcid)
-        )
-      }
-      if (nzchar(authors[[1]]$affiliation)) {
-        contact_parts <- c(
-          contact_parts,
-          paste0("**Institution:** ", authors[[1]]$affiliation)
-        )
-      }
-      contact_section <- if (length(contact_parts)) {
-        paste(contact_parts, collapse = "\n- ")
-      } else {
-        "[Contact information]"
-      }
-
-      dataset_title <- if (nzchar(input$zenTitle)) {
-        input$zenTitle
-      } else {
-        "[Dataset Title]"
-      }
-      emod_url <- if (nzchar(input$emodnetUrl)) input$emodnetUrl else "#"
-      emod_label <- if (nzchar(input$emodnetUrl)) input$emodnetUrl else "[URL]"
-
-      sprintf(
-        "# Metadata for %s
-
-### Access the data via EMODnet: [%s](%s)
-
-- **Project:** Partnership for the Assessment of Risks from Chemicals (PARC)
-- **EU funding:** HORIZON.2.6
-- **Project DOI:** [10.3030/101057014](https://cordis.europa.eu/project/id/101057014)
-- **Zenodo DOI:** (Will be generated upon upload)
-
----
-
-## What is this?
-
-This Zenodo record provides metadata for the dataset **%s**.
-
-%s
-
----
-
-## Authors
-
-%s
-
----
-
-## How to cite
-
-%s (%s). *%s*. Zenodo. https://doi.org/[DOI-will-be-generated]
-
----
-
-## License
-
-Released under **%s**.
-
----
-
-## Contact
-
-- %s",
-        dataset_title,
-        emod_label,
-        emod_url,
-        dataset_title,
-        if (nzchar(input$zenDescription)) input$zenDescription else "",
-        paste(author_lines, collapse = "\n\n"),
-        citation_authors,
-        current_year,
-        dataset_title,
-        license_display,
-        contact_section
-      )
-    })
-
-    # ═════════════════════════════════════════════════════════════════════════
-    # README preview & copy
-    # ═════════════════════════════════════════════════════════════════════════
-
-    output$readmePreview <- renderUI({
-      readme_content <- generateReadme()
-      if (input$viewMode == "rich") {
-        div(
-          class = "preview-box",
-          style = "background-color: #ffffff; border: 1px solid #e5e7eb; border-radius: 0.5rem; padding: 1.5rem; max-height: 400px; overflow-y: auto;",
-          HTML(markdown::mark_html(text = readme_content, template = FALSE))
-        )
-      } else {
-        div(
-          class = "preview-box",
-          style = "font-family: monospace; white-space: pre-wrap; background: #f8fafc; color: #1e293b; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-height: 400px; overflow-y: auto;",
-          readme_content
-        )
-      }
-    })
-
-    observeEvent(input$copyReadme, {
-      session$sendCustomMessage("copyToClipboard", generateReadme())
-      showNotification(
-        "README copied to clipboard!",
-        type = "message",
-        duration = 2
-      )
-    })
-
-    # ═════════════════════════════════════════════════════════════════════════
-    # Environment UI observers (unchanged from original)
-    # ═════════════════════════════════════════════════════════════════════════
+    zenSessionState <- reactiveValues(
+      ready = FALSE,
+      available_datasets = character(0),
+      campaign_name = "Unknown_Campaign",
+      dataset_dimensions = list()
+    )
 
     observe({
-      if (input$zenEnvironment) {
-        shinyjs::html("headerBadge", "TEST MODE")
-        shinyjs::runjs(sprintf(
-          "$('#%s').css({'background-color': '#ffc107', 'color': '#000'});",
-          ns("headerBadge")
-        ))
+      rv <- session$userData$reactiveValues
+      dataset_check <- check_available_datasets(rv)
+
+      zenSessionState$available_datasets <- dataset_check$available_datasets
+      zenSessionState$dataset_dimensions <- dataset_check$dataset_dimensions
+      zenSessionState$ready <- dataset_check$export_ready
+
+      campaign_name <- extract_campaign_name(rv$campaignData)
+      if (!is.null(campaign_name)) {
+        zenSessionState$campaign_name <- campaign_name
+      }
+
+      print_dev(glue(
+        "mod_zenodo: {length(dataset_check$available_datasets)} datasets found: ",
+        "{paste(dataset_check$available_datasets, collapse = ', ')}"
+      ))
+    }) |>
+      bindEvent(input$get_session_data)
+
+    output$session_data_summary <- renderUI({
+      req(input$get_session_data)
+
+      if (zenSessionState$ready) {
+        summaries <- map_chr(
+          zenSessionState$available_datasets,
+          ~ {
+            dims <- zenSessionState$dataset_dimensions[[.x]]
+            if (dims$type == "text") {
+              glue("{.x}: {dims$chars} characters")
+            } else {
+              glue("{.x}: {dims$rows} \u00D7 {dims$cols}")
+            }
+          }
+        )
+        div(
+          style = "margin-top: 12px;",
+          div(
+            bs_icon("check-circle"),
+            glue(
+              " {length(zenSessionState$available_datasets)} datasets ready for upload"
+            ),
+            class = "validation-status validation-complete",
+            style = "display: inline-block; margin-bottom: 8px;"
+          ),
+          tags$code(paste(summaries, collapse = ", "))
+        )
       } else {
-        shinyjs::html("headerBadge", "PRODUCTION")
-        shinyjs::runjs(sprintf(
-          "$('#%s').css({'background-color': '#dc3545', 'color': '#fff'});",
-          ns("headerBadge")
-        ))
+        div(
+          bs_icon("exclamation-triangle"),
+          " No session data found. Have you entered data in the other modules?",
+          class = "validation-status validation-warning",
+          style = "display: inline-block; margin-top: 12px;"
+        )
       }
     })
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # README generator (used in production confirmation modal)
+    # ═════════════════════════════════════════════════════════════════════════
+
+    # upstream: all form input$ fields, all_authors()
+    # downstream: production confirmation modal, companion README file upload
+    generateReadme <- reactive({
+      generate_zenodo_readme(
+        title = input$zenTitle,
+        description = input$zenDescription,
+        authors = all_authors(),
+        license_id = input$zenLicense,
+        contact_name = input$contactName,
+        contact_email = input$contactEmail
+      )
+    })
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # README preview modal
+    # ═════════════════════════════════════════════════════════════════════════
+
+    observeEvent(input$previewReadme, {
+      showModal(modalDialog(
+        title = tags$div(
+          style = "display: flex; align-items: center; gap: 8px;",
+          bs_icon("file-text"),
+          "README Preview"
+        ),
+        size = "l",
+        div(
+          style = "font-family: monospace; white-space: pre-wrap; background: #f8fafc; color: #1e293b; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-height: 500px; overflow-y: auto; font-size: 0.85em;",
+          generateReadme()
+        ),
+        footer = modalButton("Close"),
+        easyClose = TRUE
+      ))
+    })
+
+    # ═════════════════════════════════════════════════════════════════════════
+    # Environment UI observers
+    # ═════════════════════════════════════════════════════════════════════════
 
     output$environmentWarning <- renderUI({
       if (input$zenEnvironment) {
@@ -646,7 +643,7 @@ Released under **%s**.
           style = "background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; padding: 10px; margin-top: 12px;",
           div(
             style = "display: flex; align-items: flex-start; gap: 8px;",
-            icon("info-circle", style = "color: #0c5460; margin-top: 2px;"),
+            bs_icon("info-circle", style = "color: #0c5460; margin-top: 2px;"),
             tags$small(
               style = "color: #0c5460;",
               tags$strong("Sandbox mode:"),
@@ -659,7 +656,7 @@ Released under **%s**.
           style = "background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; padding: 10px; margin-top: 12px;",
           div(
             style = "display: flex; align-items: flex-start; gap: 8px;",
-            icon(
+            bs_icon(
               "exclamation-triangle",
               style = "color: #721c24; margin-top: 2px;"
             ),
@@ -676,22 +673,22 @@ Released under **%s**.
     })
 
     observe({
-      shinyjs::html(
-        "envLabel",
+      html(
+        ns("envLabel"),
         if (input$zenEnvironment) "Sandbox (Testing)" else "Production (Live)"
       )
     })
 
     observe({
       if (input$zenEnvironment) {
-        shinyjs::html("envBadge", "TEST MODE")
-        shinyjs::runjs(sprintf(
+        html(ns("envBadge"), "TEST MODE")
+        runjs(sprintf(
           "$('#%s').css({'background-color': '#ffc107', 'color': '#000'});",
           ns("envBadge")
         ))
       } else {
-        shinyjs::html("envBadge", "LIVE")
-        shinyjs::runjs(sprintf(
+        html(ns("envBadge"), "LIVE")
+        runjs(sprintf(
           "$('#%s').css({'background-color': '#dc3545', 'color': '#fff'});",
           ns("envBadge")
         ))
@@ -703,103 +700,93 @@ Released under **%s**.
     # ═════════════════════════════════════════════════════════════════════════
 
     observeEvent(input$submitZen, {
-      is_upload_mode <- identical(input$inputMode, "upload")
-      is_template_mode <- identical(input$inputMode, "template")
-
-      # Check every author row has at minimum first name, last name, affiliation
+      # Check every author row has at minimum first + last name
       author_errors <- vapply(
         seq_len(author_count()),
         function(i) {
           fn <- input[[paste0("zenFirstName_", i)]] %||% ""
           ln <- input[[paste0("zenLastName_", i)]] %||% ""
-          aff <- input[[paste0("zenAffiliation_", i)]] %||% ""
-          fn == "" || ln == "" || aff == ""
+          fn == "" || ln == ""
         },
         logical(1)
       )
 
       required_missing <- c(
-        input$zenTitle == "",
-        input$zenDescription == "",
-        input$contactEmail == "",
+        !iv$is_valid(),
         any(author_errors),
-        is_upload_mode && is.null(input$zenUpload),
-        is_template_mode &&
-          (is.null(input$emodnetUrl) || input$emodnetUrl == "")
+        !zenSessionState$ready
       )
 
       if (any(required_missing)) {
+        extra <- paste(
+          if (any(author_errors)) {
+            "(all authors need a first and last name)"
+          } else {
+            ""
+          },
+          if (!zenSessionState$ready) {
+            "(no session data \u2014 click 'Check Session Data' first)"
+          } else {
+            ""
+          }
+        )
         showNotification(
-          paste(
-            "Please fill in all required fields marked with *",
-            if (any(author_errors)) {
-              "(all authors need first name, last name and affiliation)"
-            } else {
-              ""
-            },
-            if (is_upload_mode && is.null(input$zenUpload)) {
-              "(upload mode requires a file)"
-            } else {
-              ""
-            },
-            if (
-              is_template_mode &&
-                (is.null(input$emodnetUrl) || input$emodnetUrl == "")
-            ) {
-              "(template mode requires an EMODnet URL)"
-            } else {
-              ""
-            }
-          ),
+          paste("Please fill in all required fields.", extra),
           type = "error",
           duration = 5
         )
         return()
       }
 
-      # Production confirmation modal
-      if (!input$zenEnvironment) {
-        showModal(modalDialog(
-          title = tags$div(
-            style = "display: flex; align-items: center; gap: 8px; color: #dc3545;",
-            icon("exclamation-triangle", style = "font-size: 1.2em;"),
-            "Confirm Production Upload"
-          ),
-          tags$div(
-            tags$p(
-              style = "font-weight: 500; margin-bottom: 10px;",
-              "You are about to upload to the LIVE Zenodo repository."
-            ),
-            tags$p(
-              "This upload will be ",
-              tags$strong("permanent"),
-              " and ",
-              tags$strong("publicly accessible"),
-              ". Are you sure you want to proceed?"
-            ),
-            tags$hr(),
-            tags$p(
-              style = "font-size: 0.9em; color: #6c757d;",
-              icon("lightbulb"),
-              " Tip: Use Sandbox mode to test your upload first."
-            )
-          ),
-          footer = tagList(
-            modalButton("Cancel"),
-            actionButton(
-              ns("confirmSubmit"),
-              "Yes, Upload to Production",
-              class = "btn-danger",
-              icon = icon("check")
-            )
-          ),
-          easyClose = FALSE,
-          size = "m"
-        ))
-        return()
+      # Always confirm before uploading — messaging is environment-aware
+      if (input$zenEnvironment) {
+        modal_title <- tags$div(
+          style = "display: flex; align-items: center; gap: 8px;",
+          bs_icon("cloud-upload"),
+          "Confirm Sandbox Upload"
+        )
+        modal_body <- tags$p(
+          "Upload to the Zenodo ",
+          tags$strong("sandbox (testing)"),
+          " environment? Test uploads are not preserved and are safe to discard."
+        )
+        confirm_label <- "Yes, Upload to Sandbox"
+        confirm_class <- "btn-primary"
+      } else {
+        modal_title <- tags$div(
+          style = "display: flex; align-items: center; gap: 8px; color: #dc3545;",
+          bs_icon("exclamation-triangle", style = "font-size: 1.2em;"),
+          "Confirm Production Upload"
+        )
+        modal_body <- tags$p(
+          style = "font-weight: 500;",
+          "You are about to upload to the ",
+          tags$strong("live Zenodo repository"),
+          ". This will be ",
+          tags$strong("permanent"),
+          " and ",
+          tags$strong("publicly accessible"),
+          ". Use the \u2018Preview README\u2019 button to review the README before confirming."
+        )
+        confirm_label <- "Yes, Upload to Production"
+        confirm_class <- "btn-danger"
       }
 
-      performUpload()
+      showModal(modalDialog(
+        title = modal_title,
+        size = "m",
+        modal_body,
+        footer = tagList(
+          modalButton("Cancel"),
+          actionButton(
+            ns("confirmSubmit"),
+            confirm_label,
+            class = confirm_class,
+            icon = bs_icon("check")
+          )
+        ),
+        easyClose = FALSE
+      ))
     })
 
     observeEvent(input$confirmSubmit, {
@@ -815,34 +802,20 @@ Released under **%s**.
       zenodo <- current_zenodo()
       env_name <- if (input$zenEnvironment) "Sandbox" else "Production"
 
-      tryCatch(
-        {
-          showNotification(
-            paste0("Uploading to Zenodo ", env_name, "..."),
-            type = "message",
-            duration = NULL,
-            id = "upload_notification"
-          )
-        },
-        error = function(e) {
-          showNotification(
-            paste("Failed to start upload:", e$message),
-            type = "error",
-            duration = 10
-          )
-          stop(e)
-        }
+      showNotification(
+        paste0("Uploading to Zenodo ", env_name, "..."),
+        type = "message",
+        duration = NULL,
+        id = "upload_notification"
       )
 
-      # Build record
+      # Build record metadata
       myrec <- ZenodoRecord$new()
       myrec$setTitle(input$zenTitle)
       myrec$setDescription(input$zenDescription)
       myrec$setResourceType(input$zenResourceType)
 
-      # Add every author as a creator
-      authors <- all_authors()
-      for (auth in authors) {
+      for (auth in all_authors()) {
         if (nzchar(auth$first) && nzchar(auth$last)) {
           myrec$addCreator(
             firstname = auth$first,
@@ -861,22 +834,20 @@ Released under **%s**.
       myrec$setPublisher("Zenodo")
       myrec$setPublicationDate(Sys.Date())
 
-      # Deposit
+      # Deposit record
       myrec <- zenodo$depositRecord(myrec)
 
-      # Upload data file (required in upload mode, optional otherwise)
-      if (!is.null(input$zenUpload)) {
-        zenodo$uploadFile(input$zenUpload$datapath, myrec)
-      }
+      # Upload session ZIP
+      session_zip <- tempfile(fileext = ".zip")
+      on.exit(unlink(session_zip), add = TRUE)
+      build_session_zip(session, zenSessionState, session_zip)
+      zenodo$uploadFile(session_zip, myrec)
 
-      # Upload README only in template mode
-      if (identical(input$inputMode, "template")) {
-        readme_content <- generateReadme()
-        readme_temp <- tempfile(fileext = ".md")
-        writeLines(readme_content, readme_temp)
-        zenodo$uploadFile(readme_temp, myrec)
-        unlink(readme_temp)
-      }
+      # Upload README as a companion file
+      readme_temp <- tempfile(fileext = ".md")
+      on.exit(unlink(readme_temp), add = TRUE)
+      writeLines(generateReadme(), readme_temp)
+      zenodo$uploadFile(readme_temp, myrec)
 
       # Submit for community review
       msg <- paste0(
@@ -889,7 +860,6 @@ Released under **%s**.
           "No additional comments"
         }
       )
-
       zenodo$createReviewRequest(myrec, "stop-test")
       ok <- zenodo$submitRecordForReview(myrec$id, msg)
 
@@ -912,9 +882,7 @@ Released under **%s**.
         showNotification(
           HTML(paste0(
             "<strong>Success!</strong><br>",
-            "Your data ",
-            if (identical(input$inputMode, "template")) "and README " else "",
-            "have been uploaded to Zenodo ",
+            "Your data has been uploaded to Zenodo ",
             env_name,
             ".<br>",
             tail_msg

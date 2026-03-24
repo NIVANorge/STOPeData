@@ -14,9 +14,9 @@
     STOPeData is a data entry and formatting Shiny app in the Source to Outcome Pathway/Risk assessment database family, designed to make extracting data on chemical concentrations in the environment from papers and reports easier. 
     <br />
     <br />
-    <a href="https://edata.test-stop.niva.no">Test Version</a> 
+    <a href="https://edata.test-stop.niva.no">Test Version</a> (Login required)
     &middot;
-    <a href="https://edata.stop.niva.no">Prod</a> (require NIVA account)
+    <a href="https://edata.stop.niva.no">Prod</a> (Login required)
     &middot;
     <a href="https://github.com/NIVANorge/STOPeData/issues/new?labels=bug&template=bug-report---.md">Report Bug</a>
     &middot;
@@ -89,14 +89,16 @@ I haven't tested setting the app up to run locally on systems other than my home
 ### Installation
 
 1. (Optional) Get an [Anthropic API key](https://console.anthropic.com) for LLM data extraction
-2. Clone the repo
+2a. Clone the repo, or
    ```sh
    git clone https://github.com/NIVANorge/STOPeData.git
    ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
+2b. Download the package with devtools/pak
+  ```R
+  devtools::install_github("NIVANorge/STOPeData")
+  # pak::pak("NIVANorge/STOPeData")
+  ```
+3. Install missing R packages
 4. (Optional) Enter your API in your `.Renviron` file 
    ```js
    ANTHROPIC_API_KEY = 'sk-ant-api03-...';
@@ -165,7 +167,7 @@ Project Link: [https://github.com/NIVANorge/STOPeData](https://github.com/NIVANo
 ## Acknowledgments
 
 * Project Lead: Knut Erik Tollefsen
-* Funding: EXPECT, PARC, and NCTP Projects
+* Funding: [EXPECT](https://www.niva.no/en/projects/expect), [PARC](https://www.eu-parc.eu/), and [NCTP](https://www.niva.no/radb) Projects
 * Testers: Li Xi, Knut Erik Tollefsen, Sophie Mentzel, Pierre Blévin, Camden Karon Klefbom
 * Support and Advice: Viviane Giradin, Andrea Merlina, Kim Leirvik, Jemmima Knight, Malcolm Reid
 * An LLM (Anthropic Claude Sonnet 4.5) was used in the creation of this app and its code.

@@ -165,6 +165,7 @@ parse_compartment_selections <- function(
   return(parsed)
 }
 
+# TODO: Transferred to eDataDRFr
 #' Generate Sample ID with Components ----
 #' @param site_code Site code (vectorized)
 #' @param parameter_name Parameter name (vectorized)
@@ -257,6 +258,7 @@ combination_exists_with_components <- function(
 #' @importFrom stats setNames
 #' @importFrom purrr map_dfr map map_dbl
 #' @importFrom tidyr expand_grid
+#' @importFrom tibble tibble
 #' @noRd
 create_sample_combinations <- function(
   sites,
@@ -284,7 +286,7 @@ create_sample_combinations <- function(
 
   if (nrow(parsed_compartments) == 0) {
     warning("No valid compartment combinations found")
-    return(list(combinations = tibble::tibble(), skipped = 0))
+    return(list(combinations = tibble(), skipped = 0))
   }
 
   # Process dates using functional approach to avoid class-stripping
@@ -309,16 +311,10 @@ create_sample_combinations <- function(
     # do some fairly careful checking of subsamples to see if it's empty
     # todo: we run this exact same code outside the function as well. could be consolidated.
     subsamples <- subsamples |> as.character()
-    subsamples <- if (
-      length(trimws(strsplit(subsamples, split = ",")[[1]])) > 1
-    ) {
-      trimws(strsplit(subsamples, split = ",")[[1]])
-    } else {
-      "1"
-    }
+    subsamples <- trimws(strsplit(subsamples, split = ",")[[1]])
 
     # Process each base combination with compartments and subsamples
-    date_combinations <- tibble::tibble()
+    date_combinations <- tibble()
     skipped_for_date <- 0
 
     for (i in 1:nrow(base_combinations)) {
@@ -328,7 +324,7 @@ create_sample_combinations <- function(
 
         # Add subsamples for each combination
         for (k in 1:length(subsamples)) {
-          combination <- tibble::tibble(
+          combination <- tibble(
             SITE_CODE = base_combo$SITE_CODE,
             PARAMETER_NAME = base_combo$PARAMETER_NAME,
             ENVIRON_COMPARTMENT = compartment_combo$ENVIRON_COMPARTMENT,
@@ -482,6 +478,7 @@ update_combination_preview <- function(
 # Dummy data for standalone testing ----
 
 #' dummy_sites ----
+#'
 #' @noRd
 dummy_sites <- tibble::tibble(
   SITE_CODE = c("SITE_001", "SITE_002", "SITE_003"),

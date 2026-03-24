@@ -23,16 +23,14 @@ mod_parameters_ui <- function(id) {
     # Main content card ----
     card(
       full_screen = TRUE,
-      fill = TRUE,
+      fill = FALSE,
       card_body(
-        ## Info accordion ----
-        info_accordion(content_file = "inst/app/www/md/intro_parameters.md"),
+        layout_columns(
+          col_widths = c(8, 4),
 
         ## Parameter selection controls ----
-        layout_column_wrap(
-          width = "300px",
-          fill = FALSE,
-          fillable = FALSE,
+        layout_columns(
+          col_widths = c(6, 6,12,12),
 
           pickerInput(
             inputId = ns("parameter_type_select"),
@@ -66,36 +64,39 @@ mod_parameters_ui <- function(id) {
               liveSearch = TRUE,
               virtualScroll = TRUE
             )
+          ),
+          pickerInput(
+            inputId = ns("parameter_name_select"),
+            label = tooltip(
+              list("Parameter Name", bs_icon("info-circle-fill")),
+              "Press backspace to remove existing parameters. Start typing a name to search for parameters."
+            ),
+            choices = c("Select parameter type first..."),
+            width = "100%",
+            selected = "Formaldehyde",
+            options = pickerOptions(
+              actionsBox = TRUE,
+              liveSearch = TRUE,
+              virtualScroll = TRUE
+            ),
+            multiple = FALSE
+          ),
+          textAreaInput(
+            inputId = ns("parameter_comment"),
+            label = tooltip(
+              list("Parameter Comments", bs_icon("info-circle-fill")),
+              "Use this space to enter any potentially relevant or noteworthy comments or remarks about the measured parameter."
+            ),
+            placeholder = "Parameter notes (optional)",
+            width = "100%",
+            rows = 1
           )
         ),
+        ## Info accordion ----
+        info_accordion(content_file = "inst/app/www/md/intro_parameters.md")
 
-        pickerInput(
-          inputId = ns("parameter_name_select"),
-          label = tooltip(
-            list("Parameter Name", bs_icon("info-circle-fill")),
-            "Press backspace to remove existing parameters. Start typing a name to search for parameters."
-          ),
-          choices = c("Select parameter type first..."),
-          width = "100%",
-          selected = "Formaldehyde",
-          options = pickerOptions(
-            actionsBox = TRUE,
-            liveSearch = TRUE,
-            virtualScroll = TRUE
-          ),
-          multiple = FALSE
         ),
 
-        textAreaInput(
-          inputId = ns("parameter_comment"),
-          label = tooltip(
-            list("Parameter Comments", bs_icon("info-circle-fill")),
-            "Use this space to enter any potentially relevant or noteworthy comments or remarks about the measured parameter."
-          ),
-          placeholder = "Parameter notes (optional)",
-          width = "100%",
-          rows = 1
-        ),
 
         ## Action buttons and validation status ----
         div(
@@ -195,7 +196,7 @@ mod_parameters_server <- function(id) {
       llm_lookup_validation = FALSE
     )
 
-    chemical_parameters <- dummy_parameters_vocabulary()
+    chemical_parameters <- parameters_vocabulary()
 
     ## InputValidator for table-level validation ----
     iv <- InputValidator$new()
@@ -299,7 +300,7 @@ mod_parameters_server <- function(id) {
 
       if (isTruthy(param_type)) {
         # Get available subtypes for this parameter type
-        type_filtered_data <- dummy_parameters_vocabulary() |>
+        type_filtered_data <- parameters_vocabulary() |>
           filter(PARAMETER_TYPE == param_type)
 
         available_subtypes <- if (nrow(type_filtered_data) > 0) {
@@ -338,7 +339,7 @@ mod_parameters_server <- function(id) {
         available_names <- get_parameters_filtered(
           param_type = param_type,
           param_subtype = param_subtype,
-          dummy_parameters = dummy_parameters_vocabulary(),
+          dummy_parameters = parameters_vocabulary(),
           session_parameters = moduleState$session_parameters
         )
 
@@ -437,7 +438,7 @@ mod_parameters_server <- function(id) {
         new_param <- create_existing_parameter(
           param_type,
           param_name,
-          dummy_parameters = dummy_parameters_vocabulary()
+          dummy_parameters = parameters_vocabulary()
         )
 
         if (!is.null(new_param)) {
@@ -514,10 +515,8 @@ mod_parameters_server <- function(id) {
           param_name <- updated_data[i, "PARAMETER_NAME"]
 
           if (isTruthy(param_type) && isTruthy(param_name)) {
-            # Check if this is a new parameter (not in dummy_parameters_vocabulary())
-            if (
-              is.null(dummy_parameters_vocabulary()[[param_type]][[param_name]])
-            ) {
+            # Check if this is a new parameter (not in parameters_vocabulary())
+            if (is.null(parameters_vocabulary()[[param_type]][[param_name]])) {
               # Store in session parameters
               if (is.null(moduleState$session_parameters[[param_type]])) {
                 moduleState$session_parameters[[param_type]] <- list()
@@ -610,10 +609,13 @@ mod_parameters_server <- function(id) {
             )
           )
       } else {
+
+        tbl =  session$userData$reactiveValues$parametersData
+        dynamic_height = rHandsontableGetHeight(dataTable = tbl)
         rhandsontable(
-          session$userData$reactiveValues$parametersData,
+          tbl,
           stretchH = "all",
-          height = 500,
+          height = dynamic_height,
           selectCallback = TRUE,
           width = NULL,
         ) |>

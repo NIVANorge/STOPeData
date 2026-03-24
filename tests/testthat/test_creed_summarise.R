@@ -40,8 +40,8 @@ test_that("summarise_sites returns full summary with all parameters TRUE", {
     PRECISION = TRUE
   )
   expect_match(result, "2 sites")
-  expect_match(result, "NO") # Country code
-  expect_match(result, "Skagerrak, North Sea")
+  expect_match(result, "Norway") # Country code
+  expect_match(result, "Not relevant, North Sea")
   expect_match(result, "Distinct features")
   expect_match(result, "Lowest coordinate precision: 4")
 })

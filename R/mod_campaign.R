@@ -19,7 +19,7 @@ mod_campaign_ui <- function(id) {
       card_body(
         ## # Info accordion ----
         info_accordion(content_file = "inst/app/www/md/intro_campaign.md"),
-        ##  #Input fields layout ----
+        ## # Input fields layout ----
         layout_column_wrap(
           width = "300px",
           fill = FALSE,
@@ -30,7 +30,7 @@ mod_campaign_ui <- function(id) {
             inputId = ns("CAMPAIGN_NAME"),
             label = tooltip(
               list("Campaign Name", bs_icon("info-circle-fill")),
-              "Text string used to identify the sampling campaign or project. Ensure a consistent Campaign string is used."
+              "Text string used to identify the sampling campaign or project."
             ),
             placeholder = "e.g., 'Vannmiljo Mitigation Monitoring 2025'",
             width = "100%"
@@ -84,51 +84,6 @@ mod_campaign_ui <- function(id) {
           ) |>
             suppressWarnings(), # suppress date NA warning
 
-          # # Disabled reliability fields, as we don't use them and they're not really germaine.
-          # ### RELIABILITY_EVAL_SYS - Optional string, 50 char ----
-          # selectInput(
-          #   inputId = ns("RELIABILITY_EVAL_SYS"),
-          #   label = tooltip(
-          #     list(
-          #       "Reliability Evaluation System",
-          #       bs_icon("info-circle-fill")
-          #     ),
-          #     "The system used to evaluate data quality."
-          #   ),
-          #   choices = c(
-          #     "Not relevant",
-          #     "Not reported",
-          #     "CREED",
-          #     "Other (add to comments)"
-          #   ),
-          #   width = "100%"
-          # ),
-
-          # ### RELIABILITY_SCORE - Optional int, 22 char ----
-          # textInput(
-          #   inputId = ns("RELIABILITY_SCORE"),
-          #   label = tooltip(
-          #     list("Reliability Score", bs_icon("info-circle-fill")),
-          #     "The score given (numeric or categorical) under the Reliability Evaluation System, if relevant."
-          #   ),
-          #   value = NA,
-          #   placeholder = "Numeric or categorical",
-          #   width = "100%"
-          # ),
-
-          ### CONFIDENTIALITY_EXPIRY_DATE - Optional date ----
-          # dateInput(
-          #   inputId = ns("CONFIDENTIALITY_EXPIRY_DATE"),
-          #   label = tooltip(
-          #     list("Confidentiality Expiry Date", bs_icon("info-circle-fill")),
-          #     "The date at which the data leaves embargo or ceases to be confidential. Use ISO date format (YYYY-MM-DD)."
-          #   ),
-          #   value = NA,
-          #   format = "yyyy-mm-dd",
-          #   width = "100%"
-          # ) |>
-          #   suppressWarnings(), # suppress date NA warning
-
           ### ENTERED_BY - Required string, 50 char ----
           textInput(
             inputId = ns("ENTERED_BY"),
@@ -163,30 +118,30 @@ mod_campaign_ui <- function(id) {
           placeholder = "Campaign-level notes (optional)",
           width = "100%",
           rows = 3
-        ),
-
-        ## # Validation status and raw data ----
-        span(
-          # prevent flex-grow validation element from growing vertically
-          uiOutput(ns("validation_reporter"))
-        ),
-        accordion(
-          id = ns("data_accordion"),
-          open = FALSE,
-          accordion_panel(
-            title = "Click to view raw validated data",
-            icon = bs_icon("code"),
-            verbatimTextOutput(ns("validated_data_display"))
-          )
-        ),
-
-        ## # Action buttons ----
-        actionButton(
-          inputId = ns("clear"),
-          label = "Clear All Fields",
-          class = "btn-danger",
-          width = "300px"
         )
+      ),
+
+      ## # Validation status and raw data ----
+      span(
+        # prevent flex-grow validation element from growing vertically
+        uiOutput(ns("validation_reporter"))
+      ),
+      accordion(
+        id = ns("data_accordion"),
+        open = FALSE,
+        accordion_panel(
+          title = "Click to view raw validated data",
+          icon = bs_icon("code"),
+          verbatimTextOutput(ns("validated_data_display"))
+        )
+      ),
+
+      ## # Action buttons ----
+      actionButton(
+        inputId = ns("clear"),
+        label = "Clear All Fields",
+        class = "btn-danger",
+        width = "300px"
       )
     )
   )
@@ -226,17 +181,6 @@ mod_campaign_server <- function(id) {
     })
 
     iv$add_rule("ENTERED_DATE", sv_required())
-
-    # Conditional validation for reliability score
-    iv$add_rule("RELIABILITY_SCORE", function(value) {
-      if (
-        isTruthy(input$RELIABILITY_EVAL_SYS) &&
-          isRelevant(input$RELIABILITY_EVAL_SYS) &&
-          !isTruthy(value)
-      ) {
-        "If an evaluation system is selected a score must also be entered."
-      }
-    })
 
     iv$add_rule("CAMPAIGN_COMMENT", function(value) {
       if (isTruthy(value) && nchar(value) > 1000) {
@@ -289,11 +233,6 @@ mod_campaign_server <- function(id) {
                     as.Date(NA),
                   CAMPAIGN_END_DATE = input$CAMPAIGN_END_DATE %|truthy|%
                     as.Date(NA),
-                  RELIABILITY_SCORE = input$RELIABILITY_SCORE %|truthy|% NA,
-                  RELIABILITY_EVAL_SYS = input$RELIABILITY_EVAL_SYS %|truthy|%
-                    NA,
-                  CONFIDENTIALITY_EXPIRY_DATE = input$CONFIDENTIALITY_EXPIRY_DATE %|truthy|%
-                    as.Date(NA),
                   ORGANISATION = input$ORGANISATION,
                   ENTERED_BY = input$ENTERED_BY,
                   ENTERED_DATE = input$ENTERED_DATE,
@@ -314,11 +253,9 @@ mod_campaign_server <- function(id) {
             session$userData$reactiveValues$campaignDataValid <- TRUE
           }
 
-          # CHANGED: Store directly to userData
           session$userData$reactiveValues$campaignData <- validated_data
 
           # } else {
-          # CHANGED: Set validation flag to FALSE
           # session$userData$reactiveValues$campaignDataValid <- FALSE
           # }
         },
@@ -352,9 +289,6 @@ mod_campaign_server <- function(id) {
         input$CAMPAIGN_NAME_SHORT,
         input$CAMPAIGN_START_DATE,
         input$CAMPAIGN_END_DATE,
-        input$RELIABILITY_SCORE,
-        input$RELIABILITY_EVAL_SYS,
-        input$CONFIDENTIALITY_EXPIRY_DATE,
         input$ORGANISATION,
         input$ENTERED_BY,
         input$ENTERED_DATE,
@@ -372,19 +306,11 @@ mod_campaign_server <- function(id) {
           updateTextInput(session, "CAMPAIGN_NAME", value = "")
           updateDateInput(session, "CAMPAIGN_START_DATE", value = as.Date(NA))
           updateDateInput(session, "CAMPAIGN_END_DATE", value = as.Date(NA))
-          # updateNumericInput(session, "RELIABILITY_SCORE", value = NA)
-          # updateTextInput(session, "RELIABILITY_EVAL_SYS", value = "")
-          updateDateInput(
-            session,
-            "CONFIDENTIALITY_EXPIRY_DATE",
-            value = as.Date(NA)
-          )
           updateTextInput(session, "ORGANISATION", value = "")
           updateTextInput(session, "ENTERED_BY", value = "")
           updateDateInput(session, "ENTERED_DATE", value = Sys.Date())
           updateTextAreaInput(session, "CAMPAIGN_COMMENT", value = "")
 
-          # CHANGED: Clear validation state in userData
           session$userData$reactiveValues$campaignData <- initialise_campaign_tibble()
           session$userData$reactiveValues$campaignDataValid <- FALSE
         },
@@ -518,7 +444,7 @@ mod_campaign_server <- function(id) {
               session$userData$reactiveValues$llmPopulateModules
           ) {
             populate_campaign_from_llm(session, llm_data)
-
+            browser() # TODO: #32 warning here when loading campaign example data. still works though. #
             # showNotification(
             #   "Campaign form populated.",
             #   type = "message"

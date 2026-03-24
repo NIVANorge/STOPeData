@@ -62,10 +62,11 @@ test_that("summarise_CREED_details separates sampling and analytical methods", {
   sampling_methods <- result$value[result$field == "sampling_methods"]
   analytical_methods <- result$value[result$field == "analytical_methods"]
 
-  expect_true(grepl("Sampling Protocol", sampling_methods))
-  expect_true(grepl("Grab", sampling_methods))
-  expect_true(grepl("Analytical Protocol", analytical_methods))
-  expect_true(grepl("ICP-MS", analytical_methods))
+  expect_match("Sampling Protocols: Grab sampling", sampling_methods)
+  expect_match(
+    "Analytical Protocols: Inductively coupled plasma mass spectrometry",
+    analytical_methods
+  )
 })
 
 test_that("summarise_CREED_details handles missing data", {

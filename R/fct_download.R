@@ -307,6 +307,102 @@ downloadable_text_datasets <- function() {
 }
 
 
+#' Build a session ZIP archive
+#'
+#' @description Writes all available session datasets to a ZIP file at `dest_file`.
+#'   Includes tabular data as CSV, text/object data as TXT, the source PDF (if
+#'   present), and a metadata file. Called by both `download_all_data()` and the
+#'   Zenodo module's session-upload mode.
+#' @param session Shiny session object. Required to access reactive values.
+#' @param moduleState ReactiveValues object containing `available_datasets` and
+#'   `campaign_name` fields.
+#' @param dest_file Character. Path where the ZIP file should be written.
+#' @return `dest_file` invisibly.
+#' @importFrom glue glue
+#' @importFrom zip zip
+#' @importFrom readr write_excel_csv
+#' @export
+build_session_zip <- function(session, moduleState, dest_file) {
+  rv <- session$userData$reactiveValues
+  metadata <- get_export_metadata(session = session)
+
+  temp_dir  <- tempdir()
+  timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
+
+  campaign <- if (nrow(rv$referenceData) > 0) {
+    generate_reference_id(
+      rv$referenceData$YEAR,
+      rv$referenceData$AUTHOR,
+      rv$referenceData$TITLE
+    )
+  } else {
+    "ReferenceNotFound"
+  }
+
+  text_datasets <- c("schemaLLM", "promptLLM", "rawLLM")
+  all_files <- character(0)
+
+  # Export each dataset ----
+  for (dataset_name in moduleState$available_datasets) {
+    tryCatch(
+      {
+        if (stringr::str_detect(dataset_name, "CREED")) {}
+        print_dev(glue("prepping {dataset_name} for export"))
+
+        data <- rv[[dataset_name]]
+
+        display_name <- gsub(" ", "_", get_dataset_display_name(dataset_name))
+        base_name    <- glue("{campaign}_{display_name}_{timestamp}")
+
+        if (dataset_name %in% text_datasets) {
+          if (!is.null(data)) {
+            txt_file <- file.path(temp_dir, glue("{base_name}.txt"))
+            writeLines(object_to_text(data, dataset_name = display_name), txt_file)
+            all_files <- c(all_files, txt_file)
+          }
+        } else {
+          if (!is.null(data) && nrow(data) > 0) {
+            csv_file <- file.path(temp_dir, glue("{base_name}.csv"))
+            write_excel_csv(data, file = csv_file, na = "")
+            all_files <- c(all_files, csv_file)
+          }
+        }
+      },
+      error = function(e) {
+        showNotification(
+          paste0("Error creating download data: ", e$message, " (Code: build_session_zip())"),
+          type = "error",
+          duration = NULL
+        )
+      }
+    )
+  }
+
+  # Export PDF if available ----
+  if (!is.null(rv$pdfPath) && file.exists(rv$pdfPath)) {
+    pdf_dest <- file.path(
+      temp_dir,
+      rv$uploaded_pdf_filename %||% glue("{campaign}_MS.pdf")
+    )
+    file.copy(rv$pdfPath, pdf_dest)
+    all_files <- c(all_files, pdf_dest)
+  }
+
+  # Write metadata file ----
+  combined_metadata_file <- file.path(
+    temp_dir,
+    glue("{campaign}_export_metadata_{timestamp}.txt")
+  )
+  write_metadata_txt(metadata, combined_metadata_file)
+  all_files <- c(all_files, combined_metadata_file)
+
+  # Create and cleanup ZIP archive ----
+  zip(zipfile = dest_file, files = all_files, mode = "cherry-pick")
+  unlink(all_files)
+
+  invisible(dest_file)
+}
+
 #' Download all data as CSV and TXT files in a ZIP archive
 #'
 #' @description Creates a Shiny downloadHandler that exports all available datasets
@@ -317,14 +413,10 @@ downloadable_text_datasets <- function() {
 #'   and campaign_name fields.
 #' @return A Shiny downloadHandler function
 #' @importFrom glue glue
-#' @importFrom zip zip
-#' @importFrom readr write_excel_csv
 #' @export
 download_all_data <- function(session, moduleState = NULL) {
   if (is.null(moduleState) || is.null(session)) {
-    stop(
-      "moduleState & session reactive objects must be supplied to create CSVs"
-    )
+    stop("moduleState & session reactive objects must be supplied to create CSVs")
   }
 
   campaign_short <- function() {
@@ -342,108 +434,10 @@ download_all_data <- function(session, moduleState = NULL) {
   downloadHandler(
     filename = function() {
       timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-      campaign <- campaign_short()
+      campaign  <- campaign_short()
       glue("{campaign}_AllData_{timestamp}.zip")
     },
-
-    content = function(file) {
-      rv <- session$userData$reactiveValues
-      metadata <- get_export_metadata(session = session)
-
-      # Setup temporary directory and naming
-      temp_dir <- tempdir()
-      timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-      campaign <- campaign_short()
-
-      # Define which datasets should be exported as text files
-      text_datasets <- c("schemaLLM", "promptLLM", "rawLLM")
-
-      all_files <- character(0)
-
-      # Export each dataset ----
-      for (dataset_name in moduleState$available_datasets) {
-        tryCatch(
-          {
-            if (stringr::str_detect(dataset_name, "CREED")) {}
-            print_dev(glue("prepping {dataset_name} for export"))
-
-            data <- rv[[dataset_name]]
-
-            display_name <- gsub(
-              " ",
-              "_",
-              get_dataset_display_name(dataset_name)
-            )
-            base_name <- glue("{campaign}_{display_name}_{timestamp}")
-
-            if (dataset_name %in% text_datasets) {
-              # Handle text/object data
-              if (!is.null(data)) {
-                txt_file <- file.path(temp_dir, glue("{base_name}.txt"))
-
-                # Convert object to text using helper function
-                text_content <- object_to_text(
-                  data,
-                  dataset_name = display_name
-                )
-                writeLines(text_content, txt_file)
-
-                all_files <- c(all_files, txt_file)
-              }
-            } else {
-              # Handle tabular data
-              if (!is.null(data) && nrow(data) > 0) {
-                csv_file <- file.path(temp_dir, glue("{base_name}.csv"))
-
-                write_excel_csv(data, file = csv_file, na = "")
-
-                all_files <- c(all_files, csv_file)
-              }
-            }
-          },
-          error = function(e) {
-            showNotification(
-              paste0(
-                "Error creating download data: ",
-                e$message,
-                " (Code: download_all_data())"
-              ),
-              type = "error",
-              duration = NULL
-            )
-          }
-        )
-      }
-
-      # Export PDF if available ----
-      if (!is.null(rv$pdfPath) && file.exists(rv$pdfPath)) {
-        pdf_dest <- file.path(
-          temp_dir,
-          rv$uploaded_pdf_filename %||%
-            glue("{campaign}_MS.pdf")
-        )
-        file.copy(rv$pdfPath, pdf_dest)
-        all_files <- c(all_files, pdf_dest)
-      }
-
-      # Write metadata file ----
-      combined_metadata_file <- file.path(
-        temp_dir,
-        glue("{campaign}_export_metadata_{timestamp}.txt")
-      )
-      write_metadata_txt(metadata, combined_metadata_file)
-      all_files <- c(all_files, combined_metadata_file)
-
-      # Create and cleanup ZIP archive ----
-      zip(
-        zipfile = file,
-        files = all_files,
-        mode = "cherry-pick"
-      )
-
-      unlink(all_files)
-    },
-
+    content = function(file) build_session_zip(session, moduleState, file),
     contentType = "application/zip"
   )
 }
