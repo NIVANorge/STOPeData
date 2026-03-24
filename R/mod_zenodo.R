@@ -32,44 +32,43 @@ mod_Zenodo_ui <- function(id) {
 
         hr(),
 
-        # ===== Dataset Information =====
-        h5(bs_icon("info-circle"), " 1. Dataset Information"),
-        layout_column_wrap(
-          width = "300px",
-          fill = FALSE,
-          fillable = FALSE,
-          div(
-            actionButton(
-              ns("get_session_data"),
-              label = list(
-                "Get Data from Modules",
-                bs_icon("arrow-down-circle-fill")
-              ),
-              class = "btn-primary"
+        div(
+          id = "get-module-data-well",
+          class = "navigation-buttons-container",
+          style = "display: flex; align-items: start; margin: 0 5px 10px 5px;",
+          actionButton(
+            ns("get_session_data"),
+            label = list(
+              "Get Data from Modules",
+              bs_icon("arrow-down-circle-fill")
             ),
-            uiOutput(ns("session_data_summary"))
-          ),
-          div(
-            textInput(
-              ns("zenTitle"),
-              label = tooltip(
-                list("Dataset Title", bs_icon("info-circle-fill")),
-                "A descriptive title for your dataset on Zenodo."
-              ),
-              placeholder = "Enter a descriptive title for your dataset",
-              width = "800px"
-            ),
-            textAreaInput(
-              ns("zenDescription"),
-              label = tooltip(
-                list("Description", bs_icon("info-circle-fill")),
-                "Explain what the dataset contains, how it was collected, and its scientific context."
-              ),
-              placeholder = "Provide a detailed description of your dataset",
-              width = "800px",
-              height = "100px"
-            )
+            class = "btn-primary"
           )
+        ),
+        uiOutput(ns("session_data_summary")),
+
+        hr(),
+
+        # ===== Dataset Information =====
+
+        textInput(
+          ns("zenTitle"),
+          label = tooltip(
+            list("Dataset Title", bs_icon("info-circle-fill")),
+            "A descriptive title for your dataset on Zenodo."
+          ),
+          width = "900px",
+          placeholder = "Enter a descriptive title for your dataset"
+        ),
+        textAreaInput(
+          ns("zenDescription"),
+          label = tooltip(
+            list("Description", bs_icon("info-circle-fill")),
+            "Explain what the dataset contains, how it was collected, and its scientific context."
+          ),
+          placeholder = "Provide a detailed description of your dataset",
+          height = "200px",
+          width = "900px"
         ),
         hr(),
 
@@ -77,17 +76,25 @@ mod_Zenodo_ui <- function(id) {
         h5(bs_icon("person"), " 2. Authors"),
         p(
           style = "color: #6c757d; font-size: 0.9em;",
-          "Author names are auto-filled from the Reference module where available. Affiliation and ORCID must be entered manually."
+          "Author names are auto-filled from the Reference module where available. Affiliation and ORCID must be entered manually.",
+          " Don't have an ORCID? ",
+          tags$a(
+            href = "https://orcid.org/register",
+            target = "_blank",
+            "Register here."
+          )
         ),
 
         # Dynamic author rows
         uiOutput(ns("authorFields")),
 
-        actionButton(
-          ns("addAuthor"),
-          "Add Author",
-          icon = bs_icon("plus-circle"),
-          class = "btn-primary"
+        tooltip(
+          actionButton(
+            ns("addAuthor"),
+            label = bs_icon("plus-circle"),
+            class = "btn-outline-success"
+          ),
+          "Add another author."
         ),
 
         hr(),
@@ -125,7 +132,7 @@ mod_Zenodo_ui <- function(id) {
         # ===== Metadata & Licensing =====
         h5(bs_icon("tags"), " 5. Metadata & Licensing"),
         layout_column_wrap(
-          width = "300px",
+          width = "400px",
           fill = FALSE,
           fillable = FALSE,
           selectizeInput(
@@ -136,17 +143,6 @@ mod_Zenodo_ui <- function(id) {
             ),
             choices = zenodo_resource_types,
             selected = "dataset"
-          ),
-          selectizeInput(
-            ns("zenLicense"),
-            label = tooltip(
-              list("License", bs_icon("info-circle-fill")),
-              "CC BY 4.0 is recommended for open research data \u2014 it allows reuse with attribution."
-            ),
-            choices = zenodo_licenses |>
-              arrange(desc(popular)) |>
-              pull(id, name = title),
-            selected = "cc-by-4.0"
           ),
           selectizeInput(
             ns("zenAccess"),
@@ -161,6 +157,18 @@ mod_Zenodo_ui <- function(id) {
               "Closed" = "closed"
             ),
             selected = "open"
+          ),
+
+          selectizeInput(
+            ns("zenLicense"),
+            label = tooltip(
+              list("License", bs_icon("info-circle-fill")),
+              "CC BY 4.0 is recommended for open research data \u2014 it allows reuse with attribution."
+            ),
+            choices = zenodo_licenses |>
+              arrange(desc(popular)) |>
+              pull(id, name = title),
+            selected = "cc-by-4.0"
           )
         ),
 
@@ -173,7 +181,7 @@ mod_Zenodo_ui <- function(id) {
           " 6. Optional Information"
         ),
         layout_column_wrap(
-          width = "300px",
+          width = "400px",
           fill = FALSE,
           fillable = FALSE,
           textInput(
@@ -194,6 +202,13 @@ mod_Zenodo_ui <- function(id) {
             rows = 2
           )
         )
+      ),
+
+      actionButton(
+        ns("previewReadme"),
+        "Preview README",
+        icon = bs_icon("file-text"),
+        class = "btn-primary"
       ),
 
       # ===== Submit row =====
@@ -222,15 +237,9 @@ mod_Zenodo_ui <- function(id) {
           )
         ),
 
-        # Right: Preview README + Submit buttons
+        # Right: Submit button
         div(
           style = "display: flex; gap: 10px; align-items: center;",
-          actionButton(
-            ns("previewReadme"),
-            "Preview README",
-            icon = bs_icon("eye"),
-            class = "btn-outline-secondary"
-          ),
           input_task_button(
             ns("submitZen"),
             "Submit to Zenodo",
@@ -249,6 +258,7 @@ mod_Zenodo_ui <- function(id) {
 #' Zenodo Server Functions
 #'
 #' @noRd
+#' @importFrom purrr imap
 mod_Zenodo_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -417,10 +427,10 @@ mod_Zenodo_server <- function(id) {
               actionButton(
                 ns(paste0("removeAuthor_", i)),
                 NULL,
-                icon = bs_icon("x"),
+                label = bs_icon("x"),
                 class = "btn-sm btn-outline-danger",
                 style = "padding: 2px 8px; font-size: 0.75rem;",
-                title = paste("Remove author", i)
+                title = paste("Remove Author", i)
               )
             )
           },
@@ -428,8 +438,11 @@ mod_Zenodo_server <- function(id) {
             style = "color: #6c757d; font-weight: 600; display: block; margin-bottom: 8px;",
             if (i == 1) "Primary Author" else paste("Author", i)
           ),
-          div(
-            style = "display: grid; grid-template-columns: 1fr 1fr; gap: 10px;",
+          layout_column_wrap(
+            width = "300px",
+            fill = FALSE,
+            fillable = FALSE,
+            style = "margin-bottom: 0px;",
             textInput(
               ns(paste0("zenFirstName_", i)),
               "First name",
@@ -445,25 +458,13 @@ mod_Zenodo_server <- function(id) {
               "Affiliation/Institution",
               placeholder = "e.g., University of Example"
             ),
-            div(
-              textInput(
-                ns(paste0("zenAuthorOrcid_", i)),
-                tooltip(
-                  list("ORCID iD", bs_icon("info-circle-fill")),
-                  "A persistent digital identifier for researchers. Register free at orcid.org."
-                ),
-                placeholder = "e.g., 0000-0002-1825-0097"
+            textInput(
+              ns(paste0("zenAuthorOrcid_", i)),
+              tooltip(
+                list("ORCID iD", bs_icon("info-circle-fill")),
+                "A persistent digital identifier for researchers. Register free at orcid.org."
               ),
-              tags$small(
-                style = "color: #6c757d; display: block; margin-top: -10px; margin-bottom: 5px;",
-                bs_icon("question-circle"),
-                " Don't have an ORCID? ",
-                tags$a(
-                  href = "https://orcid.org/register",
-                  target = "_blank",
-                  "Register here"
-                )
-              )
+              placeholder = "e.g., 0000-0002-1825-0097"
             )
           )
         )
@@ -558,9 +559,8 @@ mod_Zenodo_server <- function(id) {
     }) |>
       bindEvent(input$get_session_data)
 
+    # output: summary of data from upstream modules
     output$session_data_summary <- renderUI({
-      req(input$get_session_data)
-
       if (zenSessionState$ready) {
         summaries <- map_chr(
           zenSessionState$available_datasets,
@@ -583,12 +583,21 @@ mod_Zenodo_server <- function(id) {
             class = "validation-status validation-complete",
             style = "display: inline-block; margin-bottom: 8px;"
           ),
-          tags$code(paste(summaries, collapse = ", "))
+          # render summaries elements as separate code block tags, separated by commas
+          tagList(
+            imap(
+              summaries,
+              ~ tagList(
+                tags$code(.x),
+                if (.y < length(summaries)) ", "
+              )
+            )
+          )
         )
       } else {
         div(
           bs_icon("exclamation-triangle"),
-          " No session data found. Have you entered data in the other modules?",
+          " Click 'Get Data from Modules' to auto-fill fields with relevant information.",
           class = "validation-status validation-warning",
           style = "display: inline-block; margin-top: 12px;"
         )
@@ -625,8 +634,8 @@ mod_Zenodo_server <- function(id) {
         ),
         size = "l",
         div(
-          style = "font-family: monospace; white-space: pre-wrap; background: #f8fafc; color: #1e293b; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-height: 500px; overflow-y: auto; font-size: 0.85em;",
-          generateReadme()
+          style = "white-space: pre-wrap; background: #f8fafc; color: #1e293b; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-height: 500px; overflow-y: auto; font-size: 0.85em;",
+          includeMarkdown(generateReadme())
         ),
         footer = modalButton("Close"),
         easyClose = TRUE
