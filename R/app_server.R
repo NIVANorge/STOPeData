@@ -144,6 +144,7 @@ app_server <- function(input, output, session) {
   #   "export"
   # )
   moduleCREED <- mod_CREED_server("CREED")
+  moduleZenodo <- mod_Zenodo_server("Zenodo")
 
   ## Navigation setup ----
   # upstream: session start
@@ -162,6 +163,7 @@ app_server <- function(input, output, session) {
     "09-data",
     "10-review",
     "12-CREED",
+    "13-Zenodo",
     "info"
   )
 

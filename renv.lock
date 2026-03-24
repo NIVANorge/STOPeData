@@ -298,6 +298,32 @@
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
       "Repository": "RSPM"
     },
+    "XML": {
+      "Package": "XML",
+      "Version": "3.99-0.22",
+      "Source": "Repository",
+      "Authors@R": "c(person(\"CRAN Team\", role = \"ctb\", email = \"CRAN@r-project.org\", comment = \"de facto maintainer in 2013-2026\"), person(\"Duncan\", \"Temple Lang\", role = \"aut\", email = \"duncan@r-project.org\", comment = c(ORCID = \"0000-0003-0159-1546\")), person(\"Tomas\", \"Kalibera\", role = \"ctb\"), person(\"Ivan\", \"Krylov\", email = \"ikrylov@disroot.org\", role = \"cre\"))",
+      "Title": "Tools for Parsing and Generating XML Within R and S-Plus",
+      "Depends": [
+        "R (>= 4.0.0)",
+        "methods",
+        "utils"
+      ],
+      "Suggests": [
+        "bitops",
+        "RCurl"
+      ],
+      "SystemRequirements": "libxml2 (>= 2.6.3)",
+      "Description": "Many approaches for both reading and creating XML (and HTML) documents (including DTDs), both local and accessible via HTTP or FTP.  Also offers access to an 'XPath' \"interpreter\".",
+      "BugReports": "https://codeberg.org/aitap/XML/issues",
+      "License": "BSD_3_clause + file LICENSE",
+      "Collate": "AAA.R DTD.R DTDClasses.R DTDRef.R SAXMethods.R XMLClasses.R applyDOM.R assignChild.R catalog.R createNode.R dynSupports.R error.R flatTree.R nodeAccessors.R parseDTD.R schema.R summary.R tangle.R toString.R tree.R version.R xmlErrorEnums.R xmlEventHandler.R xmlEventParse.R xmlHandler.R xmlInternalSource.R xmlOutputDOM.R xmlNodes.R xmlOutputBuffer.R xmlTree.R xmlTreeParse.R htmlParse.R hashTree.R zzz.R supports.R parser.R libxmlFeatures.R xmlString.R saveXML.R namespaces.R readHTMLTable.R reflection.R xmlToDataFrame.R bitList.R compare.R encoding.R fixNS.R xmlRoot.R serialize.R xmlMemoryMgmt.R keyValueDB.R solrDocs.R XMLRErrorInfo.R xincludes.R namespaceHandlers.R tangle1.R htmlLinks.R htmlLists.R getDependencies.R getRelativeURL.R xmlIncludes.R simplifyPath.R",
+      "NeedsCompilation": "yes",
+      "Author": "CRAN Team [ctb] (de facto maintainer in 2013-2026), Duncan Temple Lang [aut] (ORCID: <https://orcid.org/0000-0003-0159-1546>), Tomas Kalibera [ctb], Ivan Krylov [cre]",
+      "Maintainer": "Ivan Krylov <ikrylov@disroot.org>",
+      "Repository": "RSPM",
+      "Encoding": "UTF-8"
+    },
     "V8": {
       "Package": "V8",
       "Version": "8.0.1",
@@ -1860,6 +1886,33 @@
       "Maintainer": "Winston Chang <winston@posit.co>",
       "Repository": "CRAN"
     },
+    "filelock": {
+      "Package": "filelock",
+      "Version": "1.0.3",
+      "Source": "Repository",
+      "Title": "Portable File Locking",
+      "Authors@R": "c( person(\"Gábor\", \"Csárdi\", , \"csardi.gabor@gmail.com\", role = c(\"aut\", \"cre\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\")) )",
+      "Description": "Place an exclusive or shared lock on a file. It uses 'LockFile' on Windows and 'fcntl' locks on Unix-like systems.",
+      "License": "MIT + file LICENSE",
+      "URL": "https://r-lib.github.io/filelock/, https://github.com/r-lib/filelock",
+      "BugReports": "https://github.com/r-lib/filelock/issues",
+      "Depends": [
+        "R (>= 3.4)"
+      ],
+      "Suggests": [
+        "callr (>= 2.0.0)",
+        "covr",
+        "testthat (>= 3.0.0)"
+      ],
+      "Config/Needs/website": "tidyverse/tidytemplate",
+      "Config/testthat/edition": "3",
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.2.3",
+      "NeedsCompilation": "yes",
+      "Author": "Gábor Csárdi [aut, cre], Posit Software, PBC [cph, fnd]",
+      "Maintainer": "Gábor Csárdi <csardi.gabor@gmail.com>",
+      "Repository": "RSPM"
+    },
     "fontawesome": {
       "Package": "fontawesome",
       "Version": "0.5.3",
@@ -2859,6 +2912,46 @@
       "Author": "Jeroen Ooms [aut, cre] (<https://orcid.org/0000-0002-4035-0289>), Duncan Temple Lang [ctb], Lloyd Hilaiel [cph] (author of bundled libyajl)",
       "Repository": "CRAN"
     },
+    "keyring": {
+      "Package": "keyring",
+      "Version": "1.4.1",
+      "Source": "Repository",
+      "Title": "Access the System Credential Store from R",
+      "Authors@R": "c( person(\"Gábor\", \"Csárdi\", , \"csardi.gabor@gmail.com\", role = c(\"aut\", \"cre\")), person(\"Alec\", \"Wong\", role = \"ctb\"), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\"), comment = c(ROR = \"03wc8by49\")) )",
+      "Description": "Platform independent 'API' to access the operating system's credential store. Currently supports: 'Keychain' on 'macOS', Credential Store on 'Windows', the Secret Service 'API' on 'Linux', and simple, platform independent stores implemented with environment variables or encrypted files.  Additional storage back-ends can be added easily.",
+      "License": "MIT + file LICENSE",
+      "URL": "https://keyring.r-lib.org/, https://github.com/r-lib/keyring",
+      "BugReports": "https://github.com/r-lib/keyring/issues",
+      "Depends": [
+        "R (>= 3.5)"
+      ],
+      "Imports": [
+        "askpass",
+        "filelock",
+        "R6",
+        "tools",
+        "utils",
+        "yaml"
+      ],
+      "Suggests": [
+        "callr",
+        "covr",
+        "openssl",
+        "testthat (>= 3.0.0)",
+        "withr"
+      ],
+      "Biarch": "true",
+      "Config/Needs/website": "tidyverse/tidytemplate",
+      "Config/testthat/edition": "3",
+      "Config/usethis/last-upkeep": "2025-04-30",
+      "Encoding": "UTF-8",
+      "RoxygenNote": "7.3.2.9000",
+      "SystemRequirements": "Optional: libsecret on Linux (libsecret-1-dev on Debian/Ubuntu, libsecret-devel on Fedora/CentOS)",
+      "NeedsCompilation": "yes",
+      "Author": "Gábor Csárdi [aut, cre], Alec Wong [ctb], Posit Software, PBC [cph, fnd] (ROR: <https://ror.org/03wc8by49>)",
+      "Maintainer": "Gábor Csárdi <csardi.gabor@gmail.com>",
+      "Repository": "RSPM"
+    },
     "juicyjuice": {
       "Package": "juicyjuice",
       "Version": "0.1.0",
@@ -3609,6 +3702,7 @@
       "Title": "Lightweight Toolkit for Messaging, Concurrency and the Web",
       "Authors@R": "c( person(\"Charlie\", \"Gao\", , \"charlie.gao@posit.co\", role = c(\"aut\", \"cre\"), comment = c(ORCID = \"0000-0002-0750-061X\")), person(\"Posit Software, PBC\", role = c(\"cph\", \"fnd\"), comment = c(ROR = \"03wc8by49\")), person(\"Hibiki AI Limited\", role = \"cph\"), person(\"R Consortium\", role = \"fnd\") )",
       "Description": "R binding for NNG (Nanomsg Next Gen), a successor to ZeroMQ. A toolkit for messaging, concurrency and the web. High-performance socket messaging over in-process, IPC, TCP, WebSocket and secure TLS transports implements 'Scalability Protocols', a standard for common communications patterns including publish/subscribe, request/reply and survey. A threaded concurrency framework with intuitive 'aio' objects that resolve automatically upon completion of asynchronous operations, and synchronisation primitives that allow R to wait on events signalled by concurrent threads. A unified HTTP server hosting REST endpoints, WebSocket connections and streaming on a single port, with a built-in HTTP client.",
+      "Description": "R binding for NNG (Nanomsg Next Gen), a successor to ZeroMQ. A toolkit for messaging, concurrency and the web. High-performance socket messaging over in-process, IPC, TCP, WebSocket and secure TLS transports implements 'Scalability Protocols', a standard for common communications patterns including publish/subscribe, request/reply and survey. A threaded concurrency framework with intuitive 'aio' objects that resolve automatically upon completion of asynchronous operations, and synchronisation primitives that allow R to wait on events signalled by concurrent threads. A unified HTTP server hosting REST endpoints, WebSocket connections and streaming on a single port, with a built-in HTTP client.",
       "License": "MIT + file LICENSE",
       "URL": "https://nanonext.r-lib.org, https://github.com/r-lib/nanonext",
       "BugReports": "https://github.com/r-lib/nanonext/issues",
@@ -3710,6 +3804,7 @@
       "NeedsCompilation": "yes",
       "Author": "Jordan Mark Barbone [aut] (ORCID: <https://orcid.org/0000-0001-9788-3628>), Jan Marvin Garbuszus [aut, cre], Olivier Roy [ctb], openxlsx authors [cph] (openxlsx package), Arseny Kapoulkine [ctb, cph] (Author of included pugixml code)",
       "Maintainer": "Jan Marvin Garbuszus <jan.garbuszus@ruhr-uni-bochum.de>",
+      "Repository": "RSPM"
       "Repository": "RSPM"
     },
     "otel": {
@@ -6594,6 +6689,49 @@
       "NeedsCompilation": "yes",
       "Author": "Hadley Wickham [cre] (ORCID: <https://orcid.org/0000-0003-4757-117X>), Shawn Garbett [ctb] (ORCID: <https://orcid.org/0000-0003-4079-5621>), Jeremy Stephens [aut, ctb], Kirill Simonov [aut], Yihui Xie [ctb] (ORCID: <https://orcid.org/0000-0003-0645-5666>), Zhuoer Dong [ctb], Jeffrey Horner [ctb], reikoch [ctb], Will Beasley [ctb] (ORCID: <https://orcid.org/0000-0002-5613-5006>), Brendan O'Connor [ctb], Michael Quinn [ctb], Charlie Gao [ctb], Gregory R. Warnes [ctb], Zhian N. Kamvar [ctb]",
       "Maintainer": "Hadley Wickham <hadley@posit.co>",
+      "Repository": "RSPM"
+    },
+    "zen4R": {
+      "Package": "zen4R",
+      "Version": "0.10.4",
+      "Source": "Repository",
+      "Date": "2025-12-18",
+      "Title": "Interface to 'Zenodo' REST API",
+      "Authors@R": "c( person(\"Emmanuel\", \"Blondel\", role = c(\"aut\", \"cre\"), email = \"emmanuel.blondel1@gmail.com\", comment = c(ORCID = \"0000-0002-5870-5762\")), person(\"Julien\", \"Barde\", role = c(\"ctb\"), email = \"julien.barde@ird.fr\", comment = c(ORCID = \"0000-0002-3519-6141\")), person(\"Stephen\", \"Eglen\", role = c(\"ctb\"), comment = c(ORCID = \"0000-0001-8607-8025\")), person(\"Hans\", \"Van Calster\", role = c(\"ctb\"), comment = c(ORCID = \"0000-0001-8595-8426\")), person(\"Floris\", \"Vanderhaeghe\", role = c(\"ctb\"), comment = c(ORCID = \"0000-0002-6378-6229\")), person(\"Jemma\", \"Stachelek\", role = c(\"ctb\"), comment = c(ORCID = \"0000-0002-5924-2464\")), person(\"Collin\", \"Schwantes\", role = c(\"ctb\"), comment = c(ORCID = \"0000-0002-9882-941X\")), person(\"Nicholas\", \"Tierney\", role = c(\"ctb\"), comment = c(ORCID = \"0000-0003-1460-8722\")))",
+      "Maintainer": "Emmanuel Blondel <emmanuel.blondel1@gmail.com>",
+      "Depends": [
+        "R (>= 3.3.0)",
+        "methods"
+      ],
+      "Imports": [
+        "R6",
+        "cli",
+        "httr",
+        "jsonlite",
+        "XML",
+        "xml2",
+        "keyring",
+        "tools",
+        "utf8",
+        "plyr"
+      ],
+      "Suggests": [
+        "testthat",
+        "parallel",
+        "knitr",
+        "markdown",
+        "atom4R"
+      ],
+      "Description": "Provides an Interface to 'Zenodo' (<https://zenodo.org>) REST API,  including management of depositions, attribution of DOIs by 'Zenodo' and  upload and download of files.",
+      "License": "MIT + file LICENSE",
+      "URL": "https://github.com/eblondel/zen4R",
+      "BugReports": "https://github.com/eblondel/zen4R/issues",
+      "LazyLoad": "yes",
+      "RoxygenNote": "7.3.3",
+      "Encoding": "UTF-8",
+      "VignetteBuilder": "knitr",
+      "NeedsCompilation": "no",
+      "Author": "Emmanuel Blondel [aut, cre] (ORCID: <https://orcid.org/0000-0002-5870-5762>), Julien Barde [ctb] (ORCID: <https://orcid.org/0000-0002-3519-6141>), Stephen Eglen [ctb] (ORCID: <https://orcid.org/0000-0001-8607-8025>), Hans Van Calster [ctb] (ORCID: <https://orcid.org/0000-0001-8595-8426>), Floris Vanderhaeghe [ctb] (ORCID: <https://orcid.org/0000-0002-6378-6229>), Jemma Stachelek [ctb] (ORCID: <https://orcid.org/0000-0002-5924-2464>), Collin Schwantes [ctb] (ORCID: <https://orcid.org/0000-0002-9882-941X>), Nicholas Tierney [ctb] (ORCID: <https://orcid.org/0000-0003-1460-8722>)",
       "Repository": "RSPM"
     },
     "zip": {
