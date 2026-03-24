@@ -17,6 +17,8 @@ zenodo_production <- ZenodoManager$new(
 )
 
 # Get licenses and resource types
+
+# TODO: cache licenses, resource types
 licenses_list <- zenodo_sandbox$getLicenses(pretty = TRUE)
 licenses <- licenses_list[[1]]
 resourceType <- zenodo_sandbox$getResourceTypes()
@@ -32,13 +34,17 @@ resourceType <- zenodo_sandbox$getResourceTypes()
 #' @noRd
 #'
 #' @import shiny
-#' @import bslib
+#' @import bslib # todo: use importFrom
 mod_Zenodo_ui <- function(id) {
   ns <- NS(id)
+  # TODO: Fix form overlapping navigation buttons
   tagList(bslib::card_body(
     fillable = FALSE,
 
     # ===== Input Mode (Upload vs Template) =====
+    # TODO: Update UI style to match rest of app
+    # TODO: Add shinyvalidate
+    # TODO: Add field tooltips
     tags$h5(
       style = "margin-top: 0; margin-bottom: 15px; color: #0d6efd; border-bottom: 2px solid #0d6efd; padding-bottom: 5px;",
       icon("toggle-on"),
@@ -75,6 +81,7 @@ mod_Zenodo_ui <- function(id) {
             style = "font-weight: 500;",
             "Sandbox (Testing)"
           )
+          # repeat info on sandbox mode on "submit to zenodo" button
         ),
         tags$span(
           id = ns("envBadge"),
@@ -170,6 +177,7 @@ mod_Zenodo_ui <- function(id) {
           "Contact Name/Role",
           placeholder = "e.g., Dr. Jane Smith or Data Curator"
         ),
+        # TODO: Grab from ENTERED_BY, if appropriate
         textInput(
           ns("contactEmail"),
           "Contact Email*",
