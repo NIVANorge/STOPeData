@@ -242,6 +242,7 @@ mod_Zenodo_ui <- function(id) {
 #' @noRd
 #' @importFrom purrr imap
 #' @importFrom markdown markdownToHTML
+#' @importFrom utils unzip
 mod_Zenodo_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -1136,7 +1137,6 @@ mod_Zenodo_server <- function(id) {
     performUpload <- function() {
       tryCatch(
         {
-          browser()
           zenodo <- current_zenodo()
           env_name <- if (input$zenEnvironment) "Sandbox" else "Production"
 
@@ -1175,17 +1175,43 @@ mod_Zenodo_server <- function(id) {
           # Deposit the record to create a draft on Zenodo
           myrec <- zenodo$depositRecord(myrec)
 
-          # Upload session data as a ZIP archive
+          # Build the session ZIP, then unzip and upload each file individually
+          # FIXME: This is obviously very stupid, but requires the fewest changes
           session_zip <- tempfile(fileext = ".zip")
-          on.exit(unlink(session_zip), add = TRUE)
-          build_session_zip(session, zenSessionState, session_zip)
-          zenodo$uploadFile(session_zip, myrec)
+          unzip_dir <- tempfile()
+          dir.create(unzip_dir)
+          on.exit(
+            {
+              unlink(session_zip)
+              unlink(unzip_dir, recursive = TRUE)
+            },
+            add = TRUE
+          )
 
-          # Upload a companion README.md alongside the data
-          readme_temp <- tempfile(fileext = ".md")
-          on.exit(unlink(readme_temp), add = TRUE)
-          writeLines(generateReadme(), readme_temp)
-          zenodo$uploadFile(readme_temp, myrec)
+          build_session_zip(session, zenSessionState, session_zip)
+          unzip(session_zip, exdir = unzip_dir)
+
+          extracted_files <- list.files(
+            unzip_dir,
+            full.names = TRUE,
+            recursive = TRUE
+          )
+          for (f in extracted_files) {
+            # Copy to a clean temp dir so zen4R picks up basename() as the filename
+            upload_dir <- tempfile()
+            dir.create(upload_dir)
+            on.exit(unlink(upload_dir, recursive = TRUE), add = TRUE)
+            file.copy(f, file.path(upload_dir, basename(f)))
+            zenodo$uploadFile(file.path(upload_dir, basename(f)), myrec)
+          }
+
+          # Upload README.md
+          readme_dir <- tempfile()
+          dir.create(readme_dir)
+          readme_file <- file.path(readme_dir, "README.md")
+          on.exit(unlink(readme_dir, recursive = TRUE), add = TRUE)
+          writeLines(generateReadme(), readme_file)
+          zenodo$uploadFile(readme_file, myrec)
 
           # Submit record to the STOP community for curator review
           msg <- paste0(
