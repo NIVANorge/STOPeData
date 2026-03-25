@@ -26,6 +26,10 @@ RUN R -s -e "options(renv.config.pak.enabled = TRUE); renv::restore()"
 COPY manifest.json ./manifest.json
 COPY ./DESCRIPTION ./DESCRIPTION
 COPY ./NAMESPACE ./NAMESPACE
+COPY ./dependencies.R ./dependencies.R
+
+RUN Rscript dependencies.R
+
 COPY ./app.R ./app.R 
 COPY ./R ./R
 COPY ./inst ./inst

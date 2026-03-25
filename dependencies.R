@@ -39,5 +39,6 @@ pak::pkg_install(c(
   "bib2df",
   "lubridate",
   "markdown",
-  "shinytest2"
+  "shinytest2",
+  "mirai"
 ))
