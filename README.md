@@ -88,7 +88,7 @@ I haven't tested setting the app up to run locally on systems other than my home
 
 ### Installation
 
-1. (Optional) Get an [Anthropic API key](https://console.anthropic.com) for LLM data extraction
+1. (Optional) Get an [Anthropic API key](https://console.anthropic.com) for LLM data extraction, and Zenodo/Zenodo Sandbox tokens for upload to Zenodo
 2a. Clone the repo, or
    ```sh
    git clone https://github.com/NIVANorge/STOPeData.git
@@ -99,9 +99,11 @@ I haven't tested setting the app up to run locally on systems other than my home
   # pak::pak("NIVANorge/STOPeData")
   ```
 3. Install missing R packages
-4. (Optional) Enter your API in your `.Renviron` file 
-   ```js
-   ANTHROPIC_API_KEY = 'sk-ant-api03-...';
+4. (Optional) Enter your API keys/tokens in your `.Renviron` file 
+   ```
+   ANTHROPIC_API_KEY="sk-ant-api03-..."
+   ZENODO_TOKEN="..."
+   ZENODO_SANDBOX_TOKEN="..."
    ```
 5. Change git remote url to avoid accidental pushes to base project
    ```sh
