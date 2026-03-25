@@ -279,7 +279,7 @@ mod_Zenodo_server <- function(id) {
     }
     if (Sys.getenv("ZENODO_SANDBOX_TOKEN") == "") {
       showNotification(
-        ui = "No valid Zenodo Sandbox token was found. Uploads to Zenodo (prod) will fail. 
+        ui = "No valid Zenodo Sandbox token was found. Uploads to Zenodo (sandbox) will fail. 
         Please set ZENODO_SANDBOX_TOKEN to a valid token in your .Renviron file or contact
         the server administrator.",
         type = "error",
