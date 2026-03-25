@@ -135,9 +135,6 @@ generate_zenodo_readme <- function(
 
   glue(
     "# {title}",
-    "- **Project:** Partnership for the Assessment of Risks from Chemicals (PARC)",
-    "- **EU funding:** HORIZON.2.6",
-    "- **Project DOI:** [10.3030/101057014](https://cordis.europa.eu/project/id/101057014)",
     "- **Zenodo DOI:** (Will be generated upon upload)",
     "",
     "---",
