@@ -36,13 +36,13 @@ mod_Zenodo_ui <- function(id) {
           id = "get-module-data-well",
           class = "navigation-buttons-container",
           style = "display: flex; align-items: start; margin: 0 5px 10px 5px;",
-          actionButton(
+          input_task_button(
             ns("get_session_data"),
             label = list(
               "Get Data from Modules",
               bs_icon("arrow-down-circle-fill")
             ),
-            class = "btn-primary"
+            type = "primary"
           )
         ),
         uiOutput(ns("session_data_summary")),
@@ -234,7 +234,7 @@ mod_Zenodo_ui <- function(id) {
         input_task_button(
           ns("submitZen"),
           label = list(bs_icon("cloud-upload"), "Submit to Zenodo"),
-          color = "success"
+          type = "success"
         ),
       )
     )
@@ -280,7 +280,7 @@ mod_Zenodo_server <- function(id) {
     ## author_count reactiveVal: tracks number of visible author rows ----
     # Declared early so it can be referenced in the author_iv rule closures below.
     author_count <- reactiveVal(1)
-    parsed_authors <- reactiveVal(NULL)    # pending autofill list; cleared after filling
+    parsed_authors <- reactiveVal(NULL) # pending autofill list; cleared after filling
     author_fields_ready <- reactiveVal(FALSE) # flipped TRUE by renderUI each render cycle
 
     ## InputValidator$new: author_iv ----
@@ -348,7 +348,11 @@ mod_Zenodo_server <- function(id) {
           dataset_description <- if (
             !is.na(campaign$CAMPAIGN_COMMENT[1]) &&
               nzchar(campaign$CAMPAIGN_COMMENT[1] %||% "")
-          ) campaign$CAMPAIGN_COMMENT[1] else ""
+          ) {
+            campaign$CAMPAIGN_COMMENT[1]
+          } else {
+            ""
+          }
 
           # append datasetDetails rows ("**field:** value") if they exist
           details <- session$userData$reactiveValues$datasetDetails
@@ -364,7 +368,9 @@ mod_Zenodo_server <- function(id) {
             }
           }
 
-          if (nzchar(dataset_description) && !nzchar(input$zenDescription %||% "")) {
+          if (
+            nzchar(dataset_description) && !nzchar(input$zenDescription %||% "")
+          ) {
             updateTextAreaInput(
               session,
               "zenDescription",
@@ -608,10 +614,18 @@ mod_Zenodo_server <- function(id) {
       req(author_fields_ready())
       p <- parsed_authors()
       req(p)
-      walk2(p, seq_along(p), ~ {
-        updateTextInput(session, paste0("zenFirstName_", .y), value = .x$first)
-        updateTextInput(session, paste0("zenLastName_", .y), value = .x$last)
-      })
+      walk2(
+        p,
+        seq_along(p),
+        ~ {
+          updateTextInput(
+            session,
+            paste0("zenFirstName_", .y),
+            value = .x$first
+          )
+          updateTextInput(session, paste0("zenLastName_", .y), value = .x$last)
+        }
+      )
       parsed_authors(NULL)
       author_fields_ready(FALSE)
     }) |>
@@ -888,7 +902,7 @@ mod_Zenodo_server <- function(id) {
             tags$small(
               style = "color: #0c5460;",
               tags$strong("Sandbox mode:"),
-              " Uploads are for testing only and will not be preserved. Perfect for trying things out!"
+              " Uploads are for testing only and will not be preserved."
             )
           )
         )
