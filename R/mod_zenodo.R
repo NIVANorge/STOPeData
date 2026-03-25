@@ -202,23 +202,19 @@ mod_Zenodo_ui <- function(id) {
             placeholder = "Any additional information (optional)",
             rows = 2
           )
-        )
-      ),
+        ),
 
-      actionButton(
-        ns("previewReadme"),
-        "Preview README",
-        icon = bs_icon("file-text"),
-        class = "btn-primary"
-      ),
+        actionButton(
+          ns("previewReadme"),
+          "Preview README",
+          icon = bs_icon("file-text"),
+          class = "btn-primary"
+        ),
 
-      # ===== Submit row =====
-      div(
-        style = "display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px;",
-
+        # ===== Submit row =====
         # Left: environment switch + badge
         div(
-          style = "display: flex; align-items: center; gap: 10px;",
+          style = "display: inline; align-items: left; gap: 10px;",
           materialSwitch(
             inputId = ns("zenEnvironment"),
             label = NULL,
@@ -226,31 +222,20 @@ mod_Zenodo_ui <- function(id) {
             status = "success",
             right = TRUE
           ),
-          tags$span(
-            id = ns("envLabel"),
-            style = "font-weight: 500;",
-            "Sandbox (Testing)"
-          ),
-          tags$span(
+          span(
             id = ns("envBadge"),
             style = "background-color: #ffc107; color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: bold; letter-spacing: 0.5px;",
             "TEST MODE"
           )
         ),
 
+        uiOutput(ns("environmentWarning")),
         # Right: Submit button
-        div(
-          style = "display: flex; gap: 10px; align-items: center;",
-          input_task_button(
-            ns("submitZen"),
-            "Submit to Zenodo",
-            color = "primary",
-            style = "material-flat",
-            icon = bs_icon("cloud-upload"),
-            size = "md"
-          )
+        input_task_button(
+          ns("submitZen"),
+          label = list(bs_icon("cloud-upload"), "Submit to Zenodo"),
+          color = "success"
         ),
-        uiOutput(ns("environmentWarning"))
       )
     )
   )
