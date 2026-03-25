@@ -267,6 +267,26 @@ mod_Zenodo_server <- function(id) {
       logger = "INFO"
     )
 
+    # Warn users if tokens not found
+    if (Sys.getenv("ZENODO_TOKEN") == "") {
+      showNotification(
+        ui = "No valid Zenodo token was found. Uploads to Zenodo (prod) will fail. 
+        Please set ZENODO_TOKEN to a valid token in your .Renviron file or contact
+        the server administrator.",
+        type = "error",
+        duration = NULL
+      )
+    }
+    if (Sys.getenv("ZENODO_SANDBOX_TOKEN") == "") {
+      showNotification(
+        ui = "No valid Zenodo Sandbox token was found. Uploads to Zenodo (prod) will fail. 
+        Please set ZENODO_SANDBOX_TOKEN to a valid token in your .Renviron file or contact
+        the server administrator.",
+        type = "error",
+        duration = NULL
+      )
+    }
+
     ## current_zenodo reactive: returns the active ZenodoManager ----
     # Switches between sandbox and production based on the environment toggle.
     current_zenodo <- reactive({
