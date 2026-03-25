@@ -210,6 +210,7 @@ mod_Zenodo_ui <- function(id) {
           icon = bs_icon("file-text"),
           class = "btn-primary"
         ),
+        hr(),
 
         # ===== Submit row =====
         # Left: environment switch + badge
@@ -217,20 +218,15 @@ mod_Zenodo_ui <- function(id) {
           style = "display: inline; align-items: left; gap: 10px;",
           materialSwitch(
             inputId = ns("zenEnvironment"),
-            label = NULL,
+            label = "Sandbox/Production Mode",
             value = TRUE,
             status = "success",
             right = TRUE
-          ),
-          span(
-            id = ns("envBadge"),
-            style = "background-color: #ffc107; color: #000; padding: 4px 12px; border-radius: 20px; font-size: 0.75em; font-weight: bold; letter-spacing: 0.5px;",
-            "TEST MODE"
           )
         ),
-
+        hr(),
         uiOutput(ns("environmentWarning")),
-        # Right: Submit button
+        br(),
         input_task_button(
           ns("submitZen"),
           label = list(bs_icon("cloud-upload"), "Submit to Zenodo"),
@@ -261,13 +257,13 @@ mod_Zenodo_server <- function(id) {
     zenodo_sandbox <- ZenodoManager$new(
       url = "http://sandbox.zenodo.org/api",
       sandbox = TRUE,
-      token = Sys.getenv("ZENSANDTOKEN"),
+      token = Sys.getenv("ZENODO_SANDBOX_TOKEN"),
       logger = "DEBUG"
     )
     zenodo_production <- ZenodoManager$new(
       url = "https://zenodo.org/api",
       sandbox = FALSE,
-      token = Sys.getenv("ZENTOKEN"),
+      token = Sys.getenv("ZENODO_TOKEN"),
       logger = "INFO"
     )
 
@@ -310,6 +306,7 @@ mod_Zenodo_server <- function(id) {
     iv$add_rule("zenTitle", sv_required())
     iv$add_rule("zenDescription", sv_required())
     iv$add_rule("contactEmail", sv_required())
+    iv$add_rule("contactName", sv_required())
 
     ## iv$add_validator(author_iv) ----
     iv$add_validator(author_iv)
@@ -537,7 +534,7 @@ mod_Zenodo_server <- function(id) {
       )
     }) |>
       bindEvent(
-        # I think currently gets triggered by username/email propogation
+        # FIXME: Really this should trigger off input$get_session_data, but doing so breaks the logic
         (session$userData$reactiveValues$referenceDataValid &
           nrow(session$userData$reactiveValues$referenceData) == 1),
         ignoreNULL = TRUE,
@@ -1119,6 +1116,7 @@ mod_Zenodo_server <- function(id) {
     performUpload <- function() {
       tryCatch(
         {
+          browser()
           zenodo <- current_zenodo()
           env_name <- if (input$zenEnvironment) "Sandbox" else "Production"
 
