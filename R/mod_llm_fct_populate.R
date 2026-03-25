@@ -378,7 +378,11 @@ create_parameters_from_llm <- function(
       PARAMETER_NAME = param_name,
       PARAMETER_NAME_SUB = "",
       INCHIKEY_SD = if (!is.null(db_match)) db_match$INCHIKEY_SD else "",
-      PUBCHEM_CID = if (!is.null(db_match)) db_match$PUBCHEM_CID else "",
+      PUBCHEM_CID = if (!is.null(db_match)) {
+        as.character(db_match$PUBCHEM_CID) # sometimes causes problems
+      } else {
+        ""
+      },
       CAS_RN = cas_rn,
       ENTERED_BY = session$userData$reactiveValues$ENTERED_BY %|truthy|% "",
       PARAMETER_COMMENT = param_comment,
@@ -423,6 +427,7 @@ find_parameter_lookup_match <- function(
   cas_rn,
   chemical_parameters
 ) {
+  browser()
   if (is.null(chemical_parameters) | nrow(chemical_parameters) == 0) {
     stop("Chemical parameters not found.")
   }
