@@ -280,6 +280,8 @@ mod_Zenodo_server <- function(id) {
     ## author_count reactiveVal: tracks number of visible author rows ----
     # Declared early so it can be referenced in the author_iv rule closures below.
     author_count <- reactiveVal(1)
+    parsed_authors <- reactiveVal(NULL)    # pending autofill list; cleared after filling
+    author_fields_ready <- reactiveVal(FALSE) # flipped TRUE by renderUI each render cycle
 
     ## InputValidator$new: author_iv ----
     # Child validator for dynamic author rows.
@@ -342,31 +344,33 @@ mod_Zenodo_server <- function(id) {
             )
           }
 
-          # if campaign comment exists, add it
-          if (
-            !nzchar(input$zenDescription %||% "") &&
-              !is.na(campaign$CAMPAIGN_COMMENT[1]) &&
+          # build description from campaign comment + datasetDetails
+          dataset_description <- if (
+            !is.na(campaign$CAMPAIGN_COMMENT[1]) &&
               nzchar(campaign$CAMPAIGN_COMMENT[1] %||% "")
-          ) {
-            dataset_description <- campaign$CAMPAIGN_COMMENT[1]
+          ) campaign$CAMPAIGN_COMMENT[1] else ""
+
+          # append datasetDetails rows ("**field:** value") if they exist
+          details <- session$userData$reactiveValues$datasetDetails
+          if (!is.null(details) && nrow(details) > 0) {
+            details_text <- paste(
+              paste0("**", details$field, ":** ", details$value),
+              collapse = "\n"
+            )
+            dataset_description <- if (nzchar(dataset_description)) {
+              paste(dataset_description, details_text, sep = "\n\n")
+            } else {
+              details_text
+            }
           }
 
-          # and if datasetDetails from CREED exists, add it on the end
-          # if (
-          #   !nzchar(input$zenDescription %||% "") &&
-          #     !is.null(datasetDetails) &&
-          #     nrow(datasetDetails) != 0
-          # ) {
-          #   dataset_description <- campaign$CAMPAIGN_COMMENT[1]
-          # }
-
-          updateTextAreaInput(
-            session,
-            "zenDescription",
-            value = dataset_description
-          )
-
-          session$userData$reactiveValues$datasetDetails
+          if (nzchar(dataset_description) && !nzchar(input$zenDescription %||% "")) {
+            updateTextAreaInput(
+              session,
+              "zenDescription",
+              value = dataset_description
+            )
+          }
         },
         error = function(e) {
           showNotification(
@@ -390,6 +394,7 @@ mod_Zenodo_server <- function(id) {
     }) |>
       bindEvent(
         session$userData$reactiveValues$campaignData,
+        session$userData$reactiveValues$datasetDetails,
         ignoreNULL = TRUE,
         label = "mod_zenodo_prefill_title"
       )
@@ -499,31 +504,7 @@ mod_Zenodo_server <- function(id) {
             )
 
           author_count(length(parsed))
-
-          # Wait for renderUI to process the new author_count before updating inputs
-          # FIXME: Doesn't actually wait, so the names get silently written to the inputs before they exist (?)
-          session$onFlushed(
-            function() {
-              walk2(
-                parsed,
-                seq_along(parsed),
-                ~ {
-                  browser()
-                  updateTextInput(
-                    session,
-                    paste0("zenFirstName_", .y),
-                    value = .x$first
-                  )
-                  updateTextInput(
-                    session,
-                    paste0("zenLastName_", .y),
-                    value = .x$last
-                  )
-                }
-              )
-            },
-            once = TRUE
-          )
+          parsed_authors(parsed)
         },
         error = function(e) {
           showNotification(
@@ -561,7 +542,7 @@ mod_Zenodo_server <- function(id) {
     ## output$authorFields: render one bordered row per author ----
     output$authorFields <- renderUI({
       n <- author_count()
-      lapply(seq_len(n), function(i) {
+      ui_out <- lapply(seq_len(n), function(i) {
         div(
           style = paste0(
             "border: 1px solid #dee2e6; border-radius: 6px; padding: 14px; margin-bottom: 12px;",
@@ -616,7 +597,29 @@ mod_Zenodo_server <- function(id) {
           )
         )
       })
+      author_fields_ready(TRUE)
+      ui_out
     })
+
+    ## observe: fill author name inputs once renderUI has run ----
+    # upstream:  author_fields_ready, parsed_authors
+    # downstream: zenFirstName_i / zenLastName_i inputs
+    observe({
+      req(author_fields_ready())
+      p <- parsed_authors()
+      req(p)
+      walk2(p, seq_along(p), ~ {
+        updateTextInput(session, paste0("zenFirstName_", .y), value = .x$first)
+        updateTextInput(session, paste0("zenLastName_", .y), value = .x$last)
+      })
+      parsed_authors(NULL)
+      author_fields_ready(FALSE)
+    }) |>
+      bindEvent(
+        author_fields_ready(),
+        ignoreInit = TRUE,
+        label = "mod_zenodo_fill_author_inputs"
+      )
 
     ## observe: register remove-button observers for all non-first author rows ----
     # Re-runs whenever author_count changes so newly rendered remove buttons are wired up.
