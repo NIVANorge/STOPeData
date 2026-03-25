@@ -10,7 +10,7 @@ mod_CREED_details_ui <- function(id) {
       label = "Populate section from data",
       icon = bs_icon("arrow-down-circle")
     ),
-    br(),
+    hr(),
 
     layout_column_wrap(
       width = "800px",
@@ -212,16 +212,7 @@ mod_CREED_details_ui <- function(id) {
         rows = 3,
         width = "100%"
       )
-    ),
-
-    ## Action buttons ----
-    # input_task_button(
-    #   id = ns("save_assessment"),
-    #   label = "Save Section",
-    #   icon = icon("save"),
-    #   class = "btn-success"
-    # ) |>
-    #   shinyjs::disabled() # TODO: Necessary?
+    )
   )
 }
 

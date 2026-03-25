@@ -306,7 +306,9 @@ mod_Zenodo_server <- function(id) {
       local({
         idx <- i
         author_iv$add_rule(paste0("zenFirstName_", idx), function(value) {
-          if (author_count() >= idx && !isTruthy(value)) "First name is required"
+          if (author_count() >= idx && !isTruthy(value)) {
+            "First name is required"
+          }
         })
         author_iv$add_rule(paste0("zenLastName_", idx), function(value) {
           if (author_count() >= idx && !isTruthy(value)) "Last name is required"
@@ -348,25 +350,44 @@ mod_Zenodo_server <- function(id) {
               !is.na(campaign$CAMPAIGN_NAME[1]) &&
               nzchar(campaign$CAMPAIGN_NAME[1])
           ) {
-            updateTextInput(session, "zenTitle", value = campaign$CAMPAIGN_NAME[1])
+            updateTextInput(
+              session,
+              "zenTitle",
+              value = campaign$CAMPAIGN_NAME[1]
+            )
           }
 
+          # if campaign comment exists, add it
           if (
             !nzchar(input$zenDescription %||% "") &&
               !is.na(campaign$CAMPAIGN_COMMENT[1]) &&
               nzchar(campaign$CAMPAIGN_COMMENT[1] %||% "")
           ) {
-            updateTextAreaInput(
-              session,
-              "zenDescription",
-              value = campaign$CAMPAIGN_COMMENT[1]
-            )
+            dataset_description <- campaign$CAMPAIGN_COMMENT[1]
           }
+
+          # and if datasetDetails from CREED exists, add it on the end
+          # if (
+          #   !nzchar(input$zenDescription %||% "") &&
+          #     !is.null(datasetDetails) &&
+          #     nrow(datasetDetails) != 0
+          # ) {
+          #   dataset_description <- campaign$CAMPAIGN_COMMENT[1]
+          # }
+
+          updateTextAreaInput(
+            session,
+            "zenDescription",
+            value = dataset_description
+          )
+
+          session$userData$reactiveValues$datasetDetails
         },
         error = function(e) {
           showNotification(
             paste0(
-              "Error pre-filling title/description: ", e$message,
+              "Error pre-filling title/description: ",
+              e$message,
               " (Code: mod_zenodo_prefill_title)"
             ),
             type = "error",
@@ -406,7 +427,8 @@ mod_Zenodo_server <- function(id) {
         error = function(e) {
           showNotification(
             paste0(
-              "Error pre-filling contact email: ", e$message,
+              "Error pre-filling contact email: ",
+              e$message,
               " (Code: mod_zenodo_prefill_contact)"
             ),
             type = "error",
@@ -415,7 +437,11 @@ mod_Zenodo_server <- function(id) {
         },
         warning = function(w) {
           showNotification(
-            paste0("Warning: ", w$message, " (Code: mod_zenodo_prefill_contact)"),
+            paste0(
+              "Warning: ",
+              w$message,
+              " (Code: mod_zenodo_prefill_contact)"
+            ),
             type = "warning",
             duration = 10
           )
@@ -438,14 +464,22 @@ mod_Zenodo_server <- function(id) {
         },
         error = function(e) {
           showNotification(
-            paste0("Error adding author row: ", e$message, " (Code: mod_zenodo_add_author)"),
+            paste0(
+              "Error adding author row: ",
+              e$message,
+              " (Code: mod_zenodo_add_author)"
+            ),
             type = "error",
             duration = NULL
           )
         }
       )
     }) |>
-      bindEvent(input$addAuthor, ignoreInit = TRUE, label = "mod_zenodo_add_author")
+      bindEvent(
+        input$addAuthor,
+        ignoreInit = TRUE,
+        label = "mod_zenodo_add_author"
+      )
 
     ## observe: pre-fill author rows from referenceData$AUTHOR ("Last, First; ...") ----
     # upstream:  session$userData$reactiveValues$referenceData
@@ -482,12 +516,14 @@ mod_Zenodo_server <- function(id) {
           author_count(length(parsed))
 
           # Wait for renderUI to process the new author_count before updating inputs
+          # FIXME: Doesn't actually wait, so the names get silently written to the inputs before they exist (?)
           session$onFlushed(
             function() {
               walk2(
                 parsed,
                 seq_along(parsed),
                 ~ {
+                  browser()
                   updateTextInput(
                     session,
                     paste0("zenFirstName_", .y),
@@ -507,7 +543,8 @@ mod_Zenodo_server <- function(id) {
         error = function(e) {
           showNotification(
             paste0(
-              "Error pre-filling authors: ", e$message,
+              "Error pre-filling authors: ",
+              e$message,
               " (Code: mod_zenodo_prefill_authors)"
             ),
             type = "error",
@@ -516,7 +553,11 @@ mod_Zenodo_server <- function(id) {
         },
         warning = function(w) {
           showNotification(
-            paste0("Warning: ", w$message, " (Code: mod_zenodo_prefill_authors)"),
+            paste0(
+              "Warning: ",
+              w$message,
+              " (Code: mod_zenodo_prefill_authors)"
+            ),
             type = "warning",
             duration = 10
           )
@@ -524,8 +565,11 @@ mod_Zenodo_server <- function(id) {
       )
     }) |>
       bindEvent(
-        session$userData$reactiveValues$referenceData,
+        # I think currently gets triggered by username/email propogation
+        (session$userData$reactiveValues$referenceDataValid &
+          nrow(session$userData$reactiveValues$referenceData) == 1),
         ignoreNULL = TRUE,
+        ignoreInit = TRUE,
         label = "mod_zenodo_prefill_authors"
       )
 
@@ -636,7 +680,8 @@ mod_Zenodo_server <- function(id) {
                 error = function(e) {
                   showNotification(
                     paste0(
-                      "Error removing author: ", e$message,
+                      "Error removing author: ",
+                      e$message,
                       " (Code: mod_zenodo_remove_author)"
                     ),
                     type = "error",
@@ -656,7 +701,8 @@ mod_Zenodo_server <- function(id) {
         error = function(e) {
           showNotification(
             paste0(
-              "Error registering remove-author observers: ", e$message,
+              "Error registering remove-author observers: ",
+              e$message,
               " (Code: mod_zenodo_remove_author_observers)"
             ),
             type = "error",
@@ -716,7 +762,8 @@ mod_Zenodo_server <- function(id) {
         error = function(e) {
           showNotification(
             paste0(
-              "Error checking session data: ", e$message,
+              "Error checking session data: ",
+              e$message,
               " (Code: mod_zenodo_check_session_data)"
             ),
             type = "error",
@@ -725,7 +772,11 @@ mod_Zenodo_server <- function(id) {
         },
         warning = function(w) {
           showNotification(
-            paste0("Warning: ", w$message, " (Code: mod_zenodo_check_session_data)"),
+            paste0(
+              "Warning: ",
+              w$message,
+              " (Code: mod_zenodo_check_session_data)"
+            ),
             type = "warning",
             duration = 10
           )
@@ -810,7 +861,10 @@ mod_Zenodo_server <- function(id) {
             size = "l",
             div(
               style = "background: #f8fafc; color: #1e293b; padding: 1rem; border: 1px solid #e5e7eb; border-radius: 0.5rem; max-height: 500px; overflow-y: auto; font-size: 0.85em;",
-              HTML(markdownToHTML(text = generateReadme(), fragment.only = TRUE))
+              HTML(markdownToHTML(
+                text = generateReadme(),
+                fragment.only = TRUE
+              ))
             ),
             footer = modalButton("Close"),
             easyClose = TRUE
@@ -819,7 +873,8 @@ mod_Zenodo_server <- function(id) {
         error = function(e) {
           showNotification(
             paste0(
-              "Error generating README preview: ", e$message,
+              "Error generating README preview: ",
+              e$message,
               " (Code: mod_zenodo_preview_readme)"
             ),
             type = "error",
@@ -828,7 +883,11 @@ mod_Zenodo_server <- function(id) {
         }
       )
     }) |>
-      bindEvent(input$previewReadme, ignoreInit = TRUE, label = "mod_zenodo_preview_readme")
+      bindEvent(
+        input$previewReadme,
+        ignoreInit = TRUE,
+        label = "mod_zenodo_preview_readme"
+      )
 
     ## output$environmentWarning: informational banner reflecting the active environment ----
     output$environmentWarning <- renderUI({
@@ -874,13 +933,18 @@ mod_Zenodo_server <- function(id) {
         {
           html(
             ns("envLabel"),
-            if (input$zenEnvironment) "Sandbox (Testing)" else "Production (Live)"
+            if (input$zenEnvironment) {
+              "Sandbox (Testing)"
+            } else {
+              "Production (Live)"
+            }
           )
         },
         error = function(e) {
           showNotification(
             paste0(
-              "Error updating environment label: ", e$message,
+              "Error updating environment label: ",
+              e$message,
               " (Code: mod_zenodo_env_label)"
             ),
             type = "error",
@@ -914,7 +978,8 @@ mod_Zenodo_server <- function(id) {
         error = function(e) {
           showNotification(
             paste0(
-              "Error updating environment badge: ", e$message,
+              "Error updating environment badge: ",
+              e$message,
               " (Code: mod_zenodo_env_badge)"
             ),
             type = "error",
@@ -1005,7 +1070,8 @@ mod_Zenodo_server <- function(id) {
         error = function(e) {
           showNotification(
             paste0(
-              "Error during submit validation: ", e$message,
+              "Error during submit validation: ",
+              e$message,
               " (Code: mod_zenodo_submit)"
             ),
             type = "error",
@@ -1028,7 +1094,8 @@ mod_Zenodo_server <- function(id) {
         error = function(e) {
           showNotification(
             paste0(
-              "Error starting upload: ", e$message,
+              "Error starting upload: ",
+              e$message,
               " (Code: mod_zenodo_confirm_submit)"
             ),
             type = "error",
@@ -1037,7 +1104,11 @@ mod_Zenodo_server <- function(id) {
         }
       )
     }) |>
-      bindEvent(input$confirmSubmit, ignoreInit = TRUE, label = "mod_zenodo_confirm_submit")
+      bindEvent(
+        input$confirmSubmit,
+        ignoreInit = TRUE,
+        label = "mod_zenodo_confirm_submit"
+      )
 
     ## performUpload: build Zenodo record, upload files, and submit for community review ----
     # Called by the confirmSubmit observer.
@@ -1149,7 +1220,11 @@ mod_Zenodo_server <- function(id) {
         },
         warning = function(w) {
           showNotification(
-            paste0("Warning during upload: ", w$message, " (Code: mod_zenodo_upload)"),
+            paste0(
+              "Warning during upload: ",
+              w$message,
+              " (Code: mod_zenodo_upload)"
+            ),
             type = "warning",
             duration = 10
           )
