@@ -14,13 +14,13 @@
 #' @noRd
 
 # Set background processe for running tasks
-daemons(1)
+mirai::daemons(1)
 # make sure this process can access the llm extraction function, etc.
-everywhere(source("R/mod_llm_fct_extract.R"))
-everywhere(library(ellmer))
-everywhere(library(shiny))
+mirai::everywhere(source("R/mod_llm_fct_extract.R"))
+mirai::everywhere(library(ellmer))
+mirai::everywhere(library(shiny))
 # Reset when the app is stopped
-onStop(function() daemons(0))
+onStop(function() mirai::daemons(0))
 
 # -----------------------
 # ---- userData ----
