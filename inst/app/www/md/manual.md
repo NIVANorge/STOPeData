@@ -4,6 +4,8 @@ Please refer to the [format documentation](https://nivanorge.github.io/eDataDRF/
 
 In case of questions and feedback concerning the application itself, please open an issue here: https://github.com/NIVANorge/STOPeData/issues.
 
+For more information and documentation on the application, please see the following paper: link to follow.
+
 # FAQ
 
 **- The screen has turned grey, and most buttons don't work!**
