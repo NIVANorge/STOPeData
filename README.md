@@ -89,15 +89,18 @@ I haven't tested setting the app up to run locally on systems other than my home
 ### Installation
 
 1. (Optional) Get an [Anthropic API key](https://console.anthropic.com) for LLM data extraction, and Zenodo/Zenodo Sandbox tokens for upload to Zenodo
+   
 2a. Clone the repo, or
    ```sh
    git clone https://github.com/NIVANorge/STOPeData.git
    ```
+
 2b. Download the package with devtools/pak
   ```R
   devtools::install_github("NIVANorge/STOPeData")
   # pak::pak("NIVANorge/STOPeData")
   ```
+
 3. Install missing R packages
 4. (Optional) Enter your API keys/tokens in your `.Renviron` file 
    ```
