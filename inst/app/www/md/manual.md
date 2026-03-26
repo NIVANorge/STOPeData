@@ -1,25 +1,32 @@
+# Help
+
+Please refer to the [format documentation](https://nivanorge.github.io/eDataDRF/) for more information on the tables, variables and controlled vocabulary. In case of a question or feedback concerning format coverage, please open an issue here: https://github.com/NIVANorge/eDataDRF/issues. 
+
+In case of questions and feedback concerning the application itself, please open an issue here: https://github.com/NIVANorge/STOPeData/issues.
+
 # FAQ
 
-##### Something's gone wrong with the extraction!
-Extraction reporting currently isn't very good. Check your internet connection, whether your PDF is corrupted, and if the Claude service [is up](https://status.claude.com/). If the Raw Data Extraction is showing a lot of `NULL` and `NA` values, this may mean that the paper is too big for the extraction token limit (how much information the LLM can take on at one time). Let me know if that's the case.
+**- The screen has turned grey, and most buttons don't work!**
+- This indicates the application has crashed. Please report the issue at the link above, ideally with a screenshot and as much information as possible about what you were trying to do?
 
-##### I can't find the unit/organism/compartment/etc. I need!
-Use the most appropriate available option for now, and let me know.
+**- The extraction stage has misinterpreted an element of the uploaded paper. What should I do?**
+- As a statistical model the Large Language Model will on occasion misreport or hallucinate irrelevant details. These should be corrected by hand.
 
-##### Why can we extract sites, parameter, campaign, etc. data but not actual measurements?
-This is something I'm working on, but it's harder than simple data like the above. 
+**- The paper I'm reviewing is missing a detail marked as required.**
+- Mark the detail as "Not reported", and leave a note in the relevant comments section.
 
-##### A module is showing that my data isn't validated, but I think it is.
-Send me a screenshot + a copy of your files.
+**- How can I extract data from longer documents?**
+- As the length of documents increases, the cost and complexity of extraction increases non-linearly. You may be able to extract from longer documents by increasing the token limit, but the LLM service currently in use has a hard limit of 30 Mb/100 pages, and extraction quality may degrade before this point for particularly information-rich documents.
 
-##### The screen has gone grey/the app has crashed.
-My mistake! But I'm very interested in hearing how this happened and what you were doing when it did. Please let me know ASAP.
+**- How can I use my preferred LLM for extraction?**
+- Currently only a single LLM (Anthropic's Claude Sonnet 4) is supported. We hope to extend support to more LLMs in future.
 
-##### Methods or protocols?
-I'm not really sure. It seems there are methods, protocols and techniques. LibreTexts Chemistry says:
-> A technique is any chemical or physical principle that we can use to study an analyte
-> A method is the application of a technique for a specific analyte in a specific matrix.
-> A procedure is a set of written directions that tell us how to apply a method to a particular sample.
-> Finally, a protocol is a set of stringent guidelines that specify a procedure that an analyst must follow if an agency is to accept the results.
+**- How do I get an API key for extraction?**
+- Register on [Anthropic's developer platform](https://platform.claude.com/), purchase credits, and request an API key. 
 
-So I am certainly using the term "protocol" wrong here. But I haven't reworked this section yet because, frankly, I don't know who will be using the app. But I'm open to input.
+**- What happens to my data when I exit the application?**
+- The application retains data only for as long as the session remains open. No data is retained between sessions, please save frequently to ensure no work is lost.
+
+**- I only want to extract information on a specific set of parameters. How can I do this?**
+- By modifying the extraction prompt in the LLM Extraction module, or by modifying `extraction_prompt.md` in the application files. Additionally, the schema can be modified in the same module or the application files (e.g. change the `parameter_name` description to request that only a certain family of stressors are returned).
+
