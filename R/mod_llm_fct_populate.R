@@ -427,7 +427,6 @@ find_parameter_lookup_match <- function(
   cas_rn,
   chemical_parameters
 ) {
-  browser()
   if (is.null(chemical_parameters) | nrow(chemical_parameters) == 0) {
     stop("Chemical parameters not found.")
   }
