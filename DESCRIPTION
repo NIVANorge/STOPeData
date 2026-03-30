@@ -53,9 +53,11 @@ LazyData: true
 RoxygenNote: 7.3.3
 Repository: https://github.com/sawelch-NIVA/STOPeData
 Suggests: 
+    quarto,
     testthat (>= 3.0.0)
 Config/testthat/edition: 3
 URL: https://github.com/sawelch-NIVA/STOPeData, https://nivanorge.github.io/STOPeData/
 BugReports: https://github.com/sawelch-NIVA/STOPeData/issues
 Remotes: 
     NIVANorge/eDataDRF
+Config/Needs/website: quarto

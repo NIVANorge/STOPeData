@@ -79,8 +79,6 @@ This app is part of the [Source to Outcome Pathway/Risk assessment database](htt
 <!-- GETTING STARTED -->
 ## Getting Started
 
-I haven't tested setting the app up to run locally on systems other than my home PC. It *should* work following the below instructions, although it depends on quite a lot of R packages which you will have to download. In general, I recommend 
-
 ### Prerequisites
 
 * R version 4.5.2

@@ -19,3 +19,6 @@ _\.new\.png$
 ^_pkgdown\.yml$
 ^docs$
 ^pkgdown$
+^vignettes/articles/\.quarto$
+^vignettes/articles/*_files$
+^vignettes/articles$
