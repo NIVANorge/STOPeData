@@ -21,5 +21,6 @@ get_parameters_of_types(
 Character vector of parameter names
 }
 \description{
-Get parameter names for a specific parameter type
+Returns a character vector of parameter names for the given type,
+  combining base parameters with any session-specific parameters.
 }

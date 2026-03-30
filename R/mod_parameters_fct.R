@@ -1,11 +1,14 @@
 #' Get parameter names for a specific parameter type
 #'
+#' @description Returns a character vector of parameter names for the given type,
+#'   combining base parameters with any session-specific parameters.
 #' @param param_type Character string specifying the parameter type
 #' @param dummy_parameters Dataframe containing base parameters
 #' @param session_parameters Optional list containing session-specific parameters
 #'
 #' @return Character vector of parameter names
 #' @importFrom dplyr filter pull
+#' @importFrom rlang `%||%`
 #' @import eDataDRF
 #' @export
 get_parameters_of_types <- function(
@@ -31,10 +34,12 @@ get_parameters_of_types <- function(
 
 #' Create new blank parameter row
 #'
+#' @description Creates a single-row template tibble with default values for a new parameter.
 #' @param param_type Character string specifying the parameter type
 #' @param entered_by Character string specifying who entered the parameter
 #'
 #' @return tibble with blank parameter template
+#' @importFrom dplyr add_row
 #' @import eDataDRF
 #' @export
 #' @seealso \code{\link{initialise_parameters_tibble}}
@@ -59,6 +64,8 @@ create_new_parameter <- function(param_type, entered_by) {
 
 #' Create parameter row from existing parameter data
 #'
+#' @description Looks up an existing parameter by name and type, returning a populated
+#'   tibble row or NULL if not found.
 #' @param param_type Character string specifying the parameter type
 #' @param param_name Character string specifying the parameter name
 #' @param dummy_parameters Dataframe containing base parameters
@@ -66,6 +73,7 @@ create_new_parameter <- function(param_type, entered_by) {
 #'
 #' @return tibble with parameter information or NULL if not found
 #' @importFrom dplyr filter slice add_row
+#' @importFrom rlang `%||%`
 #' @import eDataDRF
 #' @export
 #' @seealso \code{\link{initialise_parameters_tibble}}
@@ -113,6 +121,8 @@ create_existing_parameter <- function(
 
 #' Get parameter names filtered by type and optionally subtype
 #'
+#' @description Returns a character vector of parameter names filtered by type and
+#'   optionally by subtype, combining base parameters with session-specific parameters.
 #' @param param_type Character string specifying the parameter type
 #' @param param_subtype Character string specifying the parameter subtype (optional)
 #' @param dummy_parameters Dataframe containing base parameters
@@ -120,6 +130,7 @@ create_existing_parameter <- function(
 #'
 #' @return Character vector of parameter names
 #' @importFrom dplyr filter pull
+#' @importFrom rlang `%||%`
 #' @export
 get_parameters_filtered <- function(
   param_type,

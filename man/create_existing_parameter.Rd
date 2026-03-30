@@ -24,7 +24,8 @@ create_existing_parameter(
 tibble with parameter information or NULL if not found
 }
 \description{
-Create parameter row from existing parameter data
+Looks up an existing parameter by name and type, returning a populated
+  tibble row or NULL if not found.
 }
 \seealso{
 \code{\link{initialise_parameters_tibble}}

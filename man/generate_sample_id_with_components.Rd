@@ -26,6 +26,10 @@ generate_sample_id_with_components(
 
 \item{subsample}{subsample}
 }
+\value{
+Character vector of sample IDs.
+}
 \description{
-Generate Sample ID with Components ----
+Generates vectorised sample identifiers from site, parameter, compartment,
+  date, and subsample components.
 }

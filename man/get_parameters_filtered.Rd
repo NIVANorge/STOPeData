@@ -24,5 +24,6 @@ get_parameters_filtered(
 Character vector of parameter names
 }
 \description{
-Get parameter names filtered by type and optionally subtype
+Returns a character vector of parameter names filtered by type and
+  optionally by subtype, combining base parameters with session-specific parameters.
 }

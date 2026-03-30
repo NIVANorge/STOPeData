@@ -113,6 +113,8 @@ check_gateway_availability <- function(module_data) {
 #' @description summarise session user data into pretty strings for CREED "Dataset Details" reporting
 #' @param sessionData session$userData$reactiveValues object
 #' @return tibble of Dataset Details fields ("field") and pretty strings ("value")
+#' @importFrom tibble tibble
+#' @importFrom shiny isTruthy
 #' @export
 summarise_CREED_details <- function(sessionData) {
   # Helper function to check if a dataset exists and has content
@@ -299,6 +301,7 @@ summarise_CREED_details <- function(sessionData) {
 #' @param description Character string description of the criterion
 #' @return Shiny div element containing the complete criterion section
 #' @noRd
+#' @importFrom glue glue
 #' @importFrom shiny div selectInput p strong h4 HTML
 #' @importFrom bslib layout_columns
 #' @importFrom bsicons bs_icon
@@ -535,6 +538,9 @@ copper_CREED_purpose_statement <- function() {
 #' @description summarise session user data into pretty strings for CREED reliability criteria
 #' @param sessionData session$userData$reactiveValues object
 #' @return tibble of Reliability criteria fields ("field") and pretty strings ("value")
+#' @importFrom glue glue
+#' @importFrom shiny isTruthy
+#' @importFrom tibble tribble
 #' @export
 summarise_CREED_reliability <- function(sessionData) {
   # Helper function to check if a dataset exists and has content
@@ -706,6 +712,9 @@ summarise_CREED_reliability <- function(sessionData) {
 #' @description summarise session user data into pretty strings for CREED relevance criteria
 #' @param sessionData session$userData$reactiveValues object
 #' @return tibble of Relevance criteria fields ("field") and pretty strings ("value")
+#' @importFrom glue glue
+#' @importFrom shiny isTruthy
+#' @importFrom tibble tribble
 #' @export
 summarise_CREED_relevance <- function(sessionData) {
   # Helper function to check if a dataset exists and has content
@@ -918,6 +927,8 @@ autopop_relevance_fields <- function(sessionData) {
 #'
 #' @importFrom tibble add_row
 #' @importFrom shiny isTruthy
+#' @importFrom dplyr mutate
+#' @importFrom rlang `%||%`
 #' @export
 collect_CREED_data <- function(criteria_config, input) {
   # Start from standardised empty structure

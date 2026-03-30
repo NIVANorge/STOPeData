@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Rscript -e \"devtools::document\\(\\)\")",
+      "Bash(Rscript --version)",
+      "Bash(echo \"PATH: $PATH\")"
+    ]
+  }
+}

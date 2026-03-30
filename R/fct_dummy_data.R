@@ -58,6 +58,7 @@ create_dummy_session_data <- function() {
 #' @param navigate_to Optional tab to navigate to after loading data
 #' @param parent_session Parent session for navigation (if different from session)
 #'
+#' @return NULL invisibly.
 #' @importFrom shiny showNotification updateNavbarPage
 #' @import eDataDRF
 #' @importFrom golem print_dev
@@ -110,6 +111,7 @@ populate_session_with_dummy_data <- function(
       selected = navigate_to
     )
   }
+  invisible(NULL)
 }
 
 
@@ -120,6 +122,9 @@ populate_session_with_dummy_data <- function(
 #' collect_CREED_data().
 #'
 #' @param creed_tibble A tibble with columns: criterion_id, relevant_data, score, limitations
+#' @return A named list mimicking the structure of a Shiny input object, with entries
+#'   named `criterionId_score`, `criterionId_relevant_data`, and `criterionId_limitations`
+#'   (or `criterionId_justification` for RB8).
 #'
 #' @details
 #' Score values are converted from numeric to text:

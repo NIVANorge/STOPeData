@@ -2,9 +2,12 @@
 # Utility functions for the samples module
 
 #' Update Sites Selectize Input ----
+#' @description Updates the sites picker input with available site choices.
 #' @param session Shiny session
 #' @param sites_data tibble with SITE_CODE and SITE_NAME columns
+#' @return NULL invisibly.
 #' @importFrom stats setNames
+#' @importFrom shinyWidgets updatePickerInput
 #' @noRd
 update_sites_selectize <- function(session, sites_data) {
   if (nrow(sites_data) == 0) {
@@ -34,9 +37,12 @@ update_sites_selectize <- function(session, sites_data) {
 }
 
 #' Update Parameters Selectize Input ----
+#' @description Updates the parameters picker input with available parameter choices.
 #' @param session Shiny session
 #' @param parameters_data Data frame with PARAMETER_NAME and PARAMETER_TYPE columns
+#' @return NULL invisibly.
 #' @importFrom stats setNames
+#' @importFrom shinyWidgets updatePickerInput
 #' @noRd
 update_parameters_selectize <- function(session, parameters_data) {
   if (nrow(parameters_data) == 0) {
@@ -73,9 +79,12 @@ update_parameters_selectize <- function(session, parameters_data) {
 }
 
 #' Update Compartments Selectize Input ----
+#' @description Updates the compartments picker input with available compartment choices.
 #' @param session Shiny session
 #' @param compartments_data Data frame with compartment columns
+#' @return NULL invisibly.
 #' @importFrom stats setNames
+#' @importFrom shinyWidgets updatePickerInput
 #' @noRd
 update_compartments_selectize <- function(session, compartments_data) {
   if (nrow(compartments_data) == 0) {
@@ -127,6 +136,7 @@ update_compartments_selectize <- function(session, compartments_data) {
 #' @param compartment_selections Vector of merged compartment selections like "Aquatic | Freshwater"
 #' @param available_compartments Available compartments data frame
 #' @return Data frame with separate ENVIRON_COMPARTMENT, ENVIRON_COMPARTMENT_SUB, MEASURED_CATEGORY columns
+#' @importFrom tibble tibble
 #' @noRd
 parse_compartment_selections <- function(
   compartment_selections,
@@ -167,12 +177,16 @@ parse_compartment_selections <- function(
 
 # TODO: Transferred to eDataDRFr
 #' Generate Sample ID with Components ----
+#' @description Generates vectorised sample identifiers from site, parameter, compartment,
+#'   date, and subsample components.
 #' @param site_code Site code (vectorized)
 #' @param parameter_name Parameter name (vectorized)
 #' @param environ_compartment Environmental compartment (vectorized)
 #' @param environ_compartment_sub Environmental sub-compartment (vectorized)
 #' @param date Sampling date (vectorized)
 #' @param subsample subsample
+#' @return Character vector of sample IDs.
+#' @importFrom glue glue
 #' @importFrom stringr str_to_title str_remove_all
 #' @import eDataDRF
 #' @export
@@ -214,6 +228,7 @@ generate_sample_id_with_components <- function(
 #' @param measured_category Measured category
 #' @param date Sampling date
 #' @param subsample subsample identifiers
+#' @return Logical. TRUE if the combination already exists in `existing_data`.
 #' @noRd
 combination_exists_with_components <- function(
   existing_data,
@@ -255,6 +270,8 @@ combination_exists_with_components <- function(
 #' @param available_compartments Available compartments data frame for parsing
 #' @param available_sites Available sites data frame for lookup (optional)
 #' @param available_parameters Available parameters data frame for lookup (optional)
+#' @return A list with `combinations` tibble and `skipped` count.
+#' @importFrom glue glue
 #' @importFrom stats setNames
 #' @importFrom purrr map_dfr map map_dbl
 #' @importFrom tidyr expand_grid
@@ -445,11 +462,14 @@ create_sample_combinations <- function(
 }
 
 #' Update Combination Preview ----
+#' @description Generates a preview div showing the total number of sample combinations.
 #' @param sites_count Number of selected sites
 #' @param params_count Number of selected parameters
 #' @param comps_count Number of selected compartments
 #' @param dates_count Number of selected dates
 #' @param subsamples_count Number of subsamples per combination
+#' @return A Shiny div element with the combination preview.
+#' @importFrom shiny div strong
 #' @noRd
 update_combination_preview <- function(
   sites_count,

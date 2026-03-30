@@ -77,6 +77,7 @@ read_zip_metadata <- function(zip_path) {
 #' @importFrom tibble as_tibble
 #' @importFrom glue glue
 #' @importFrom golem print_dev
+#' @importFrom rlang `%||%`
 #' @export
 import_session_from_zip <- function(zip_path, session) {
   # Validate inputs ----
@@ -280,8 +281,6 @@ import_module_table <- function(csv_path, session) {
 #' @description Determine which type of dataset based on filename patterns
 #' @param filename Name of the file
 #' @return Character string of dataset type or NULL if not recognized
-#' @importFrom glue glue
-#' @importFrom golem print_dev
 #' @export
 detect_dataset_type <- function(filename) {
   # Remove timestamp and campaign name patterns to get core name

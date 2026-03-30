@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils_utilities.R
 \name{printreactiveValues}
 \alias{printreactiveValues}
-\title{print content of reactiveValues object}
+\title{Print content of reactiveValues object}
 \usage{
 printreactiveValues(data)
 }
@@ -10,7 +10,7 @@ printreactiveValues(data)
 \item{data}{A reactiveValues object with named variables}
 }
 \value{
-a string of variable names and values
+A string of variable names and values
 }
 \description{
 Print a reactiveValues object, with each named variable and its value on a new

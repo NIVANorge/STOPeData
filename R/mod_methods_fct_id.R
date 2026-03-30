@@ -15,7 +15,8 @@
 #' @param campaign_name Character vector. Name of the campaign/study.
 #'   Will be abbreviated to first 10 alphanumeric characters. Defaults to "".
 #'
-#'
+#' @return Character vector of generated protocol identifiers, one per input element,
+#'   formatted as TypeCode + SequenceNumber + AbbreviatedName + CampaignAbbrev.
 #'   Where:
 #'   - TypeCode: S (Sampling), F (Fractionation), E (Extraction),
 #'     A (Analytical), X (Unknown)

@@ -4,6 +4,8 @@
 #' @description Creates a summary string of compartments from session data
 #' @param compartmentsData The compartments dataset
 #' @return Character string summarising compartments, or "Relevant data not found"
+#' @importFrom glue glue
+#' @importFrom shiny isTruthy
 #' @export
 summarise_compartments <- function(compartmentsData) {
   # Helper function to check if a dataset exists and has content
@@ -49,6 +51,8 @@ summarise_compartments <- function(compartmentsData) {
 #' @param SAMPLE_SPECIES_LIFESTAGE Logical. Include life stage summary?
 #' @param SAMPLE_SPECIES_GENDER Logical. Include gender summary?
 #' @return Character string summarising biota, or "Relevant data not found"
+#' @importFrom glue glue
+#' @importFrom shiny isTruthy
 #' @export
 summarise_biota <- function(
   biotaData,
@@ -117,6 +121,8 @@ summarise_biota <- function(
 #' @param methodsData The methods/protocols dataset
 #' @param categories Character vector of protocol categories to include (e.g., c("Sampling Protocol", "Analytical Protocol"))
 #' @return Character string summarising protocols, or "Relevant data not found"
+#' @importFrom glue glue
+#' @importFrom shiny isTruthy
 #' @export
 summarise_protocols <- function(methodsData, categories) {
   # Helper function to check if a dataset exists and has content
@@ -166,6 +172,8 @@ summarise_protocols <- function(methodsData, categories) {
 #' @param SITE_GEOGRAPHIC_FEATURE_SUB Logical. Include geographic feature sub summary?
 #' @param PRECISION Logical. Include coordinate precision?
 #' @return Character string summarising sites, or "Relevant data not found"
+#' @importFrom glue glue
+#' @importFrom shiny isTruthy
 #' @export
 summarise_sites <- function(
   sitesData,
@@ -297,6 +305,8 @@ calculate_coordinate_precision <- function(latitude, longitude) {
 #' @description Creates a summary string of limit of detection and quantification values
 #' @param measurementsData The measurements dataset
 #' @return Character string summarising LOD/LOQ, or "Relevant data not found"
+#' @importFrom glue glue
+#' @importFrom shiny isTruthy
 #' @export
 summarise_lod_loq <- function(measurementsData) {
   # Helper function to check if a dataset exists and has content
@@ -350,6 +360,8 @@ manual_completion_message <- function() {
 #' @description Creates a summary of uncertainty types and measurement comments
 #' @param measurementsData The measurements dataset
 #' @return Character string summarising uncertainty info, or "Relevant data not found"
+#' @importFrom glue glue
+#' @importFrom shiny isTruthy
 #' @export
 summarise_uncertainty_comments <- function(measurementsData) {
   # Helper function to check if a dataset exists and has content
@@ -397,7 +409,7 @@ summarise_uncertainty_comments <- function(measurementsData) {
 #' @description Calculates and summarises the significant figures in a numeric vector
 #' @param values Numeric vector to analyze
 #' @return Character string describing significant figures, or "Relevant data not found"
-#' @importFrom tibble tribble
+#' @importFrom glue glue
 #' @export
 summarise_sig_figs <- function(values) {
   if (length(values) == 0 || all(is.na(values))) {

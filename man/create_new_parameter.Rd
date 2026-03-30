@@ -15,7 +15,7 @@ create_new_parameter(param_type, entered_by)
 tibble with blank parameter template
 }
 \description{
-Create new blank parameter row
+Creates a single-row template tibble with default values for a new parameter.
 }
 \seealso{
 \code{\link{initialise_parameters_tibble}}

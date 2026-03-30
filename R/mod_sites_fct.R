@@ -14,6 +14,7 @@
 #' @return A tibble with one row containing the new site record, initialized with
 #'   default values according to the eDataDRF sites schema.
 #' @importFrom eDataDRF initialise_sites_tibble
+#' @importFrom dplyr add_row
 #' @export
 create_new_site <- function(site_number = 1, base_code = "", session) {
   # Generate site code ----

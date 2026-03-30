@@ -1,11 +1,15 @@
 # Get Session Data Safely ----
 #' Safely retrieve data from session reactive values
 #'
+#' @description Safely retrieves a column or variable from a named table stored
+#'   in session reactive values, returning a fallback value if the table or
+#'   variable is not available.
 #' @param session Shiny session object containing userData$reactiveValues
 #' @param table_name Character string: name of the table in reactiveValues
 #' @param variable_name Character string: name of the variable/column to retrieve
 #' @param fallback_value Character string: value to return if conditions not met (default: "Unknown")
 #' @return Value from the specified table/variable if available, fallback_value otherwise
+#' @export
 get_session_data_safe <- function(
   session,
   table_name,
