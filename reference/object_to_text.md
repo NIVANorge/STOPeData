@@ -1,0 +1,25 @@
+# Convert object to human-readable text
+
+Convert various R objects (character vectors, lists, S3/S4 objects) to
+readable text format suitable for writing to .txt files
+
+## Usage
+
+``` r
+object_to_text(obj, dataset_name = "unknown")
+```
+
+## Arguments
+
+- obj:
+
+  The object to convert (character, list, ellmer_schema, or other object
+  types)
+
+- dataset_name:
+
+  Character. Name of the dataset for header context
+
+## Value
+
+Character vector suitable for use with writeLines()
