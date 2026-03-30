@@ -16,6 +16,12 @@ creed_tibble_to_mock_input(creed_tibble)
 
   A tibble with columns: criterion_id, relevant_data, score, limitations
 
+## Value
+
+A named list mimicking the structure of a Shiny input object, with
+entries named \`criterionId_score\`, \`criterionId_relevant_data\`, and
+\`criterionId_limitations\` (or \`criterionId_justification\` for RB8).
+
 ## Details
 
 Score values are converted from numeric to text: - 1 = "Fully Met" (or

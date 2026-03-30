@@ -1,6 +1,7 @@
 # Create new blank parameter row
 
-Create new blank parameter row
+Creates a single-row template tibble with default values for a new
+parameter.
 
 ## Usage
 

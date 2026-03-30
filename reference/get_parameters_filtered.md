@@ -1,6 +1,8 @@
 # Get parameter names filtered by type and optionally subtype
 
-Get parameter names filtered by type and optionally subtype
+Returns a character vector of parameter names filtered by type and
+optionally by subtype, combining base parameters with session-specific
+parameters.
 
 ## Usage
 

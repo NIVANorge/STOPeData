@@ -1,6 +1,7 @@
 # Get parameter names for a specific parameter type
 
-Get parameter names for a specific parameter type
+Returns a character vector of parameter names for the given type,
+combining base parameters with any session-specific parameters.
 
 ## Usage
 

@@ -27,3 +27,7 @@ populate_session_with_dummy_data(
 - parent_session:
 
   Parent session for navigation (if different from session)
+
+## Value
+
+NULL invisibly.

@@ -1,4 +1,4 @@
-# print content of reactiveValues object
+# Print content of reactiveValues object
 
 Print a reactiveValues object, with each named variable and its value on
 a new line
@@ -17,4 +17,4 @@ printreactiveValues(data)
 
 ## Value
 
-a string of variable names and values
+A string of variable names and values

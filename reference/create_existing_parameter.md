@@ -1,6 +1,7 @@
 # Create parameter row from existing parameter data
 
-Create parameter row from existing parameter data
+Looks up an existing parameter by name and type, returning a populated
+tibble row or NULL if not found.
 
 ## Usage
 

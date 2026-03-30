@@ -1,6 +1,8 @@
 # Safely retrieve data from session reactive values
 
-Safely retrieve data from session reactive values
+Safely retrieves a column or variable from a named table stored in
+session reactive values, returning a fallback value if the table or
+variable is not available.
 
 ## Usage
 

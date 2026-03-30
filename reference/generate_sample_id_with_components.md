@@ -1,6 +1,7 @@
 # Generate Sample ID with Components —-
 
-Generate Sample ID with Components —-
+Generates vectorised sample identifiers from site, parameter,
+compartment, date, and subsample components.
 
 ## Usage
 
@@ -40,3 +41,7 @@ generate_sample_id_with_components(
 - subsample:
 
   subsample
+
+## Value
+
+Character vector of sample IDs.

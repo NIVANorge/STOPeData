@@ -6,16 +6,12 @@
   : CREED Relevance Criteria Configuration
 - [`CREED_reliability_criteria_config()`](https://nivanorge.github.io/STOPeData/reference/CREED_reliability_criteria_config.md)
   : CREED Reliability Criteria Configuration
-- [`abbreviate_string()`](https://nivanorge.github.io/STOPeData/reference/abbreviate_string.md)
-  : Abbreviate string to first n words with case formatting
 - [`bib_string2df_alt()`](https://nivanorge.github.io/STOPeData/reference/bib_string2df_alt.md)
   : Convert BibTeX string to data frame using temporary file
 - [`build_session_zip()`](https://nivanorge.github.io/STOPeData/reference/build_session_zip.md)
   : Build a session ZIP archive
 - [`calculate_coordinate_precision()`](https://nivanorge.github.io/STOPeData/reference/calculate_coordinate_precision.md)
   : Calculate coordinate precision
-- [`check_available_datasets()`](https://nivanorge.github.io/STOPeData/reference/check_available_datasets.md)
-  : Check which datasets contain data and get their dimensions
 - [`clean_bibtex_text()`](https://nivanorge.github.io/STOPeData/reference/clean_bibtex_text.md)
   : Clean BibTeX text formatting
 - [`collect_CREED_data()`](https://nivanorge.github.io/STOPeData/reference/collect_CREED_data.md)
@@ -40,18 +36,12 @@
   : Detect dataset type from filename —-
 - [`download_all_data()`](https://nivanorge.github.io/STOPeData/reference/download_all_data.md)
   : Download all data as CSV and TXT files in a ZIP archive
-- [`extract_campaign_name()`](https://nivanorge.github.io/STOPeData/reference/extract_campaign_name.md)
-  : Extract campaign name from campaign data for use in filenames
 - [`extract_clean_doi()`](https://nivanorge.github.io/STOPeData/reference/extract_clean_doi.md)
   : Extract clean DOI from input string
 - [`extract_clean_pmid()`](https://nivanorge.github.io/STOPeData/reference/extract_clean_pmid.md)
   : Extract clean PMID from input string
-- [`extract_pdf_with_llm()`](https://nivanorge.github.io/STOPeData/reference/extract_pdf_with_llm.md)
-  : Core async function for LLM extraction
 - [`generate_protocol_id()`](https://nivanorge.github.io/STOPeData/reference/generate_protocol_id.md)
   : Generate Protocol ID —-
-- [`generate_reference_id()`](https://nivanorge.github.io/STOPeData/reference/generate_reference_id.md)
-  : Generate Reference ID
 - [`generate_sample_id_with_components()`](https://nivanorge.github.io/STOPeData/reference/generate_sample_id_with_components.md)
   : Generate Sample ID with Components —-
 - [`generate_zenodo_readme()`](https://nivanorge.github.io/STOPeData/reference/generate_zenodo_readme.md)
@@ -77,10 +67,6 @@
 - [`info_accordion()`](https://nivanorge.github.io/STOPeData/reference/info_accordion.md)
   : Create a collapsible single-panel accordion containing a markdown
   file
-- [`isRelevant()`](https://nivanorge.github.io/STOPeData/reference/isRelevant.md)
-  : isRelevant
-- [`` `%|truthy|%` ``](https://nivanorge.github.io/STOPeData/reference/isTruthy-switch-operator.md)
-  : isTruthy switch operator
 - [`lookup_crossref_doi()`](https://nivanorge.github.io/STOPeData/reference/lookup_crossref_doi.md)
   : Lookup publication data using Crossref
 - [`manual_completion_message()`](https://nivanorge.github.io/STOPeData/reference/manual_completion_message.md)
@@ -96,7 +82,7 @@
 - [`populate_session_with_dummy_data()`](https://nivanorge.github.io/STOPeData/reference/populate_session_with_dummy_data.md)
   : Populate session data directly with dummy data
 - [`printreactiveValues()`](https://nivanorge.github.io/STOPeData/reference/printreactiveValues.md)
-  : print content of reactiveValues object
+  : Print content of reactiveValues object
 - [`read_metadata_txt()`](https://nivanorge.github.io/STOPeData/reference/read_metadata_txt.md)
   : Read metadata from text file —-
 - [`read_zip_metadata()`](https://nivanorge.github.io/STOPeData/reference/read_zip_metadata.md)
