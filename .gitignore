@@ -16,3 +16,4 @@ deployment/test/secrets.env
 .gitignore
 deployment/prod/secrets.env
 
+docs
