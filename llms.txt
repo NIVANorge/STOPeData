@@ -60,11 +60,6 @@ Predictor](https://github.com/NIVANorge/STOP).
 
 ## Getting Started
 
-I haven’t tested setting the app up to run locally on systems other than
-my home PC. It *should* work following the below instructions, although
-it depends on quite a lot of R packages which you will have to download.
-In general, I recommend
-
 ### Prerequisites
 
 - R version 4.5.2
@@ -329,3 +324,9 @@ Project Link: <https://github.com/NIVANorge/STOPeData>
 - [`zenodo_resource_types`](https://nivanorge.github.io/STOPeData/reference/zenodo_resource_types.md)
   : Zenodo resource type options vector
 
+# Articles
+
+### All vignettes
+
+- [eData
+  Application](https://nivanorge.github.io/STOPeData/articles/application.md):
