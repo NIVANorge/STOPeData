@@ -1,4 +1,6 @@
 url: https://nivanorge.github.io/STOPeData/
 template:
   bootstrap: 5
-
+  bslib:
+    font-size: "0.75rem"
+  light-switch: true
