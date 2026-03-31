@@ -1,7 +1,7 @@
 # Import Helper Functions ----
 # Functions to handle importing data from ZIP files exported by mod_export
 
-#' Read metadata from ZIP file ----
+#' Read metadata from ZIP file
 #'
 #' @description Extract and read metadata from a ZIP file without importing data
 #' @param zip_path Path to the ZIP file
@@ -71,7 +71,7 @@ read_zip_metadata <- function(zip_path) {
   )
 }
 
-#' Import data from exported ZIP file ----
+#' Import data from exported ZIP file
 #'
 #' @description Import datasets from a ZIP file created by mod_export
 #' @param zip_path Path to the ZIP file
@@ -194,7 +194,7 @@ import_session_from_zip <- function(zip_path, session) {
   }
 }
 
-#' Import module dataset from CSV ----
+#' Import module dataset from CSV
 #'
 #' @description Import a single dataset and add to session reactiveValues
 #' @param csv_path Path to CSV file
@@ -212,7 +212,7 @@ import_session_from_zip <- function(zip_path, session) {
 #' }
 #' @export
 import_module_table <- function(csv_path, session) {
-  # Determine dataset type from filename ----
+  # Determine dataset type from filename
   filename <- basename(csv_path)
   dataset_type <- detect_dataset_type(filename)
 
@@ -224,7 +224,7 @@ import_module_table <- function(csv_path, session) {
     ))
   }
 
-  # Read and validate CSV ----
+  # Read and validate CSV
   tryCatch(
     {
       data <- read.csv(csv_path, stringsAsFactors = FALSE) |>
@@ -249,7 +249,7 @@ import_module_table <- function(csv_path, session) {
     }
   )
 
-  # Validate dataset structure ----
+  # Validate dataset structure
   validation_result <- validate_dataset_structure(data, dataset_type)
 
   if (!validation_result$valid) {
@@ -260,7 +260,7 @@ import_module_table <- function(csv_path, session) {
     ))
   }
 
-  # Add to session reactiveValues ----
+  # Add to session reactiveValues
   rv_key <- get_reactiveValues_key(dataset_type)
 
   if (is.null(rv_key)) {
@@ -293,7 +293,7 @@ import_module_table <- function(csv_path, session) {
   )
 }
 
-#' Detect dataset type from filename ----
+#' Detect dataset type from filename
 #'
 #' @description Determine which type of dataset based on filename patterns.
 #'   Dataset types correspond to eDataDRF tables — see [eDataDRF::initialise_sites_tibble()],
@@ -346,7 +346,7 @@ detect_dataset_type <- function(filename) {
   return(NULL)
 }
 
-#' Get reactiveValues key for dataset type ----
+#' Get reactiveValues key for dataset type
 #'
 #' @description Map dataset type to reactiveValues key
 #' @param dataset_type Character string of dataset type
@@ -374,7 +374,7 @@ get_reactiveValues_key <- function(dataset_type) {
   return(key_mapping[[dataset_type]])
 }
 
-#' Validate dataset structure ----
+#' Validate dataset structure
 #'
 #' @description Basic validation of dataset structure
 #' @param data Tibble/data.frame to validate. Use [eDataDRF::example_sites_tibble()]
@@ -410,7 +410,7 @@ validate_dataset_structure <- function(data, dataset_type) {
   ))
 }
 
-#' Read metadata from text file ----
+#' Read metadata from text file
 #'
 #' @description Read metadata from a human-readable text file
 #' @param file_path Path to the metadata text file

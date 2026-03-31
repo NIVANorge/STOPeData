@@ -1,7 +1,7 @@
 # Sample Helper Functions ----
 # Utility functions for the samples module
 
-#' Update Sites Selectize Input ----
+#' Update Sites Selectize Input
 #' @description Updates the sites picker input with available site choices.
 #' @param session Shiny session
 #' @param sites_data tibble with SITE_CODE and SITE_NAME columns
@@ -36,7 +36,7 @@ update_sites_selectize <- function(session, sites_data) {
   )
 }
 
-#' Update Parameters Selectize Input ----
+#' Update Parameters Selectize Input
 #' @description Updates the parameters picker input with available parameter choices.
 #' @param session Shiny session
 #' @param parameters_data Data frame with PARAMETER_NAME and PARAMETER_TYPE columns
@@ -78,7 +78,7 @@ update_parameters_selectize <- function(session, parameters_data) {
   )
 }
 
-#' Update Compartments Selectize Input ----
+#' Update Compartments Selectize Input
 #' @description Updates the compartments picker input with available compartment choices.
 #' @param session Shiny session
 #' @param compartments_data Data frame with compartment columns
@@ -131,7 +131,7 @@ update_compartments_selectize <- function(session, compartments_data) {
   )
 }
 
-#' Parse Compartment Selections ----
+#' Parse Compartment Selections
 #' @description Parse merged compartment selections back to individual components
 #' @param compartment_selections Vector of merged compartment selections like "Aquatic | Freshwater"
 #' @param available_compartments Available compartments data frame
@@ -175,79 +175,7 @@ parse_compartment_selections <- function(
   return(parsed)
 }
 
-# TODO: Transferred to eDataDRF
-#' Generate Sample ID with Components ----
-#' @description Generates vectorised sample identifiers from site, parameter, compartment,
-#'   date, and subsample components. This is the STOPeData-local implementation;
-#'   see [eDataDRF::generate_sample_id_with_components()] for the canonical version
-#'   and [eDataDRF::sample_id_regex()] to validate generated IDs.
-#' @param site_code Site code (vectorized)
-#' @param parameter_name Parameter name (vectorized). See
-#'   [eDataDRF::parameters_vocabulary()] for valid parameter names.
-#' @param environ_compartment Environmental compartment (vectorized). Must be a
-#'   value from [eDataDRF::environ_compartments_vocabulary()].
-#' @param environ_compartment_sub Environmental sub-compartment (vectorized). Must
-#'   be a value from [eDataDRF::environ_compartments_sub_vocabulary()].
-#' @param date Sampling date (vectorized)
-#' @param subsample subsample
-#' @return Character vector of sample IDs.
-#' @importFrom glue glue
-#' @importFrom stringr str_to_title str_remove_all
-#' @import eDataDRF
-#' @seealso [eDataDRF::generate_sample_id_with_components()],
-#'   [eDataDRF::sample_id_regex()], [eDataDRF::environ_compartments_vocabulary()],
-#'   [eDataDRF::environ_compartments_sub_vocabulary()]
-#' @examples
-#' generate_sample_id_with_components(
-#'   site_code = "SITE001",
-#'   parameter_name = "Cadmium",
-#'   environ_compartment = "Water",
-#'   environ_compartment_sub = "Surface water",
-#'   date = as.Date("2022-06-15"),
-#'   subsample = 1
-#' )
-#'
-#' # Validate the generated ID against the regex
-#' id <- generate_sample_id_with_components(
-#'   site_code = eDataDRF::example_sites_tibble()$SITE_CODE[1],
-#'   parameter_name = eDataDRF::example_parameters_tibble()$PARAMETER_NAME[1],
-#'   environ_compartment = eDataDRF::example_compartments_tibble()$ENVIRON_COMPARTMENT[1],
-#'   environ_compartment_sub = eDataDRF::example_compartments_tibble()$ENVIRON_COMPARTMENT_SUB[1],
-#'   date = as.Date("2022-06-15"),
-#'   subsample = 1
-#' )
-#' grepl(eDataDRF::sample_id_regex(), id)
-#' @export
-generate_sample_id_with_components <- function(
-  site_code,
-  parameter_name,
-  environ_compartment,
-  environ_compartment_sub,
-  date,
-  subsample = 1
-) {
-  # Create abbreviated versions for ID (vectorized)
-  param_abbrev <- substr(gsub("[^A-Za-z0-9]", "", parameter_name), 1, 8)
-  comp_abbrev <- substr(
-    gsub("[^A-Za-z0-9]", "", environ_compartment_sub),
-    1,
-    12
-  )
-  date_abbrev <- gsub("-", "-", date)
-
-  base_id <- glue("{site_code}-{param_abbrev}-{comp_abbrev}-{date_abbrev}")
-
-  # Vectorized replicate
-  # Subsamples will generally be text, so let's abbreviate them a bit
-
-  subsample_suffix <- sapply(
-    subsample,
-    function(x) abbreviate_string(string = x, n_words = 3, case = "title")
-  )
-  paste0(base_id, "-R-", subsample_suffix)
-}
-
-#' Check if Sample Combination with Components Exists ----
+#' Check if Sample Combination with Components Exists
 #' @param existing_data Existing samples data frame
 #' @param site Site code
 #' @param parameter Parameter name
@@ -283,7 +211,7 @@ combination_exists_with_components <- function(
   )
 }
 
-#' Create Sample Combinations with Separate Compartment Components ----
+#' Create Sample Combinations with Separate Compartment Components
 #' @description
 #' Create all valid combinations of sites, parameters, compartments, dates, and subsamples,
 #' except for those already found in existing_data. Now handles separate compartment columns.
@@ -489,7 +417,7 @@ create_sample_combinations <- function(
   return(list(combinations = all_combinations, skipped = total_skipped))
 }
 
-#' Update Combination Preview ----
+#' Update Combination Preview
 #' @description Generates a preview div showing the total number of sample combinations.
 #' @param sites_count Number of selected sites
 #' @param params_count Number of selected parameters
