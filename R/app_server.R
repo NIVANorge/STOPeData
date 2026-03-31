@@ -84,7 +84,7 @@ initialise_userData <- function() {
     # LLM extraction status flags ----
     llmExtractionComplete = FALSE, # tracks if the LLM data extraction process has completed, or the user has pressed the dummy data button
     llmExtractionSuccessful = FALSE, # tracks if the LLM data extraction process (or dummy data) returned a tibble in the expected format
-    llmPopulateModules = FALSE, # tracks if the user has sent LLM data to modukles
+    llmPopulateModules = FALSE, # tracks if the user has sent LLM data to modules
 
     llmExtractionComments = tibble(NULL),
 
