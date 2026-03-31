@@ -56,6 +56,7 @@ reference:
     contents:
       - bib_string2df_alt
       - map_bibtex_to_reference_fields
+      - map_crossref_to_reference_fields
       - clean_bibtex_text
       - extract_clean_doi
       - extract_clean_pmid
