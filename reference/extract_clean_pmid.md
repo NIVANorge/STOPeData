@@ -17,3 +17,12 @@ extract_clean_pmid(input_string)
 ## Value
 
 Clean PMID string or the original input if no cleaning needed
+
+## Examples
+
+``` r
+extract_clean_pmid("PMID: 12345678")
+#> [1] "12345678"
+extract_clean_pmid("9876543")
+#> [1] "9876543"
+```

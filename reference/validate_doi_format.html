@@ -20,7 +20,9 @@ without URL prefixes (https://doi.org/ or http://dx.doi.org/)."></head><body>
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/application.html">eData Application</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/application_data.html">Application Data</a></li>
+    <li><a class="dropdown-item" href="../articles/application.html">eData Application</a></li>
+    <li><a class="dropdown-item" href="../articles/naming.html">Naming Conventions</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -72,7 +74,25 @@ without URL prefixes (https://doi.org/ or http://dx.doi.org/).</p>
 Where registrant is typically 4+ digits and suffix can contain various characters.
 This function validates format only, not whether the DOI actually exists.</p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other validate:
+<code><a href="validate_and_lookup_identifier.html">validate_and_lookup_identifier()</a></code>,
+<code><a href="validate_and_parse_bibtex.html">validate_and_parse_bibtex()</a></code>,
+<code><a href="validate_dataset_structure.html">validate_dataset_structure()</a></code>,
+<code><a href="validate_pmid_format.html">validate_pmid_format()</a></code></p></div>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">validate_doi_format</span><span class="op">(</span><span class="st">"10.1016/j.marpolbul.2022.01.001"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span><span class="fu">validate_doi_format</span><span class="op">(</span><span class="st">"https://doi.org/10.1000/xyz123"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] TRUE</span>
+<span class="r-in"><span><span class="fu">validate_doi_format</span><span class="op">(</span><span class="st">"not-a-doi"</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] FALSE</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

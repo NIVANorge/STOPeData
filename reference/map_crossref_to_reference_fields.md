@@ -32,3 +32,13 @@ Maps Crossref fields to reference fields: - type → REFERENCE_TYPE
 published.online/published.print → YEAR - container.title →
 PERIODICAL_JOURNAL - volume → VOLUME - issue → ISSUE - publisher →
 PUBLISHER - DOI → DOI - URL → URL - page → PAGES - ISBN/ISSN → ISBN_ISSN
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  result <- lookup_crossref_doi("10.1016/j.marpolbul.2022.01.001")
+  fields <- map_crossref_to_reference_fields(result$data)
+  fields$TITLE
+} # }
+```

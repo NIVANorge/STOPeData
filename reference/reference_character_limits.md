@@ -35,3 +35,13 @@ PUBLISHER: 200 characters
 REF_COMMENT: 1000 characters
 
 URL: 200 characters
+
+## Examples
+
+``` r
+limits <- reference_character_limits()
+limits$DOI
+#> [1] 200
+limits$REF_COMMENT
+#> [1] 1000
+```

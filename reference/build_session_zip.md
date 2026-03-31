@@ -29,3 +29,12 @@ build_session_zip(session, moduleState, dest_file)
 ## Value
 
 \`dest_file\` invisibly.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  # session and moduleState are Shiny reactive objects
+  build_session_zip(session, moduleState, dest_file = tempfile(fileext = ".zip"))
+} # }
+```

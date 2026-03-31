@@ -23,3 +23,14 @@ object_to_text(obj, dataset_name = "unknown")
 ## Value
 
 Character vector suitable for use with writeLines()
+
+## Examples
+
+``` r
+object_to_text(list(a = 1, b = "hello"), dataset_name = "my_list")
+#> [1] "# my_list"                       "# Exported: 2026-03-31 10:14:10"
+#> [3] "# Type: List"                    ""                               
+#> [5] "# Structure:"                    "list(a = 1, b = \"hello\")"     
+object_to_text("already a string")
+#> [1] "already a string"
+```

@@ -45,3 +45,17 @@ generate_sample_id_with_components(
 ## Value
 
 Character vector of sample IDs.
+
+## Examples
+
+``` r
+generate_sample_id_with_components(
+  site_code = "SITE001",
+  parameter_name = "Cadmium",
+  environ_compartment = "Water",
+  environ_compartment_sub = "Surface water",
+  date = as.Date("2022-06-15"),
+  subsample = 1
+)
+#> [1] "SITE001-Cadmium-Surfacewater-2022-06-15-R-1"
+```

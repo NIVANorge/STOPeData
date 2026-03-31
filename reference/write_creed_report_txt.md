@@ -35,3 +35,13 @@ write_creed_report_txt(
 ## Value
 
 NULL (invisibly). File is written to disk as a side effect.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  # creed_* tibbles are produced by the summarise_CREED_* functions
+  write_creed_report_txt(creed_details, creed_relevance, creed_reliability,
+                         file_path = tempfile(fileext = ".txt"))
+} # }
+```

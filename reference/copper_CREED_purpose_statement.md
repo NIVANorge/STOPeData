@@ -12,3 +12,11 @@ copper_CREED_purpose_statement()
 ## Value
 
 nested list of criteria and thresholds to meet them
+
+## Examples
+
+``` r
+purpose <- copper_CREED_purpose_statement()
+names(purpose)
+#> [1] "study_purpose" "criteria"     
+```

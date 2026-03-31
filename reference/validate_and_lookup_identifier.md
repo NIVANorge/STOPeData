@@ -33,3 +33,21 @@ This is the main entry point for DOI/PMID lookup functionality. It
 handles the complete workflow: 1. Validate input format 2. Convert PMID
 to DOI if necessary 3. Query Crossref for publication data 4. Map
 results to reference field format
+
+## See also
+
+Other validate:
+[`validate_and_parse_bibtex()`](https://nivanorge.github.io/STOPeData/reference/validate_and_parse_bibtex.md),
+[`validate_dataset_structure()`](https://nivanorge.github.io/STOPeData/reference/validate_dataset_structure.md),
+[`validate_doi_format()`](https://nivanorge.github.io/STOPeData/reference/validate_doi_format.md),
+[`validate_pmid_format()`](https://nivanorge.github.io/STOPeData/reference/validate_pmid_format.md)
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  result <- validate_and_lookup_identifier("10.1016/j.marpolbul.2022.01.001")
+  result$data$TITLE
+  result$identifier_type
+} # }
+```

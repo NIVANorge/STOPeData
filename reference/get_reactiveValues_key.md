@@ -17,3 +17,12 @@ get_reactiveValues_key(dataset_type)
 ## Value
 
 Character string of reactiveValues key or NULL
+
+## Examples
+
+``` r
+get_reactiveValues_key("Sites")
+#> [1] "sitesData"
+get_reactiveValues_key("CREED_RB")
+#> [1] "creedReliability"
+```

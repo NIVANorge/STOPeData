@@ -39,3 +39,19 @@ tibble with parameter information or NULL if not found
 ## See also
 
 `initialise_parameters_tibble`
+
+Other create:
+[`create_compartment_combination()`](https://nivanorge.github.io/STOPeData/reference/create_compartment_combination.md),
+[`create_dummy_session_data()`](https://nivanorge.github.io/STOPeData/reference/create_dummy_session_data.md),
+[`create_new_parameter()`](https://nivanorge.github.io/STOPeData/reference/create_new_parameter.md),
+[`create_new_site()`](https://nivanorge.github.io/STOPeData/reference/create_new_site.md)
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  # dummy_parameters is a dataframe from the eDataDRF package
+  row <- create_existing_parameter("Chemical", "Cadmium", dummy_parameters)
+  row
+} # }
+```

@@ -50,3 +50,11 @@ run_app(
 
   arguments to pass to golem_opts. See \`?golem::get_golem_options\` for
   more details.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  run_app()
+} # }
+```

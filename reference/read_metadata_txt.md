@@ -17,3 +17,12 @@ read_metadata_txt(file_path)
 ## Value
 
 List with metadata or NULL if not found/readable
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  metadata <- read_metadata_txt("path/to/export_metadata.txt")
+  metadata$campaign_name
+} # }
+```

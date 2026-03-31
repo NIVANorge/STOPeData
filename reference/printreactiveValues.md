@@ -18,3 +18,12 @@ printreactiveValues(data)
 ## Value
 
 A string of variable names and values
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  rv <- shiny::reactiveValues(campaign_name = "North Sea 2022", year = 2022)
+  printreactiveValues(rv)
+} # }
+```

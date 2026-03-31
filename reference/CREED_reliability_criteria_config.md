@@ -37,3 +37,19 @@ may be skipped.
 ## See also
 
 \[CREED_relevance_criteria_config()\], \[collect_CREED_data()\]
+
+## Examples
+
+``` r
+config <- CREED_reliability_criteria_config()
+names(config)
+#>  [1] "RB1"  "RB2"  "RB3"  "RB4"  "RB5"  "RB6"  "RB7"  "RB8"  "RB9"  "RB10"
+#> [11] "RB11" "RB12" "RB13" "RB14" "RB15" "RB16" "RB17" "RB18" "RB19"
+config$RB1
+#> $title
+#> [1] "Sample Medium/Matrix"
+#> 
+#> $type
+#> [1] "Required"
+#> 
+```

@@ -25,3 +25,12 @@ download_all_data(session, moduleState = NULL)
 ## Value
 
 A Shiny downloadHandler function
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  # Used inside a Shiny module server function
+  output$download_btn <- download_all_data(session, moduleState)
+} # }
+```

@@ -30,3 +30,13 @@ get_parameters_of_types(
 ## Value
 
 Character vector of parameter names
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  # dummy_parameters is a dataframe from the eDataDRF package
+  params <- get_parameters_of_types("Chemical", dummy_parameters)
+  head(params)
+} # }
+```

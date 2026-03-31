@@ -18,7 +18,9 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/application.html">eData Application</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/application_data.html">Application Data</a></li>
+    <li><a class="dropdown-item" href="../articles/application.html">eData Application</a></li>
+    <li><a class="dropdown-item" href="../articles/naming.html">Naming Conventions</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -63,7 +65,35 @@
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>tibble of Relevance criteria fields ("field") and pretty strings ("value")</p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other summarise:
+<code><a href="calculate_coordinate_precision.html">calculate_coordinate_precision()</a></code>,
+<code><a href="manual_completion_message.html">manual_completion_message()</a></code>,
+<code><a href="summarise_CREED_details.html">summarise_CREED_details()</a></code>,
+<code><a href="summarise_CREED_reliability.html">summarise_CREED_reliability()</a></code>,
+<code><a href="summarise_biota.html">summarise_biota()</a></code>,
+<code><a href="summarise_compartments.html">summarise_compartments()</a></code>,
+<code><a href="summarise_date_range.html">summarise_date_range()</a></code>,
+<code><a href="summarise_lod_loq.html">summarise_lod_loq()</a></code>,
+<code><a href="summarise_measured_units.html">summarise_measured_units()</a></code>,
+<code><a href="summarise_multiple.html">summarise_multiple()</a></code>,
+<code><a href="summarise_protocols.html">summarise_protocols()</a></code>,
+<code><a href="summarise_reference.html">summarise_reference()</a></code>,
+<code><a href="summarise_sig_figs.html">summarise_sig_figs()</a></code>,
+<code><a href="summarise_sites.html">summarise_sites()</a></code>,
+<code><a href="summarise_uncertainty_comments.html">summarise_uncertainty_comments()</a></code></p></div>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="kw">if</span> <span class="op">(</span><span class="cn">FALSE</span><span class="op">)</span> <span class="op">{</span> <span class="co"># \dontrun{</span></span></span>
+<span class="r-in"><span>  <span class="co"># sessionData is the reactiveValues object from the Shiny app</span></span></span>
+<span class="r-in"><span>  <span class="va">relevance</span> <span class="op">&lt;-</span> <span class="fu">summarise_CREED_relevance</span><span class="op">(</span><span class="va">session</span><span class="op">$</span><span class="va">userData</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="va">relevance</span></span></span>
+<span class="r-in"><span><span class="op">}</span> <span class="co"># }</span></span></span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

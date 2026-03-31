@@ -26,3 +26,13 @@ entries named \`criterionId_score\`, \`criterionId_relevant_data\`, and
 
 Score values are converted from numeric to text: - 1 = "Fully Met" (or
 "Not Relevant") - 2 = "Partly Met" - 3 = "Not Reported" - 4 = "Not Met"
+
+## Examples
+
+``` r
+dummy_data <- create_dummy_session_data()
+mock_input <- creed_tibble_to_mock_input(dummy_data$creedReliability)
+mock_input$RB1_score
+#>           1 
+#> "Fully Met" 
+```

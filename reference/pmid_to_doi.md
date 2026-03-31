@@ -26,3 +26,12 @@ Status message for user feedback
 Uses the PubMed E-utilities API to fetch article information and extract
 DOI. Requires internet connection. May fail if PubMed is unavailable or
 if the article doesn't have a DOI registered.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  result <- pmid_to_doi("12345678")
+  result$doi
+} # }
+```

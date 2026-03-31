@@ -24,7 +24,9 @@
       <ul class="navbar-nav me-auto"><li class="active nav-item"><a class="nav-link" href="../reference/index.html">Reference</a></li>
 <li class="nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
-  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/application.html">eData Application</a></li>
+  <ul class="dropdown-menu" aria-labelledby="dropdown-articles"><li><a class="dropdown-item" href="../articles/application_data.html">Application Data</a></li>
+    <li><a class="dropdown-item" href="../articles/application.html">eData Application</a></li>
+    <li><a class="dropdown-item" href="../articles/naming.html">Naming Conventions</a></li>
   </ul></li>
       </ul><ul class="navbar-nav"><li class="nav-item"><form class="form-inline" role="search">
  <input class="form-control" type="search" name="search-input" id="search-input" autocomplete="off" aria-label="Search site" placeholder="Search for" data-search-index="../search.json"></form></li>
@@ -101,7 +103,63 @@ The human-readable title is looked up from `zenodo_licenses`.</p></dd>
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
     <p>Character string containing the full README in markdown format.</p>
     </div>
+    <div class="section level2">
+    <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
+    <div class="dont-index"><p>Other zenodo:
+<code><a href="zenodo_licenses.html">zenodo_licenses</a></code>,
+<code><a href="zenodo_resource_types.html">zenodo_resource_types</a></code></p></div>
+    </div>
 
+    <div class="section level2">
+    <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">readme</span> <span class="op">&lt;-</span> <span class="fu">generate_zenodo_readme</span><span class="op">(</span></span></span>
+<span class="r-in"><span>  title <span class="op">=</span> <span class="st">"Marine contaminant monitoring 2020-2022"</span>,</span></span>
+<span class="r-in"><span>  description <span class="op">=</span> <span class="st">"Trace metal concentrations in blue mussels from Norwegian fjords."</span>,</span></span>
+<span class="r-in"><span>  authors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span></span>
+<span class="r-in"><span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>first <span class="op">=</span> <span class="st">"Jane"</span>, last <span class="op">=</span> <span class="st">"Smith"</span>, affiliation <span class="op">=</span> <span class="st">"NIVA"</span>, orcid <span class="op">=</span> <span class="st">""</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="op">)</span>,</span></span>
+<span class="r-in"><span>  license_id <span class="op">=</span> <span class="st">"cc-by-4.0"</span>,</span></span>
+<span class="r-in"><span>  contact_name <span class="op">=</span> <span class="st">"Jane Smith"</span>,</span></span>
+<span class="r-in"><span>  contact_email <span class="op">=</span> <span class="st">"jane.smith@niva.no"</span></span></span>
+<span class="r-in"><span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/cat.html" class="external-link">cat</a></span><span class="op">(</span><span class="va">readme</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> # Marine contaminant monitoring 2020-2022</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - **Zenodo DOI:** (Will be generated upon upload)</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## What is this?</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Trace metal concentrations in blue mussels from Norwegian fjords.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## Authors</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> **Primary Author:** Jane Smith</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   **Institution:** NIVA</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## How to cite</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Smith J. (2026). *Marine contaminant monitoring 2020-2022*. Zenodo. https://doi.org/[DOI-will-be-generated]</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## License</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> Released under **Creative Commons Attribution 4.0 International**.</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ---</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> ## Contact</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - **Name:** Jane Smith</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - **Email:** jane.smith@niva.no</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> - **Institution:** NIVA</span>
+</code></pre></div>
+    </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>
     </nav></aside></div>
 

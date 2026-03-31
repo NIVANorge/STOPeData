@@ -19,3 +19,14 @@ collect_CREED_data(criteria_config, input)
 - input:
 
   the shiny input object for the module
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  # Used inside a Shiny module server function
+  config <- CREED_reliability_criteria_config()
+  scores <- collect_CREED_data(config, input)
+  scores
+} # }
+```

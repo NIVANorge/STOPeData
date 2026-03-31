@@ -17,3 +17,14 @@ get_dataset_display_name(dataset_name)
 ## Value
 
 Character. User-friendly display name (e.g., "Sites")
+
+## Examples
+
+``` r
+get_dataset_display_name("sitesData")
+#> [1] "Sites"
+get_dataset_display_name("measurementsData")
+#> [1] "Measurements"
+get_dataset_display_name("creedReliability")
+#> [1] "CREED_RB"
+```

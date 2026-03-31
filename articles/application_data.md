@@ -1,0 +1,102 @@
+# Application Data
+
+``` r
+library(STOPeData)
+```
+
+The STOPeData app uses what the developers of `Golem` call the
+[“stratégie du petit
+r”](https://engineering-shiny.org/structuring-project.html?q=document#communication-between-modules);
+that is, almost all the app’s data is stored in a big reactiveValues
+object in the main server function.
+
+``` r
+initialise_userData <- function() {
+  list(
+    ENTERED_BY = character(0),
+
+    # Standard validated data ----
+    # All userData and module_state$data data is stored in a tabular (tibble) format centrally, even for campaign and reference (which currently only have one row)
+    # This means we can use a consistent set of functions to check for presence (nrow(tibble) > 0), and not have any nasty surprises when we expect one and get the other
+    # Data entry modules
+    sitesData = initialise_sites_tibble(),
+    sitesDataValid = FALSE,
+    parametersData = initialise_parameters_tibble(),
+    parametersDataValid = FALSE,
+    compartmentsData = initialise_compartments_tibble(),
+    compartmentsDataValid = FALSE,
+    referenceData = initialise_references_tibble(),
+    referenceDataValid = FALSE,
+    campaignData = initialise_campaign_tibble(),
+    campaignDataValid = FALSE,
+    methodsData = initialise_methods_tibble(),
+    methodsDataValid = FALSE,
+    samplesData = initialise_samples_tibble(),
+    samplesDataValid = FALSE,
+    biotaData = initialise_biota_tibble(),
+    biotaDataValid = FALSE,
+    samplesDataWithBiota = tibble(NULL),
+    measurementsData = initialise_measurements_tibble(),
+    measurementsDataValid = FALSE,
+
+    # CREED Data
+    datasetDetails = tibble(NULL),
+    creedRelevance = initialise_CREED_data_tibble(),
+    creedReliability = initialise_CREED_data_tibble(),
+    creedScores = initialise_CREED_scores_tibble(),
+    creedReport = "",
+
+    # CREED reactive objects that just exist to trigger reactivity. Probably bad coding!
+    creedGetData = 0, # watched by multiple observers in nested CREED modules. +1 every time we input$get_data in mod_CREED
+    creedCalculateScores = 0, # same
+
+    # LLM extracted data and metadata ----
+    schemaLLM = "",
+    promptLLM = "",
+    rawLLM = "",
+    pdfPath = NULL,
+    campaignDataLLM = tibble(NULL),
+    referenceDataLLM = tibble(NULL),
+    sitesDataLLM = tibble(NULL),
+    parametersDataLLM = tibble(NULL),
+    compartmentsDataLLM = tibble(NULL),
+    methodsDataLLM = tibble(NULL),
+    samplesDataLLM = tibble(NULL),
+    biotaDataLLM = tibble(NULL),
+    samplesDataLLM = tibble(NULL),
+
+    # LLM extraction status flags ----
+    llmExtractionComplete = FALSE, # tracks if the LLM data extraction process has completed, or the user has pressed the dummy data button
+    llmExtractionSuccessful = FALSE, # tracks if the LLM data extraction process (or dummy data) returned a tibble in the expected format
+    llmPopulateModules = FALSE, # tracks if the user has sent LLM data to modukles
+
+    llmExtractionComments = tibble(NULL),
+
+    # Import data from save status flags ----
+    saveExtractionComplete = FALSE,
+    saveExtractionSuccessful = FALSE
+  )
+}
+```
+
+This has its pros and cons.
+
+- Pro: No need to write specific code to for each transfer of data
+  between modules
+- Pro: Data can be initialised using a list function, as above. makes
+  testing easier since we can mock the app data structure outside of a
+  shiny session
+- Pro: Better centralised overview of flags, etc.
+- Con: Assigning to a new value in a list creates it, so there’s no way
+  to defend against e.g. typos in flags, which will create a new flag
+  (that doesn’t do anything)
+- Con: At least the way I’m using it, leads to long, difficult-to-read
+  variable names like `session$userData$reactiveValues$sitesData`
+- Con: Our checks for data presence are fairly messy, because we have to
+  use `!is.null(data) && nrow(data) != 0` for tibbles, but different
+  checks for strings, vectors, etc.
+
+It would probably be much safer to use an R6 object because then we
+could defend against invalid inputs. And I have actually done this in
+another branch, but it’s not up to date with other changes, and I think
+it’s something I’ll save for when I (perhaps) have more time and money.

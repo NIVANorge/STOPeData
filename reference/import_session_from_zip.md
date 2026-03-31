@@ -21,3 +21,13 @@ import_session_from_zip(zip_path, session)
 ## Value
 
 List with success status and user-facing message
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  # session is the Shiny session object from the module server function
+  result <- import_session_from_zip("path/to/session_export.zip", session)
+  result$success
+} # }
+```

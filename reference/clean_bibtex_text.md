@@ -26,3 +26,12 @@ This function performs the following cleaning operations: - Removes
 double curly braces used for capitalization preservation - Converts
 common LaTeX accent commands to Unicode characters - Normalises
 whitespace
+
+## Examples
+
+``` r
+clean_bibtex_text("{{Marine}} pollution")
+#> [1] "Marine pollution"
+clean_bibtex_text("M\\u00FCller")
+#> [1] "M\\u00FCller"
+```

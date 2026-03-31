@@ -26,3 +26,12 @@ info_accordion(title = "Instructions", content_file, ...)
 ## Value
 
 a bslib::accordion html element
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  # Used inside a Shiny UI function
+  info_accordion("Instructions", "path/to/instructions.md")
+} # }
+```

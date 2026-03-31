@@ -12,3 +12,10 @@ get_git_commit()
 
 Character. Short git commit hash, or "Git hash not available" if
 retrieval fails
+
+## Examples
+
+``` r
+get_git_commit()
+#> [1] "97bd2c2"
+```

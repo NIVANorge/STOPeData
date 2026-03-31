@@ -37,3 +37,18 @@ an error occurs.
 ## Author
 
 Philipp Ottolinger (original function), Sam Welch (added string wrapper)
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  bibtex_str <- "@article{smith2022,
+    author  = {Smith, Jane},
+    title   = {Marine pollution},
+    journal = {Marine Pollution Bulletin},
+    year    = {2022}
+  }"
+  df <- bib_string2df_alt(bibtex_str)
+  df$TITLE
+} # }
+```

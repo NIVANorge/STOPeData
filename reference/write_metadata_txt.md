@@ -21,3 +21,14 @@ write_metadata_txt(metadata_list, file_path)
 ## Value
 
 NULL (invisibly). File is written to disk as a side effect.
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  meta <- list(campaign_name = "North Sea 2022", export_datetime = Sys.time(),
+               user = "Jane", app_name = "STOPeData", app_version = "1.0",
+               clientData = "localhost")
+  write_metadata_txt(meta, tempfile(fileext = ".txt"))
+} # }
+```

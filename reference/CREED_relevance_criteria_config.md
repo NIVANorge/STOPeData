@@ -33,3 +33,19 @@ handling (summary statistics) - RV11: Supporting parameters
 ## See also
 
 \[CREED_reliability_criteria_config()\], \[collect_CREED_data()\]
+
+## Examples
+
+``` r
+config <- CREED_relevance_criteria_config()
+names(config)
+#>  [1] "RV1"  "RV2"  "RV3"  "RV4"  "RV5"  "RV6"  "RV7"  "RV8"  "RV9"  "RV10"
+#> [11] "RV11"
+config$RV1
+#> $title
+#> [1] "Sample Medium/Matrix"
+#> 
+#> $type
+#> [1] "Required"
+#> 
+```

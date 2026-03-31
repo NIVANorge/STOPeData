@@ -18,3 +18,22 @@ validate_pmid_format(input_string)
 ## Value
 
 Logical indicating whether the input is a valid PMID format
+
+## See also
+
+Other validate:
+[`validate_and_lookup_identifier()`](https://nivanorge.github.io/STOPeData/reference/validate_and_lookup_identifier.md),
+[`validate_and_parse_bibtex()`](https://nivanorge.github.io/STOPeData/reference/validate_and_parse_bibtex.md),
+[`validate_dataset_structure()`](https://nivanorge.github.io/STOPeData/reference/validate_dataset_structure.md),
+[`validate_doi_format()`](https://nivanorge.github.io/STOPeData/reference/validate_doi_format.md)
+
+## Examples
+
+``` r
+validate_pmid_format("12345678")
+#> [1] TRUE
+validate_pmid_format("PMID: 9876543")
+#> [1] TRUE
+validate_pmid_format("not-a-pmid")
+#> [1] FALSE
+```

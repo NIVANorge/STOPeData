@@ -17,3 +17,12 @@ read_zip_metadata(zip_path)
 ## Value
 
 List with metadata information or NULL if not found/readable
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  metadata <- read_zip_metadata("path/to/session_export.zip")
+  metadata$campaign_name
+} # }
+```

@@ -53,3 +53,12 @@ The function handles edge cases gracefully: - NULL or empty values
 result in appropriate defaults - Invalid protocol types default to "X" -
 Names are cleaned of special characters and spaces - Empty components
 are omitted from the final ID
+
+## Examples
+
+``` r
+generate_protocol_id("Sampling Protocol", "Water grab sampling", sequence_number = 1)
+#> [1] "S01_WaterGrabSampli"
+generate_protocol_id("Analytical Protocol", "ICP-MS", sequence_number = 2, campaign_name = "NorthSea2022")
+#> [1] "A02_Icpms_NorthSea20"
+```

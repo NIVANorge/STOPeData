@@ -36,3 +36,13 @@ get_parameters_filtered(
 ## Value
 
 Character vector of parameter names
+
+## Examples
+
+``` r
+if (FALSE) { # \dontrun{
+  # dummy_parameters is a dataframe from the eDataDRF package
+  params <- get_parameters_filtered("Chemical", "Metal", dummy_parameters)
+  head(params)
+} # }
+```
