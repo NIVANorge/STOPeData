@@ -1,7 +1,10 @@
 # Create new compartment combination row
 
 Creates a single-row tibble with specified compartment information,
-using the standardised structure from initialise_compartments_tibble().
+using the standardised structure from
+\[eDataDRF::initialise_campaign_tibble()\]. Function will return an
+error if compartment, sub_compartment, or category are not of the
+correct variable type, but it doesn't check for vocabulary
 
 ## Usage
 
@@ -14,14 +17,17 @@ create_compartment_combination(compartment, sub_compartment, category)
 - compartment:
 
   Character string specifying the environmental compartment
+  (\[eDataDRF::environ_compartments_vocabulary()\])
 
 - sub_compartment:
 
   Character string specifying the sub-compartment
+  (\[eDataDRF::environ_compartments_sub_vocabulary()\])
 
 - category:
 
   Character string specifying the measured category
+  (\[eDataDRF::measured_category()\])
 
 ## Value
 
@@ -29,7 +35,7 @@ tibble with one row containing the specified compartment information
 
 ## See also
 
-`initialise_compartments_tibble`
+\[eDataDRF::initialise_campaign_tibble()\]
 
 Other create:
 [`create_dummy_session_data()`](https://nivanorge.github.io/STOPeData/reference/create_dummy_session_data.md),
@@ -40,14 +46,14 @@ Other create:
 ## Examples
 
 ``` r
-create_compartment_combination("Water", "Surface water", "Abiotic")
+create_compartment_combination("Aquatic", "Surface water", "External")
 #> # A tibble: 1 × 3
 #>   ENVIRON_COMPARTMENT ENVIRON_COMPARTMENT_SUB MEASURED_CATEGORY
 #>   <chr>               <chr>                   <chr>            
-#> 1 Water               Surface water           Abiotic          
-create_compartment_combination("Biota", "Fish", "Biotic")
+#> 1 Aquatic             Surface water           External         
+create_compartment_combination("Biota", "Biota, Aquatic", "Internal")
 #> # A tibble: 1 × 3
 #>   ENVIRON_COMPARTMENT ENVIRON_COMPARTMENT_SUB MEASURED_CATEGORY
 #>   <chr>               <chr>                   <chr>            
-#> 1 Biota               Fish                    Biotic           
+#> 1 Biota               Biota, Aquatic          Internal         
 ```
