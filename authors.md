@@ -4,6 +4,8 @@
 
 - **Sam A. Welch**. Author, maintainer.
 
+- **Knut Erik Tollefsen**. Conservator.
+
 ## Citation
 
 Source:
