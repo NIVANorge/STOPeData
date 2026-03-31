@@ -113,18 +113,7 @@
 <p><code><a href="../reference/run_app.html">STOPeData::run_app()</a></code> calls <code>~/R/run_app.R</code>, which is a wrapper function created by the <code>Golem</code> package.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co">#' Run the Shiny Application</span></span>
-<span><span class="co">#'</span></span>
-<span><span class="co">#' @param ... arguments to pass to golem_opts.</span></span>
-<span><span class="co">#' See `?golem::get_golem_options` for more details.</span></span>
-<span><span class="co">#' @inheritParams shiny::shinyApp</span></span>
-<span><span class="co">#'</span></span>
-<span><span class="co">#' @export</span></span>
-<span><span class="co">#' @importFrom shiny shinyApp</span></span>
-<span><span class="co">#' @importFrom golem with_golem_options</span></span>
-<span><span class="co">#' @importFrom logger log_appender log_layout log_threshold log_messages log_warnings layout_json</span></span>
-<span></span>
-<span><span class="va">run_app</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
+<code class="sourceCode R"><span><span class="va">run_app</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>  <span class="va">onStart</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">options</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  <span class="va">enableBookmarking</span> <span class="op">=</span> <span class="st">"server"</span>,</span>

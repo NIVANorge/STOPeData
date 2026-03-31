@@ -43,17 +43,6 @@ calls `~/R/run_app.R`, which is a wrapper function created by the
 `Golem` package.
 
 ``` r
-#' Run the Shiny Application
-#'
-#' @param ... arguments to pass to golem_opts.
-#' See `?golem::get_golem_options` for more details.
-#' @inheritParams shiny::shinyApp
-#'
-#' @export
-#' @importFrom shiny shinyApp
-#' @importFrom golem with_golem_options
-#' @importFrom logger log_appender log_layout log_threshold log_messages log_warnings layout_json
-
 run_app <- function(
   onStart = NULL,
   options = list(),
