@@ -1,6 +1,8 @@
 # Generate Units Summary by Parameter
 
-Creates a summary of measurement units grouped by parameter name
+Creates a summary of measurement units grouped by parameter name. Valid
+unit values are defined by
+[`eDataDRF::parameter_unit_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameter_unit_vocabulary.html).
 
 ## Usage
 
@@ -12,17 +14,25 @@ summarise_measured_units(measurement_data, parameters_data)
 
 - measurement_data:
 
-  Measurement data frame
+  Measurement data frame. Use
+  [`eDataDRF::example_measurements_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_measurements_tibble.html)
+  to generate an example input.
 
 - parameters_data:
 
-  Parameters data frame
+  Parameters data frame. Use
+  [`eDataDRF::example_parameters_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_parameters_tibble.html)
+  to generate an example input.
 
 ## Value
 
 Character string with units grouped by parameter
 
 ## See also
+
+[`eDataDRF::example_measurements_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_measurements_tibble.html),
+[`eDataDRF::example_parameters_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_parameters_tibble.html),
+[`eDataDRF::parameter_unit_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameter_unit_vocabulary.html)
 
 Other summarise:
 [`calculate_coordinate_precision()`](https://nivanorge.github.io/STOPeData/reference/calculate_coordinate_precision.md),
@@ -44,11 +54,9 @@ Other summarise:
 ## Examples
 
 ``` r
-measurements <- data.frame(
-  PARAMETER_NAME = c("Cadmium", "Cadmium", "Lead"),
-  MEASURED_UNIT = c("ug/g dw", "ug/g dw", "ug/g ww")
+summarise_measured_units(
+  eDataDRF::example_measurements_tibble(),
+  eDataDRF::example_parameters_tibble()
 )
-parameters <- data.frame(PARAMETER_NAME = c("Cadmium", "Lead"))
-summarise_measured_units(measurements, parameters)
-#> [1] "Cadmium: ug/g dw; Lead: ug/g ww"
+#> [1] "Copper: mg/kg (dry), Not Relevant; Lead: mg/kg (wet)"
 ```

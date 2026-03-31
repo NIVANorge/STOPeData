@@ -18,15 +18,19 @@ create_existing_parameter(
 
 - param_type:
 
-  Character string specifying the parameter type
+  Character string specifying the parameter type. Must be a value from
+  [`eDataDRF::parameter_types_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameter_types_vocabulary.html).
 
 - param_name:
 
-  Character string specifying the parameter name
+  Character string specifying the parameter name. Must be a value from
+  [`eDataDRF::parameters_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameters_vocabulary.html).
 
 - dummy_parameters:
 
-  Dataframe containing base parameters
+  Dataframe containing base parameters. Use
+  [`eDataDRF::parameters_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameters_vocabulary.html)
+  to obtain the full parameter list.
 
 - session_parameters:
 
@@ -38,7 +42,9 @@ tibble with parameter information or NULL if not found
 
 ## See also
 
-[`eDataDRF::initialise_parameters_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_parameters_tibble.html)
+[`eDataDRF::initialise_parameters_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_parameters_tibble.html),
+[`eDataDRF::parameters_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameters_vocabulary.html),
+[`eDataDRF::parameter_types_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameter_types_vocabulary.html)
 
 Other create:
 [`create_compartment_combination()`](https://nivanorge.github.io/STOPeData/reference/create_compartment_combination.md),
@@ -49,9 +55,11 @@ Other create:
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-  # dummy_parameters is a dataframe from the eDataDRF package
-  row <- create_existing_parameter("Chemical", "Cadmium", dummy_parameters)
-  row
-} # }
+create_existing_parameter("Chemical", "Cadmium", eDataDRF::parameters_vocabulary())
+#> # A tibble: 1 × 10
+#>   PARAMETER_TYPE PARAMETER_TYPE_SUB          MEASURED_TYPE PARAMETER_NAME
+#>   <chr>          <chr>                       <chr>         <chr>         
+#> 1 Chemical       Homogeneous metal compounds Concentration Cadmium       
+#> # ℹ 6 more variables: PARAMETER_NAME_SUB <chr>, INCHIKEY_SD <chr>,
+#> #   PUBCHEM_CID <int>, CAS_RN <chr>, ENTERED_BY <chr>, PARAMETER_COMMENT <chr>
 ```

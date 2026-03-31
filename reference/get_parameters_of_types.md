@@ -17,11 +17,14 @@ get_parameters_of_types(
 
 - param_type:
 
-  Character string specifying the parameter type
+  Character string specifying the parameter type. Must be a value from
+  [`eDataDRF::parameter_types_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameter_types_vocabulary.html).
 
 - dummy_parameters:
 
-  Dataframe containing base parameters
+  Dataframe containing base parameters. Use
+  [`eDataDRF::parameters_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameters_vocabulary.html)
+  to obtain the full parameter list.
 
 - session_parameters:
 
@@ -31,12 +34,16 @@ get_parameters_of_types(
 
 Character vector of parameter names
 
+## See also
+
+[`eDataDRF::parameters_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameters_vocabulary.html),
+[`eDataDRF::parameter_types_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameter_types_vocabulary.html),
+[`eDataDRF::parameter_types_sub_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameter_types_sub_vocabulary.html)
+
 ## Examples
 
 ``` r
-if (FALSE) { # \dontrun{
-  # dummy_parameters is a dataframe from the eDataDRF package
-  params <- get_parameters_of_types("Chemical", dummy_parameters)
-  head(params)
-} # }
+params <- get_parameters_of_types("Chemical", eDataDRF::parameters_vocabulary())
+head(params)
+#> [1] "-- New Parameter --"
 ```

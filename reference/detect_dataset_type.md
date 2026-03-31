@@ -1,6 +1,10 @@
 # Detect dataset type from filename —-
 
-Determine which type of dataset based on filename patterns
+Determine which type of dataset based on filename patterns. Dataset
+types correspond to eDataDRF tables — see
+[`eDataDRF::initialise_sites_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_sites_tibble.html),
+[`eDataDRF::initialise_measurements_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_measurements_tibble.html),
+etc. for the full set.
 
 ## Usage
 
@@ -17,6 +21,12 @@ detect_dataset_type(filename)
 ## Value
 
 Character string of dataset type or NULL if not recognized
+
+## See also
+
+[`eDataDRF::initialise_sites_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_sites_tibble.html),
+[`eDataDRF::initialise_measurements_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_measurements_tibble.html),
+[`eDataDRF::initialise_campaign_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_campaign_tibble.html)
 
 ## Examples
 

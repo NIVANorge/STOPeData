@@ -12,17 +12,24 @@ validate_dataset_structure(data, dataset_type)
 
 - data:
 
-  Tibble/data.frame to validate
+  Tibble/data.frame to validate. Use
+  [`eDataDRF::example_sites_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_sites_tibble.html)
+  or other `example_*_tibble()` functions to generate valid example
+  inputs.
 
 - dataset_type:
 
-  Character string of dataset type
+  Character string of dataset type, as returned by
+  [`detect_dataset_type()`](https://nivanorge.github.io/STOPeData/reference/detect_dataset_type.md)
 
 ## Value
 
 List with valid (logical) and message (character)
 
 ## See also
+
+[`detect_dataset_type()`](https://nivanorge.github.io/STOPeData/reference/detect_dataset_type.md),
+[`eDataDRF::initialise_sites_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_sites_tibble.html)
 
 Other validate:
 [`validate_and_lookup_identifier()`](https://nivanorge.github.io/STOPeData/reference/validate_and_lookup_identifier.md),
@@ -33,8 +40,14 @@ Other validate:
 ## Examples
 
 ``` r
-df <- data.frame(SITE_CODE = c("S001", "S002"), LATITUDE = c(59.1, 57.4))
-validate_dataset_structure(df, "Sites")
+validate_dataset_structure(eDataDRF::example_sites_tibble(), "Sites")
+#> $valid
+#> [1] TRUE
+#> 
+#> $message
+#> [1] "Valid structure"
+#> 
+validate_dataset_structure(eDataDRF::example_measurements_tibble(), "Measurements")
 #> $valid
 #> [1] TRUE
 #> 

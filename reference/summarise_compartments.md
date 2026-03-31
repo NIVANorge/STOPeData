@@ -12,13 +12,19 @@ summarise_compartments(compartmentsData)
 
 - compartmentsData:
 
-  The compartments dataset
+  The compartments dataset. Use
+  [`eDataDRF::example_compartments_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_compartments_tibble.html)
+  to generate an example input.
 
 ## Value
 
 Character string summarising compartments, or "Relevant data not found"
 
 ## See also
+
+[`eDataDRF::example_compartments_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_compartments_tibble.html),
+[`eDataDRF::environ_compartments_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/environ_compartments_vocabulary.html),
+[`eDataDRF::environ_compartments_sub_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/environ_compartments_sub_vocabulary.html)
 
 Other summarise:
 [`calculate_coordinate_precision()`](https://nivanorge.github.io/STOPeData/reference/calculate_coordinate_precision.md),
@@ -40,10 +46,6 @@ Other summarise:
 ## Examples
 
 ``` r
-comps <- data.frame(
-  ENVIRON_COMPARTMENT = c("Water", "Sediment"),
-  ENVIRON_COMPARTMENT_SUB = c("Surface water", NA)
-)
-summarise_compartments(comps)
-#> 2 compartments: Water (Surface water); Sediment
+summarise_compartments(eDataDRF::example_compartments_tibble())
+#> 2 compartments: Aquatic (Aquatic Sediment); Biota (Biota, Aquatic)
 ```

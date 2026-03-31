@@ -22,11 +22,16 @@ write_creed_report_txt(
 
 - creed_relevance:
 
-  Tibble with field/value columns from summarise_CREED_relevance()
+  Tibble with field/value columns from summarise_CREED_relevance(). Use
+  [`eDataDRF::example_CREED_relevance_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_CREED_relevance_tibble.html)
+  to generate example data.
 
 - creed_reliability:
 
-  Tibble with field/value columns from summarise_CREED_reliability()
+  Tibble with field/value columns from summarise_CREED_reliability().
+  Use
+  [`eDataDRF::example_CREED_reliability_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_CREED_reliability_tibble.html)
+  to generate example data.
 
 - file_path:
 
@@ -35,6 +40,12 @@ write_creed_report_txt(
 ## Value
 
 NULL (invisibly). File is written to disk as a side effect.
+
+## See also
+
+[`eDataDRF::example_CREED_relevance_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_CREED_relevance_tibble.html),
+[`eDataDRF::example_CREED_reliability_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_CREED_reliability_tibble.html),
+[`eDataDRF::initialise_CREED_data_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_CREED_data_tibble.html)
 
 ## Examples
 

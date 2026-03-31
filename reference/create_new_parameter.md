@@ -13,7 +13,8 @@ create_new_parameter(param_type, entered_by)
 
 - param_type:
 
-  Character string specifying the parameter type
+  Character string specifying the parameter type. Must be a value from
+  [`eDataDRF::parameter_types_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameter_types_vocabulary.html).
 
 - entered_by:
 
@@ -25,7 +26,9 @@ tibble with blank parameter template
 
 ## See also
 
-[`eDataDRF::initialise_parameters_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_parameters_tibble.html)
+[`eDataDRF::initialise_parameters_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_parameters_tibble.html),
+[`eDataDRF::parameter_types_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameter_types_vocabulary.html),
+[`eDataDRF::measured_types_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/measured_types_vocabulary.html)
 
 Other create:
 [`create_compartment_combination()`](https://nivanorge.github.io/STOPeData/reference/create_compartment_combination.md),

@@ -19,23 +19,33 @@ summarise_sites(
 
 - sitesData:
 
-  The sites dataset
+  The sites dataset. Use
+  [`eDataDRF::example_sites_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_sites_tibble.html)
+  to generate an example input.
 
 - COUNTRY_ISO:
 
-  Logical. Include country summary?
+  Logical. Include country summary? See
+  [`eDataDRF::countries_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/countries_vocabulary.html)
+  for valid country codes.
 
 - OCEAN_IHO:
 
-  Logical. Include area summary?
+  Logical. Include area summary? See
+  [`eDataDRF::ocean_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/ocean_vocabulary.html)
+  for valid ocean areas.
 
 - SITE_GEOGRAPHIC_FEATURE:
 
-  Logical. Include geographic feature summary?
+  Logical. Include geographic feature summary? See
+  [`eDataDRF::geographic_features_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/geographic_features_vocabulary.html)
+  for valid features.
 
 - SITE_GEOGRAPHIC_FEATURE_SUB:
 
-  Logical. Include geographic feature sub summary?
+  Logical. Include geographic feature sub summary? See
+  [`eDataDRF::geographic_features_sub_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/geographic_features_sub_vocabulary.html)
+  for valid sub-features.
 
 - PRECISION:
 
@@ -46,6 +56,12 @@ summarise_sites(
 Character string summarising sites, or "Relevant data not found"
 
 ## See also
+
+[`eDataDRF::example_sites_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_sites_tibble.html),
+[`eDataDRF::countries_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/countries_vocabulary.html),
+[`eDataDRF::ocean_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/ocean_vocabulary.html),
+[`eDataDRF::geographic_features_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/geographic_features_vocabulary.html),
+[`eDataDRF::geographic_features_sub_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/geographic_features_sub_vocabulary.html)
 
 Other summarise:
 [`calculate_coordinate_precision()`](https://nivanorge.github.io/STOPeData/reference/calculate_coordinate_precision.md),
@@ -67,13 +83,6 @@ Other summarise:
 ## Examples
 
 ``` r
-sites <- data.frame(
-  COUNTRY_ISO = c("NO", "SE"),
-  OCEAN_IHO = c("North Sea", "Baltic Sea"),
-  SITE_GEOGRAPHIC_FEATURE = c("Fjord", "Bay"),
-  LATITUDE = c(59.123, 57.456),
-  LONGITUDE = c(10.12, 11.789)
-)
-summarise_sites(sites, COUNTRY_ISO = TRUE, PRECISION = TRUE)
-#> [1] "2 sites. Countries (2): NO, SE. Lowest coordinate precision: 2"
+summarise_sites(eDataDRF::example_sites_tibble(), COUNTRY_ISO = TRUE, PRECISION = TRUE)
+#> [1] "2 sites. Countries: Norway. Lowest coordinate precision: 4"
 ```

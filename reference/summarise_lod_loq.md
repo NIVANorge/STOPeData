@@ -12,13 +12,18 @@ summarise_lod_loq(measurementsData)
 
 - measurementsData:
 
-  The measurements dataset
+  The measurements dataset. Use
+  [`eDataDRF::example_measurements_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_measurements_tibble.html)
+  to generate an example input.
 
 ## Value
 
 Character string summarising LOD/LOQ, or "Relevant data not found"
 
 ## See also
+
+[`eDataDRF::example_measurements_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_measurements_tibble.html),
+[`eDataDRF::parameter_unit_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/parameter_unit_vocabulary.html)
 
 Other summarise:
 [`calculate_coordinate_precision()`](https://nivanorge.github.io/STOPeData/reference/calculate_coordinate_precision.md),
@@ -40,12 +45,6 @@ Other summarise:
 ## Examples
 
 ``` r
-meas <- data.frame(
-  LOQ_VALUE = c(0.1, 0.2, 0.15),
-  LOQ_UNIT = c("ug/L", "ug/L", "ug/L"),
-  LOD_VALUE = c(0.05, 0.08, NA),
-  LOD_UNIT = c("ug/L", "ug/L", NA)
-)
-summarise_lod_loq(meas)
-#> [1] "LOQ: 0.1 to 0.2 ug/L; LOD: 0.05 to 0.08 ug/L"
+summarise_lod_loq(eDataDRF::example_measurements_tibble())
+#> [1] "LOQ: 0.05 to 1 mg/kg (dry); LOD: 0.01 to 0.3 mg/kg (dry)"
 ```

@@ -58,7 +58,8 @@
 
 
 <dl><dt id="arg-measurementsdata">measurementsData<a class="anchor" aria-label="anchor" href="#arg-measurementsdata"></a></dt>
-<dd><p>The measurements dataset</p></dd>
+<dd><p>The measurements dataset. Use
+<code><a href="https://NIVANorge.github.io/eDataDRF/reference/example_measurements_tibble.html" class="external-link">eDataDRF::example_measurements_tibble()</a></code> to generate an example input.</p></dd>
 
 </dl></div>
     <div class="section level2">
@@ -67,7 +68,9 @@
     </div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
-    <div class="dont-index"><p>Other summarise:
+    <div class="dont-index"><p><code><a href="https://NIVANorge.github.io/eDataDRF/reference/example_measurements_tibble.html" class="external-link">eDataDRF::example_measurements_tibble()</a></code>,
+<code><a href="https://NIVANorge.github.io/eDataDRF/reference/parameter_unit_vocabulary.html" class="external-link">eDataDRF::parameter_unit_vocabulary()</a></code></p>
+<p>Other summarise:
 <code><a href="calculate_coordinate_precision.html">calculate_coordinate_precision()</a></code>,
 <code><a href="manual_completion_message.html">manual_completion_message()</a></code>,
 <code><a href="summarise_CREED_details.html">summarise_CREED_details()</a></code>,
@@ -87,14 +90,8 @@
 
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
-    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">meas</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span></span></span>
-<span class="r-in"><span>  LOQ_VALUE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.1</span>, <span class="fl">0.2</span>, <span class="fl">0.15</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  LOQ_UNIT <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ug/L"</span>, <span class="st">"ug/L"</span>, <span class="st">"ug/L"</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  LOD_VALUE <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0.05</span>, <span class="fl">0.08</span>, <span class="cn">NA</span><span class="op">)</span>,</span></span>
-<span class="r-in"><span>  LOD_UNIT <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"ug/L"</span>, <span class="st">"ug/L"</span>, <span class="cn">NA</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="fu">summarise_lod_loq</span><span class="op">(</span><span class="va">meas</span><span class="op">)</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "LOQ: 0.1 to 0.2 ug/L; LOD: 0.05 to 0.08 ug/L"</span>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="fu">summarise_lod_loq</span><span class="op">(</span><span class="fu">eDataDRF</span><span class="fu">::</span><span class="fu"><a href="https://NIVANorge.github.io/eDataDRF/reference/example_measurements_tibble.html" class="external-link">example_measurements_tibble</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] "LOQ: 0.05 to 1 mg/kg (dry); LOD: 0.01 to 0.3 mg/kg (dry)"</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

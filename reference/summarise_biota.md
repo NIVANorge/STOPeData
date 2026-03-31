@@ -20,33 +20,52 @@ summarise_biota(
 
 - biotaData:
 
-  The biota dataset
+  The biota dataset. Use
+  [`eDataDRF::example_biota_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_biota_tibble.html)
+  to generate an example input.
 
 - SPECIES_GROUP:
 
-  Logical. Include species group summary?
+  Logical. Include species group summary? See
+  [`eDataDRF::species_groups_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/species_groups_vocabulary.html)
+  for valid groups.
 
 - SAMPLE_SPECIES:
 
-  Logical. Include sample species summary?
+  Logical. Include sample species summary? See
+  [`eDataDRF::species_names_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/species_names_vocabulary.html)
+  for valid species.
 
 - SAMPLE_TISSUE:
 
-  Logical. Include tissue type summary?
+  Logical. Include tissue type summary? See
+  [`eDataDRF::tissue_types_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/tissue_types_vocabulary.html)
+  for valid tissue types.
 
 - SAMPLE_SPECIES_LIFESTAGE:
 
-  Logical. Include life stage summary?
+  Logical. Include life stage summary? See
+  [`eDataDRF::lifestage_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/lifestage_vocabulary.html)
+  for valid life stages.
 
 - SAMPLE_SPECIES_GENDER:
 
-  Logical. Include gender summary?
+  Logical. Include gender summary? See
+  [`eDataDRF::gender_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/gender_vocabulary.html)
+  for valid gender values.
 
 ## Value
 
 Character string summarising biota, or "Relevant data not found"
 
 ## See also
+
+[`eDataDRF::example_biota_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_biota_tibble.html),
+[`eDataDRF::species_groups_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/species_groups_vocabulary.html),
+[`eDataDRF::species_names_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/species_names_vocabulary.html),
+[`eDataDRF::tissue_types_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/tissue_types_vocabulary.html),
+[`eDataDRF::lifestage_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/lifestage_vocabulary.html),
+[`eDataDRF::gender_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/gender_vocabulary.html)
 
 Other summarise:
 [`calculate_coordinate_precision()`](https://nivanorge.github.io/STOPeData/reference/calculate_coordinate_precision.md),
@@ -68,13 +87,6 @@ Other summarise:
 ## Examples
 
 ``` r
-biota <- data.frame(
-  SPECIES_GROUP = c("Fish", "Fish"),
-  SAMPLE_SPECIES = c("Gadus morhua", "Clupea harengus"),
-  SAMPLE_TISSUE = c("Liver", "Muscle"),
-  SAMPLE_SPECIES_LIFESTAGE = c("Adult", "Juvenile"),
-  SAMPLE_SPECIES_GENDER = c("Male", "Female")
-)
-summarise_biota(biota, SAMPLE_SPECIES = TRUE, SAMPLE_TISSUE = TRUE)
-#> [1] "2 biota samples. Species (2): Gadus morhua, Clupea harengus. Tissue types (2): Liver, Muscle"
+summarise_biota(eDataDRF::example_biota_tibble(), SAMPLE_SPECIES = TRUE, SAMPLE_TISSUE = TRUE)
+#> [1] "1 biota samples. Species: Gadus morhua. Tissue types: Liver"
 ```

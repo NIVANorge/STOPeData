@@ -1,8 +1,11 @@
 # Convert CREED Tibble to Mock Input List
 
-Converts a CREED data tibble (from dummy_CREED_reliability_tibble() or
-dummy_CREED_relevance_tibble()) into a mock shiny input list object
-suitable for testing collect_CREED_data().
+Converts a CREED data tibble (from
+[`eDataDRF::example_CREED_reliability_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_CREED_reliability_tibble.html)
+or
+[`eDataDRF::example_CREED_relevance_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_CREED_relevance_tibble.html))
+into a mock shiny input list object suitable for testing
+collect_CREED_data().
 
 ## Usage
 
@@ -14,7 +17,12 @@ creed_tibble_to_mock_input(creed_tibble)
 
 - creed_tibble:
 
-  A tibble with columns: criterion_id, relevant_data, score, limitations
+  A tibble with columns: criterion_id, relevant_data, score,
+  limitations. Use
+  [`eDataDRF::example_CREED_reliability_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_CREED_reliability_tibble.html)
+  or
+  [`eDataDRF::example_CREED_relevance_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_CREED_relevance_tibble.html)
+  to generate example inputs.
 
 ## Value
 
@@ -34,11 +42,15 @@ Score values are converted from numeric to text:
 
 - 4 = "Not Met"
 
+## See also
+
+[`eDataDRF::example_CREED_reliability_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_CREED_reliability_tibble.html),
+[`eDataDRF::example_CREED_relevance_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_CREED_relevance_tibble.html)
+
 ## Examples
 
 ``` r
-dummy_data <- create_dummy_session_data()
-mock_input <- creed_tibble_to_mock_input(dummy_data$creedReliability)
+mock_input <- creed_tibble_to_mock_input(eDataDRF::example_CREED_reliability_tibble())
 mock_input$RB1_score
 #>           1 
 #> "Fully Met" 

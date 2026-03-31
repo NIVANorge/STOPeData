@@ -4,6 +4,12 @@ Generates a standardised protocol identifier based on protocol type,
 name, sequence number, and campaign. The function is fully vectorised
 and can handle multiple protocols simultaneously.
 
+This is the STOPeData-local implementation. See also
+[`eDataDRF::generate_protocol_id()`](https://NIVANorge.github.io/eDataDRF/reference/generate_protocol_id.html)
+for the canonical version and
+[`eDataDRF::protocol_id_regex()`](https://NIVANorge.github.io/eDataDRF/reference/protocol_id_regex.html)
+to validate generated IDs.
+
 ## Usage
 
 ``` r
@@ -20,13 +26,17 @@ generate_protocol_id(
 - protocol_type:
 
   Character vector. The category of protocol (e.g., "Sampling Protocol",
-  "Analytical Protocol"). Must match one of the predefined categories or
-  will default to "X".
+  "Analytical Protocol"). Must match one of the predefined categories
+  from
+  [`eDataDRF::protocol_categories_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/protocol_categories_vocabulary.html)
+  or will default to "X".
 
 - protocol_name:
 
   Character vector. The specific name/method within the protocol
-  category. Will be abbreviated and cleaned for ID generation.
+  category. See
+  [`eDataDRF::protocol_options_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/protocol_options_vocabulary.html)
+  for valid options. Will be abbreviated and cleaned for ID generation.
 
 - sequence_number:
 
@@ -65,6 +75,13 @@ The function handles edge cases gracefully:
 
 - Empty components are omitted from the final ID
 
+## See also
+
+[`eDataDRF::generate_protocol_id()`](https://NIVANorge.github.io/eDataDRF/reference/generate_protocol_id.html),
+[`eDataDRF::protocol_id_regex()`](https://NIVANorge.github.io/eDataDRF/reference/protocol_id_regex.html),
+[`eDataDRF::protocol_categories_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/protocol_categories_vocabulary.html),
+[`eDataDRF::protocol_options_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/protocol_options_vocabulary.html)
+
 ## Examples
 
 ``` r
@@ -72,4 +89,9 @@ generate_protocol_id("Sampling Protocol", "Water grab sampling", sequence_number
 #> [1] "S01_WaterGrabSampli"
 generate_protocol_id("Analytical Protocol", "ICP-MS", sequence_number = 2, campaign_name = "NorthSea2022")
 #> [1] "A02_Icpms_NorthSea20"
+
+# Validate the generated ID against the regex
+id <- generate_protocol_id("Extraction Protocol", "Soxhlet", sequence_number = 1)
+grepl(eDataDRF::protocol_id_regex(), id)
+#> [1] TRUE
 ```

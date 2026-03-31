@@ -12,18 +12,26 @@ summarise_protocols(methodsData, categories)
 
 - methodsData:
 
-  The methods/protocols dataset
+  The methods/protocols dataset. Use
+  [`eDataDRF::example_methods_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_methods_tibble.html)
+  to generate an example input.
 
 - categories:
 
-  Character vector of protocol categories to include (e.g., c("Sampling
-  Protocol", "Analytical Protocol"))
+  Character vector of protocol categories to include. Must be values
+  from
+  [`eDataDRF::protocol_categories_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/protocol_categories_vocabulary.html)
+  (e.g., `c("Sampling Protocol", "Analytical Protocol")`).
 
 ## Value
 
 Character string summarising protocols, or "Relevant data not found"
 
 ## See also
+
+[`eDataDRF::example_methods_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_methods_tibble.html),
+[`eDataDRF::protocol_categories_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/protocol_categories_vocabulary.html),
+[`eDataDRF::protocol_options_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/protocol_options_vocabulary.html)
 
 Other summarise:
 [`calculate_coordinate_precision()`](https://nivanorge.github.io/STOPeData/reference/calculate_coordinate_precision.md),
@@ -45,13 +53,11 @@ Other summarise:
 ## Examples
 
 ``` r
-methods <- data.frame(
-  PROTOCOL_CATEGORY = c("Sampling Protocol", "Analytical Protocol"),
-  PROTOCOL_NAME = c("Water grab sampling", "ICP-MS"),
-  PROTOCOL_COMMENT = c(NA, "ISO 17294-2")
+summarise_protocols(
+  eDataDRF::example_methods_tibble(),
+  categories = c("Sampling Protocol", "Analytical Protocol")
 )
-summarise_protocols(methods, categories = c("Sampling Protocol", "Analytical Protocol"))
 #> 2 protocols:
-#> Sampling Protocol - Water grab sampling
-#> Analytical Protocol - ICP-MS: (ISO 17294-2)
+#> Sampling Protocol - Grab sampling: (Surface sediment grab samples collected by Van Veen grab)
+#> Analytical Protocol - Inductively coupled plasma mass spectrometry: (Inductively coupled plasma mass spectrometry using the ICP-MASTER 9000.)
 ```

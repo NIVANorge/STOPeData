@@ -1,7 +1,8 @@
 # Reference field character limits
 
 Returns maximum character lengths for text fields in the references
-table.
+table
+([`eDataDRF::initialise_references_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_references_tibble.html)).
 
 ## Usage
 
@@ -35,6 +36,13 @@ PUBLISHER: 200 characters
 REF_COMMENT: 1000 characters
 
 URL: 200 characters
+
+## See also
+
+[`eDataDRF::initialise_references_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_references_tibble.html),
+[`eDataDRF::example_references_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_references_tibble.html),
+[`eDataDRF::reference_type_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/reference_type_vocabulary.html),
+[`eDataDRF::data_source_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/data_source_vocabulary.html)
 
 ## Examples
 

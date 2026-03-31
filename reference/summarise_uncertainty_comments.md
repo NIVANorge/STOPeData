@@ -12,7 +12,9 @@ summarise_uncertainty_comments(measurementsData)
 
 - measurementsData:
 
-  The measurements dataset
+  The measurements dataset. Use
+  [`eDataDRF::example_measurements_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_measurements_tibble.html)
+  to generate an example input.
 
 ## Value
 
@@ -20,6 +22,9 @@ Character string summarising uncertainty info, or "Relevant data not
 found"
 
 ## See also
+
+[`eDataDRF::example_measurements_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/example_measurements_tibble.html),
+[`eDataDRF::uncertainty_types_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/uncertainty_types_vocabulary.html)
 
 Other summarise:
 [`calculate_coordinate_precision()`](https://nivanorge.github.io/STOPeData/reference/calculate_coordinate_precision.md),
@@ -41,10 +46,6 @@ Other summarise:
 ## Examples
 
 ``` r
-meas <- data.frame(
-  UNCERTAINTY_TYPE = c("Standard deviation", "Standard deviation", NA),
-  MEASUREMENT_COMMENT = c(NA, "Replicate mean", "Replicate mean")
-)
-summarise_uncertainty_comments(meas)
-#> [1] "Uncertainty types: Standard deviation; Measurement comments: Replicate mean"
+summarise_uncertainty_comments(eDataDRF::example_measurements_tibble())
+#> [1] "Uncertainty types: Standard Deviation, Arithmetic Mean, Not Reported; Measurement comments: Below LOQ - biota sample"
 ```
