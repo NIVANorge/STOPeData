@@ -36,7 +36,7 @@ bib_string2df_alt <- function(string, ...) {
   temp_file <- tempfile(fileext = ".bib")
   on.exit(unlink(temp_file))
   writeLines(string, temp_file)
-  bib2df::bib2df(temp_file, ...)
+  bib2df(temp_file, ...)
 }
 
 # BibTeX Functions ----
@@ -448,9 +448,7 @@ clean_bibtex_text <- function(text) {
   text <- trimws(text)
 
   # Use stringi for additional Unicode normalization if available
-  if (requireNamespace("stringi", quietly = TRUE)) {
-    text <- stringi::stri_trans_general(text, "Latin-ASCII; Any-NFC")
-  }
+  text <- stri_trans_general(text, "Latin-ASCII; Any-NFC")
 
   return(text)
 }

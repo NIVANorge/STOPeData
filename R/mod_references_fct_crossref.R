@@ -161,9 +161,9 @@ pmid_to_doi <- function(pmid) {
       )
 
       # Make API request
-      response <- httr::GET(url)
+      response <- GET(url)
 
-      if (httr::http_error(response)) {
+      if (http_error(response)) {
         return(list(
           success = FALSE,
           doi = NULL,
@@ -172,11 +172,11 @@ pmid_to_doi <- function(pmid) {
       }
 
       # Parse XML response
-      xml_content <- httr::content(response, "text", encoding = "UTF-8")
-      xml_doc <- xml2::read_xml(xml_content)
+      xml_content <- content(response, "text", encoding = "UTF-8")
+      xml_doc <- read_xml(xml_content)
 
       # Look for DOI in ArticleIdList
-      doi_node <- xml2::xml_find_first(xml_doc, "//ArticleId[@IdType='doi']")
+      doi_node <- xml_find_first(xml_doc, "//ArticleId[@IdType='doi']")
 
       if (length(doi_node) == 0 || is.na(doi_node)) {
         return(list(
@@ -186,7 +186,7 @@ pmid_to_doi <- function(pmid) {
         ))
       }
 
-      doi <- xml2::xml_text(doi_node)
+      doi <- xml_text(doi_node)
 
       if (is.na(doi) || doi == "") {
         return(list(
@@ -241,7 +241,7 @@ lookup_crossref_doi <- function(doi) {
   tryCatch(
     {
       # Query Crossref
-      result <- rcrossref::cr_works(doi)
+      result <- cr_works(doi)
 
       if (is.null(result) || is.null(result$data)) {
         return(list(

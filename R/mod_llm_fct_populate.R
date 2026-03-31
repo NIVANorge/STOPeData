@@ -112,6 +112,7 @@ populate_campaign_from_llm <- function(session, llm_campaign_data) {
 #' @importFrom dplyr rename_with
 #' @importFrom shiny updateSelectInput updateTextInput updateTextAreaInput updateNumericInput updateDateInput showNotification
 #' @importFrom golem print_dev
+#' @importFrom eDataDRF generate_reference_id
 #' @noRd
 # ! FORMAT-BASED
 populate_references_from_llm <- function(session, llm_references_data) {
@@ -150,7 +151,7 @@ populate_references_from_llm <- function(session, llm_references_data) {
   } else {
     tryCatch(
       {
-        eDataDRF::generate_reference_id(
+        generate_reference_id(
           date = llm_references_data$YEAR,
           author = llm_references_data$AUTHOR,
           title = llm_references_data$TITLE

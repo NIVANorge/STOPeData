@@ -143,14 +143,14 @@ parse_compartment_selections <- function(
   available_compartments
 ) {
   if (is.null(compartment_selections) || length(compartment_selections) == 0) {
-    return(tibble::tibble(
+    return(tibble(
       ENVIRON_COMPARTMENT = character(0),
       ENVIRON_COMPARTMENT_SUB = character(0),
       MEASURED_CATEGORY = character(0)
     ))
   }
 
-  parsed <- tibble::tibble()
+  parsed <- tibble()
 
   for (selection in compartment_selections) {
     # Parse "Aquatic | Freshwater" format

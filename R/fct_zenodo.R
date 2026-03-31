@@ -14,7 +14,7 @@
 #' @importFrom tibble as_tibble
 #' @export
 zenodo_licenses <- readRDS("inst/extdata/clean/Zenodo_Licenses_2026_03.rds") |>
-  tibble::as_tibble()
+  as_tibble()
 
 #' Zenodo resource type options vector
 #'
