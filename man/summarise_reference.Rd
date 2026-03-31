@@ -7,26 +7,25 @@
 summarise_reference(ref_data)
 }
 \arguments{
-\item{ref_data}{Reference data frame}
+\item{ref_data}{Reference data frame. Use \code{\link[eDataDRF:example_references_tibble]{eDataDRF::example_references_tibble()}}
+to generate an example input.}
 }
 \value{
 Character string with formatted reference
 }
 \description{
-Creates a formatted bibliographic reference from reference data
+Creates a formatted bibliographic reference from reference data.
+See \code{\link[eDataDRF:initialise_references_tibble]{eDataDRF::initialise_references_tibble()}} for the expected column
+structure.
 }
 \examples{
-ref <- data.frame(
-  AUTHOR = "Smith J.",
-  YEAR = 2022,
-  TITLE = "Marine pollution monitoring",
-  PERIODICAL_JOURNAL = "Marine Pollution Bulletin",
-  PUBLISHER = NA,
-  DOI = "10.1000/xyz123"
-)
-summarise_reference(ref)
+summarise_reference(eDataDRF::example_references_tibble())
 }
 \seealso{
+\code{\link[eDataDRF:example_references_tibble]{eDataDRF::example_references_tibble()}},
+\code{\link[eDataDRF:initialise_references_tibble]{eDataDRF::initialise_references_tibble()}},
+\code{\link[eDataDRF:generate_reference_id]{eDataDRF::generate_reference_id()}}
+
 Other summarise: 
 \code{\link{calculate_coordinate_precision}()},
 \code{\link{manual_completion_message}()},

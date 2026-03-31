@@ -7,7 +7,8 @@
 summarise_lod_loq(measurementsData)
 }
 \arguments{
-\item{measurementsData}{The measurements dataset}
+\item{measurementsData}{The measurements dataset. Use
+\code{\link[eDataDRF:example_measurements_tibble]{eDataDRF::example_measurements_tibble()}} to generate an example input.}
 }
 \value{
 Character string summarising LOD/LOQ, or "Relevant data not found"
@@ -16,15 +17,12 @@ Character string summarising LOD/LOQ, or "Relevant data not found"
 Creates a summary string of limit of detection and quantification values
 }
 \examples{
-meas <- data.frame(
-  LOQ_VALUE = c(0.1, 0.2, 0.15),
-  LOQ_UNIT = c("ug/L", "ug/L", "ug/L"),
-  LOD_VALUE = c(0.05, 0.08, NA),
-  LOD_UNIT = c("ug/L", "ug/L", NA)
-)
-summarise_lod_loq(meas)
+summarise_lod_loq(eDataDRF::example_measurements_tibble())
 }
 \seealso{
+\code{\link[eDataDRF:example_measurements_tibble]{eDataDRF::example_measurements_tibble()}},
+\code{\link[eDataDRF:parameter_unit_vocabulary]{eDataDRF::parameter_unit_vocabulary()}}
+
 Other summarise: 
 \code{\link{calculate_coordinate_precision}()},
 \code{\link{manual_completion_message}()},

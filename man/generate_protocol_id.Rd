@@ -14,10 +14,12 @@ generate_protocol_id(
 \arguments{
 \item{protocol_type}{Character vector. The category of protocol
 (e.g., "Sampling Protocol", "Analytical Protocol"). Must match one of
-the predefined categories or will default to "X".}
+the predefined categories from \code{\link[eDataDRF:protocol_categories_vocabulary]{eDataDRF::protocol_categories_vocabulary()}}
+or will default to "X".}
 
 \item{protocol_name}{Character vector. The specific name/method within
-the protocol category. Will be abbreviated and cleaned for ID generation.}
+the protocol category. See \code{\link[eDataDRF:protocol_options_vocabulary]{eDataDRF::protocol_options_vocabulary()}} for
+valid options. Will be abbreviated and cleaned for ID generation.}
 
 \item{sequence_number}{Numeric vector. Sequential number for protocols
 within the same category. Defaults to 1. Will be zero-padded to 2 digits.}
@@ -41,6 +43,10 @@ A (Analytical), X (Unknown)
 Generates a standardised protocol identifier based on protocol type, name,
 sequence number, and campaign. The function is fully vectorised and can
 handle multiple protocols simultaneously.
+
+This is the STOPeData-local implementation. See also
+\code{\link[eDataDRF:generate_protocol_id]{eDataDRF::generate_protocol_id()}} for the canonical version and
+\code{\link[eDataDRF:protocol_id_regex]{eDataDRF::protocol_id_regex()}} to validate generated IDs.
 }
 \details{
 The function handles edge cases gracefully:
@@ -54,5 +60,14 @@ The function handles edge cases gracefully:
 \examples{
 generate_protocol_id("Sampling Protocol", "Water grab sampling", sequence_number = 1)
 generate_protocol_id("Analytical Protocol", "ICP-MS", sequence_number = 2, campaign_name = "NorthSea2022")
+
+# Validate the generated ID against the regex
+id <- generate_protocol_id("Extraction Protocol", "Soxhlet", sequence_number = 1)
+grepl(eDataDRF::protocol_id_regex(), id)
+}
+\seealso{
+\code{\link[eDataDRF:generate_protocol_id]{eDataDRF::generate_protocol_id()}}, \code{\link[eDataDRF:protocol_id_regex]{eDataDRF::protocol_id_regex()}},
+\code{\link[eDataDRF:protocol_categories_vocabulary]{eDataDRF::protocol_categories_vocabulary()}},
+\code{\link[eDataDRF:protocol_options_vocabulary]{eDataDRF::protocol_options_vocabulary()}}
 }
 \concept{protocol_functions}

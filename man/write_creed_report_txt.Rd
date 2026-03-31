@@ -14,9 +14,11 @@ write_creed_report_txt(
 \arguments{
 \item{creed_details}{Tibble with field/value columns from summarise_CREED_details()}
 
-\item{creed_relevance}{Tibble with field/value columns from summarise_CREED_relevance()}
+\item{creed_relevance}{Tibble with field/value columns from summarise_CREED_relevance().
+Use \code{\link[eDataDRF:example_CREED_relevance_tibble]{eDataDRF::example_CREED_relevance_tibble()}} to generate example data.}
 
-\item{creed_reliability}{Tibble with field/value columns from summarise_CREED_reliability()}
+\item{creed_reliability}{Tibble with field/value columns from summarise_CREED_reliability().
+Use \code{\link[eDataDRF:example_CREED_reliability_tibble]{eDataDRF::example_CREED_reliability_tibble()}} to generate example data.}
 
 \item{file_path}{Character. Path where to write the report file}
 }
@@ -33,4 +35,9 @@ a single human-readable text file with section headers
   write_creed_report_txt(creed_details, creed_relevance, creed_reliability,
                          file_path = tempfile(fileext = ".txt"))
 }
+}
+\seealso{
+\code{\link[eDataDRF:example_CREED_relevance_tibble]{eDataDRF::example_CREED_relevance_tibble()}},
+\code{\link[eDataDRF:example_CREED_reliability_tibble]{eDataDRF::example_CREED_reliability_tibble()}},
+\code{\link[eDataDRF:initialise_CREED_data_tibble]{eDataDRF::initialise_CREED_data_tibble()}}
 }

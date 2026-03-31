@@ -7,25 +7,30 @@
 summarise_measured_units(measurement_data, parameters_data)
 }
 \arguments{
-\item{measurement_data}{Measurement data frame}
+\item{measurement_data}{Measurement data frame. Use
+\code{\link[eDataDRF:example_measurements_tibble]{eDataDRF::example_measurements_tibble()}} to generate an example input.}
 
-\item{parameters_data}{Parameters data frame}
+\item{parameters_data}{Parameters data frame. Use
+\code{\link[eDataDRF:example_parameters_tibble]{eDataDRF::example_parameters_tibble()}} to generate an example input.}
 }
 \value{
 Character string with units grouped by parameter
 }
 \description{
-Creates a summary of measurement units grouped by parameter name
+Creates a summary of measurement units grouped by parameter name.
+Valid unit values are defined by \code{\link[eDataDRF:parameter_unit_vocabulary]{eDataDRF::parameter_unit_vocabulary()}}.
 }
 \examples{
-measurements <- data.frame(
-  PARAMETER_NAME = c("Cadmium", "Cadmium", "Lead"),
-  MEASURED_UNIT = c("ug/g dw", "ug/g dw", "ug/g ww")
+summarise_measured_units(
+  eDataDRF::example_measurements_tibble(),
+  eDataDRF::example_parameters_tibble()
 )
-parameters <- data.frame(PARAMETER_NAME = c("Cadmium", "Lead"))
-summarise_measured_units(measurements, parameters)
 }
 \seealso{
+\code{\link[eDataDRF:example_measurements_tibble]{eDataDRF::example_measurements_tibble()}},
+\code{\link[eDataDRF:example_parameters_tibble]{eDataDRF::example_parameters_tibble()}},
+\code{\link[eDataDRF:parameter_unit_vocabulary]{eDataDRF::parameter_unit_vocabulary()}}
+
 Other summarise: 
 \code{\link{calculate_coordinate_precision}()},
 \code{\link{manual_completion_message}()},

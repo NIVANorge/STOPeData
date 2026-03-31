@@ -16,11 +16,14 @@ generate_sample_id_with_components(
 \arguments{
 \item{site_code}{Site code (vectorized)}
 
-\item{parameter_name}{Parameter name (vectorized)}
+\item{parameter_name}{Parameter name (vectorized). See
+\code{\link[eDataDRF:parameters_vocabulary]{eDataDRF::parameters_vocabulary()}} for valid parameter names.}
 
-\item{environ_compartment}{Environmental compartment (vectorized)}
+\item{environ_compartment}{Environmental compartment (vectorized). Must be a
+value from \code{\link[eDataDRF:environ_compartments_vocabulary]{eDataDRF::environ_compartments_vocabulary()}}.}
 
-\item{environ_compartment_sub}{Environmental sub-compartment (vectorized)}
+\item{environ_compartment_sub}{Environmental sub-compartment (vectorized). Must
+be a value from \code{\link[eDataDRF:environ_compartments_sub_vocabulary]{eDataDRF::environ_compartments_sub_vocabulary()}}.}
 
 \item{date}{Sampling date (vectorized)}
 
@@ -31,7 +34,9 @@ Character vector of sample IDs.
 }
 \description{
 Generates vectorised sample identifiers from site, parameter, compartment,
-date, and subsample components.
+date, and subsample components. This is the STOPeData-local implementation;
+see \code{\link[eDataDRF:generate_sample_id_with_components]{eDataDRF::generate_sample_id_with_components()}} for the canonical version
+and \code{\link[eDataDRF:sample_id_regex]{eDataDRF::sample_id_regex()}} to validate generated IDs.
 }
 \examples{
 generate_sample_id_with_components(
@@ -42,4 +47,20 @@ generate_sample_id_with_components(
   date = as.Date("2022-06-15"),
   subsample = 1
 )
+
+# Validate the generated ID against the regex
+id <- generate_sample_id_with_components(
+  site_code = eDataDRF::example_sites_tibble()$SITE_CODE[1],
+  parameter_name = eDataDRF::example_parameters_tibble()$PARAMETER_NAME[1],
+  environ_compartment = eDataDRF::example_compartments_tibble()$ENVIRON_COMPARTMENT[1],
+  environ_compartment_sub = eDataDRF::example_compartments_tibble()$ENVIRON_COMPARTMENT_SUB[1],
+  date = as.Date("2022-06-15"),
+  subsample = 1
+)
+grepl(eDataDRF::sample_id_regex(), id)
+}
+\seealso{
+\code{\link[eDataDRF:generate_sample_id_with_components]{eDataDRF::generate_sample_id_with_components()}},
+\code{\link[eDataDRF:sample_id_regex]{eDataDRF::sample_id_regex()}}, \code{\link[eDataDRF:environ_compartments_vocabulary]{eDataDRF::environ_compartments_vocabulary()}},
+\code{\link[eDataDRF:environ_compartments_sub_vocabulary]{eDataDRF::environ_compartments_sub_vocabulary()}}
 }

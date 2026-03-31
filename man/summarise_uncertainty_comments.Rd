@@ -7,7 +7,8 @@
 summarise_uncertainty_comments(measurementsData)
 }
 \arguments{
-\item{measurementsData}{The measurements dataset}
+\item{measurementsData}{The measurements dataset. Use
+\code{\link[eDataDRF:example_measurements_tibble]{eDataDRF::example_measurements_tibble()}} to generate an example input.}
 }
 \value{
 Character string summarising uncertainty info, or "Relevant data not found"
@@ -16,13 +17,12 @@ Character string summarising uncertainty info, or "Relevant data not found"
 Creates a summary of uncertainty types and measurement comments
 }
 \examples{
-meas <- data.frame(
-  UNCERTAINTY_TYPE = c("Standard deviation", "Standard deviation", NA),
-  MEASUREMENT_COMMENT = c(NA, "Replicate mean", "Replicate mean")
-)
-summarise_uncertainty_comments(meas)
+summarise_uncertainty_comments(eDataDRF::example_measurements_tibble())
 }
 \seealso{
+\code{\link[eDataDRF:example_measurements_tibble]{eDataDRF::example_measurements_tibble()}},
+\code{\link[eDataDRF:uncertainty_types_vocabulary]{eDataDRF::uncertainty_types_vocabulary()}}
+
 Other summarise: 
 \code{\link{calculate_coordinate_precision}()},
 \code{\link{manual_completion_message}()},

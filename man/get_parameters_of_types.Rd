@@ -11,9 +11,11 @@ get_parameters_of_types(
 )
 }
 \arguments{
-\item{param_type}{Character string specifying the parameter type}
+\item{param_type}{Character string specifying the parameter type. Must be a
+value from \code{\link[eDataDRF:parameter_types_vocabulary]{eDataDRF::parameter_types_vocabulary()}}.}
 
-\item{dummy_parameters}{Dataframe containing base parameters}
+\item{dummy_parameters}{Dataframe containing base parameters. Use
+\code{\link[eDataDRF:parameters_vocabulary]{eDataDRF::parameters_vocabulary()}} to obtain the full parameter list.}
 
 \item{session_parameters}{Optional list containing session-specific parameters}
 }
@@ -25,9 +27,11 @@ Returns a character vector of parameter names for the given type,
 combining base parameters with any session-specific parameters.
 }
 \examples{
-\dontrun{
-  # dummy_parameters is a dataframe from the eDataDRF package
-  params <- get_parameters_of_types("Chemical", dummy_parameters)
-  head(params)
+params <- get_parameters_of_types("Chemical", eDataDRF::parameters_vocabulary())
+head(params)
 }
+\seealso{
+\code{\link[eDataDRF:parameters_vocabulary]{eDataDRF::parameters_vocabulary()}},
+\code{\link[eDataDRF:parameter_types_vocabulary]{eDataDRF::parameter_types_vocabulary()}},
+\code{\link[eDataDRF:parameter_types_sub_vocabulary]{eDataDRF::parameter_types_sub_vocabulary()}}
 }

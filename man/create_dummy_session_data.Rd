@@ -11,8 +11,9 @@ A list matching the structure of initialise_userData() with dummy data
 }
 \description{
 Creates a complete userData-like list structure populated with
-dummy data from all dummy_*_tibble() functions. This mirrors the structure
-created by initialise_userData() but with test data instead of empty tibbles.
+dummy data from all \code{\link[eDataDRF:example_campaign_tibble]{eDataDRF::example_campaign_tibble()}} and related
+functions. This mirrors the structure created by initialise_userData() but
+with test data instead of empty tibbles.
 
 Useful for testing outside of a reactive context.
 }
@@ -22,6 +23,17 @@ names(session_data)
 nrow(session_data$sitesData)
 }
 \seealso{
+\code{\link[eDataDRF:example_campaign_tibble]{eDataDRF::example_campaign_tibble()}},
+\code{\link[eDataDRF:example_references_tibble]{eDataDRF::example_references_tibble()}}, \code{\link[eDataDRF:example_sites_tibble]{eDataDRF::example_sites_tibble()}},
+\code{\link[eDataDRF:example_parameters_tibble]{eDataDRF::example_parameters_tibble()}},
+\code{\link[eDataDRF:example_compartments_tibble]{eDataDRF::example_compartments_tibble()}},
+\code{\link[eDataDRF:example_methods_tibble]{eDataDRF::example_methods_tibble()}}, \code{\link[eDataDRF:example_samples_tibble]{eDataDRF::example_samples_tibble()}},
+\code{\link[eDataDRF:example_biota_tibble]{eDataDRF::example_biota_tibble()}},
+\code{\link[eDataDRF:example_measurements_tibble]{eDataDRF::example_measurements_tibble()}},
+\code{\link[eDataDRF:example_CREED_reliability_tibble]{eDataDRF::example_CREED_reliability_tibble()}},
+\code{\link[eDataDRF:example_CREED_relevance_tibble]{eDataDRF::example_CREED_relevance_tibble()}},
+\code{\link[eDataDRF:example_CREED_scores_tibble]{eDataDRF::example_CREED_scores_tibble()}}
+
 Other create: 
 \code{\link{create_compartment_combination}()},
 \code{\link{create_existing_parameter}()},

@@ -7,9 +7,12 @@
 summarise_protocols(methodsData, categories)
 }
 \arguments{
-\item{methodsData}{The methods/protocols dataset}
+\item{methodsData}{The methods/protocols dataset. Use
+\code{\link[eDataDRF:example_methods_tibble]{eDataDRF::example_methods_tibble()}} to generate an example input.}
 
-\item{categories}{Character vector of protocol categories to include (e.g., c("Sampling Protocol", "Analytical Protocol"))}
+\item{categories}{Character vector of protocol categories to include. Must be
+values from \code{\link[eDataDRF:protocol_categories_vocabulary]{eDataDRF::protocol_categories_vocabulary()}} (e.g.,
+\code{c("Sampling Protocol", "Analytical Protocol")}).}
 }
 \value{
 Character string summarising protocols, or "Relevant data not found"
@@ -18,14 +21,16 @@ Character string summarising protocols, or "Relevant data not found"
 Creates a summary string of protocols by category
 }
 \examples{
-methods <- data.frame(
-  PROTOCOL_CATEGORY = c("Sampling Protocol", "Analytical Protocol"),
-  PROTOCOL_NAME = c("Water grab sampling", "ICP-MS"),
-  PROTOCOL_COMMENT = c(NA, "ISO 17294-2")
+summarise_protocols(
+  eDataDRF::example_methods_tibble(),
+  categories = c("Sampling Protocol", "Analytical Protocol")
 )
-summarise_protocols(methods, categories = c("Sampling Protocol", "Analytical Protocol"))
 }
 \seealso{
+\code{\link[eDataDRF:example_methods_tibble]{eDataDRF::example_methods_tibble()}},
+\code{\link[eDataDRF:protocol_categories_vocabulary]{eDataDRF::protocol_categories_vocabulary()}},
+\code{\link[eDataDRF:protocol_options_vocabulary]{eDataDRF::protocol_options_vocabulary()}}
+
 Other summarise: 
 \code{\link{calculate_coordinate_precision}()},
 \code{\link{manual_completion_message}()},

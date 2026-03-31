@@ -10,7 +10,8 @@ reference_character_limits()
 A named list of character limits for reference fields
 }
 \description{
-Returns maximum character lengths for text fields in the references table.
+Returns maximum character lengths for text fields in the references table
+(\code{\link[eDataDRF:initialise_references_tibble]{eDataDRF::initialise_references_tibble()}}).
 }
 \details{
 Provides a named list of character limits for reference metadata fields to ensure
@@ -38,6 +39,12 @@ URL: 200 characters
 limits <- reference_character_limits()
 limits$DOI
 limits$REF_COMMENT
+}
+\seealso{
+\code{\link[eDataDRF:initialise_references_tibble]{eDataDRF::initialise_references_tibble()}},
+\code{\link[eDataDRF:example_references_tibble]{eDataDRF::example_references_tibble()}},
+\code{\link[eDataDRF:reference_type_vocabulary]{eDataDRF::reference_type_vocabulary()}},
+\code{\link[eDataDRF:data_source_vocabulary]{eDataDRF::data_source_vocabulary()}}
 }
 \concept{limits}
 \concept{reference}

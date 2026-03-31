@@ -7,7 +7,9 @@
 creed_tibble_to_mock_input(creed_tibble)
 }
 \arguments{
-\item{creed_tibble}{A tibble with columns: criterion_id, relevant_data, score, limitations}
+\item{creed_tibble}{A tibble with columns: criterion_id, relevant_data, score,
+limitations. Use \code{\link[eDataDRF:example_CREED_reliability_tibble]{eDataDRF::example_CREED_reliability_tibble()}} or
+\code{\link[eDataDRF:example_CREED_relevance_tibble]{eDataDRF::example_CREED_relevance_tibble()}} to generate example inputs.}
 }
 \value{
 A named list mimicking the structure of a Shiny input object, with entries
@@ -15,9 +17,10 @@ named \code{criterionId_score}, \code{criterionId_relevant_data}, and \code{crit
 (or \code{criterionId_justification} for RB8).
 }
 \description{
-Converts a CREED data tibble (from dummy_CREED_reliability_tibble()
-or dummy_CREED_relevance_tibble()) into a mock shiny input list object suitable for testing
-collect_CREED_data().
+Converts a CREED data tibble (from
+\code{\link[eDataDRF:example_CREED_reliability_tibble]{eDataDRF::example_CREED_reliability_tibble()}} or
+\code{\link[eDataDRF:example_CREED_relevance_tibble]{eDataDRF::example_CREED_relevance_tibble()}}) into a mock shiny input list
+object suitable for testing collect_CREED_data().
 }
 \details{
 Score values are converted from numeric to text:
@@ -29,8 +32,11 @@ Score values are converted from numeric to text:
 }
 }
 \examples{
-dummy_data <- create_dummy_session_data()
-mock_input <- creed_tibble_to_mock_input(dummy_data$creedReliability)
+mock_input <- creed_tibble_to_mock_input(eDataDRF::example_CREED_reliability_tibble())
 mock_input$RB1_score
 
+}
+\seealso{
+\code{\link[eDataDRF:example_CREED_reliability_tibble]{eDataDRF::example_CREED_reliability_tibble()}},
+\code{\link[eDataDRF:example_CREED_relevance_tibble]{eDataDRF::example_CREED_relevance_tibble()}}
 }

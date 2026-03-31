@@ -12,11 +12,14 @@ get_parameters_filtered(
 )
 }
 \arguments{
-\item{param_type}{Character string specifying the parameter type}
+\item{param_type}{Character string specifying the parameter type. Must be a
+value from \code{\link[eDataDRF:parameter_types_vocabulary]{eDataDRF::parameter_types_vocabulary()}}.}
 
-\item{param_subtype}{Character string specifying the parameter subtype (optional)}
+\item{param_subtype}{Character string specifying the parameter subtype (optional).
+Must be a value from \code{\link[eDataDRF:parameter_types_sub_vocabulary]{eDataDRF::parameter_types_sub_vocabulary()}}.}
 
-\item{dummy_parameters}{Dataframe containing base parameters}
+\item{dummy_parameters}{Dataframe containing base parameters. Use
+\code{\link[eDataDRF:parameters_vocabulary]{eDataDRF::parameters_vocabulary()}} to obtain the full parameter list.}
 
 \item{session_parameters}{Optional list containing session-specific parameters}
 }
@@ -28,9 +31,11 @@ Returns a character vector of parameter names filtered by type and
 optionally by subtype, combining base parameters with session-specific parameters.
 }
 \examples{
-\dontrun{
-  # dummy_parameters is a dataframe from the eDataDRF package
-  params <- get_parameters_filtered("Chemical", "Metal", dummy_parameters)
-  head(params)
+get_parameters_filtered("Stressor", "Homogeneous metal compounds", eDataDRF::parameters_vocabulary())
+get_parameters_filtered("Chemical", dummy_parameters = eDataDRF::parameters_vocabulary())
 }
+\seealso{
+\code{\link[eDataDRF:parameters_vocabulary]{eDataDRF::parameters_vocabulary()}},
+\code{\link[eDataDRF:parameter_types_vocabulary]{eDataDRF::parameter_types_vocabulary()}},
+\code{\link[eDataDRF:parameter_types_sub_vocabulary]{eDataDRF::parameter_types_sub_vocabulary()}}
 }

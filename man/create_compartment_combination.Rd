@@ -7,18 +7,18 @@
 create_compartment_combination(compartment, sub_compartment, category)
 }
 \arguments{
-\item{compartment}{Character string specifying the environmental compartment (\code{eDataDRF::environ_compartments_vocabulary()})}
+\item{compartment}{Character string specifying the environmental compartment (\code{\link[eDataDRF:environ_compartments_vocabulary]{eDataDRF::environ_compartments_vocabulary()}})}
 
-\item{sub_compartment}{Character string specifying the sub-compartment (\code{eDataDRF::environ_compartments_sub_vocabulary()})}
+\item{sub_compartment}{Character string specifying the sub-compartment (\code{\link[eDataDRF:environ_compartments_sub_vocabulary]{eDataDRF::environ_compartments_sub_vocabulary()}})}
 
-\item{category}{Character string specifying the measured category (\code{eDataDRF::measured_category()})}
+\item{category}{Character string specifying the measured category (\code{\link[eDataDRF:measured_category_vocabulary]{eDataDRF::measured_category_vocabulary()}})}
 }
 \value{
 tibble with one row containing the specified compartment information
 }
 \description{
 Creates a single-row tibble with specified compartment information,
-using the standardised structure from \code{eDataDRF::initialise_campaign_tibble()}.
+using the standardised structure from \code{\link[eDataDRF:initialise_campaign_tibble]{eDataDRF::initialise_campaign_tibble()}}.
 Function will return an error if compartment, sub_compartment, or category are
 not of the correct variable type, but it doesn't check for vocabulary
 }
@@ -27,7 +27,7 @@ create_compartment_combination("Aquatic", "Surface water", "External")
 create_compartment_combination("Biota", "Biota, Aquatic", "Internal")
 }
 \seealso{
-\code{eDataDRF::initialise_campaign_tibble()}
+\code{\link[eDataDRF:initialise_campaign_tibble]{eDataDRF::initialise_campaign_tibble()}}
 
 Other create: 
 \code{\link{create_dummy_session_data}()},

@@ -7,7 +7,8 @@
 summarise_compartments(compartmentsData)
 }
 \arguments{
-\item{compartmentsData}{The compartments dataset}
+\item{compartmentsData}{The compartments dataset. Use
+\code{\link[eDataDRF:example_compartments_tibble]{eDataDRF::example_compartments_tibble()}} to generate an example input.}
 }
 \value{
 Character string summarising compartments, or "Relevant data not found"
@@ -16,13 +17,13 @@ Character string summarising compartments, or "Relevant data not found"
 Creates a summary string of compartments from session data
 }
 \examples{
-comps <- data.frame(
-  ENVIRON_COMPARTMENT = c("Water", "Sediment"),
-  ENVIRON_COMPARTMENT_SUB = c("Surface water", NA)
-)
-summarise_compartments(comps)
+summarise_compartments(eDataDRF::example_compartments_tibble())
 }
 \seealso{
+\code{\link[eDataDRF:example_compartments_tibble]{eDataDRF::example_compartments_tibble()}},
+\code{\link[eDataDRF:environ_compartments_vocabulary]{eDataDRF::environ_compartments_vocabulary()}},
+\code{\link[eDataDRF:environ_compartments_sub_vocabulary]{eDataDRF::environ_compartments_sub_vocabulary()}}
+
 Other summarise: 
 \code{\link{calculate_coordinate_precision}()},
 \code{\link{manual_completion_message}()},
