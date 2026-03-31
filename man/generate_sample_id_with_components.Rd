@@ -31,7 +31,7 @@ Character vector of sample IDs.
 }
 \description{
 Generates vectorised sample identifiers from site, parameter, compartment,
-  date, and subsample components.
+date, and subsample components.
 }
 \examples{
 generate_sample_id_with_components(

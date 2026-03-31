@@ -51,7 +51,7 @@ get_parameters_of_types <- function(
 #' @examples
 #' create_new_parameter("Chemical", "Jane Smith")
 #' @export
-#' @seealso \code{\link{initialise_parameters_tibble}}
+#' @seealso [initialise_parameters_tibble()]
 create_new_parameter <- function(param_type, entered_by) {
   template <- initialise_parameters_tibble()
 
@@ -92,7 +92,7 @@ create_new_parameter <- function(param_type, entered_by) {
 #'   row
 #' }
 #' @export
-#' @seealso \code{\link{initialise_parameters_tibble}}
+#' @seealso [initialise_parameters_tibble()]
 create_existing_parameter <- function(
   param_type,
   param_name,

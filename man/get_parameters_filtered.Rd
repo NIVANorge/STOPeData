@@ -25,7 +25,7 @@ Character vector of parameter names
 }
 \description{
 Returns a character vector of parameter names filtered by type and
-  optionally by subtype, combining base parameters with session-specific parameters.
+optionally by subtype, combining base parameters with session-specific parameters.
 }
 \examples{
 \dontrun{

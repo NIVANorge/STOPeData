@@ -21,7 +21,7 @@ Creates a single-row template tibble with default values for a new parameter.
 create_new_parameter("Chemical", "Jane Smith")
 }
 \seealso{
-\code{\link{initialise_parameters_tibble}}
+\code{\link[eDataDRF:initialise_parameters_tibble]{eDataDRF::initialise_parameters_tibble()}}
 
 Other create: 
 \code{\link{create_compartment_combination}()},

@@ -17,7 +17,7 @@ session$userData$reactiveValues$campaignData$ENTERED_BY.}
 }
 \value{
 A tibble with one row containing the new site record, initialized with
-  default values according to the eDataDRF sites schema.
+default values according to the eDataDRF sites schema.
 }
 \description{
 Creates a new site record with auto-generated site code and default values.

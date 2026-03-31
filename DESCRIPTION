@@ -65,3 +65,4 @@ Remotes:
     NIVANorge/eDataDRF
 Config/Needs/website: quarto
 VignetteBuilder: knitr, quarto
+Roxygen: list(markdown = TRUE)

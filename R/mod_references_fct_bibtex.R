@@ -2,18 +2,18 @@
 #' Convert BibTeX string to data frame using temporary file
 #'
 #' @param string A BibTeX formatted string containing one or more entries
-#' @param ... Additional arguments passed to \code{\link[bib2df]{bib2df}}
+#' @param ... Additional arguments passed to [bib2df::bib2df()]
 #'
 #' @description
 #' This function converts a BibTeX formatted string into a data frame by writing
-#' the string to a temporary file and then using \code{bib2df::bib2df} to parse it.
+#' the string to a temporary file and then using `bib2df::bib2df` to parse it.
 #' The temporary file is automatically cleaned up after use.
 #'
 #' @return A tibble/data frame with parsed BibTeX entries
 #'
 #' @details
 #' This approach uses temporary files to work around the limitation that
-#' \code{bib2df::bib2df} only accepts file paths, not strings directly.
+#' `bib2df::bib2df` only accepts file paths, not strings directly.
 #' The temporary file is created in the system temp directory and removed
 #' automatically, even if an error occurs.
 #'

@@ -17,8 +17,8 @@ A Shiny downloadHandler function
 }
 \description{
 Creates a Shiny downloadHandler that exports all available datasets
-  as CSV files (for tabular data) or TXT files (for text/object data) in a single ZIP archive.
-  Also includes a metadata file with export information.
+as CSV files (for tabular data) or TXT files (for text/object data) in a single ZIP archive.
+Also includes a metadata file with export information.
 }
 \examples{
 \dontrun{

@@ -25,8 +25,8 @@ Value from the specified table/variable if available, fallback_value otherwise
 }
 \description{
 Safely retrieves a column or variable from a named table stored
-  in session reactive values, returning a fallback value if the table or
-  variable is not available.
+in session reactive values, returning a fallback value if the table or
+variable is not available.
 }
 \examples{
 \dontrun{

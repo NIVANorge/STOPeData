@@ -20,7 +20,7 @@ zenodo_licenses <- readRDS("inst/extdata/clean/Zenodo_Licenses_2026_03.rds") |>
 #'
 #' @description Named character vector of Zenodo resource types.
 #'   Names are display labels; values are Zenodo resource type identifiers.
-#'   See \url{https://help.zenodo.org/docs/deposit/describe-records/resource-type/}
+#'   See <https://help.zenodo.org/docs/deposit/describe-records/resource-type/>
 #'   for more details. Filtered to values likely to be used in this application.
 #'
 #' @family zenodo

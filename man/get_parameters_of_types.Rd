@@ -22,7 +22,7 @@ Character vector of parameter names
 }
 \description{
 Returns a character vector of parameter names for the given type,
-  combining base parameters with any session-specific parameters.
+combining base parameters with any session-specific parameters.
 }
 \examples{
 \dontrun{

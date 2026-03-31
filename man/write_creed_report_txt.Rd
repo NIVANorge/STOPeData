@@ -25,7 +25,7 @@ NULL (invisibly). File is written to disk as a side effect.
 }
 \description{
 Merge CREED details, relevance, and reliability tibbles into
-  a single human-readable text file with section headers
+a single human-readable text file with section headers
 }
 \examples{
 \dontrun{

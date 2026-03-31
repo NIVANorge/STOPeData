@@ -14,7 +14,7 @@ Should contain at least one row of BibTeX entry data.}
 }
 \value{
 A named list containing mapped field values for all reference input fields.
-  Values are NA for fields not present in the BibTeX entry.
+Values are NA for fields not present in the BibTeX entry.
 }
 \description{
 Converts parsed BibTeX data from bib2df format into a list of values

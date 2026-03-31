@@ -11,8 +11,8 @@ creed_tibble_to_mock_input(creed_tibble)
 }
 \value{
 A named list mimicking the structure of a Shiny input object, with entries
-  named `criterionId_score`, `criterionId_relevant_data`, and `criterionId_limitations`
-  (or `criterionId_justification` for RB8).
+named \code{criterionId_score}, \code{criterionId_relevant_data}, and \code{criterionId_limitations}
+(or \code{criterionId_justification} for RB8).
 }
 \description{
 Converts a CREED data tibble (from dummy_CREED_reliability_tibble()
@@ -21,10 +21,12 @@ collect_CREED_data().
 }
 \details{
 Score values are converted from numeric to text:
-- 1 = "Fully Met" (or "Not Relevant")
-- 2 = "Partly Met"
-- 3 = "Not Reported"
-- 4 = "Not Met"
+\itemize{
+\item 1 = "Fully Met" (or "Not Relevant")
+\item 2 = "Partly Met"
+\item 3 = "Not Reported"
+\item 4 = "Not Met"
+}
 }
 \examples{
 dummy_data <- create_dummy_session_data()

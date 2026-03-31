@@ -11,9 +11,11 @@ pmid_to_doi(pmid)
 }
 \value{
 List with components:
-  - success: Logical indicating whether conversion succeeded
-  - doi: DOI string (if success = TRUE) or NULL
-  - message: Status message for user feedback
+\itemize{
+\item success: Logical indicating whether conversion succeeded
+\item doi: DOI string (if success = TRUE) or NULL
+\item message: Status message for user feedback
+}
 }
 \description{
 Attempts to convert a PubMed ID to a DOI by querying the PubMed API.

@@ -25,7 +25,7 @@ tibble with parameter information or NULL if not found
 }
 \description{
 Looks up an existing parameter by name and type, returning a populated
-  tibble row or NULL if not found.
+tibble row or NULL if not found.
 }
 \examples{
 \dontrun{
@@ -35,7 +35,7 @@ Looks up an existing parameter by name and type, returning a populated
 }
 }
 \seealso{
-\code{\link{initialise_parameters_tibble}}
+\code{\link[eDataDRF:initialise_parameters_tibble]{eDataDRF::initialise_parameters_tibble()}}
 
 Other create: 
 \code{\link{create_compartment_combination}()},

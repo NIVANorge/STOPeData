@@ -18,7 +18,7 @@ a bslib::accordion html element
 }
 \description{
 Creates a collapsible single-panel bslib accordion displaying
-  the contents of a markdown file, with an info icon.
+the contents of a markdown file, with an info icon.
 }
 \examples{
 \dontrun{

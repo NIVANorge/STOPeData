@@ -14,10 +14,12 @@ If FALSE (default), will return an error for multiple entries.}
 }
 \value{
 A list with components:
-  - success: Logical indicating whether parsing succeeded
-  - data: Parsed data frame (if success = TRUE) or NULL
-  - message: Success/error message for user feedback
-  - warning: Additional warning message (if applicable)
+\itemize{
+\item success: Logical indicating whether parsing succeeded
+\item data: Parsed data frame (if success = TRUE) or NULL
+\item message: Success/error message for user feedback
+\item warning: Additional warning message (if applicable)
+}
 }
 \description{
 Wrapper function that validates BibTeX syntax, parses the string using

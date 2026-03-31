@@ -9,7 +9,7 @@ bib_string2df_alt(string, ...)
 \arguments{
 \item{string}{A BibTeX formatted string containing one or more entries}
 
-\item{...}{Additional arguments passed to \code{\link[bib2df]{bib2df}}}
+\item{...}{Additional arguments passed to \code{\link[bib2df:bib2df]{bib2df::bib2df()}}}
 }
 \value{
 A tibble/data frame with parsed BibTeX entries

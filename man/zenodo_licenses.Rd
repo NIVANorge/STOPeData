@@ -12,8 +12,8 @@ zenodo_licenses
 }
 \description{
 Returns a tibble of Zenodo license options as of March 2026.
-Includes `id`, `title`, `description`, `url`, `schema`, `osi_approved`, `revision_id`,
-`created`, `updated`, and `popular`, a custom boolean highlighting the most commonly
+Includes \code{id}, \code{title}, \code{description}, \code{url}, \code{schema}, \code{osi_approved}, \code{revision_id},
+\code{created}, \code{updated}, and \code{popular}, a custom boolean highlighting the most commonly
 used licenses.
 }
 \examples{
