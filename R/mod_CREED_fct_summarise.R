@@ -2,17 +2,17 @@
 
 #' @title Summarise compartments data
 #' @description Creates a summary string of compartments from session data
-#' @param compartmentsData The compartments dataset
+#' @param compartmentsData The compartments dataset. Use
+#'   [eDataDRF::example_compartments_tibble()] to generate an example input.
 #' @return Character string summarising compartments, or "Relevant data not found"
 #' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @seealso [eDataDRF::example_compartments_tibble()],
+#'   [eDataDRF::environ_compartments_vocabulary()],
+#'   [eDataDRF::environ_compartments_sub_vocabulary()]
 #' @examples
-#' comps <- data.frame(
-#'   ENVIRON_COMPARTMENT = c("Water", "Sediment"),
-#'   ENVIRON_COMPARTMENT_SUB = c("Surface water", NA)
-#' )
-#' summarise_compartments(comps)
+#' summarise_compartments(eDataDRF::example_compartments_tibble())
 #' @export
 summarise_compartments <- function(compartmentsData) {
   # Helper function to check if a dataset exists and has content
@@ -51,25 +51,28 @@ summarise_compartments <- function(compartmentsData) {
 
 #' @title Summarise biota data
 #' @description Creates a summary string of biota including species, tissues, and life stages
-#' @param biotaData The biota dataset
-#' @param SPECIES_GROUP Logical. Include species group summary?
-#' @param SAMPLE_SPECIES Logical. Include sample species summary?
-#' @param SAMPLE_TISSUE Logical. Include tissue type summary?
-#' @param SAMPLE_SPECIES_LIFESTAGE Logical. Include life stage summary?
-#' @param SAMPLE_SPECIES_GENDER Logical. Include gender summary?
+#' @param biotaData The biota dataset. Use [eDataDRF::example_biota_tibble()] to
+#'   generate an example input.
+#' @param SPECIES_GROUP Logical. Include species group summary? See
+#'   [eDataDRF::species_groups_vocabulary()] for valid groups.
+#' @param SAMPLE_SPECIES Logical. Include sample species summary? See
+#'   [eDataDRF::species_names_vocabulary()] for valid species.
+#' @param SAMPLE_TISSUE Logical. Include tissue type summary? See
+#'   [eDataDRF::tissue_types_vocabulary()] for valid tissue types.
+#' @param SAMPLE_SPECIES_LIFESTAGE Logical. Include life stage summary? See
+#'   [eDataDRF::lifestage_vocabulary()] for valid life stages.
+#' @param SAMPLE_SPECIES_GENDER Logical. Include gender summary? See
+#'   [eDataDRF::gender_vocabulary()] for valid gender values.
 #' @return Character string summarising biota, or "Relevant data not found"
 #' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @seealso [eDataDRF::example_biota_tibble()],
+#'   [eDataDRF::species_groups_vocabulary()], [eDataDRF::species_names_vocabulary()],
+#'   [eDataDRF::tissue_types_vocabulary()], [eDataDRF::lifestage_vocabulary()],
+#'   [eDataDRF::gender_vocabulary()]
 #' @examples
-#' biota <- data.frame(
-#'   SPECIES_GROUP = c("Fish", "Fish"),
-#'   SAMPLE_SPECIES = c("Gadus morhua", "Clupea harengus"),
-#'   SAMPLE_TISSUE = c("Liver", "Muscle"),
-#'   SAMPLE_SPECIES_LIFESTAGE = c("Adult", "Juvenile"),
-#'   SAMPLE_SPECIES_GENDER = c("Male", "Female")
-#' )
-#' summarise_biota(biota, SAMPLE_SPECIES = TRUE, SAMPLE_TISSUE = TRUE)
+#' summarise_biota(eDataDRF::example_biota_tibble(), SAMPLE_SPECIES = TRUE, SAMPLE_TISSUE = TRUE)
 #' @export
 summarise_biota <- function(
   biotaData,
@@ -135,19 +138,23 @@ summarise_biota <- function(
 
 #' @title Summarise protocols data
 #' @description Creates a summary string of protocols by category
-#' @param methodsData The methods/protocols dataset
-#' @param categories Character vector of protocol categories to include (e.g., c("Sampling Protocol", "Analytical Protocol"))
+#' @param methodsData The methods/protocols dataset. Use
+#'   [eDataDRF::example_methods_tibble()] to generate an example input.
+#' @param categories Character vector of protocol categories to include. Must be
+#'   values from [eDataDRF::protocol_categories_vocabulary()] (e.g.,
+#'   `c("Sampling Protocol", "Analytical Protocol")`).
 #' @return Character string summarising protocols, or "Relevant data not found"
 #' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @seealso [eDataDRF::example_methods_tibble()],
+#'   [eDataDRF::protocol_categories_vocabulary()],
+#'   [eDataDRF::protocol_options_vocabulary()]
 #' @examples
-#' methods <- data.frame(
-#'   PROTOCOL_CATEGORY = c("Sampling Protocol", "Analytical Protocol"),
-#'   PROTOCOL_NAME = c("Water grab sampling", "ICP-MS"),
-#'   PROTOCOL_COMMENT = c(NA, "ISO 17294-2")
+#' summarise_protocols(
+#'   eDataDRF::example_methods_tibble(),
+#'   categories = c("Sampling Protocol", "Analytical Protocol")
 #' )
-#' summarise_protocols(methods, categories = c("Sampling Protocol", "Analytical Protocol"))
 #' @export
 summarise_protocols <- function(methodsData, categories) {
   # Helper function to check if a dataset exists and has content
@@ -190,25 +197,26 @@ summarise_protocols <- function(methodsData, categories) {
 
 #' @title Summarise sites data
 #' @description Creates a summary string of sites including countries and areas
-#' @param sitesData The sites dataset
-#' @param COUNTRY_ISO Logical. Include country summary?
-#' @param OCEAN_IHO Logical. Include area summary?
-#' @param SITE_GEOGRAPHIC_FEATURE Logical. Include geographic feature summary?
+#' @param sitesData The sites dataset. Use [eDataDRF::example_sites_tibble()] to
+#'   generate an example input.
+#' @param COUNTRY_ISO Logical. Include country summary? See
+#'   [eDataDRF::countries_vocabulary()] for valid country codes.
+#' @param OCEAN_IHO Logical. Include area summary? See [eDataDRF::ocean_vocabulary()]
+#'   for valid ocean areas.
+#' @param SITE_GEOGRAPHIC_FEATURE Logical. Include geographic feature summary? See
+#'   [eDataDRF::geographic_features_vocabulary()] for valid features.
 #' @param SITE_GEOGRAPHIC_FEATURE_SUB Logical. Include geographic feature sub summary?
+#'   See [eDataDRF::geographic_features_sub_vocabulary()] for valid sub-features.
 #' @param PRECISION Logical. Include coordinate precision?
 #' @return Character string summarising sites, or "Relevant data not found"
 #' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @seealso [eDataDRF::example_sites_tibble()], [eDataDRF::countries_vocabulary()],
+#'   [eDataDRF::ocean_vocabulary()], [eDataDRF::geographic_features_vocabulary()],
+#'   [eDataDRF::geographic_features_sub_vocabulary()]
 #' @examples
-#' sites <- data.frame(
-#'   COUNTRY_ISO = c("NO", "SE"),
-#'   OCEAN_IHO = c("North Sea", "Baltic Sea"),
-#'   SITE_GEOGRAPHIC_FEATURE = c("Fjord", "Bay"),
-#'   LATITUDE = c(59.123, 57.456),
-#'   LONGITUDE = c(10.12, 11.789)
-#' )
-#' summarise_sites(sites, COUNTRY_ISO = TRUE, PRECISION = TRUE)
+#' summarise_sites(eDataDRF::example_sites_tibble(), COUNTRY_ISO = TRUE, PRECISION = TRUE)
 #' @export
 summarise_sites <- function(
   sitesData,
@@ -342,19 +350,16 @@ calculate_coordinate_precision <- function(latitude, longitude) {
 
 #' @title Summarise LOD/LOQ data
 #' @description Creates a summary string of limit of detection and quantification values
-#' @param measurementsData The measurements dataset
+#' @param measurementsData The measurements dataset. Use
+#'   [eDataDRF::example_measurements_tibble()] to generate an example input.
 #' @return Character string summarising LOD/LOQ, or "Relevant data not found"
 #' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @seealso [eDataDRF::example_measurements_tibble()],
+#'   [eDataDRF::parameter_unit_vocabulary()]
 #' @examples
-#' meas <- data.frame(
-#'   LOQ_VALUE = c(0.1, 0.2, 0.15),
-#'   LOQ_UNIT = c("ug/L", "ug/L", "ug/L"),
-#'   LOD_VALUE = c(0.05, 0.08, NA),
-#'   LOD_UNIT = c("ug/L", "ug/L", NA)
-#' )
-#' summarise_lod_loq(meas)
+#' summarise_lod_loq(eDataDRF::example_measurements_tibble())
 #' @export
 summarise_lod_loq <- function(measurementsData) {
   # Helper function to check if a dataset exists and has content
@@ -409,17 +414,16 @@ manual_completion_message <- function() {
 
 #' @title Summarise uncertainty and measurement comments
 #' @description Creates a summary of uncertainty types and measurement comments
-#' @param measurementsData The measurements dataset
+#' @param measurementsData The measurements dataset. Use
+#'   [eDataDRF::example_measurements_tibble()] to generate an example input.
 #' @return Character string summarising uncertainty info, or "Relevant data not found"
 #' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @seealso [eDataDRF::example_measurements_tibble()],
+#'   [eDataDRF::uncertainty_types_vocabulary()]
 #' @examples
-#' meas <- data.frame(
-#'   UNCERTAINTY_TYPE = c("Standard deviation", "Standard deviation", NA),
-#'   MEASUREMENT_COMMENT = c(NA, "Replicate mean", "Replicate mean")
-#' )
-#' summarise_uncertainty_comments(meas)
+#' summarise_uncertainty_comments(eDataDRF::example_measurements_tibble())
 #' @export
 summarise_uncertainty_comments <- function(measurementsData) {
   # Helper function to check if a dataset exists and has content
@@ -507,20 +511,18 @@ summarise_sig_figs <- function(values) {
 
 #' Summarise mod_reference data into a single string
 #'
-#' @description Creates a formatted bibliographic reference from reference data
-#' @param ref_data Reference data frame
+#' @description Creates a formatted bibliographic reference from reference data.
+#'   See [eDataDRF::initialise_references_tibble()] for the expected column
+#'   structure.
+#' @param ref_data Reference data frame. Use [eDataDRF::example_references_tibble()]
+#'   to generate an example input.
 #' @return Character string with formatted reference
 #' @family summarise
+#' @seealso [eDataDRF::example_references_tibble()],
+#'   [eDataDRF::initialise_references_tibble()],
+#'   [eDataDRF::generate_reference_id()]
 #' @examples
-#' ref <- data.frame(
-#'   AUTHOR = "Smith J.",
-#'   YEAR = 2022,
-#'   TITLE = "Marine pollution monitoring",
-#'   PERIODICAL_JOURNAL = "Marine Pollution Bulletin",
-#'   PUBLISHER = NA,
-#'   DOI = "10.1000/xyz123"
-#' )
-#' summarise_reference(ref)
+#' summarise_reference(eDataDRF::example_references_tibble())
 #' @export
 summarise_reference <- function(ref_data) {
   if (is.null(ref_data) || nrow(ref_data) == 0) {
@@ -653,18 +655,22 @@ summarise_date_range <- function(dates) {
 
 #' Generate Units Summary by Parameter
 #'
-#' @description Creates a summary of measurement units grouped by parameter name
-#' @param measurement_data Measurement data frame
-#' @param parameters_data Parameters data frame
+#' @description Creates a summary of measurement units grouped by parameter name.
+#'   Valid unit values are defined by [eDataDRF::parameter_unit_vocabulary()].
+#' @param measurement_data Measurement data frame. Use
+#'   [eDataDRF::example_measurements_tibble()] to generate an example input.
+#' @param parameters_data Parameters data frame. Use
+#'   [eDataDRF::example_parameters_tibble()] to generate an example input.
 #' @return Character string with units grouped by parameter
 #' @family summarise
+#' @seealso [eDataDRF::example_measurements_tibble()],
+#'   [eDataDRF::example_parameters_tibble()],
+#'   [eDataDRF::parameter_unit_vocabulary()]
 #' @examples
-#' measurements <- data.frame(
-#'   PARAMETER_NAME = c("Cadmium", "Cadmium", "Lead"),
-#'   MEASURED_UNIT = c("ug/g dw", "ug/g dw", "ug/g ww")
+#' summarise_measured_units(
+#'   eDataDRF::example_measurements_tibble(),
+#'   eDataDRF::example_parameters_tibble()
 #' )
-#' parameters <- data.frame(PARAMETER_NAME = c("Cadmium", "Lead"))
-#' summarise_measured_units(measurements, parameters)
 #' @export
 summarise_measured_units <- function(measurement_data, parameters_data) {
   if (

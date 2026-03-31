@@ -4,14 +4,25 @@
 #' Create Dummy Session Data
 #'
 #' @description Creates a complete userData-like list structure populated with
-#' dummy data from all dummy_*_tibble() functions. This mirrors the structure
-#' created by initialise_userData() but with test data instead of empty tibbles.
+#' dummy data from all [eDataDRF::example_campaign_tibble()] and related
+#' functions. This mirrors the structure created by initialise_userData() but
+#' with test data instead of empty tibbles.
 #'
 #' Useful for testing outside of a reactive context.
 #'
 #' @import eDataDRF
 #' @return A list matching the structure of initialise_userData() with dummy data
 #' @family create
+#' @seealso [eDataDRF::example_campaign_tibble()],
+#'   [eDataDRF::example_references_tibble()], [eDataDRF::example_sites_tibble()],
+#'   [eDataDRF::example_parameters_tibble()],
+#'   [eDataDRF::example_compartments_tibble()],
+#'   [eDataDRF::example_methods_tibble()], [eDataDRF::example_samples_tibble()],
+#'   [eDataDRF::example_biota_tibble()],
+#'   [eDataDRF::example_measurements_tibble()],
+#'   [eDataDRF::example_CREED_reliability_tibble()],
+#'   [eDataDRF::example_CREED_relevance_tibble()],
+#'   [eDataDRF::example_CREED_scores_tibble()]
 #' @examples
 #' session_data <- create_dummy_session_data()
 #' names(session_data)
@@ -127,18 +138,22 @@ populate_session_with_dummy_data <- function(
 
 #' Convert CREED Tibble to Mock Input List
 #'
-#' @description Converts a CREED data tibble (from dummy_CREED_reliability_tibble()
-#' or dummy_CREED_relevance_tibble()) into a mock shiny input list object suitable for testing
-#' collect_CREED_data().
+#' @description Converts a CREED data tibble (from
+#' [eDataDRF::example_CREED_reliability_tibble()] or
+#' [eDataDRF::example_CREED_relevance_tibble()]) into a mock shiny input list
+#' object suitable for testing collect_CREED_data().
 #'
-#' @param creed_tibble A tibble with columns: criterion_id, relevant_data, score, limitations
+#' @param creed_tibble A tibble with columns: criterion_id, relevant_data, score,
+#'   limitations. Use [eDataDRF::example_CREED_reliability_tibble()] or
+#'   [eDataDRF::example_CREED_relevance_tibble()] to generate example inputs.
 #' @return A named list mimicking the structure of a Shiny input object, with entries
 #'   named `criterionId_score`, `criterionId_relevant_data`, and `criterionId_limitations`
 #'   (or `criterionId_justification` for RB8).
 #'
+#' @seealso [eDataDRF::example_CREED_reliability_tibble()],
+#'   [eDataDRF::example_CREED_relevance_tibble()]
 #' @examples
-#' dummy_data <- create_dummy_session_data()
-#' mock_input <- creed_tibble_to_mock_input(dummy_data$creedReliability)
+#' mock_input <- creed_tibble_to_mock_input(eDataDRF::example_CREED_reliability_tibble())
 #' mock_input$RB1_score
 #'
 #' @details

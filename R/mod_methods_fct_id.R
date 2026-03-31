@@ -5,11 +5,17 @@
 #' sequence number, and campaign. The function is fully vectorised and can
 #' handle multiple protocols simultaneously.
 #'
+#' This is the STOPeData-local implementation. See also
+#' [eDataDRF::generate_protocol_id()] for the canonical version and
+#' [eDataDRF::protocol_id_regex()] to validate generated IDs.
+#'
 #' @param protocol_type Character vector. The category of protocol
 #'   (e.g., "Sampling Protocol", "Analytical Protocol"). Must match one of
-#'   the predefined categories or will default to "X".
+#'   the predefined categories from [eDataDRF::protocol_categories_vocabulary()]
+#'   or will default to "X".
 #' @param protocol_name Character vector. The specific name/method within
-#'   the protocol category. Will be abbreviated and cleaned for ID generation.
+#'   the protocol category. See [eDataDRF::protocol_options_vocabulary()] for
+#'   valid options. Will be abbreviated and cleaned for ID generation.
 #' @param sequence_number Numeric vector. Sequential number for protocols
 #'   within the same category. Defaults to 1. Will be zero-padded to 2 digits.
 #' @param campaign_name Character vector. Name of the campaign/study.
@@ -34,9 +40,16 @@
 #' @family protocol_functions
 #' @importFrom stringr str_trim str_split str_to_upper str_to_lower str_sub
 #'   str_remove_all str_c
+#' @seealso [eDataDRF::generate_protocol_id()], [eDataDRF::protocol_id_regex()],
+#'   [eDataDRF::protocol_categories_vocabulary()],
+#'   [eDataDRF::protocol_options_vocabulary()]
 #' @examples
 #' generate_protocol_id("Sampling Protocol", "Water grab sampling", sequence_number = 1)
 #' generate_protocol_id("Analytical Protocol", "ICP-MS", sequence_number = 2, campaign_name = "NorthSea2022")
+#'
+#' # Validate the generated ID against the regex
+#' id <- generate_protocol_id("Extraction Protocol", "Soxhlet", sequence_number = 1)
+#' grepl(eDataDRF::protocol_id_regex(), id)
 #' @export
 generate_protocol_id <- function(
   protocol_type,

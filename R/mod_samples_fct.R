@@ -175,20 +175,28 @@ parse_compartment_selections <- function(
   return(parsed)
 }
 
-# TODO: Transferred to eDataDRFr
+# TODO: Transferred to eDataDRF
 #' Generate Sample ID with Components ----
 #' @description Generates vectorised sample identifiers from site, parameter, compartment,
-#'   date, and subsample components.
+#'   date, and subsample components. This is the STOPeData-local implementation;
+#'   see [eDataDRF::generate_sample_id_with_components()] for the canonical version
+#'   and [eDataDRF::sample_id_regex()] to validate generated IDs.
 #' @param site_code Site code (vectorized)
-#' @param parameter_name Parameter name (vectorized)
-#' @param environ_compartment Environmental compartment (vectorized)
-#' @param environ_compartment_sub Environmental sub-compartment (vectorized)
+#' @param parameter_name Parameter name (vectorized). See
+#'   [eDataDRF::parameters_vocabulary()] for valid parameter names.
+#' @param environ_compartment Environmental compartment (vectorized). Must be a
+#'   value from [eDataDRF::environ_compartments_vocabulary()].
+#' @param environ_compartment_sub Environmental sub-compartment (vectorized). Must
+#'   be a value from [eDataDRF::environ_compartments_sub_vocabulary()].
 #' @param date Sampling date (vectorized)
 #' @param subsample subsample
 #' @return Character vector of sample IDs.
 #' @importFrom glue glue
 #' @importFrom stringr str_to_title str_remove_all
 #' @import eDataDRF
+#' @seealso [eDataDRF::generate_sample_id_with_components()],
+#'   [eDataDRF::sample_id_regex()], [eDataDRF::environ_compartments_vocabulary()],
+#'   [eDataDRF::environ_compartments_sub_vocabulary()]
 #' @examples
 #' generate_sample_id_with_components(
 #'   site_code = "SITE001",
@@ -198,6 +206,17 @@ parse_compartment_selections <- function(
 #'   date = as.Date("2022-06-15"),
 #'   subsample = 1
 #' )
+#'
+#' # Validate the generated ID against the regex
+#' id <- generate_sample_id_with_components(
+#'   site_code = eDataDRF::example_sites_tibble()$SITE_CODE[1],
+#'   parameter_name = eDataDRF::example_parameters_tibble()$PARAMETER_NAME[1],
+#'   environ_compartment = eDataDRF::example_compartments_tibble()$ENVIRON_COMPARTMENT[1],
+#'   environ_compartment_sub = eDataDRF::example_compartments_tibble()$ENVIRON_COMPARTMENT_SUB[1],
+#'   date = as.Date("2022-06-15"),
+#'   subsample = 1
+#' )
+#' grepl(eDataDRF::sample_id_regex(), id)
 #' @export
 generate_sample_id_with_components <- function(
   site_code,

@@ -295,9 +295,14 @@ import_module_table <- function(csv_path, session) {
 
 #' Detect dataset type from filename ----
 #'
-#' @description Determine which type of dataset based on filename patterns
+#' @description Determine which type of dataset based on filename patterns.
+#'   Dataset types correspond to eDataDRF tables — see [eDataDRF::initialise_sites_tibble()],
+#'   [eDataDRF::initialise_measurements_tibble()], etc. for the full set.
 #' @param filename Name of the file
 #' @return Character string of dataset type or NULL if not recognized
+#' @seealso [eDataDRF::initialise_sites_tibble()],
+#'   [eDataDRF::initialise_measurements_tibble()],
+#'   [eDataDRF::initialise_campaign_tibble()]
 #' @examples
 #' detect_dataset_type("Campaign_Sites_20241024.csv")
 #' detect_dataset_type("Measurements_export.csv")
@@ -372,13 +377,16 @@ get_reactiveValues_key <- function(dataset_type) {
 #' Validate dataset structure ----
 #'
 #' @description Basic validation of dataset structure
-#' @param data Tibble/data.frame to validate
-#' @param dataset_type Character string of dataset type
+#' @param data Tibble/data.frame to validate. Use [eDataDRF::example_sites_tibble()]
+#'   or other `example_*_tibble()` functions to generate valid example inputs.
+#' @param dataset_type Character string of dataset type, as returned by
+#'   [detect_dataset_type()]
 #' @return List with valid (logical) and message (character)
 #' @family validate
+#' @seealso [detect_dataset_type()], [eDataDRF::initialise_sites_tibble()]
 #' @examples
-#' df <- data.frame(SITE_CODE = c("S001", "S002"), LATITUDE = c(59.1, 57.4))
-#' validate_dataset_structure(df, "Sites")
+#' validate_dataset_structure(eDataDRF::example_sites_tibble(), "Sites")
+#' validate_dataset_structure(eDataDRF::example_measurements_tibble(), "Measurements")
 #' validate_dataset_structure(data.frame(), "Sites")
 #' @export
 validate_dataset_structure <- function(data, dataset_type) {

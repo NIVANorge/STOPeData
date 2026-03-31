@@ -27,7 +27,8 @@
 
 #' Reference field character limits
 #'
-#' Returns maximum character lengths for text fields in the references table.
+#' Returns maximum character lengths for text fields in the references table
+#' ([eDataDRF::initialise_references_tibble()]).
 #'
 #' @details
 #' Provides a named list of character limits for reference metadata fields to ensure
@@ -54,6 +55,10 @@
 #' @return A named list of character limits for reference fields
 #' @family limits
 #' @family reference
+#' @seealso [eDataDRF::initialise_references_tibble()],
+#'   [eDataDRF::example_references_tibble()],
+#'   [eDataDRF::reference_type_vocabulary()],
+#'   [eDataDRF::data_source_vocabulary()]
 #' @examples
 #' limits <- reference_character_limits()
 #' limits$DOI
