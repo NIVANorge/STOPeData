@@ -52,18 +52,7 @@ STOPeData::run_app() # add parameters here (if any)
 ```{r}
 #| eval: false
 #| label: STOPeData::run_app()
-
-#' Run the Shiny Application
-#'
-#' @param ... arguments to pass to golem_opts.
-#' See `?golem::get_golem_options` for more details.
-#' @inheritParams shiny::shinyApp
-#'
-#' @export
-#' @importFrom shiny shinyApp
-#' @importFrom golem with_golem_options
-#' @importFrom logger log_appender log_layout log_threshold log_messages log_warnings layout_json
-
+#| 
 run_app <- function(
   onStart = NULL,
   options = list(),
