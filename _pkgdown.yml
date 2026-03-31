@@ -98,3 +98,6 @@ reference:
     desc: "Run the STOPeData Shiny application."
     contents:
       - run_app
+
+deploy:
+  install_metadata: true # permits linking between local websites
