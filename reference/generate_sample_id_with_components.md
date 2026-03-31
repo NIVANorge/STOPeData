@@ -73,7 +73,7 @@ generate_sample_id_with_components(
   date = as.Date("2022-06-15"),
   subsample = 1
 )
-#> [1] "SITE001-Cadmium-Surfacewater-2022-06-15-R-1"
+#> SITE001-Cadmium-Surfacewater-2022-06-15-R-1
 
 # Validate the generated ID against the regex
 id <- generate_sample_id_with_components(

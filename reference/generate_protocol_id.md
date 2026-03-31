@@ -88,7 +88,7 @@ The function handles edge cases gracefully:
 generate_protocol_id("Sampling Protocol", "Water grab sampling", sequence_number = 1)
 #> [1] "S01_WaterGrabSampli"
 generate_protocol_id("Analytical Protocol", "ICP-MS", sequence_number = 2, campaign_name = "NorthSea2022")
-#> [1] "A02_Icpms_NorthSea20"
+#> [1] "A02_ICPMS_NorthSea20"
 
 # Validate the generated ID against the regex
 id <- generate_protocol_id("Extraction Protocol", "Soxhlet", sequence_number = 1)
