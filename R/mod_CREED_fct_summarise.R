@@ -4,8 +4,15 @@
 #' @description Creates a summary string of compartments from session data
 #' @param compartmentsData The compartments dataset
 #' @return Character string summarising compartments, or "Relevant data not found"
+#' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @examples
+#' comps <- data.frame(
+#'   ENVIRON_COMPARTMENT = c("Water", "Sediment"),
+#'   ENVIRON_COMPARTMENT_SUB = c("Surface water", NA)
+#' )
+#' summarise_compartments(comps)
 #' @export
 summarise_compartments <- function(compartmentsData) {
   # Helper function to check if a dataset exists and has content
@@ -51,8 +58,18 @@ summarise_compartments <- function(compartmentsData) {
 #' @param SAMPLE_SPECIES_LIFESTAGE Logical. Include life stage summary?
 #' @param SAMPLE_SPECIES_GENDER Logical. Include gender summary?
 #' @return Character string summarising biota, or "Relevant data not found"
+#' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @examples
+#' biota <- data.frame(
+#'   SPECIES_GROUP = c("Fish", "Fish"),
+#'   SAMPLE_SPECIES = c("Gadus morhua", "Clupea harengus"),
+#'   SAMPLE_TISSUE = c("Liver", "Muscle"),
+#'   SAMPLE_SPECIES_LIFESTAGE = c("Adult", "Juvenile"),
+#'   SAMPLE_SPECIES_GENDER = c("Male", "Female")
+#' )
+#' summarise_biota(biota, SAMPLE_SPECIES = TRUE, SAMPLE_TISSUE = TRUE)
 #' @export
 summarise_biota <- function(
   biotaData,
@@ -121,8 +138,16 @@ summarise_biota <- function(
 #' @param methodsData The methods/protocols dataset
 #' @param categories Character vector of protocol categories to include (e.g., c("Sampling Protocol", "Analytical Protocol"))
 #' @return Character string summarising protocols, or "Relevant data not found"
+#' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @examples
+#' methods <- data.frame(
+#'   PROTOCOL_CATEGORY = c("Sampling Protocol", "Analytical Protocol"),
+#'   PROTOCOL_NAME = c("Water grab sampling", "ICP-MS"),
+#'   PROTOCOL_COMMENT = c(NA, "ISO 17294-2")
+#' )
+#' summarise_protocols(methods, categories = c("Sampling Protocol", "Analytical Protocol"))
 #' @export
 summarise_protocols <- function(methodsData, categories) {
   # Helper function to check if a dataset exists and has content
@@ -172,8 +197,18 @@ summarise_protocols <- function(methodsData, categories) {
 #' @param SITE_GEOGRAPHIC_FEATURE_SUB Logical. Include geographic feature sub summary?
 #' @param PRECISION Logical. Include coordinate precision?
 #' @return Character string summarising sites, or "Relevant data not found"
+#' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @examples
+#' sites <- data.frame(
+#'   COUNTRY_ISO = c("NO", "SE"),
+#'   OCEAN_IHO = c("North Sea", "Baltic Sea"),
+#'   SITE_GEOGRAPHIC_FEATURE = c("Fjord", "Bay"),
+#'   LATITUDE = c(59.123, 57.456),
+#'   LONGITUDE = c(10.12, 11.789)
+#' )
+#' summarise_sites(sites, COUNTRY_ISO = TRUE, PRECISION = TRUE)
 #' @export
 summarise_sites <- function(
   sitesData,
@@ -263,6 +298,10 @@ summarise_sites <- function(
 #' @param latitude Numeric vector of latitudes
 #' @param longitude Numeric vector of longitudes
 #' @return Integer representing minimum decimal places, or "N/A" if no valid coords
+#' @family summarise
+#' @examples
+#' calculate_coordinate_precision(c(59.123, 57.4), c(10.12, 11.789))
+#' calculate_coordinate_precision(c(59.1234567, 57.456789), c(10.1, 11.12345))
 #' @export
 calculate_coordinate_precision <- function(latitude, longitude) {
   # Helper to count decimal places ----
@@ -305,8 +344,17 @@ calculate_coordinate_precision <- function(latitude, longitude) {
 #' @description Creates a summary string of limit of detection and quantification values
 #' @param measurementsData The measurements dataset
 #' @return Character string summarising LOD/LOQ, or "Relevant data not found"
+#' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @examples
+#' meas <- data.frame(
+#'   LOQ_VALUE = c(0.1, 0.2, 0.15),
+#'   LOQ_UNIT = c("ug/L", "ug/L", "ug/L"),
+#'   LOD_VALUE = c(0.05, 0.08, NA),
+#'   LOD_UNIT = c("ug/L", "ug/L", NA)
+#' )
+#' summarise_lod_loq(meas)
 #' @export
 summarise_lod_loq <- function(measurementsData) {
   # Helper function to check if a dataset exists and has content
@@ -351,6 +399,9 @@ summarise_lod_loq <- function(measurementsData) {
 #' @title Return manual completion message
 #' @description Returns a standard message for fields not collected by the app
 #' @return Character string indicating manual completion required
+#' @family summarise
+#' @examples
+#' manual_completion_message()
 #' @export
 manual_completion_message <- function() {
   "Relevant data not collected by app. Please complete manually."
@@ -360,8 +411,15 @@ manual_completion_message <- function() {
 #' @description Creates a summary of uncertainty types and measurement comments
 #' @param measurementsData The measurements dataset
 #' @return Character string summarising uncertainty info, or "Relevant data not found"
+#' @family summarise
 #' @importFrom glue glue
 #' @importFrom shiny isTruthy
+#' @examples
+#' meas <- data.frame(
+#'   UNCERTAINTY_TYPE = c("Standard deviation", "Standard deviation", NA),
+#'   MEASUREMENT_COMMENT = c(NA, "Replicate mean", "Replicate mean")
+#' )
+#' summarise_uncertainty_comments(meas)
 #' @export
 summarise_uncertainty_comments <- function(measurementsData) {
   # Helper function to check if a dataset exists and has content
@@ -409,7 +467,11 @@ summarise_uncertainty_comments <- function(measurementsData) {
 #' @description Calculates and summarises the significant figures in a numeric vector
 #' @param values Numeric vector to analyze
 #' @return Character string describing significant figures, or "Relevant data not found"
+#' @family summarise
 #' @importFrom glue glue
+#' @examples
+#' summarise_sig_figs(c(1.23, 4.567, 8.9))
+#' summarise_sig_figs(c(0.001, 0.0023))
 #' @export
 summarise_sig_figs <- function(values) {
   if (length(values) == 0 || all(is.na(values))) {
@@ -448,6 +510,17 @@ summarise_sig_figs <- function(values) {
 #' @description Creates a formatted bibliographic reference from reference data
 #' @param ref_data Reference data frame
 #' @return Character string with formatted reference
+#' @family summarise
+#' @examples
+#' ref <- data.frame(
+#'   AUTHOR = "Smith J.",
+#'   YEAR = 2022,
+#'   TITLE = "Marine pollution monitoring",
+#'   PERIODICAL_JOURNAL = "Marine Pollution Bulletin",
+#'   PUBLISHER = NA,
+#'   DOI = "10.1000/xyz123"
+#' )
+#' summarise_reference(ref)
 #' @export
 summarise_reference <- function(ref_data) {
   if (is.null(ref_data) || nrow(ref_data) == 0) {
@@ -495,6 +568,10 @@ summarise_reference <- function(ref_data) {
 #' @param prefix Optional prefix for output
 #' @param max_display Maximum items to display before truncating
 #' @return Character string summary
+#' @family summarise
+#' @examples
+#' summarise_multiple(c("Norway", "Sweden", "Denmark"), "Countries")
+#' summarise_multiple(c("NO", "NO", "SE"), "Countries")
 #' @export
 summarise_multiple <- function(values, prefix = "", max_display = 10) {
   if (is.null(values) || length(values) == 0) {
@@ -533,6 +610,10 @@ summarise_multiple <- function(values, prefix = "", max_display = 10) {
 #' @description Creates a date range string from vector of dates with count and interval
 #' @param dates Vector of dates
 #' @return Character string with date range, sample count, and interval in days
+#' @family summarise
+#' @examples
+#' summarise_date_range(as.Date(c("2020-01-15", "2021-06-01", "2022-03-10")))
+#' summarise_date_range(as.Date(c("2021-07-01", "2021-07-01")))
 #' @export
 summarise_date_range <- function(dates) {
   if (is.null(dates) || length(dates) == 0) {
@@ -576,6 +657,14 @@ summarise_date_range <- function(dates) {
 #' @param measurement_data Measurement data frame
 #' @param parameters_data Parameters data frame
 #' @return Character string with units grouped by parameter
+#' @family summarise
+#' @examples
+#' measurements <- data.frame(
+#'   PARAMETER_NAME = c("Cadmium", "Cadmium", "Lead"),
+#'   MEASURED_UNIT = c("ug/g dw", "ug/g dw", "ug/g ww")
+#' )
+#' parameters <- data.frame(PARAMETER_NAME = c("Cadmium", "Lead"))
+#' summarise_measured_units(measurements, parameters)
 #' @export
 summarise_measured_units <- function(measurement_data, parameters_data) {
   if (

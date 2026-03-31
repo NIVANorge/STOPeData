@@ -8,6 +8,13 @@
 #' @param file_path Character. Path where to write the metadata file
 #' @return NULL (invisibly). File is written to disk as a side effect.
 #' @importFrom glue glue
+#' @examples
+#' \dontrun{
+#'   meta <- list(campaign_name = "North Sea 2022", export_datetime = Sys.time(),
+#'                user = "Jane", app_name = "STOPeData", app_version = "1.0",
+#'                clientData = "localhost")
+#'   write_metadata_txt(meta, tempfile(fileext = ".txt"))
+#' }
 #' @export
 write_metadata_txt <- function(metadata_list, file_path) {
   # Helper operator for string repetition
@@ -46,6 +53,8 @@ write_metadata_txt <- function(metadata_list, file_path) {
 #'
 #' @description Retrieve the short git commit hash of the current repository state
 #' @return Character. Short git commit hash, or "Git hash not available" if retrieval fails
+#' @examples
+#' get_git_commit()
 #' @export
 get_git_commit <- function() {
   tryCatch(
@@ -63,6 +72,12 @@ get_git_commit <- function() {
 #' @return List containing export metadata fields (campaign_name, export_datetime, app_name, etc.)
 #' @importFrom golem get_golem_version
 #' @importFrom rlang `%||%`
+#' @examples
+#' \dontrun{
+#'   # session is the Shiny session object from the module server function
+#'   meta <- get_export_metadata(session)
+#'   meta$campaign_name
+#' }
 #' @export
 get_export_metadata <- function(session = NULL) {
   if (is.null(session)) {
@@ -104,6 +119,8 @@ get_export_metadata <- function(session = NULL) {
 #' @param metadata_list List containing metadata fields
 #' @return Tibble with Property and Value columns
 #' @importFrom tibble tibble
+#' @examples
+#' create_metadata_tibble(list(campaign = "North Sea 2022", version = "1.0", user = "Jane"))
 #' @export
 create_metadata_tibble <- function(metadata_list) {
   tibble(
@@ -118,6 +135,10 @@ create_metadata_tibble <- function(metadata_list) {
 #' @param dataset_name Character. Internal name of the dataset (e.g., "sitesData")
 #' @return Character. User-friendly display name (e.g., "Sites")
 #' @importFrom rlang `%||%`
+#' @examples
+#' get_dataset_display_name("sitesData")
+#' get_dataset_display_name("measurementsData")
+#' get_dataset_display_name("creedReliability")
 #' @export
 get_dataset_display_name <- function(dataset_name) {
   display_names <- c(
@@ -247,6 +268,9 @@ extract_campaign_name <- function(campaign_data) {
 #' @return Character vector suitable for use with writeLines()
 #' @importFrom glue glue
 #' @importFrom utils str capture.output
+#' @examples
+#' object_to_text(list(a = 1, b = "hello"), dataset_name = "my_list")
+#' object_to_text("already a string")
 #' @export
 object_to_text <- function(obj, dataset_name = "unknown") {
   if (is.character(obj)) {
@@ -342,6 +366,11 @@ downloadable_text_datasets <- function() {
 #' @importFrom golem print_dev
 #' @importFrom rlang `%||%`
 #' @importFrom shiny showNotification
+#' @examples
+#' \dontrun{
+#'   # session and moduleState are Shiny reactive objects
+#'   build_session_zip(session, moduleState, dest_file = tempfile(fileext = ".zip"))
+#' }
 #' @export
 build_session_zip <- function(session, moduleState, dest_file) {
   rv <- session$userData$reactiveValues
@@ -435,6 +464,11 @@ build_session_zip <- function(session, moduleState, dest_file) {
 #' @return A Shiny downloadHandler function
 #' @importFrom glue glue
 #' @importFrom shiny downloadHandler
+#' @examples
+#' \dontrun{
+#'   # Used inside a Shiny module server function
+#'   output$download_btn <- download_all_data(session, moduleState)
+#' }
 #' @export
 download_all_data <- function(session, moduleState = NULL) {
   if (is.null(moduleState) || is.null(session)) {
@@ -474,6 +508,12 @@ download_all_data <- function(session, moduleState = NULL) {
 #' @param file_path Character. Path where to write the report file
 #' @return NULL (invisibly). File is written to disk as a side effect.
 #' @importFrom glue glue
+#' @examples
+#' \dontrun{
+#'   # creed_* tibbles are produced by the summarise_CREED_* functions
+#'   write_creed_report_txt(creed_details, creed_relevance, creed_reliability,
+#'                          file_path = tempfile(fileext = ".txt"))
+#' }
 #' @export
 write_creed_report_txt <- function(
   creed_details,

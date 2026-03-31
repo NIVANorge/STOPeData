@@ -34,5 +34,10 @@ REF_COMMENT: 1000 characters
 
 URL: 200 characters
 }
+\examples{
+limits <- reference_character_limits()
+limits$DOI
+limits$REF_COMMENT
+}
 \concept{limits}
 \concept{reference}

@@ -21,3 +21,16 @@ DOI format follows the pattern: 10.registrant/suffix
 Where registrant is typically 4+ digits and suffix can contain various characters.
 This function validates format only, not whether the DOI actually exists.
 }
+\examples{
+validate_doi_format("10.1016/j.marpolbul.2022.01.001")
+validate_doi_format("https://doi.org/10.1000/xyz123")
+validate_doi_format("not-a-doi")
+}
+\seealso{
+Other validate: 
+\code{\link{validate_and_lookup_identifier}()},
+\code{\link{validate_and_parse_bibtex}()},
+\code{\link{validate_dataset_structure}()},
+\code{\link{validate_pmid_format}()}
+}
+\concept{validate}

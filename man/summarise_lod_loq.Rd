@@ -15,3 +15,31 @@ Character string summarising LOD/LOQ, or "Relevant data not found"
 \description{
 Creates a summary string of limit of detection and quantification values
 }
+\examples{
+meas <- data.frame(
+  LOQ_VALUE = c(0.1, 0.2, 0.15),
+  LOQ_UNIT = c("ug/L", "ug/L", "ug/L"),
+  LOD_VALUE = c(0.05, 0.08, NA),
+  LOD_UNIT = c("ug/L", "ug/L", NA)
+)
+summarise_lod_loq(meas)
+}
+\seealso{
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_sites}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

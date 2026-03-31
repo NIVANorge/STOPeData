@@ -189,6 +189,15 @@ parse_compartment_selections <- function(
 #' @importFrom glue glue
 #' @importFrom stringr str_to_title str_remove_all
 #' @import eDataDRF
+#' @examples
+#' generate_sample_id_with_components(
+#'   site_code = "SITE001",
+#'   parameter_name = "Cadmium",
+#'   environ_compartment = "Water",
+#'   environ_compartment_sub = "Surface water",
+#'   date = as.Date("2022-06-15"),
+#'   subsample = 1
+#' )
 #' @export
 generate_sample_id_with_components <- function(
   site_code,

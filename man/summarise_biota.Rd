@@ -32,3 +32,32 @@ Character string summarising biota, or "Relevant data not found"
 \description{
 Creates a summary string of biota including species, tissues, and life stages
 }
+\examples{
+biota <- data.frame(
+  SPECIES_GROUP = c("Fish", "Fish"),
+  SAMPLE_SPECIES = c("Gadus morhua", "Clupea harengus"),
+  SAMPLE_TISSUE = c("Liver", "Muscle"),
+  SAMPLE_SPECIES_LIFESTAGE = c("Adult", "Juvenile"),
+  SAMPLE_SPECIES_GENDER = c("Male", "Female")
+)
+summarise_biota(biota, SAMPLE_SPECIES = TRUE, SAMPLE_TISSUE = TRUE)
+}
+\seealso{
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_sites}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

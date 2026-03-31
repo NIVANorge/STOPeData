@@ -7,6 +7,10 @@
 #' `created`, `updated`, and `popular`, a custom boolean highlighting the most commonly
 #' used licenses.
 #'
+#' @family zenodo
+#' @examples
+#' # Show only popular licenses
+#' zenodo_licenses[zenodo_licenses$popular, c("id", "title")]
 #' @importFrom tibble as_tibble
 #' @export
 zenodo_licenses <- readRDS("inst/extdata/clean/Zenodo_Licenses_2026_03.rds") |>
@@ -19,6 +23,10 @@ zenodo_licenses <- readRDS("inst/extdata/clean/Zenodo_Licenses_2026_03.rds") |>
 #'   See \url{https://help.zenodo.org/docs/deposit/describe-records/resource-type/}
 #'   for more details. Filtered to values likely to be used in this application.
 #'
+#' @family zenodo
+#' @examples
+#' zenodo_resource_types
+#' zenodo_resource_types["Dataset"]
 #' @export
 zenodo_resource_types <- c(
   "Book" = "publication-book",
@@ -46,6 +54,19 @@ zenodo_resource_types <- c(
 #'
 #' @return Character string containing the full README in markdown format.
 #'
+#' @family zenodo
+#' @examples
+#' readme <- generate_zenodo_readme(
+#'   title = "Marine contaminant monitoring 2020-2022",
+#'   description = "Trace metal concentrations in blue mussels from Norwegian fjords.",
+#'   authors = list(
+#'     list(first = "Jane", last = "Smith", affiliation = "NIVA", orcid = "")
+#'   ),
+#'   license_id = "cc-by-4.0",
+#'   contact_name = "Jane Smith",
+#'   contact_email = "jane.smith@niva.no"
+#' )
+#' cat(readme)
 #' @importFrom glue glue
 #' @export
 generate_zenodo_readme <- function(

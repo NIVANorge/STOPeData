@@ -24,3 +24,9 @@ Uses rcrossref::cr_works() to query the Crossref API. Requires internet
 connection. May fail if Crossref is unavailable or if the DOI is not
 registered with Crossref.
 }
+\examples{
+\dontrun{
+  result <- lookup_crossref_doi("10.1016/j.marpolbul.2022.01.001")
+  result$data$title
+}
+}

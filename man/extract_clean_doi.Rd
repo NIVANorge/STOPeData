@@ -15,3 +15,7 @@ Clean DOI string or the original input if no cleaning needed
 \description{
 Extracts a clean DOI string by removing URL prefixes and whitespace.
 }
+\examples{
+extract_clean_doi("https://doi.org/10.1016/j.marpolbul.2022.01.001")
+extract_clean_doi("10.1000/xyz123")
+}

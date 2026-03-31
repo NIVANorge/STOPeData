@@ -16,3 +16,9 @@ A string of variable names and values
 Print a reactiveValues object, with each named variable and its value on a new
 line
 }
+\examples{
+\dontrun{
+  rv <- shiny::reactiveValues(campaign_name = "North Sea 2022", year = 2022)
+  printreactiveValues(rv)
+}
+}

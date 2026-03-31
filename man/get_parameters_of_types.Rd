@@ -24,3 +24,10 @@ Character vector of parameter names
 Returns a character vector of parameter names for the given type,
   combining base parameters with any session-specific parameters.
 }
+\examples{
+\dontrun{
+  # dummy_parameters is a dataframe from the eDataDRF package
+  params <- get_parameters_of_types("Chemical", dummy_parameters)
+  head(params)
+}
+}

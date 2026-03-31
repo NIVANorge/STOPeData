@@ -34,6 +34,9 @@
 #' @family protocol_functions
 #' @importFrom stringr str_trim str_split str_to_upper str_to_lower str_sub
 #'   str_remove_all str_c
+#' @examples
+#' generate_protocol_id("Sampling Protocol", "Water grab sampling", sequence_number = 1)
+#' generate_protocol_id("Analytical Protocol", "ICP-MS", sequence_number = 2, campaign_name = "NorthSea2022")
 #' @export
 generate_protocol_id <- function(
   protocol_type,

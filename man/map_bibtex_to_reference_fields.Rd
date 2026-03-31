@@ -21,3 +21,16 @@ Converts parsed BibTeX data from bib2df format into a list of values
 that correspond to the reference module input fields. Handles field
 mapping between BibTeX conventions and the reference data structure.
 }
+\examples{
+\dontrun{
+  bibtex_str <- "@article{smith2022,
+    author  = {Smith, Jane},
+    title   = {Marine pollution},
+    journal = {Marine Pollution Bulletin},
+    year    = {2022}
+  }"
+  df <- bib_string2df_alt(bibtex_str)
+  fields <- map_bibtex_to_reference_fields(df)
+  fields$TITLE
+}
+}

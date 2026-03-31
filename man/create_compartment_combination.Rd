@@ -20,6 +20,17 @@ tibble with one row containing the specified compartment information
 Creates a single-row tibble with specified compartment information,
 using the standardised structure from initialise_compartments_tibble().
 }
+\examples{
+create_compartment_combination("Water", "Surface water", "Abiotic")
+create_compartment_combination("Biota", "Fish", "Biotic")
+}
 \seealso{
 \code{\link{initialise_compartments_tibble}}
+
+Other create: 
+\code{\link{create_dummy_session_data}()},
+\code{\link{create_existing_parameter}()},
+\code{\link{create_new_parameter}()},
+\code{\link{create_new_site}()}
 }
+\concept{create}

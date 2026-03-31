@@ -32,3 +32,32 @@ Character string summarising sites, or "Relevant data not found"
 \description{
 Creates a summary string of sites including countries and areas
 }
+\examples{
+sites <- data.frame(
+  COUNTRY_ISO = c("NO", "SE"),
+  OCEAN_IHO = c("North Sea", "Baltic Sea"),
+  SITE_GEOGRAPHIC_FEATURE = c("Fjord", "Bay"),
+  LATITUDE = c(59.123, 57.456),
+  LONGITUDE = c(10.12, 11.789)
+)
+summarise_sites(sites, COUNTRY_ISO = TRUE, PRECISION = TRUE)
+}
+\seealso{
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

@@ -15,3 +15,7 @@ Character string of reactiveValues key or NULL
 \description{
 Map dataset type to reactiveValues key
 }
+\examples{
+get_reactiveValues_key("Sites")
+get_reactiveValues_key("CREED_RB")
+}

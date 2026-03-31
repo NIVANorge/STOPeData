@@ -17,6 +17,16 @@ tibble with blank parameter template
 \description{
 Creates a single-row template tibble with default values for a new parameter.
 }
+\examples{
+create_new_parameter("Chemical", "Jane Smith")
+}
 \seealso{
 \code{\link{initialise_parameters_tibble}}
+
+Other create: 
+\code{\link{create_compartment_combination}()},
+\code{\link{create_dummy_session_data}()},
+\code{\link{create_existing_parameter}()},
+\code{\link{create_new_site}()}
 }
+\concept{create}

@@ -3,7 +3,8 @@
     "allow": [
       "Bash(Rscript -e \"devtools::document\\(\\)\")",
       "Bash(Rscript --version)",
-      "Bash(echo \"PATH: $PATH\")"
+      "Bash(echo \"PATH: $PATH\")",
+      "Bash(\"/c/Program Files/R/R-4.4.2/bin/Rscript.exe\" -e \"devtools::document\\(\\)\")"
     ]
   }
 }

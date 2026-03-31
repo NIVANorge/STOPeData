@@ -15,3 +15,9 @@ List with metadata or NULL if not found/readable
 \description{
 Read metadata from a human-readable text file
 }
+\examples{
+\dontrun{
+  metadata <- read_metadata_txt("path/to/export_metadata.txt")
+  metadata$campaign_name
+}
+}

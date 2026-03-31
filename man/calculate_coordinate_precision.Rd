@@ -17,3 +17,26 @@ Integer representing minimum decimal places, or "N/A" if no valid coords
 \description{
 Determines the minimum decimal places across latitude and longitude
 }
+\examples{
+calculate_coordinate_precision(c(59.123, 57.4), c(10.12, 11.789))
+calculate_coordinate_precision(c(59.1234567, 57.456789), c(10.1, 11.12345))
+}
+\seealso{
+Other summarise: 
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_sites}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

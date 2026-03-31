@@ -54,6 +54,10 @@
 #' @return A named list of character limits for reference fields
 #' @family limits
 #' @family reference
+#' @examples
+#' limits <- reference_character_limits()
+#' limits$DOI
+#' limits$REF_COMMENT
 #' @export
 reference_character_limits <- function() {
   list(
@@ -106,6 +110,11 @@ isRelevant <- function(input) {
 #' @param data A reactiveValues object with named variables
 #' @return A string of variable names and values
 #' @importFrom shiny reactiveValues
+#' @examples
+#' \dontrun{
+#'   rv <- shiny::reactiveValues(campaign_name = "North Sea 2022", year = 2022)
+#'   printreactiveValues(rv)
+#' }
 #' @export
 printreactiveValues <- function(data) {
   data_lines <- sapply(
@@ -137,6 +146,11 @@ printreactiveValues <- function(data) {
 #'
 #' @return a bslib::accordion html element
 #'
+#' @examples
+#' \dontrun{
+#'   # Used inside a Shiny UI function
+#'   info_accordion("Instructions", "path/to/instructions.md")
+#' }
 #' @export
 #' @importFrom bslib card card_body accordion accordion_panel
 #' @importFrom bsicons bs_icon

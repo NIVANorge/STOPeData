@@ -8,8 +8,12 @@
 #' @param category Character string specifying the measured category
 #'
 #' @return tibble with one row containing the specified compartment information
+#' @family create
 #' @importFrom dplyr add_row
 #' @import eDataDRF
+#' @examples
+#' create_compartment_combination("Water", "Surface water", "Abiotic")
+#' create_compartment_combination("Biota", "Fish", "Biotic")
 #' @export
 #' @seealso \code{\link{initialise_compartments_tibble}}
 create_compartment_combination <- function(

@@ -10,6 +10,12 @@
 #' @importFrom dplyr filter pull
 #' @importFrom rlang `%||%`
 #' @import eDataDRF
+#' @examples
+#' \dontrun{
+#'   # dummy_parameters is a dataframe from the eDataDRF package
+#'   params <- get_parameters_of_types("Chemical", dummy_parameters)
+#'   head(params)
+#' }
 #' @export
 get_parameters_of_types <- function(
   param_type,
@@ -39,8 +45,11 @@ get_parameters_of_types <- function(
 #' @param entered_by Character string specifying who entered the parameter
 #'
 #' @return tibble with blank parameter template
+#' @family create
 #' @importFrom dplyr add_row
 #' @import eDataDRF
+#' @examples
+#' create_new_parameter("Chemical", "Jane Smith")
 #' @export
 #' @seealso \code{\link{initialise_parameters_tibble}}
 create_new_parameter <- function(param_type, entered_by) {
@@ -72,9 +81,16 @@ create_new_parameter <- function(param_type, entered_by) {
 #' @param session_parameters Optional dataframe containing session-specific parameters
 #'
 #' @return tibble with parameter information or NULL if not found
+#' @family create
 #' @importFrom dplyr filter slice add_row
 #' @importFrom rlang `%||%`
 #' @import eDataDRF
+#' @examples
+#' \dontrun{
+#'   # dummy_parameters is a dataframe from the eDataDRF package
+#'   row <- create_existing_parameter("Chemical", "Cadmium", dummy_parameters)
+#'   row
+#' }
 #' @export
 #' @seealso \code{\link{initialise_parameters_tibble}}
 create_existing_parameter <- function(
@@ -131,6 +147,12 @@ create_existing_parameter <- function(
 #' @return Character vector of parameter names
 #' @importFrom dplyr filter pull
 #' @importFrom rlang `%||%`
+#' @examples
+#' \dontrun{
+#'   # dummy_parameters is a dataframe from the eDataDRF package
+#'   params <- get_parameters_filtered("Chemical", "Metal", dummy_parameters)
+#'   head(params)
+#' }
 #' @export
 get_parameters_filtered <- function(
   param_type,

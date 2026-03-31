@@ -34,3 +34,10 @@ Maps Crossref fields to reference fields:
 - page → PAGES
 - ISBN/ISSN → ISBN_ISSN
 }
+\examples{
+\dontrun{
+  result <- lookup_crossref_doi("10.1016/j.marpolbul.2022.01.001")
+  fields <- map_crossref_to_reference_fields(result$data)
+  fields$TITLE
+}
+}

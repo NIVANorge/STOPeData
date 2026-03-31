@@ -20,3 +20,9 @@ a bslib::accordion html element
 Creates a collapsible single-panel bslib accordion displaying
   the contents of a markdown file, with an info icon.
 }
+\examples{
+\dontrun{
+  # Used inside a Shiny UI function
+  info_accordion("Instructions", "path/to/instructions.md")
+}
+}

@@ -30,3 +30,18 @@ It handles the complete workflow:
 3. Query Crossref for publication data
 4. Map results to reference field format
 }
+\examples{
+\dontrun{
+  result <- validate_and_lookup_identifier("10.1016/j.marpolbul.2022.01.001")
+  result$data$TITLE
+  result$identifier_type
+}
+}
+\seealso{
+Other validate: 
+\code{\link{validate_and_parse_bibtex}()},
+\code{\link{validate_dataset_structure}()},
+\code{\link{validate_doi_format}()},
+\code{\link{validate_pmid_format}()}
+}
+\concept{validate}

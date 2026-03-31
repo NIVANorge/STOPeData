@@ -15,3 +15,26 @@ Character string describing significant figures, or "Relevant data not found"
 \description{
 Calculates and summarises the significant figures in a numeric vector
 }
+\examples{
+summarise_sig_figs(c(1.23, 4.567, 8.9))
+summarise_sig_figs(c(0.001, 0.0023))
+}
+\seealso{
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sites}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

@@ -15,3 +15,8 @@ Character string of dataset type or NULL if not recognized
 \description{
 Determine which type of dataset based on filename patterns
 }
+\examples{
+detect_dataset_type("Campaign_Sites_20241024.csv")
+detect_dataset_type("Measurements_export.csv")
+detect_dataset_type("unknown_file.csv")
+}

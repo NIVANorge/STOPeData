@@ -4,3 +4,96 @@ template:
   bslib:
     font-size: "0.75rem"
   light-switch: true
+
+reference:
+  - title: "Summarise"
+    desc: "Summarise session data into text strings for CREED quality assessment reporting."
+    contents:
+      - starts_with("summarise_")
+      - calculate_coordinate_precision
+      - manual_completion_message
+
+  - title: "Validate"
+    desc: "Validate data formats and structures."
+    contents:
+      - starts_with("validate_")
+
+  - title: "Zenodo"
+    desc: "Helpers for preparing and submitting datasets to Zenodo."
+    contents:
+      - starts_with("zenodo_")
+      - generate_zenodo_readme
+
+  - title: "Create"
+    desc: "Create new data rows and structures."
+    contents:
+      - starts_with("create_")
+
+  - title: "Data Export"
+    desc: "Build and download session data as ZIP archives and metadata files."
+    contents:
+      - write_metadata_txt
+      - get_git_commit
+      - get_export_metadata
+      - get_dataset_display_name
+      - object_to_text
+      - build_session_zip
+      - download_all_data
+      - write_creed_report_txt
+
+  - title: "Data Import"
+    desc: "Import session data from exported ZIP archives."
+    contents:
+      - read_zip_metadata
+      - import_session_from_zip
+      - import_module_table
+      - detect_dataset_type
+      - get_reactiveValues_key
+      - read_metadata_txt
+
+  - title: "Reference Management"
+    desc: "Parse BibTeX, look up DOIs and PMIDs, and manage bibliographic references."
+    contents:
+      - bib_string2df_alt
+      - map_bibtex_to_reference_fields
+      - clean_bibtex_text
+      - extract_clean_doi
+      - extract_clean_pmid
+      - pmid_to_doi
+      - lookup_crossref_doi
+      - validate_and_lookup_identifier
+      - reference_character_limits
+
+  - title: "Data Setup"
+    desc: "Look up and generate IDs for parameters, samples, and protocols."
+    contents:
+      - get_parameters_of_types
+      - get_parameters_filtered
+      - generate_sample_id_with_components
+      - generate_protocol_id
+
+  - title: "CREED Utilities"
+    desc: "Configuration and helper functions for CREED quality assessment criteria."
+    contents:
+      - collect_CREED_data
+      - CREED_reliability_criteria_config
+      - CREED_relevance_criteria_config
+      - copper_CREED_purpose_statement
+
+  - title: "Testing"
+    desc: "Generate dummy data for development and testing."
+    contents:
+      - populate_session_with_dummy_data
+      - creed_tibble_to_mock_input
+
+  - title: "Utilities"
+    desc: "General-purpose helpers for the Shiny app."
+    contents:
+      - printreactiveValues
+      - info_accordion
+      - get_session_data_safe
+
+  - title: "App"
+    desc: "Run the STOPeData Shiny application."
+    contents:
+      - run_app

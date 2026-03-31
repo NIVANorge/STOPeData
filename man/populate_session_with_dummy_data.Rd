@@ -25,3 +25,9 @@ Stores dummy data directly into session reactiveValues.
 This bypasses the LLM extraction process and populates all module
 data objects immediately.
 }
+\examples{
+\dontrun{
+  # Used in a Shiny module server function to pre-populate all data with dummy data
+  populate_session_with_dummy_data(session, navigate_to = "Data", parent_session = session)
+}
+}

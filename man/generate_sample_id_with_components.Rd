@@ -33,3 +33,13 @@ Character vector of sample IDs.
 Generates vectorised sample identifiers from site, parameter, compartment,
   date, and subsample components.
 }
+\examples{
+generate_sample_id_with_components(
+  site_code = "SITE001",
+  parameter_name = "Cadmium",
+  environ_compartment = "Water",
+  environ_compartment_sub = "Surface water",
+  date = as.Date("2022-06-15"),
+  subsample = 1
+)
+}

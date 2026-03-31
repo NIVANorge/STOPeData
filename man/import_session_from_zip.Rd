@@ -17,3 +17,10 @@ List with success status and user-facing message
 \description{
 Import datasets from a ZIP file created by mod_export
 }
+\examples{
+\dontrun{
+  # session is the Shiny session object from the module server function
+  result <- import_session_from_zip("path/to/session_export.zip", session)
+  result$success
+}
+}

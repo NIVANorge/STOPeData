@@ -27,3 +27,10 @@ NULL (invisibly). File is written to disk as a side effect.
 Merge CREED details, relevance, and reliability tibbles into
   a single human-readable text file with section headers
 }
+\examples{
+\dontrun{
+  # creed_* tibbles are produced by the summarise_CREED_* functions
+  write_creed_report_txt(creed_details, creed_relevance, creed_reliability,
+                         file_path = tempfile(fileext = ".txt"))
+}
+}

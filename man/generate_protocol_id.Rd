@@ -47,4 +47,8 @@ The function handles edge cases gracefully:
 - Names are cleaned of special characters and spaces
 - Empty components are omitted from the final ID
 }
+\examples{
+generate_protocol_id("Sampling Protocol", "Water grab sampling", sequence_number = 1)
+generate_protocol_id("Analytical Protocol", "ICP-MS", sequence_number = 2, campaign_name = "NorthSea2022")
+}
 \concept{protocol_functions}

@@ -16,4 +16,14 @@ Includes `id`, `title`, `description`, `url`, `schema`, `osi_approved`, `revisio
 `created`, `updated`, and `popular`, a custom boolean highlighting the most commonly
 used licenses.
 }
+\examples{
+# Show only popular licenses
+zenodo_licenses[zenodo_licenses$popular, c("id", "title")]
+}
+\seealso{
+Other zenodo: 
+\code{\link{generate_zenodo_readme}()},
+\code{\link{zenodo_resource_types}}
+}
+\concept{zenodo}
 \keyword{datasets}

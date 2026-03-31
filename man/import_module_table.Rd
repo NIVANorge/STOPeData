@@ -17,3 +17,10 @@ List with success status and details
 \description{
 Import a single dataset and add to session reactiveValues
 }
+\examples{
+\dontrun{
+  # session is the Shiny session object from the module server function
+  result <- import_module_table("path/to/Sites_export.csv", session)
+  result$rows_imported
+}
+}

@@ -11,6 +11,11 @@
 #'
 #' @import eDataDRF
 #' @return A list matching the structure of initialise_userData() with dummy data
+#' @family create
+#' @examples
+#' session_data <- create_dummy_session_data()
+#' names(session_data)
+#' nrow(session_data$sitesData)
 #' @export
 create_dummy_session_data <- function() {
   # Start from the proper userData structure
@@ -62,6 +67,11 @@ create_dummy_session_data <- function() {
 #' @importFrom shiny showNotification updateNavbarPage
 #' @import eDataDRF
 #' @importFrom golem print_dev
+#' @examples
+#' \dontrun{
+#'   # Used in a Shiny module server function to pre-populate all data with dummy data
+#'   populate_session_with_dummy_data(session, navigate_to = "Data", parent_session = session)
+#' }
 #' @export
 populate_session_with_dummy_data <- function(
   session,
@@ -125,6 +135,11 @@ populate_session_with_dummy_data <- function(
 #' @return A named list mimicking the structure of a Shiny input object, with entries
 #'   named `criterionId_score`, `criterionId_relevant_data`, and `criterionId_limitations`
 #'   (or `criterionId_justification` for RB8).
+#'
+#' @examples
+#' dummy_data <- create_dummy_session_data()
+#' mock_input <- creed_tibble_to_mock_input(dummy_data$creedReliability)
+#' mock_input$RB1_score
 #'
 #' @details
 #' Score values are converted from numeric to text:

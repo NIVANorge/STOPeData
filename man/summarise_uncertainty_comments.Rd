@@ -15,3 +15,29 @@ Character string summarising uncertainty info, or "Relevant data not found"
 \description{
 Creates a summary of uncertainty types and measurement comments
 }
+\examples{
+meas <- data.frame(
+  UNCERTAINTY_TYPE = c("Standard deviation", "Standard deviation", NA),
+  MEASUREMENT_COMMENT = c(NA, "Replicate mean", "Replicate mean")
+)
+summarise_uncertainty_comments(meas)
+}
+\seealso{
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_sites}()}
+}
+\concept{summarise}

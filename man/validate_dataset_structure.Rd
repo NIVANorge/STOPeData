@@ -17,3 +17,16 @@ List with valid (logical) and message (character)
 \description{
 Basic validation of dataset structure
 }
+\examples{
+df <- data.frame(SITE_CODE = c("S001", "S002"), LATITUDE = c(59.1, 57.4))
+validate_dataset_structure(df, "Sites")
+validate_dataset_structure(data.frame(), "Sites")
+}
+\seealso{
+Other validate: 
+\code{\link{validate_and_lookup_identifier}()},
+\code{\link{validate_and_parse_bibtex}()},
+\code{\link{validate_doi_format}()},
+\code{\link{validate_pmid_format}()}
+}
+\concept{validate}

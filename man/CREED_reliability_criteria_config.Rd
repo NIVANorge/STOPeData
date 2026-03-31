@@ -29,6 +29,11 @@ Reliability criteria assess the methodological quality of the data:
 
 RB8 (Accreditation/QMS) is a shortcut criterion: if fully met, RB9-RB12 may be skipped.
 }
+\examples{
+config <- CREED_reliability_criteria_config()
+names(config)
+config$RB1
+}
 \seealso{
 [CREED_relevance_criteria_config()], [collect_CREED_data()]
 }

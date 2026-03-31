@@ -27,3 +27,10 @@ Character vector of parameter names
 Returns a character vector of parameter names filtered by type and
   optionally by subtype, combining base parameters with session-specific parameters.
 }
+\examples{
+\dontrun{
+  # dummy_parameters is a dataframe from the eDataDRF package
+  params <- get_parameters_filtered("Chemical", "Metal", dummy_parameters)
+  head(params)
+}
+}

@@ -26,3 +26,9 @@ Score values are converted from numeric to text:
 - 3 = "Not Reported"
 - 4 = "Not Met"
 }
+\examples{
+dummy_data <- create_dummy_session_data()
+mock_input <- creed_tibble_to_mock_input(dummy_data$creedReliability)
+mock_input$RB1_score
+
+}

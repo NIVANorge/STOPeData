@@ -27,6 +27,20 @@ tibble with parameter information or NULL if not found
 Looks up an existing parameter by name and type, returning a populated
   tibble row or NULL if not found.
 }
+\examples{
+\dontrun{
+  # dummy_parameters is a dataframe from the eDataDRF package
+  row <- create_existing_parameter("Chemical", "Cadmium", dummy_parameters)
+  row
+}
+}
 \seealso{
 \code{\link{initialise_parameters_tibble}}
+
+Other create: 
+\code{\link{create_compartment_combination}()},
+\code{\link{create_dummy_session_data}()},
+\code{\link{create_new_parameter}()},
+\code{\link{create_new_site}()}
 }
+\concept{create}

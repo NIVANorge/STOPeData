@@ -24,3 +24,24 @@ Wrapper function that validates BibTeX syntax, parses the string using
 bib_string2df_alt, and provides detailed error handling with user-friendly
 error messages.
 }
+\examples{
+\dontrun{
+  bibtex_str <- "@article{smith2022,
+    author  = {Smith, Jane},
+    title   = {Marine pollution},
+    journal = {Marine Pollution Bulletin},
+    year    = {2022}
+  }"
+  result <- validate_and_parse_bibtex(bibtex_str)
+  result$success
+  result$data$TITLE
+}
+}
+\seealso{
+Other validate: 
+\code{\link{validate_and_lookup_identifier}()},
+\code{\link{validate_dataset_structure}()},
+\code{\link{validate_doi_format}()},
+\code{\link{validate_pmid_format}()}
+}
+\concept{validate}

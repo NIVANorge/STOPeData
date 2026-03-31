@@ -37,3 +37,22 @@ Produces a markdown-formatted README string suitable for
   with the dataset and as the preview shown in the production confirmation
   modal.
 }
+\examples{
+readme <- generate_zenodo_readme(
+  title = "Marine contaminant monitoring 2020-2022",
+  description = "Trace metal concentrations in blue mussels from Norwegian fjords.",
+  authors = list(
+    list(first = "Jane", last = "Smith", affiliation = "NIVA", orcid = "")
+  ),
+  license_id = "cc-by-4.0",
+  contact_name = "Jane Smith",
+  contact_email = "jane.smith@niva.no"
+)
+cat(readme)
+}
+\seealso{
+Other zenodo: 
+\code{\link{zenodo_licenses}},
+\code{\link{zenodo_resource_types}}
+}
+\concept{zenodo}

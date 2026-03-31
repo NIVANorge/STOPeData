@@ -23,3 +23,9 @@ Writes all available session datasets to a ZIP file at `dest_file`.
   present), and a metadata file. Called by both `download_all_data()` and the
   Zenodo module's session-upload mode.
 }
+\examples{
+\dontrun{
+  # session and moduleState are Shiny reactive objects
+  build_session_zip(session, moduleState, dest_file = tempfile(fileext = ".zip"))
+}
+}

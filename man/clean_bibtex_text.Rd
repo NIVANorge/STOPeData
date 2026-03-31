@@ -23,3 +23,8 @@ This function performs the following cleaning operations:
 - Converts common LaTeX accent commands to Unicode characters
 - Normalises whitespace
 }
+\examples{
+clean_bibtex_text("{{Marine}} pollution")
+clean_bibtex_text("M\\\\u00FCller")
+
+}

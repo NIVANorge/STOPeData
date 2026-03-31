@@ -16,3 +16,16 @@ created by initialise_userData() but with test data instead of empty tibbles.
 
 Useful for testing outside of a reactive context.
 }
+\examples{
+session_data <- create_dummy_session_data()
+names(session_data)
+nrow(session_data$sitesData)
+}
+\seealso{
+Other create: 
+\code{\link{create_compartment_combination}()},
+\code{\link{create_existing_parameter}()},
+\code{\link{create_new_parameter}()},
+\code{\link{create_new_site}()}
+}
+\concept{create}

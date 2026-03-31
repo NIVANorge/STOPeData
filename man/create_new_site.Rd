@@ -24,3 +24,18 @@ Creates a new site record with auto-generated site code and default values.
 The site code is generated using either a base code or a default "SITE_" prefix,
 followed by a zero-padded three-digit number.
 }
+\examples{
+\dontrun{
+  # session is the Shiny session object from the module server function
+  new_site <- create_new_site(site_number = 1, base_code = "FJORD", session = session)
+  new_site$SITE_CODE
+}
+}
+\seealso{
+Other create: 
+\code{\link{create_compartment_combination}()},
+\code{\link{create_dummy_session_data}()},
+\code{\link{create_existing_parameter}()},
+\code{\link{create_new_parameter}()}
+}
+\concept{create}

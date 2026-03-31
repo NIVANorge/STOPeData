@@ -25,6 +25,18 @@ This approach uses temporary files to work around the limitation that
 The temporary file is created in the system temp directory and removed
 automatically, even if an error occurs.
 }
+\examples{
+\dontrun{
+  bibtex_str <- "@article{smith2022,
+    author  = {Smith, Jane},
+    title   = {Marine pollution},
+    journal = {Marine Pollution Bulletin},
+    year    = {2022}
+  }"
+  df <- bib_string2df_alt(bibtex_str)
+  df$TITLE
+}
+}
 \author{
 Philipp Ottolinger (original function), Sam Welch (added string wrapper)
 }

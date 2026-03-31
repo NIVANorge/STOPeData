@@ -20,6 +20,17 @@
 #' @author Philipp Ottolinger (original function), Sam Welch (added string wrapper)
 #'
 #' @importFrom bib2df bib2df
+#' @examples
+#' \dontrun{
+#'   bibtex_str <- "@article{smith2022,
+#'     author  = {Smith, Jane},
+#'     title   = {Marine pollution},
+#'     journal = {Marine Pollution Bulletin},
+#'     year    = {2022}
+#'   }"
+#'   df <- bib_string2df_alt(bibtex_str)
+#'   df$TITLE
+#' }
 #' @export
 bib_string2df_alt <- function(string, ...) {
   temp_file <- tempfile(fileext = ".bib")
@@ -46,6 +57,18 @@ bib_string2df_alt <- function(string, ...) {
 #'   Values are NA for fields not present in the BibTeX entry.
 #'
 #' @importFrom rlang `%||%`
+#' @examples
+#' \dontrun{
+#'   bibtex_str <- "@article{smith2022,
+#'     author  = {Smith, Jane},
+#'     title   = {Marine pollution},
+#'     journal = {Marine Pollution Bulletin},
+#'     year    = {2022}
+#'   }"
+#'   df <- bib_string2df_alt(bibtex_str)
+#'   fields <- map_bibtex_to_reference_fields(df)
+#'   fields$TITLE
+#' }
 #' @export
 map_bibtex_to_reference_fields <- function(
   bibtex_df,
@@ -158,7 +181,19 @@ map_bibtex_to_reference_fields <- function(
 #'   - message: Success/error message for user feedback
 #'   - warning: Additional warning message (if applicable)
 #'
-#'
+#' @family validate
+#' @examples
+#' \dontrun{
+#'   bibtex_str <- "@article{smith2022,
+#'     author  = {Smith, Jane},
+#'     title   = {Marine pollution},
+#'     journal = {Marine Pollution Bulletin},
+#'     year    = {2022}
+#'   }"
+#'   result <- validate_and_parse_bibtex(bibtex_str)
+#'   result$success
+#'   result$data$TITLE
+#' }
 #' @export
 validate_and_parse_bibtex <- function(bibtex_string, allow_multiple = FALSE) {
   # Input validation
@@ -309,6 +344,9 @@ validate_and_parse_bibtex <- function(bibtex_string, allow_multiple = FALSE) {
 #' - Converts common LaTeX accent commands to Unicode characters
 #' - Normalises whitespace
 #'
+#' @examples
+#' clean_bibtex_text("{{Marine}} pollution")
+#' clean_bibtex_text("M\\u00FCller")
 #'
 #' @importFrom stringi stri_trans_general
 #' @export

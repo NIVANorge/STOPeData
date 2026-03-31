@@ -15,3 +15,29 @@ tibble of Dataset Details fields ("field") and pretty strings ("value")
 \description{
 summarise session user data into pretty strings for CREED "Dataset Details" reporting
 }
+\examples{
+\dontrun{
+  # sessionData is the reactiveValues object from the Shiny app
+  details <- summarise_CREED_details(session$userData)
+  details
+}
+}
+\seealso{
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_sites}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}
