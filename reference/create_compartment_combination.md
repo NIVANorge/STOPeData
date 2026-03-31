@@ -2,7 +2,7 @@
 
 Creates a single-row tibble with specified compartment information,
 using the standardised structure from
-\[eDataDRF::initialise_campaign_tibble()\]. Function will return an
+\`eDataDRF::initialise_campaign_tibble()\`. Function will return an
 error if compartment, sub_compartment, or category are not of the
 correct variable type, but it doesn't check for vocabulary
 
@@ -17,17 +17,17 @@ create_compartment_combination(compartment, sub_compartment, category)
 - compartment:
 
   Character string specifying the environmental compartment
-  (\[eDataDRF::environ_compartments_vocabulary()\])
+  (\`eDataDRF::environ_compartments_vocabulary()\`)
 
 - sub_compartment:
 
   Character string specifying the sub-compartment
-  (\[eDataDRF::environ_compartments_sub_vocabulary()\])
+  (\`eDataDRF::environ_compartments_sub_vocabulary()\`)
 
 - category:
 
   Character string specifying the measured category
-  (\[eDataDRF::measured_category()\])
+  (\`eDataDRF::measured_category()\`)
 
 ## Value
 
@@ -35,7 +35,7 @@ tibble with one row containing the specified compartment information
 
 ## See also
 
-\[eDataDRF::initialise_campaign_tibble()\]
+\`eDataDRF::initialise_campaign_tibble()\`
 
 Other create:
 [`create_dummy_session_data()`](https://nivanorge.github.io/STOPeData/reference/create_dummy_session_data.md),
