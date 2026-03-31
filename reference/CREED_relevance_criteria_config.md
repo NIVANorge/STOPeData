@@ -24,15 +24,24 @@ A named list where each element is a criterion configuration with:
 
 ## Details
 
-Relevance criteria assess the fitness-for-purpose of the data: -
-RV1-RV2: Media (sample medium, collection method) - RV3-RV4: Spatial
-(study area, site type) - RV5-RV7: Temporal (timespan, frequency,
-conditions) - RV8-RV9: Analytical (analyte, sensitivity) - RV10: Data
-handling (summary statistics) - RV11: Supporting parameters
+Relevance criteria assess the fitness-for-purpose of the data:
+
+- RV1-RV2: Media (sample medium, collection method)
+
+- RV3-RV4: Spatial (study area, site type)
+
+- RV5-RV7: Temporal (timespan, frequency, conditions)
+
+- RV8-RV9: Analytical (analyte, sensitivity)
+
+- RV10: Data handling (summary statistics)
+
+- RV11: Supporting parameters
 
 ## See also
 
-\[CREED_reliability_criteria_config()\], \[collect_CREED_data()\]
+[`CREED_reliability_criteria_config()`](https://nivanorge.github.io/STOPeData/reference/CREED_reliability_criteria_config.md),
+[`collect_CREED_data()`](https://nivanorge.github.io/STOPeData/reference/collect_CREED_data.md)
 
 ## Examples
 

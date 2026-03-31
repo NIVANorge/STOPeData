@@ -20,7 +20,7 @@ bib_string2df_alt(string, ...)
 - ...:
 
   Additional arguments passed to
-  [`bib2df`](https://docs.ropensci.org/bib2df/reference/bib2df.html)
+  [`bib2df::bib2df()`](https://docs.ropensci.org/bib2df/reference/bib2df.html)
 
 ## Value
 

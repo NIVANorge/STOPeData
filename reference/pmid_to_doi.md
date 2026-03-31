@@ -17,9 +17,13 @@ pmid_to_doi(pmid)
 
 ## Value
 
-List with components: - success: Logical indicating whether conversion
-succeeded - doi: DOI string (if success = TRUE) or NULL - message:
-Status message for user feedback
+List with components:
+
+- success: Logical indicating whether conversion succeeded
+
+- doi: DOI string (if success = TRUE) or NULL
+
+- message: Status message for user feedback
 
 ## Details
 

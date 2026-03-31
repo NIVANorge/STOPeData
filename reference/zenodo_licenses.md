@@ -1,10 +1,9 @@
 # Zenodo license options tibble
 
 Returns a tibble of Zenodo license options as of March 2026. Includes
-\`id\`, \`title\`, \`description\`, \`url\`, \`schema\`,
-\`osi_approved\`, \`revision_id\`, \`created\`, \`updated\`, and
-\`popular\`, a custom boolean highlighting the most commonly used
-licenses.
+`id`, `title`, `description`, `url`, `schema`, `osi_approved`,
+`revision_id`, `created`, `updated`, and `popular`, a custom boolean
+highlighting the most commonly used licenses.
 
 ## Usage
 

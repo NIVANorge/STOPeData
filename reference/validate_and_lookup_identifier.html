@@ -70,21 +70,19 @@ looks up publication data from Crossref, and returns formatted results.</p>
 </dl></div>
     <div class="section level2">
     <h2 id="value">Value<a class="anchor" aria-label="anchor" href="#value"></a></h2>
-    <p>List with components:
-  - success: Logical indicating whether lookup succeeded
-  - data: Mapped field data (if success = TRUE) or NULL
-  - message: Status message for user feedback
-  - identifier_type: Type of identifier detected ("doi" or "pmid")</p>
-    </div>
+    <p>List with components:</p><ul><li><p>success: Logical indicating whether lookup succeeded</p></li>
+<li><p>data: Mapped field data (if success = TRUE) or NULL</p></li>
+<li><p>message: Status message for user feedback</p></li>
+<li><p>identifier_type: Type of identifier detected ("doi" or "pmid")</p></li>
+</ul></div>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This is the main entry point for DOI/PMID lookup functionality.
-It handles the complete workflow:
-1. Validate input format
-2. Convert PMID to DOI if necessary
-3. Query Crossref for publication data
-4. Map results to reference field format</p>
-    </div>
+It handles the complete workflow:</p><ol><li><p>Validate input format</p></li>
+<li><p>Convert PMID to DOI if necessary</p></li>
+<li><p>Query Crossref for publication data</p></li>
+<li><p>Map results to reference field format</p></li>
+</ol></div>
     <div class="section level2">
     <h2 id="see-also">See also<a class="anchor" aria-label="anchor" href="#see-also"></a></h2>
     <div class="dont-index"><p>Other validate:

@@ -26,12 +26,31 @@ fields. Values are NA for fields not present in the Crossref data.
 
 ## Details
 
-Maps Crossref fields to reference fields: - type → REFERENCE_TYPE
-(journal-article → journal, book → book, etc.) - title → TITLE - author
-→ AUTHOR (formatted as Last, First; Last, First) -
-published.online/published.print → YEAR - container.title →
-PERIODICAL_JOURNAL - volume → VOLUME - issue → ISSUE - publisher →
-PUBLISHER - DOI → DOI - URL → URL - page → PAGES - ISBN/ISSN → ISBN_ISSN
+Maps Crossref fields to reference fields:
+
+- type → REFERENCE_TYPE (journal-article → journal, book → book, etc.)
+
+- title → TITLE
+
+- author → AUTHOR (formatted as Last, First; Last, First)
+
+- published.online/published.print → YEAR
+
+- container.title → PERIODICAL_JOURNAL
+
+- volume → VOLUME
+
+- issue → ISSUE
+
+- publisher → PUBLISHER
+
+- DOI → DOI
+
+- URL → URL
+
+- page → PAGES
+
+- ISBN/ISSN → ISBN_ISSN
 
 ## Examples
 

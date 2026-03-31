@@ -24,19 +24,28 @@ A named list where each element is a criterion configuration with:
 
 ## Details
 
-Reliability criteria assess the methodological quality of the data: -
-RB1-RB3: Media (sample medium, collection method, handling) - RB4:
-Spatial (site location) - RB5: Temporal (date and time) - RB6-RB13:
-Analytical (analytes, LOD/LOQ, QA/QC, methods) - RB14-RB18: Data
-handling (calculations, significant figures, outliers, censored data) -
-RB19: Supporting parameters
+Reliability criteria assess the methodological quality of the data:
+
+- RB1-RB3: Media (sample medium, collection method, handling)
+
+- RB4: Spatial (site location)
+
+- RB5: Temporal (date and time)
+
+- RB6-RB13: Analytical (analytes, LOD/LOQ, QA/QC, methods)
+
+- RB14-RB18: Data handling (calculations, significant figures, outliers,
+  censored data)
+
+- RB19: Supporting parameters
 
 RB8 (Accreditation/QMS) is a shortcut criterion: if fully met, RB9-RB12
 may be skipped.
 
 ## See also
 
-\[CREED_relevance_criteria_config()\], \[collect_CREED_data()\]
+[`CREED_relevance_criteria_config()`](https://nivanorge.github.io/STOPeData/reference/CREED_relevance_criteria_config.md),
+[`collect_CREED_data()`](https://nivanorge.github.io/STOPeData/reference/collect_CREED_data.md)
 
 ## Examples
 

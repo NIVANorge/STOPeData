@@ -22,10 +22,13 @@ Character vector with cleaned text
 
 ## Details
 
-This function performs the following cleaning operations: - Removes
-double curly braces used for capitalization preservation - Converts
-common LaTeX accent commands to Unicode characters - Normalises
-whitespace
+This function performs the following cleaning operations:
+
+- Removes double curly braces used for capitalization preservation
+
+- Converts common LaTeX accent commands to Unicode characters
+
+- Normalises whitespace
 
 ## Examples
 

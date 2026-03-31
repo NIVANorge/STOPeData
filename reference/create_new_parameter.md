@@ -25,7 +25,7 @@ tibble with blank parameter template
 
 ## See also
 
-`initialise_parameters_tibble`
+[`eDataDRF::initialise_parameters_tibble()`](https://NIVANorge.github.io/eDataDRF/reference/initialise_parameters_tibble.html)
 
 Other create:
 [`create_compartment_combination()`](https://nivanorge.github.io/STOPeData/reference/create_compartment_combination.md),

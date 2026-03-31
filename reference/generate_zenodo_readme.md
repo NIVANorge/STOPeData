@@ -29,13 +29,13 @@ generate_zenodo_readme(
 
 - authors:
 
-  List of lists, each with elements \`first\`, \`last\`,
-  \`affiliation\`, and \`orcid\` (all character, may be empty strings).
+  List of lists, each with elements `first`, `last`, `affiliation`, and
+  `orcid` (all character, may be empty strings).
 
 - license_id:
 
-  Character. Zenodo license identifier, e.g. \`"cc-by-4.0"\`. The
-  human-readable title is looked up from \`zenodo_licenses\`.
+  Character. Zenodo license identifier, e.g. `"cc-by-4.0"`. The
+  human-readable title is looked up from `zenodo_licenses`.
 
 - contact_name:
 

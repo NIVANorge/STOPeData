@@ -22,17 +22,28 @@ validate_and_lookup_identifier(input_string, access_date = Sys.Date())
 
 ## Value
 
-List with components: - success: Logical indicating whether lookup
-succeeded - data: Mapped field data (if success = TRUE) or NULL -
-message: Status message for user feedback - identifier_type: Type of
-identifier detected ("doi" or "pmid")
+List with components:
+
+- success: Logical indicating whether lookup succeeded
+
+- data: Mapped field data (if success = TRUE) or NULL
+
+- message: Status message for user feedback
+
+- identifier_type: Type of identifier detected ("doi" or "pmid")
 
 ## Details
 
 This is the main entry point for DOI/PMID lookup functionality. It
-handles the complete workflow: 1. Validate input format 2. Convert PMID
-to DOI if necessary 3. Query Crossref for publication data 4. Map
-results to reference field format
+handles the complete workflow:
+
+1.  Validate input format
+
+2.  Convert PMID to DOI if necessary
+
+3.  Query Crossref for publication data
+
+4.  Map results to reference field format
 
 ## See also
 

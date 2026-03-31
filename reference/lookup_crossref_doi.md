@@ -17,9 +17,13 @@ lookup_crossref_doi(doi)
 
 ## Value
 
-List with components: - success: Logical indicating whether lookup
-succeeded - data: Crossref data (if success = TRUE) or NULL - message:
-Status message for user feedback
+List with components:
+
+- success: Logical indicating whether lookup succeeded
+
+- data: Crossref data (if success = TRUE) or NULL
+
+- message: Status message for user feedback
 
 ## Details
 

@@ -23,10 +23,15 @@ validate_and_parse_bibtex(bibtex_string, allow_multiple = FALSE)
 
 ## Value
 
-A list with components: - success: Logical indicating whether parsing
-succeeded - data: Parsed data frame (if success = TRUE) or NULL -
-message: Success/error message for user feedback - warning: Additional
-warning message (if applicable)
+A list with components:
+
+- success: Logical indicating whether parsing succeeded
+
+- data: Parsed data frame (if success = TRUE) or NULL
+
+- message: Success/error message for user feedback
+
+- warning: Additional warning message (if applicable)
 
 ## See also
 
