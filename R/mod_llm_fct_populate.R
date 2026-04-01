@@ -970,17 +970,13 @@ validate_species_against_database <- function(biota_data, species_database) {
 #' @importFrom glue glue
 #' @importFrom golem print_dev
 #' @importFrom tibble tibble
+#' @importFrom eDataDRF protocol_categories_vocabulary()
 #' @importFrom dplyr group_by mutate ungroup select relocate add_row
 #' @noRd
 # ! FORMAT-BASED
 create_methods_from_llm <- function(llm_methods_data, llm_campaign_data) {
-  # Define all required protocol categories ----
-  required_categories <- c(
-    "Sampling Protocol",
-    "Fractionation Protocol",
-    "Extraction Protocol",
-    "Analytical Protocol"
-  )
+  # Define all required protocol categories
+  required_categories <- protocol_categories_vocabulary()
 
   methods_tibble <- initialise_methods_tibble()
 
