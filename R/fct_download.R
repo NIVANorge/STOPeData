@@ -1,4 +1,4 @@
-# Metadata Format Helper Functions ----
+# Metadata Format Helper Functions
 # Functions to create and read human-readable metadata files
 
 #' Create readable metadata text file
@@ -8,6 +8,13 @@
 #' @param file_path Character. Path where to write the metadata file
 #' @return NULL (invisibly). File is written to disk as a side effect.
 #' @importFrom glue glue
+#' @examples
+#' \dontrun{
+#'   meta <- list(campaign_name = "North Sea 2022", export_datetime = Sys.time(),
+#'                user = "Jane", app_name = "STOPeData", app_version = "1.0",
+#'                clientData = "localhost")
+#'   write_metadata_txt(meta, tempfile(fileext = ".txt"))
+#' }
 #' @export
 write_metadata_txt <- function(metadata_list, file_path) {
   # Helper operator for string repetition
@@ -46,6 +53,8 @@ write_metadata_txt <- function(metadata_list, file_path) {
 #'
 #' @description Retrieve the short git commit hash of the current repository state
 #' @return Character. Short git commit hash, or "Git hash not available" if retrieval fails
+#' @examples
+#' get_git_commit()
 #' @export
 get_git_commit <- function() {
   tryCatch(
@@ -58,9 +67,21 @@ get_git_commit <- function() {
 
 #' Get export metadata
 #'
-#' @description Gather metadata about the current export session
+#' @description Gather metadata about the current export session. The
+#'   `campaign_name` field is drawn from the `CAMPAIGN_NAME` column of the
+#'   campaign table (see [eDataDRF::initialise_campaign_tibble()]).
 #' @param session Shiny session object. Required to access user data and client information.
 #' @return List containing export metadata fields (campaign_name, export_datetime, app_name, etc.)
+#' @importFrom golem get_golem_version
+#' @importFrom rlang `%||%`
+#' @seealso [eDataDRF::initialise_campaign_tibble()],
+#'   [eDataDRF::example_campaign_tibble()]
+#' @examples
+#' \dontrun{
+#'   # session is the Shiny session object from the module server function
+#'   meta <- get_export_metadata(session)
+#'   meta$campaign_name
+#' }
 #' @export
 get_export_metadata <- function(session = NULL) {
   if (is.null(session)) {
@@ -102,6 +123,8 @@ get_export_metadata <- function(session = NULL) {
 #' @param metadata_list List containing metadata fields
 #' @return Tibble with Property and Value columns
 #' @importFrom tibble tibble
+#' @examples
+#' create_metadata_tibble(list(campaign = "North Sea 2022", version = "1.0", user = "Jane"))
 #' @export
 create_metadata_tibble <- function(metadata_list) {
   tibble(
@@ -115,6 +138,11 @@ create_metadata_tibble <- function(metadata_list) {
 #' @description Convert internal dataset names to user-friendly display names
 #' @param dataset_name Character. Internal name of the dataset (e.g., "sitesData")
 #' @return Character. User-friendly display name (e.g., "Sites")
+#' @importFrom rlang `%||%`
+#' @examples
+#' get_dataset_display_name("sitesData")
+#' get_dataset_display_name("measurementsData")
+#' get_dataset_display_name("creedReliability")
 #' @export
 get_dataset_display_name <- function(dataset_name) {
   display_names <- c(
@@ -138,15 +166,17 @@ get_dataset_display_name <- function(dataset_name) {
   display_names[[dataset_name]] %||% dataset_name
 }
 
-# Function: Check Available Datasets ----
+# Function: Check Available Datasets
 #' Check which datasets contain data and get their dimensions
 #'
-#' @param rv standard reactiveValues object from the app
-#'
-#' @return List with three elements:
-#'   - available_datasets: character vector of dataset names with data
-#'   - dataset_dimensions: named list of lists with rows/cols for each available dataset
-#'   - export_ready: logical indicating if any datasets are available
+#' @description Checks each downloadable dataset in session reactive values for
+#'   content, returning availability status and dimension information.
+#' @param rv Standard reactiveValues object from the app.
+#' @return List with three elements: `available_datasets` (character vector of
+#'   dataset names with data), `dataset_dimensions` (named list of rows/cols per
+#'   dataset), and `export_ready` (logical).
+#' @importFrom utils capture.output str
+#' @noRd
 check_available_datasets <- function(rv) {
   available <- character(0)
   dimensions <- list()
@@ -207,12 +237,14 @@ check_available_datasets <- function(rv) {
   )
 }
 
-# Function: Extract Campaign Name ----
+# Function: Extract Campaign Name
 #' Extract campaign name from campaign data for use in filenames
 #'
-#' @param campaign_data Data frame containing campaign information
-#'
-#' @return Character string of campaign name, or NULL if not found/invalid
+#' @description Extracts the campaign name from a campaign data frame for
+#'   use in constructing export filenames.
+#' @param campaign_data Data frame containing campaign information.
+#' @return Character string of campaign name, or `NULL` if not found/invalid.
+#' @noRd
 extract_campaign_name <- function(campaign_data) {
   if (is.null(campaign_data) || nrow(campaign_data) == 0) {
     return(NULL)
@@ -240,6 +272,9 @@ extract_campaign_name <- function(campaign_data) {
 #' @return Character vector suitable for use with writeLines()
 #' @importFrom glue glue
 #' @importFrom utils str capture.output
+#' @examples
+#' object_to_text(list(a = 1, b = "hello"), dataset_name = "my_list")
+#' object_to_text("already a string")
 #' @export
 object_to_text <- function(obj, dataset_name = "unknown") {
   if (is.character(obj)) {
@@ -282,7 +317,12 @@ object_to_text <- function(obj, dataset_name = "unknown") {
   }
 }
 
-# just in one place for easier reuse
+#' List downloadable tabular dataset names
+#'
+#' @description Returns the names of all reactive value datasets that should be
+#'   exported as CSV files in the session ZIP archive.
+#' @return Character vector of dataset names.
+#' @noRd
 downloadable_tabular_datasets <- function() {
   c(
     "sitesData",
@@ -301,7 +341,12 @@ downloadable_tabular_datasets <- function() {
   )
 }
 
-# just in one place for easier reuse
+#' List downloadable text/object dataset names
+#'
+#' @description Returns the names of reactive value datasets that should be
+#'   exported as TXT files (LLM schema, prompt, and raw response).
+#' @return Character vector of dataset names.
+#' @noRd
 downloadable_text_datasets <- function() {
   c("schemaLLM", "promptLLM", "rawLLM")
 }
@@ -313,6 +358,9 @@ downloadable_text_datasets <- function() {
 #'   Includes tabular data as CSV, text/object data as TXT, the source PDF (if
 #'   present), and a metadata file. Called by both `download_all_data()` and the
 #'   Zenodo module's session-upload mode.
+#'
+#'   The ZIP filename is derived from a reference ID generated by
+#'   [eDataDRF::generate_reference_id()].
 #' @param session Shiny session object. Required to access reactive values.
 #' @param moduleState ReactiveValues object containing `available_datasets` and
 #'   `campaign_name` fields.
@@ -321,16 +369,26 @@ downloadable_text_datasets <- function() {
 #' @importFrom glue glue
 #' @importFrom zip zip
 #' @importFrom readr write_excel_csv
+#' @importFrom stringr str_detect
+#' @importFrom golem print_dev
+#' @importFrom rlang `%||%`
+#' @importFrom shiny showNotification
+#' @seealso [eDataDRF::generate_reference_id()], [download_all_data()]
+#' @examples
+#' \dontrun{
+#'   # session and moduleState are Shiny reactive objects
+#'   build_session_zip(session, moduleState, dest_file = tempfile(fileext = ".zip"))
+#' }
 #' @export
 build_session_zip <- function(session, moduleState, dest_file) {
   rv <- session$userData$reactiveValues
   metadata <- get_export_metadata(session = session)
 
-  temp_dir  <- tempdir()
+  temp_dir <- tempdir()
   timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 
   campaign <- if (nrow(rv$referenceData) > 0) {
-    generate_reference_id(
+    eDataDRF::generate_reference_id(
       rv$referenceData$YEAR,
       rv$referenceData$AUTHOR,
       rv$referenceData$TITLE
@@ -352,12 +410,15 @@ build_session_zip <- function(session, moduleState, dest_file) {
         data <- rv[[dataset_name]]
 
         display_name <- gsub(" ", "_", get_dataset_display_name(dataset_name))
-        base_name    <- glue("{campaign}_{display_name}_{timestamp}")
+        base_name <- glue("{campaign}_{display_name}_{timestamp}")
 
         if (dataset_name %in% text_datasets) {
           if (!is.null(data)) {
             txt_file <- file.path(temp_dir, glue("{base_name}.txt"))
-            writeLines(object_to_text(data, dataset_name = display_name), txt_file)
+            writeLines(
+              object_to_text(data, dataset_name = display_name),
+              txt_file
+            )
             all_files <- c(all_files, txt_file)
           }
         } else {
@@ -370,7 +431,11 @@ build_session_zip <- function(session, moduleState, dest_file) {
       },
       error = function(e) {
         showNotification(
-          paste0("Error creating download data: ", e$message, " (Code: build_session_zip())"),
+          paste0(
+            "Error creating download data: ",
+            e$message,
+            " (Code: build_session_zip())"
+          ),
           type = "error",
           duration = NULL
         )
@@ -408,20 +473,32 @@ build_session_zip <- function(session, moduleState, dest_file) {
 #' @description Creates a Shiny downloadHandler that exports all available datasets
 #'   as CSV files (for tabular data) or TXT files (for text/object data) in a single ZIP archive.
 #'   Also includes a metadata file with export information.
+#'
+#'   The ZIP filename is derived from a reference ID generated by
+#'   [eDataDRF::generate_reference_id()].
 #' @param session Shiny session object. Required to access reactive values.
 #' @param moduleState ReactiveValues object containing export_ready flag, available_datasets,
 #'   and campaign_name fields.
 #' @return A Shiny downloadHandler function
 #' @importFrom glue glue
+#' @importFrom shiny downloadHandler
+#' @seealso [eDataDRF::generate_reference_id()], [build_session_zip()]
+#' @examples
+#' \dontrun{
+#'   # Used inside a Shiny module server function
+#'   output$download_btn <- download_all_data(session, moduleState)
+#' }
 #' @export
 download_all_data <- function(session, moduleState = NULL) {
   if (is.null(moduleState) || is.null(session)) {
-    stop("moduleState & session reactive objects must be supplied to create CSVs")
+    stop(
+      "moduleState & session reactive objects must be supplied to create CSVs"
+    )
   }
 
   campaign_short <- function() {
     if (nrow(session$userData$reactiveValues$referenceData) > 0) {
-      generate_reference_id(
+      eDataDRF::generate_reference_id(
         session$userData$reactiveValues$referenceData$YEAR,
         session$userData$reactiveValues$referenceData$AUTHOR,
         session$userData$reactiveValues$referenceData$TITLE
@@ -434,7 +511,7 @@ download_all_data <- function(session, moduleState = NULL) {
   downloadHandler(
     filename = function() {
       timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-      campaign  <- campaign_short()
+      campaign <- campaign_short()
       glue("{campaign}_AllData_{timestamp}.zip")
     },
     content = function(file) build_session_zip(session, moduleState, file),
@@ -447,10 +524,22 @@ download_all_data <- function(session, moduleState = NULL) {
 #' @description Merge CREED details, relevance, and reliability tibbles into
 #'   a single human-readable text file with section headers
 #' @param creed_details Tibble with field/value columns from summarise_CREED_details()
-#' @param creed_relevance Tibble with field/value columns from summarise_CREED_relevance()
-#' @param creed_reliability Tibble with field/value columns from summarise_CREED_reliability()
+#' @param creed_relevance Tibble with field/value columns from summarise_CREED_relevance().
+#'   Use [eDataDRF::example_CREED_relevance_tibble()] to generate example data.
+#' @param creed_reliability Tibble with field/value columns from summarise_CREED_reliability().
+#'   Use [eDataDRF::example_CREED_reliability_tibble()] to generate example data.
 #' @param file_path Character. Path where to write the report file
 #' @return NULL (invisibly). File is written to disk as a side effect.
+#' @importFrom glue glue
+#' @seealso [eDataDRF::example_CREED_relevance_tibble()],
+#'   [eDataDRF::example_CREED_reliability_tibble()],
+#'   [eDataDRF::initialise_CREED_data_tibble()]
+#' @examples
+#' \dontrun{
+#'   # creed_* tibbles are produced by the summarise_CREED_* functions
+#'   write_creed_report_txt(creed_details, creed_relevance, creed_reliability,
+#'                          file_path = tempfile(fileext = ".txt"))
+#' }
 #' @export
 write_creed_report_txt <- function(
   creed_details,

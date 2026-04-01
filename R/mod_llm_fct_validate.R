@@ -6,6 +6,7 @@
 #' @param variable_name Name of the mapping variable to use from CSV
 #' @param default_value Default return value if no matches found
 #' @param case_sensitive Logical, whether pattern matching should be case sensitive
+#' @return Character. The matching output vocabulary value, or `default_value` if no match found.
 #' @importFrom readr read_csv
 #' @noRd
 # ! FORMAT-BASED
@@ -63,6 +64,8 @@ map_to_vocabulary <- function(
 }
 
 #' Map LLM parameter type to strict controlled vocabulary
+#' @param param_type Character. Parameter type value to map.
+#' @return Character. Controlled vocabulary parameter type value.
 #' @noRd
 # ! FORMAT-BASED
 map_parameter_type_strict <- function(param_type) {
@@ -75,6 +78,8 @@ map_parameter_type_strict <- function(param_type) {
 
 #' Map measured category to strict controlled vocabulary
 #' @description Maps to the exact controlled vocabulary used in compartments module
+#' @param category Character. Measured category value to map.
+#' @return Character. Controlled vocabulary measured category value.
 #' @noRd
 # ! FORMAT-BASED
 map_measured_category_strict <- function(category) {
@@ -87,6 +92,8 @@ map_measured_category_strict <- function(category) {
 
 #' Map compartment to strict controlled vocabulary
 #' @description Maps to the exact controlled vocabulary used in compartments module
+#' @param compartment Character. Compartment value to map.
+#' @return Character. Controlled vocabulary compartment value.
 #' @noRd
 # ! FORMAT-BASED
 map_compartment_strict <- function(compartment) {
@@ -100,6 +107,8 @@ map_compartment_strict <- function(compartment) {
 
 #' Map LLM geographic feature to strict controlled vocabulary
 #' @description Maps to the exact controlled vocabulary used in sites module
+#' @param feature Character. Geographic feature value to map.
+#' @return Character. Controlled vocabulary geographic feature value.
 #' @noRd
 # ! FORMAT-BASED
 map_geographic_feature_strict <- function(feature) {
@@ -113,6 +122,9 @@ map_geographic_feature_strict <- function(feature) {
 # Validation functions ----
 
 #' Validate latitude value
+#' @description Validates a latitude value, returning NA if out of range or non-numeric.
+#' @param lat Numeric or character. Latitude to validate.
+#' @return Numeric latitude, or NA if invalid.
 #' @noRd
 validate_latitude <- function(lat) {
   if (is.null(lat) || is.na(lat)) {
@@ -126,6 +138,9 @@ validate_latitude <- function(lat) {
 }
 
 #' Validate longitude value
+#' @description Validates a longitude value, returning NA if out of range or non-numeric.
+#' @param lon Numeric or character. Longitude to validate.
+#' @return Numeric longitude, or NA if invalid.
 #' @noRd
 validate_longitude <- function(lon) {
   if (is.null(lon) || is.na(lon)) {
@@ -145,6 +160,7 @@ validate_longitude <- function(lon) {
 #' @param chemical_parameters Reference database
 #' @return List with validation results and formatted text output
 #' @importFrom glue glue
+#' @importFrom dplyr filter
 #' @noRd
 # ! FORMAT-BASED
 validate_parameters_against_database <- function(
@@ -350,6 +366,8 @@ validate_parameters_against_database <- function(
 # Biota mapping functions ----
 
 #' Map species group to controlled vocabulary
+#' @param species_group Character. Species group value to map.
+#' @return Character. Controlled vocabulary species group value.
 #' @noRd
 # ! FORMAT-BASED
 map_species_group_strict <- function(species_group) {
@@ -361,6 +379,8 @@ map_species_group_strict <- function(species_group) {
 }
 
 #' Map tissue type to controlled vocabulary
+#' @param tissue_type Character. Tissue type value to map.
+#' @return Character. Controlled vocabulary tissue type value.
 #' @noRd
 # ! FORMAT-BASED
 map_tissue_type_strict <- function(tissue_type) {
@@ -372,6 +392,8 @@ map_tissue_type_strict <- function(tissue_type) {
 }
 
 #' Map life stage to controlled vocabulary
+#' @param lifestage Character. Life stage value to map.
+#' @return Character. Controlled vocabulary life stage value.
 #' @noRd
 # ! FORMAT-BASED
 map_lifestage_strict <- function(lifestage) {
@@ -383,6 +405,8 @@ map_lifestage_strict <- function(lifestage) {
 }
 
 #' Map gender to controlled vocabulary
+#' @param gender Character. Gender value to map.
+#' @return Character. Controlled vocabulary gender value.
 #' @noRd
 # ! FORMAT-BASED
 map_gender_strict <- function(gender) {
@@ -396,6 +420,8 @@ map_gender_strict <- function(gender) {
 # Methods mapping functions ----
 
 #' Map protocol category to controlled vocabulary
+#' @param protocol_category Character. Protocol category value to map.
+#' @return Character. Controlled vocabulary protocol category value.
 #' @noRd
 # ! FORMAT-BASED
 map_protocol_category_strict <- function(protocol_category) {

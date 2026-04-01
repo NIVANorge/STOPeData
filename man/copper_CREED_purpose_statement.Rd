@@ -12,3 +12,7 @@ nested list of criteria and thresholds to meet them
 \description{
 Load a pre-written CREED purpose statement for a copper exposure assessment
 }
+\examples{
+purpose <- copper_CREED_purpose_statement()
+names(purpose)
+}

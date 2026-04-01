@@ -14,8 +14,8 @@
 #' @param first The first argument, a value we want to use only if it isTruthy
 #' @param second The second argument, a safe alternative if first isn't Truthy
 #'
-#'
 #' @importFrom shiny isTruthy
+#' @noRd
 `%|truthy|%` <- function(first, second) {
   if (isTruthy(first)) {
     first
@@ -27,7 +27,8 @@
 
 #' Reference field character limits
 #'
-#' Returns maximum character lengths for text fields in the references table.
+#' Returns maximum character lengths for text fields in the references table
+#' ([eDataDRF::initialise_references_tibble()]).
 #'
 #' @details
 #' Provides a named list of character limits for reference metadata fields to ensure
@@ -54,6 +55,14 @@
 #' @return A named list of character limits for reference fields
 #' @family limits
 #' @family reference
+#' @seealso [eDataDRF::initialise_references_tibble()],
+#'   [eDataDRF::example_references_tibble()],
+#'   [eDataDRF::reference_type_vocabulary()],
+#'   [eDataDRF::data_source_vocabulary()]
+#' @examples
+#' limits <- reference_character_limits()
+#' limits$DOI
+#' limits$REF_COMMENT
 #' @export
 reference_character_limits <- function() {
   list(
@@ -91,23 +100,26 @@ reference_character_limits <- function() {
 #'
 #' @param input the variable to check
 #'
-#'
+#' @noRd
 isRelevant <- function(input) {
   stopifnot(is.character(input))
   !(input %in% c("Not relevant", "Not reported"))
 }
 
-#' print content of reactiveValues object
+#' Print content of reactiveValues object
 #'
-#' @param data A reactiveValues object with named variables
 #' @description
 #' Print a reactiveValues object, with each named variable and its value on a new
 #' line
 #'
+#' @param data A reactiveValues object with named variables
+#' @return A string of variable names and values
 #' @importFrom shiny reactiveValues
-#'
-#'
-#' @returns a string of variable names and values
+#' @examples
+#' \dontrun{
+#'   rv <- shiny::reactiveValues(campaign_name = "North Sea 2022", year = 2022)
+#'   printreactiveValues(rv)
+#' }
 #' @export
 printreactiveValues <- function(data) {
   data_lines <- sapply(
@@ -131,14 +143,22 @@ printreactiveValues <- function(data) {
 
 #' Create a collapsible single-panel accordion containing a markdown file
 #'
+#' @description Creates a collapsible single-panel bslib accordion displaying
+#'   the contents of a markdown file, with an info icon.
 #' @param title the desired title of the accordion panel
 #' @param content_file the path to a markdown file
 #' @param ... other arguments to accordion()
 #'
-#' @returns a bslib::accordion html element
+#' @return a bslib::accordion html element
 #'
+#' @examples
+#' \dontrun{
+#'   # Used inside a Shiny UI function
+#'   info_accordion("Instructions", "path/to/instructions.md")
+#' }
 #' @export
 #' @importFrom bslib card card_body accordion accordion_panel
+#' @importFrom bsicons bs_icon
 #' @importFrom htmltools includeMarkdown tags HTML
 #' @importFrom glue glue
 info_accordion <- function(title = "Instructions", content_file, ...) {
@@ -165,96 +185,25 @@ info_accordion <- function(title = "Instructions", content_file, ...) {
   )
 }
 
-#' Abbreviate string to first n words with case formatting
-#'
-#' Takes a string, extracts the first n words (removing special characters),
-#' and formats them according to the specified case style.
-#'
-#' @param string Character. The input string to abbreviate.
-#' @param n_words Integer. Number of words to include in the abbreviation.
-#' @param case Character. Case style for the output. One of:
-#'   \itemize{
-#'     \item "lower" - all lowercase, no separator (e.g., "dogsandcats")
-#'     \item "upper" - all uppercase, no separator (e.g., "DOGSANDCATS")
-#'     \item "sentence" - sentence case, no separator (e.g., "Dogsandcats")
-#'     \item "snake" - lowercase with underscores (e.g., "dogs_and_cats")
-#'     \item "title" - title case, no separator (e.g., "DogsAndCats")
-#'     \item "screamingsnake" - uppercase with underscores (e.g., "DOGS_AND_CATS")
-#'     \item "camel" - camel case (e.g., "dogsAndCats")
-#'   }
-#'
-#' @return Character. The abbreviated and formatted string.
-#'
-#' @importFrom stringr str_to_title str_split
-#'
-#' @export
-abbreviate_string <- function(
-  string,
-  n_words,
-  case = c(
-    "lower",
-    "upper",
-    "sentence",
-    "snake",
-    "title",
-    "screamingsnake",
-    "camel"
-  )
+#' Calculate rHandsontable height
+#' @description Calculates a pixel height for a rHandsontable widget based on
+#'   the number of data rows, clamped between a minimum and maximum value.
+#' @param minHeight Integer. Minimum height in pixels. Default 200.
+#' @param maxHeight Integer. Maximum height in pixels. Default 700.
+#' @param defaultRowHeight Integer. Height per data row in pixels. Default 23.
+#' @param defaultHeaderHeight Integer. Height of the header row in pixels. Default 25.
+#' @param dataTable Data frame or tibble. The data to be displayed.
+#' @return Integer. Pixel height for the table widget.
+#' @noRd
+rHandsontableGetHeight <- function(
+  minHeight = 200,
+  maxHeight = 700,
+  defaultRowHeight = 23,
+  defaultHeaderHeight = 25,
+  dataTable
 ) {
-  case <- match.arg(case)
-
-  stopifnot(
-    is.character(as.character(string)),
-    is.integer(as.integer(n_words))
-  )
-
-  n_words <- as.integer(n_words)
-  string <- as.character(string)
-
-  words <- strsplit(gsub("[^A-Za-z0-9 ]", " ", string), "\\s+")
-  words <- words[[nchar(words) > 0]] # Remove empty strings
-
-  # Take first n words
-  selected_words <- head(words, n_words)
-
-  # Apply case transformation
-  result <- switch(
-    case,
-    "lower" = paste(tolower(selected_words), collapse = ""),
-    "upper" = paste(toupper(selected_words), collapse = ""),
-    "sentence" = {
-      words_lower <- tolower(selected_words)
-      words_lower[1] <- paste0(
-        toupper(substr(words_lower[1], 1, 1)),
-        substr(words_lower[1], 2, nchar(words_lower[1]))
-      )
-      paste(words_lower, collapse = "")
-    },
-    "snake" = paste(tolower(selected_words), collapse = "_"),
-    "title" = paste(str_to_title(selected_words), collapse = ""),
-    "screamingsnake" = paste(toupper(selected_words), collapse = "_"),
-    "camel" = {
-      camel_words <- selected_words
-      # Capitalise first letter of each word
-      camel_words <- paste0(
-        toupper(substr(camel_words, 1, 1)),
-        tolower(substr(camel_words, 2, nchar(camel_words)))
-      )
-      # Make first word lowercase
-      camel_words[1] <- tolower(camel_words[1])
-      paste0(camel_words, collapse = "")
-    }
-  )
-
-  return(result)
-}
-
-rHandsontableGetHeight <- function(minHeight = 200,
-                                   maxHeight = 700,
-                                   defaultRowHeight = 23,
-                                   defaultHeaderHeight = 25,
-                                   dataTable){
-  calculated_height <- (nrow(dataTable) * defaultRowHeight) + defaultHeaderHeight
+  calculated_height <- (nrow(dataTable) * defaultRowHeight) +
+    defaultHeaderHeight
 
   if (calculated_height > maxHeight) {
     calculated_height = maxHeight

@@ -15,3 +15,8 @@ Character. User-friendly display name (e.g., "Sites")
 \description{
 Convert internal dataset names to user-friendly display names
 }
+\examples{
+get_dataset_display_name("sitesData")
+get_dataset_display_name("measurementsData")
+get_dataset_display_name("creedReliability")
+}

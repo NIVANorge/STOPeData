@@ -7,11 +7,40 @@
 summarise_reference(ref_data)
 }
 \arguments{
-\item{ref_data}{Reference data frame}
+\item{ref_data}{Reference data frame. Use \code{\link[eDataDRF:example_references_tibble]{eDataDRF::example_references_tibble()}}
+to generate an example input.}
 }
 \value{
 Character string with formatted reference
 }
 \description{
-Creates a formatted bibliographic reference from reference data
+Creates a formatted bibliographic reference from reference data.
+See \code{\link[eDataDRF:initialise_references_tibble]{eDataDRF::initialise_references_tibble()}} for the expected column
+structure.
 }
+\examples{
+summarise_reference(eDataDRF::example_references_tibble())
+}
+\seealso{
+\code{\link[eDataDRF:example_references_tibble]{eDataDRF::example_references_tibble()}},
+\code{\link[eDataDRF:initialise_references_tibble]{eDataDRF::initialise_references_tibble()}},
+\code{\link[eDataDRF:generate_reference_id]{eDataDRF::generate_reference_id()}}
+
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_sites}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

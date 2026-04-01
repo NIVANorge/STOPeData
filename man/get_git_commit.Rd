@@ -12,3 +12,6 @@ Character. Short git commit hash, or "Git hash not available" if retrieval fails
 \description{
 Retrieve the short git commit hash of the current repository state
 }
+\examples{
+get_git_commit()
+}

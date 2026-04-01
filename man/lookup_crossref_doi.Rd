@@ -11,9 +11,11 @@ lookup_crossref_doi(doi)
 }
 \value{
 List with components:
-  - success: Logical indicating whether lookup succeeded
-  - data: Crossref data (if success = TRUE) or NULL
-  - message: Status message for user feedback
+\itemize{
+\item success: Logical indicating whether lookup succeeded
+\item data: Crossref data (if success = TRUE) or NULL
+\item message: Status message for user feedback
+}
 }
 \description{
 Queries Crossref API using rcrossref::cr_works() to retrieve publication
@@ -23,4 +25,10 @@ metadata for a given DOI.
 Uses rcrossref::cr_works() to query the Crossref API. Requires internet
 connection. May fail if Crossref is unavailable or if the DOI is not
 registered with Crossref.
+}
+\examples{
+\dontrun{
+  result <- lookup_crossref_doi("10.1016/j.marpolbul.2022.01.001")
+  result$data$title
+}
 }

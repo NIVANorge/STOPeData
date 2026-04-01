@@ -16,6 +16,11 @@
 #' Where registrant is typically 4+ digits and suffix can contain various characters.
 #' This function validates format only, not whether the DOI actually exists.
 #'
+#' @family validate
+#' @examples
+#' validate_doi_format("10.1016/j.marpolbul.2022.01.001")
+#' validate_doi_format("https://doi.org/10.1000/xyz123")
+#' validate_doi_format("not-a-doi")
 #' @export
 validate_doi_format <- function(input_string) {
   if (
@@ -52,6 +57,11 @@ validate_doi_format <- function(input_string) {
 #'
 #' @return Logical indicating whether the input is a valid PMID format
 #'
+#' @family validate
+#' @examples
+#' validate_pmid_format("12345678")
+#' validate_pmid_format("PMID: 9876543")
+#' validate_pmid_format("not-a-pmid")
 #' @export
 validate_pmid_format <- function(input_string) {
   if (
@@ -81,6 +91,9 @@ validate_pmid_format <- function(input_string) {
 #'
 #' @return Clean DOI string or the original input if no cleaning needed
 #'
+#' @examples
+#' extract_clean_doi("https://doi.org/10.1016/j.marpolbul.2022.01.001")
+#' extract_clean_doi("10.1000/xyz123")
 #' @export
 extract_clean_doi <- function(input_string) {
   clean_string <- gsub(
@@ -101,6 +114,9 @@ extract_clean_doi <- function(input_string) {
 #'
 #' @return Clean PMID string or the original input if no cleaning needed
 #'
+#' @examples
+#' extract_clean_pmid("PMID: 12345678")
+#' extract_clean_pmid("9876543")
 #' @export
 extract_clean_pmid <- function(input_string) {
   clean_string <- gsub("^PMID:?\\s*", "", input_string, ignore.case = TRUE)
@@ -127,7 +143,11 @@ extract_clean_pmid <- function(input_string) {
 #'
 #' @importFrom httr GET content http_error
 #' @importFrom xml2 read_xml xml_find_first xml_text
-#'
+#' @examples
+#' \dontrun{
+#'   result <- pmid_to_doi("12345678")
+#'   result$doi
+#' }
 #' @export
 pmid_to_doi <- function(pmid) {
   tryCatch(
@@ -141,9 +161,9 @@ pmid_to_doi <- function(pmid) {
       )
 
       # Make API request
-      response <- httr::GET(url)
+      response <- GET(url)
 
-      if (httr::http_error(response)) {
+      if (http_error(response)) {
         return(list(
           success = FALSE,
           doi = NULL,
@@ -152,11 +172,11 @@ pmid_to_doi <- function(pmid) {
       }
 
       # Parse XML response
-      xml_content <- httr::content(response, "text", encoding = "UTF-8")
-      xml_doc <- xml2::read_xml(xml_content)
+      xml_content <- content(response, "text", encoding = "UTF-8")
+      xml_doc <- read_xml(xml_content)
 
       # Look for DOI in ArticleIdList
-      doi_node <- xml2::xml_find_first(xml_doc, "//ArticleId[@IdType='doi']")
+      doi_node <- xml_find_first(xml_doc, "//ArticleId[@IdType='doi']")
 
       if (length(doi_node) == 0 || is.na(doi_node)) {
         return(list(
@@ -166,7 +186,7 @@ pmid_to_doi <- function(pmid) {
         ))
       }
 
-      doi <- xml2::xml_text(doi_node)
+      doi <- xml_text(doi_node)
 
       if (is.na(doi) || doi == "") {
         return(list(
@@ -211,13 +231,17 @@ pmid_to_doi <- function(pmid) {
 #' registered with Crossref.
 #'
 #' @importFrom rcrossref cr_works
-#'
+#' @examples
+#' \dontrun{
+#'   result <- lookup_crossref_doi("10.1016/j.marpolbul.2022.01.001")
+#'   result$data$title
+#' }
 #' @export
 lookup_crossref_doi <- function(doi) {
   tryCatch(
     {
       # Query Crossref
-      result <- rcrossref::cr_works(doi)
+      result <- cr_works(doi)
 
       if (is.null(result) || is.null(result$data)) {
         return(list(
@@ -282,6 +306,12 @@ lookup_crossref_doi <- function(doi) {
 #'
 #' @importFrom stringr str_extract
 #' @importFrom stats na.omit
+#' @examples
+#' \dontrun{
+#'   result <- lookup_crossref_doi("10.1016/j.marpolbul.2022.01.001")
+#'   fields <- map_crossref_to_reference_fields(result$data)
+#'   fields$TITLE
+#' }
 #' @details
 #' Maps Crossref fields to reference fields:
 #' - type → REFERENCE_TYPE (journal-article → journal, book → book, etc.)
@@ -481,6 +511,13 @@ map_crossref_to_reference_fields <- function(
 #' 3. Query Crossref for publication data
 #' 4. Map results to reference field format
 #'
+#' @family validate
+#' @examples
+#' \dontrun{
+#'   result <- validate_and_lookup_identifier("10.1016/j.marpolbul.2022.01.001")
+#'   result$data$TITLE
+#'   result$identifier_type
+#' }
 #' @export
 validate_and_lookup_identifier <- function(
   input_string,

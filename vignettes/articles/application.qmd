@@ -1,0 +1,95 @@
+---
+title: "eData Application"
+subtitle: "How the application runs"
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r}
+#| label: setup
+library(STOPeData)
+```
+
+This is how we run the application on our server (see `Dockerfile`):
+
+```{r}
+#| eval: false
+shiny::runApp('app.R', host='0.0.0.0', port=3838)
+
+# this is how I run the app locally when I'm developing it
+golem::run_dev() 
+```
+
+It calls `~app.R`. This sets up the `logger` framework, sets some Golem options, and calls `STOPeData::run_app()`, located in `~.R`.
+
+```{r}
+#| eval: false
+#| label: app.R
+logger::log_appender(logger::appender_stdout)
+logger::log_layout(logger::layout_json())
+logger::log_threshold(logger::INFO)
+
+logger::log_messages()
+logger::log_warnings()
+
+pkgload::load_all( # without pkgload dependencies are loaded very slowly
+  export_all = FALSE,
+  helpers = FALSE,
+  attach_testthat = FALSE,
+  quiet = TRUE
+)
+options(shiny.maxRequestSize = 20 * 1024^2) # increase permitted file upload size
+options(golem.app.prod = FALSE)
+options(bslib.color_contrast_warnings = FALSE)
+STOPeData::run_app() # add parameters here (if any)
+
+```
+
+`STOPeData::run_app()` calls `~/R/run_app.R`, which is a wrapper function created by the `Golem` package.
+
+```{r}
+#| eval: false
+#| label: STOPeData::run_app()
+#| 
+run_app <- function(
+  onStart = NULL,
+  options = list(),
+  enableBookmarking = "server",
+  uiPattern = "/",
+  ...
+) {
+  # set up logger logging for gcp
+
+  with_golem_options(
+    app = shinyApp(
+      ui = app_ui,
+      server = app_server,
+      onStart = onStart,
+      options = options,
+      enableBookmarking = enableBookmarking,
+      uiPattern = uiPattern
+    ),
+    golem_opts = list(...)
+  )
+}
+
+```
+
+This calls `shiny::shinyApp()` on the ui and server objects created by `~/R/app_ui.R` and `~R/app_server.R`.
+
+```{r}
+#| eval: false
+#| label: ui and server functions
+
+app_ui <- function(request) {
+ # ui goes here
+}
+
+app_server <- function(input, output, session) {
+ # logic goes here
+}
+```
+
+In actual fact, though, the application is heavily modularised/functionalised. This means that the functional code you're looking for is more likely to be in the module files (`~/R/mod_*.R`) or function files (`~/R/mod_*_fct.R`,`fct_*.R`, and `utils_*.R`).

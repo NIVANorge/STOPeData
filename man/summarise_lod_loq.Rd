@@ -7,7 +7,8 @@
 summarise_lod_loq(measurementsData)
 }
 \arguments{
-\item{measurementsData}{The measurements dataset}
+\item{measurementsData}{The measurements dataset. Use
+\code{\link[eDataDRF:example_measurements_tibble]{eDataDRF::example_measurements_tibble()}} to generate an example input.}
 }
 \value{
 Character string summarising LOD/LOQ, or "Relevant data not found"
@@ -15,3 +16,28 @@ Character string summarising LOD/LOQ, or "Relevant data not found"
 \description{
 Creates a summary string of limit of detection and quantification values
 }
+\examples{
+summarise_lod_loq(eDataDRF::example_measurements_tibble())
+}
+\seealso{
+\code{\link[eDataDRF:example_measurements_tibble]{eDataDRF::example_measurements_tibble()}},
+\code{\link[eDataDRF:parameter_unit_vocabulary]{eDataDRF::parameter_unit_vocabulary()}}
+
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_sites}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

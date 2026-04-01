@@ -8,10 +8,10 @@ CREED_reliability_criteria_config()
 }
 \value{
 A named list where each element is a criterion configuration with:
-  \describe{
-    \item{title}{Character. Human-readable criterion title.}
-    \item{type}{Character. Either "Required" or "Recommended".}
-  }
+\describe{
+\item{title}{Character. Human-readable criterion title.}
+\item{type}{Character. Either "Required" or "Recommended".}
+}
 }
 \description{
 Returns the configuration list for all 19 CREED reliability
@@ -20,15 +20,22 @@ Required or Recommended.
 }
 \details{
 Reliability criteria assess the methodological quality of the data:
-- RB1-RB3: Media (sample medium, collection method, handling)
-- RB4: Spatial (site location)
-- RB5: Temporal (date and time)
-- RB6-RB13: Analytical (analytes, LOD/LOQ, QA/QC, methods)
-- RB14-RB18: Data handling (calculations, significant figures, outliers, censored data)
-- RB19: Supporting parameters
+\itemize{
+\item RB1-RB3: Media (sample medium, collection method, handling)
+\item RB4: Spatial (site location)
+\item RB5: Temporal (date and time)
+\item RB6-RB13: Analytical (analytes, LOD/LOQ, QA/QC, methods)
+\item RB14-RB18: Data handling (calculations, significant figures, outliers, censored data)
+\item RB19: Supporting parameters
+}
 
 RB8 (Accreditation/QMS) is a shortcut criterion: if fully met, RB9-RB12 may be skipped.
 }
+\examples{
+config <- CREED_reliability_criteria_config()
+names(config)
+config$RB1
+}
 \seealso{
-[CREED_relevance_criteria_config()], [collect_CREED_data()]
+\code{\link[=CREED_relevance_criteria_config]{CREED_relevance_criteria_config()}}, \code{\link[=collect_CREED_data]{collect_CREED_data()}}
 }

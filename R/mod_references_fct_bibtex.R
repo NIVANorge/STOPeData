@@ -2,29 +2,41 @@
 #' Convert BibTeX string to data frame using temporary file
 #'
 #' @param string A BibTeX formatted string containing one or more entries
-#' @param ... Additional arguments passed to \code{\link[bib2df]{bib2df}}
+#' @param ... Additional arguments passed to [bib2df::bib2df()]
 #'
 #' @description
 #' This function converts a BibTeX formatted string into a data frame by writing
-#' the string to a temporary file and then using \code{bib2df::bib2df} to parse it.
+#' the string to a temporary file and then using `bib2df::bib2df` to parse it.
 #' The temporary file is automatically cleaned up after use.
 #'
 #' @return A tibble/data frame with parsed BibTeX entries
 #'
 #' @details
 #' This approach uses temporary files to work around the limitation that
-#' \code{bib2df::bib2df} only accepts file paths, not strings directly.
+#' `bib2df::bib2df` only accepts file paths, not strings directly.
 #' The temporary file is created in the system temp directory and removed
 #' automatically, even if an error occurs.
 #'
 #' @author Philipp Ottolinger (original function), Sam Welch (added string wrapper)
 #'
+#' @importFrom bib2df bib2df
+#' @examples
+#' \dontrun{
+#'   bibtex_str <- "@article{smith2022,
+#'     author  = {Smith, Jane},
+#'     title   = {Marine pollution},
+#'     journal = {Marine Pollution Bulletin},
+#'     year    = {2022}
+#'   }"
+#'   df <- bib_string2df_alt(bibtex_str)
+#'   df$TITLE
+#' }
 #' @export
 bib_string2df_alt <- function(string, ...) {
   temp_file <- tempfile(fileext = ".bib")
   on.exit(unlink(temp_file))
   writeLines(string, temp_file)
-  bib2df::bib2df(temp_file, ...)
+  bib2df(temp_file, ...)
 }
 
 # BibTeX Functions ----
@@ -44,7 +56,19 @@ bib_string2df_alt <- function(string, ...) {
 #' @return A named list containing mapped field values for all reference input fields.
 #'   Values are NA for fields not present in the BibTeX entry.
 #'
-#'
+#' @importFrom rlang `%||%`
+#' @examples
+#' \dontrun{
+#'   bibtex_str <- "@article{smith2022,
+#'     author  = {Smith, Jane},
+#'     title   = {Marine pollution},
+#'     journal = {Marine Pollution Bulletin},
+#'     year    = {2022}
+#'   }"
+#'   df <- bib_string2df_alt(bibtex_str)
+#'   fields <- map_bibtex_to_reference_fields(df)
+#'   fields$TITLE
+#' }
 #' @export
 map_bibtex_to_reference_fields <- function(
   bibtex_df,
@@ -157,7 +181,19 @@ map_bibtex_to_reference_fields <- function(
 #'   - message: Success/error message for user feedback
 #'   - warning: Additional warning message (if applicable)
 #'
-#'
+#' @family validate
+#' @examples
+#' \dontrun{
+#'   bibtex_str <- "@article{smith2022,
+#'     author  = {Smith, Jane},
+#'     title   = {Marine pollution},
+#'     journal = {Marine Pollution Bulletin},
+#'     year    = {2022}
+#'   }"
+#'   result <- validate_and_parse_bibtex(bibtex_str)
+#'   result$success
+#'   result$data$TITLE
+#' }
 #' @export
 validate_and_parse_bibtex <- function(bibtex_string, allow_multiple = FALSE) {
   # Input validation
@@ -308,6 +344,9 @@ validate_and_parse_bibtex <- function(bibtex_string, allow_multiple = FALSE) {
 #' - Converts common LaTeX accent commands to Unicode characters
 #' - Normalises whitespace
 #'
+#' @examples
+#' clean_bibtex_text("{{Marine}} pollution")
+#' clean_bibtex_text("M\\u00FCller")
 #'
 #' @importFrom stringi stri_trans_general
 #' @export
@@ -409,39 +448,7 @@ clean_bibtex_text <- function(text) {
   text <- trimws(text)
 
   # Use stringi for additional Unicode normalization if available
-  if (requireNamespace("stringi", quietly = TRUE)) {
-    text <- stringi::stri_trans_general(text, "Latin-ASCII; Any-NFC")
-  }
+  text <- stri_trans_general(text, "Latin-ASCII; Any-NFC")
 
   return(text)
-}
-
-#' Generate Reference ID
-#' @param date Date (ACCESS_DATE or current date)
-#' @param author Author string
-#' @param title Title string
-#' @return Character string with format DateAuthorFirstThreeWords
-#' @importFrom stringr str_to_title
-generate_reference_id <- function(date, author, title) {
-  # Format date as YYYYMMDD
-  date_part <- date
-
-  # Extract first author's last name
-  author_part <- ""
-  if (!is.null(author) && nchar(trimws(author)) > 0) {
-    # Split by semicolon and take first author
-    first_author <- trimws(strsplit(author, ";")[[1]][1])
-    # Extract last name (part before first comma)
-    author_part <- trimws(strsplit(first_author, ",")[[1]][1])
-    # Remove any non-alphanumeric characters and limit length
-    author_part <- gsub("[^A-Za-z0-9]", "", author_part)
-    author_part <- substr(author_part, 1, 10) # Limit author part length
-  }
-
-  # Extract first three words from title
-  title_part <- abbreviate_string(title, 3, case = "title")
-  # Combine parts
-  reference_id <- paste0(date_part, author_part, title_part)
-
-  return(reference_id)
 }

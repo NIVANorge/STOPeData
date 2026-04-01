@@ -1115,8 +1115,8 @@ mod_samples_server <- function(id) {
       tryCatch(
         {
           if (!is.null(input$samples_table)) {
+            # TODO: #42 Error handling table changes: no method or default for coercing “character” to “NA” (Code: mod_samples_handle_table_changes)
             updated_data <- hot_to_r(input$samples_table)
-            # CHANGED: Update userData instead of moduleState
             session$userData$reactiveValues$samplesData <- updated_data
           }
         },

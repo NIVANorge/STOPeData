@@ -12,11 +12,14 @@ create_existing_parameter(
 )
 }
 \arguments{
-\item{param_type}{Character string specifying the parameter type}
+\item{param_type}{Character string specifying the parameter type. Must be a
+value from \code{\link[eDataDRF:parameter_types_vocabulary]{eDataDRF::parameter_types_vocabulary()}}.}
 
-\item{param_name}{Character string specifying the parameter name}
+\item{param_name}{Character string specifying the parameter name. Must be a
+value from \code{\link[eDataDRF:parameters_vocabulary]{eDataDRF::parameters_vocabulary()}}.}
 
-\item{dummy_parameters}{Dataframe containing base parameters}
+\item{dummy_parameters}{Dataframe containing base parameters. Use
+\code{\link[eDataDRF:parameters_vocabulary]{eDataDRF::parameters_vocabulary()}} to obtain the full parameter list.}
 
 \item{session_parameters}{Optional dataframe containing session-specific parameters}
 }
@@ -24,8 +27,21 @@ create_existing_parameter(
 tibble with parameter information or NULL if not found
 }
 \description{
-Create parameter row from existing parameter data
+Looks up an existing parameter by name and type, returning a populated
+tibble row or NULL if not found.
+}
+\examples{
+create_existing_parameter("Chemical", "Cadmium", eDataDRF::parameters_vocabulary())
 }
 \seealso{
-\code{\link{initialise_parameters_tibble}}
+\code{\link[eDataDRF:initialise_parameters_tibble]{eDataDRF::initialise_parameters_tibble()}},
+\code{\link[eDataDRF:parameters_vocabulary]{eDataDRF::parameters_vocabulary()}},
+\code{\link[eDataDRF:parameter_types_vocabulary]{eDataDRF::parameter_types_vocabulary()}}
+
+Other create: 
+\code{\link{create_compartment_combination}()},
+\code{\link{create_dummy_session_data}()},
+\code{\link{create_new_parameter}()},
+\code{\link{create_new_site}()}
 }
+\concept{create}

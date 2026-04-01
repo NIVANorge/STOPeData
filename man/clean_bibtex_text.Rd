@@ -19,7 +19,14 @@ non-ASCII characters.
 }
 \details{
 This function performs the following cleaning operations:
-- Removes double curly braces used for capitalization preservation
-- Converts common LaTeX accent commands to Unicode characters
-- Normalises whitespace
+\itemize{
+\item Removes double curly braces used for capitalization preservation
+\item Converts common LaTeX accent commands to Unicode characters
+\item Normalises whitespace
+}
+}
+\examples{
+clean_bibtex_text("{{Marine}} pollution")
+clean_bibtex_text("M\\\\u00FCller")
+
 }

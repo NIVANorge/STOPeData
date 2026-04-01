@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Rscript -e \"devtools::document\\(\\)\")",
+      "Bash(Rscript --version)",
+      "Bash(echo \"PATH: $PATH\")",
+      "Bash(\"/c/Program Files/R/R-4.4.2/bin/Rscript.exe\" -e \"devtools::document\\(\\)\")",
+      "Bash(mkdir -p data)",
+      "Bash(Rscript -e \":*)",
+      "Bash(Rscript --vanilla -e \"x <- readRDS\\(''inst/extdata/clean/Zenodo_Licenses_2026_03.rds''\\); cat\\(class\\(x\\), ''\\\\n''\\); cat\\(nrow\\(x\\), ''rows\\\\n''\\)\")",
+      "Bash(Rscript --vanilla -e \"zenodo_licenses <- readRDS\\(''inst/extdata/clean/Zenodo_Licenses_2026_03.rds''\\); save\\(zenodo_licenses, file=''data/zenodo_licenses.rda'', compress=''bzip2'', version=2\\); cat\\(''saved\\\\n''\\)\")",
+      "Bash(Rscript --vanilla -e \"x <- readRDS\\(''inst/extdata/clean/Zenodo_Licenses_2026_03.rds''\\); cat\\(paste\\(names\\(x\\), collapse='', ''\\), ''\\\\n''\\)\")",
+      "Bash(Rscript --vanilla -e \":*)",
+      "Bash(Rscript --vanilla -e \"suppressMessages\\(devtools::load_all\\(''.'', quiet=TRUE\\)\\); cat\\(''rows:'', nrow\\(zenodo_licenses\\), ''\\\\n''\\); cat\\(''popular n:'', sum\\(zenodo_licenses$popular\\), ''\\\\n''\\)\")",
+      "Bash(Rscript --vanilla -e \"suppressMessages\\(devtools::document\\(quiet=TRUE\\)\\)\")",
+      "Bash(Rscript --vanilla -e \"devtools::document\\(quiet=TRUE\\)\")",
+      "Bash(Rscript --vanilla -e \"load\\(''data/zenodo_licenses.rda''\\); cat\\(''loaded, rows:'', nrow\\(zenodo_licenses\\), ''\\\\n''\\)\")"
+    ]
+  }
+}

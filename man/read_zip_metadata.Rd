@@ -2,7 +2,7 @@
 % Please edit documentation in R/fct_upload.R
 \name{read_zip_metadata}
 \alias{read_zip_metadata}
-\title{Read metadata from ZIP file ----}
+\title{Read metadata from ZIP file}
 \usage{
 read_zip_metadata(zip_path)
 }
@@ -14,4 +14,10 @@ List with metadata information or NULL if not found/readable
 }
 \description{
 Extract and read metadata from a ZIP file without importing data
+}
+\examples{
+\dontrun{
+  metadata <- read_zip_metadata("path/to/session_export.zip")
+  metadata$campaign_name
+}
 }

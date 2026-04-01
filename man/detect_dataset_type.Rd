@@ -2,7 +2,7 @@
 % Please edit documentation in R/fct_upload.R
 \name{detect_dataset_type}
 \alias{detect_dataset_type}
-\title{Detect dataset type from filename ----}
+\title{Detect dataset type from filename}
 \usage{
 detect_dataset_type(filename)
 }
@@ -13,5 +13,17 @@ detect_dataset_type(filename)
 Character string of dataset type or NULL if not recognized
 }
 \description{
-Determine which type of dataset based on filename patterns
+Determine which type of dataset based on filename patterns.
+Dataset types correspond to eDataDRF tables — see \code{\link[eDataDRF:initialise_sites_tibble]{eDataDRF::initialise_sites_tibble()}},
+\code{\link[eDataDRF:initialise_measurements_tibble]{eDataDRF::initialise_measurements_tibble()}}, etc. for the full set.
+}
+\examples{
+detect_dataset_type("Campaign_Sites_20241024.csv")
+detect_dataset_type("Measurements_export.csv")
+detect_dataset_type("unknown_file.csv")
+}
+\seealso{
+\code{\link[eDataDRF:initialise_sites_tibble]{eDataDRF::initialise_sites_tibble()}},
+\code{\link[eDataDRF:initialise_measurements_tibble]{eDataDRF::initialise_measurements_tibble()}},
+\code{\link[eDataDRF:initialise_campaign_tibble]{eDataDRF::initialise_campaign_tibble()}}
 }

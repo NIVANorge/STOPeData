@@ -7,7 +7,8 @@
 create_new_parameter(param_type, entered_by)
 }
 \arguments{
-\item{param_type}{Character string specifying the parameter type}
+\item{param_type}{Character string specifying the parameter type. Must be a
+value from \code{\link[eDataDRF:parameter_types_vocabulary]{eDataDRF::parameter_types_vocabulary()}}.}
 
 \item{entered_by}{Character string specifying who entered the parameter}
 }
@@ -15,8 +16,20 @@ create_new_parameter(param_type, entered_by)
 tibble with blank parameter template
 }
 \description{
-Create new blank parameter row
+Creates a single-row template tibble with default values for a new parameter.
+}
+\examples{
+create_new_parameter("Chemical", "Jane Smith")
 }
 \seealso{
-\code{\link{initialise_parameters_tibble}}
+\code{\link[eDataDRF:initialise_parameters_tibble]{eDataDRF::initialise_parameters_tibble()}},
+\code{\link[eDataDRF:parameter_types_vocabulary]{eDataDRF::parameter_types_vocabulary()}},
+\code{\link[eDataDRF:measured_types_vocabulary]{eDataDRF::measured_types_vocabulary()}}
+
+Other create: 
+\code{\link{create_compartment_combination}()},
+\code{\link{create_dummy_session_data}()},
+\code{\link{create_existing_parameter}()},
+\code{\link{create_new_site}()}
 }
+\concept{create}

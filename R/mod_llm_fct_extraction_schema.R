@@ -3,6 +3,7 @@
 # Updated to use glue instead of paste0 for string construction
 
 #' Create campaign schema
+#' @return An ellmer type array defining the campaign extraction schema.
 #' @importFrom glue glue
 #' @noRd
 create_campaign_schema <- function() {
@@ -43,6 +44,7 @@ create_campaign_schema <- function() {
 }
 
 #' Create references schema
+#' @return An ellmer type array defining the references extraction schema.
 #' @noRd
 create_references_schema <- function() {
   type_array(
@@ -85,6 +87,8 @@ create_references_schema <- function() {
 }
 
 #' Create sites schema
+#' @return An ellmer type array defining the sites extraction schema.
+#' @importFrom glue glue
 #' @noRd
 create_sites_schema <- function() {
   type_array(
@@ -140,6 +144,7 @@ create_sites_schema <- function() {
 }
 
 #' Create parameters schema
+#' @return An ellmer type array defining the parameters extraction schema.
 #' @noRd
 create_parameters_schema <- function() {
   type_array(
@@ -167,6 +172,8 @@ create_parameters_schema <- function() {
 }
 
 #' Create compartments schema
+#' @return An ellmer type array defining the compartments extraction schema.
+#' @importFrom glue glue
 #' @noRd
 create_compartments_schema <- function() {
   type_array(
@@ -193,6 +200,8 @@ create_compartments_schema <- function() {
 }
 
 #' Create biota schema
+#' @return An ellmer type array defining the biota extraction schema.
+#' @importFrom glue glue
 #' @noRd
 create_biota_schema <- function() {
   type_array(
@@ -235,6 +244,8 @@ create_biota_schema <- function() {
 }
 
 #' Create methods schema
+#' @return An ellmer type array defining the methods extraction schema.
+#' @importFrom glue glue
 #' @noRd
 create_methods_schema <- function() {
   type_array(
@@ -261,6 +272,7 @@ create_methods_schema <- function() {
 }
 
 #' Create samples schema
+#' @return An ellmer type array defining the samples extraction schema.
 #' @noRd
 create_samples_schema <- function() {
   type_array(
@@ -297,7 +309,8 @@ create_samples_schema <- function() {
   )
 }
 
-#' Create comemnts schema
+#' Create comments schema
+#' @return An ellmer type object defining the comments extraction schema.
 #' @noRd
 create_comments_schema <- function() {
   type_object(
@@ -330,6 +343,7 @@ create_comments_schema <- function() {
 }
 
 #' Create extraction schema with correct ellmer syntax
+#' @return An ellmer type object defining the full extraction schema.
 #' @noRd
 create_extraction_schema <- function() {
   type_object(
@@ -346,6 +360,11 @@ create_extraction_schema <- function() {
   )
 }
 
+#' Display extraction schema as string
+#' @description Renders the full extraction schema as a human-readable character string.
+#' @return Character string representation of the extraction schema.
+#' @importFrom utils capture.output
+#' @noRd
 get_schema_display <- function() {
   tryCatch(
     {

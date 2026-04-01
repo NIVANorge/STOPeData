@@ -18,11 +18,11 @@ generate_zenodo_readme(
 
 \item{description}{Character. Dataset description.}
 
-\item{authors}{List of lists, each with elements `first`, `last`,
-`affiliation`, and `orcid` (all character, may be empty strings).}
+\item{authors}{List of lists, each with elements \code{first}, \code{last},
+\code{affiliation}, and \code{orcid} (all character, may be empty strings).}
 
-\item{license_id}{Character. Zenodo license identifier, e.g. `"cc-by-4.0"`.
-The human-readable title is looked up from `zenodo_licenses`.}
+\item{license_id}{Character. Zenodo license identifier, e.g. \code{"cc-by-4.0"}.
+The human-readable title is looked up from \code{zenodo_licenses}.}
 
 \item{contact_name}{Character. Display name or role for the contact.}
 
@@ -33,7 +33,26 @@ Character string containing the full README in markdown format.
 }
 \description{
 Produces a markdown-formatted README string suitable for
-  attaching to a Zenodo record. Used both as the companion file uploaded
-  with the dataset and as the preview shown in the production confirmation
-  modal.
+attaching to a Zenodo record. Used both as the companion file uploaded
+with the dataset and as the preview shown in the production confirmation
+modal.
 }
+\examples{
+readme <- generate_zenodo_readme(
+  title = "Marine contaminant monitoring 2020-2022",
+  description = "Trace metal concentrations in blue mussels from Norwegian fjords.",
+  authors = list(
+    list(first = "Jane", last = "Smith", affiliation = "NIVA", orcid = "")
+  ),
+  license_id = "cc-by-4.0",
+  contact_name = "Jane Smith",
+  contact_email = "jane.smith@niva.no"
+)
+cat(readme)
+}
+\seealso{
+Other zenodo: 
+\code{\link{zenodo_licenses}},
+\code{\link{zenodo_resource_types}}
+}
+\concept{zenodo}

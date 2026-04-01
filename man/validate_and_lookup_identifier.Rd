@@ -13,10 +13,12 @@ validate_and_lookup_identifier(input_string, access_date = Sys.Date())
 }
 \value{
 List with components:
-  - success: Logical indicating whether lookup succeeded
-  - data: Mapped field data (if success = TRUE) or NULL
-  - message: Status message for user feedback
-  - identifier_type: Type of identifier detected ("doi" or "pmid")
+\itemize{
+\item success: Logical indicating whether lookup succeeded
+\item data: Mapped field data (if success = TRUE) or NULL
+\item message: Status message for user feedback
+\item identifier_type: Type of identifier detected ("doi" or "pmid")
+}
 }
 \description{
 Main function that validates input format, converts PMID to DOI if needed,
@@ -25,8 +27,25 @@ looks up publication data from Crossref, and returns formatted results.
 \details{
 This is the main entry point for DOI/PMID lookup functionality.
 It handles the complete workflow:
-1. Validate input format
-2. Convert PMID to DOI if necessary
-3. Query Crossref for publication data
-4. Map results to reference field format
+\enumerate{
+\item Validate input format
+\item Convert PMID to DOI if necessary
+\item Query Crossref for publication data
+\item Map results to reference field format
 }
+}
+\examples{
+\dontrun{
+  result <- validate_and_lookup_identifier("10.1016/j.marpolbul.2022.01.001")
+  result$data$TITLE
+  result$identifier_type
+}
+}
+\seealso{
+Other validate: 
+\code{\link{validate_and_parse_bibtex}()},
+\code{\link{validate_dataset_structure}()},
+\code{\link{validate_doi_format}()},
+\code{\link{validate_pmid_format}()}
+}
+\concept{validate}

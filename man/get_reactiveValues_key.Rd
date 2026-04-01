@@ -2,7 +2,7 @@
 % Please edit documentation in R/fct_upload.R
 \name{get_reactiveValues_key}
 \alias{get_reactiveValues_key}
-\title{Get reactiveValues key for dataset type ----}
+\title{Get reactiveValues key for dataset type}
 \usage{
 get_reactiveValues_key(dataset_type)
 }
@@ -14,4 +14,8 @@ Character string of reactiveValues key or NULL
 }
 \description{
 Map dataset type to reactiveValues key
+}
+\examples{
+get_reactiveValues_key("Sites")
+get_reactiveValues_key("CREED_RB")
 }

@@ -113,6 +113,15 @@ check_gateway_availability <- function(module_data) {
 #' @description summarise session user data into pretty strings for CREED "Dataset Details" reporting
 #' @param sessionData session$userData$reactiveValues object
 #' @return tibble of Dataset Details fields ("field") and pretty strings ("value")
+#' @family summarise
+#' @importFrom tibble tibble
+#' @importFrom shiny isTruthy
+#' @examples
+#' \dontrun{
+#'   # sessionData is the reactiveValues object from the Shiny app
+#'   details <- summarise_CREED_details(session$userData)
+#'   details
+#' }
 #' @export
 summarise_CREED_details <- function(sessionData) {
   # Helper function to check if a dataset exists and has content
@@ -299,6 +308,7 @@ summarise_CREED_details <- function(sessionData) {
 #' @param description Character string description of the criterion
 #' @return Shiny div element containing the complete criterion section
 #' @noRd
+#' @importFrom glue glue
 #' @importFrom shiny div selectInput p strong h4 HTML
 #' @importFrom bslib layout_columns
 #' @importFrom bsicons bs_icon
@@ -521,6 +531,9 @@ create_conditional_criterion <- function(
 #' @description Load a pre-written CREED purpose statement for a copper exposure assessment
 #' @return nested list of criteria and thresholds to meet them
 #' @importFrom yaml read_yaml
+#' @examples
+#' purpose <- copper_CREED_purpose_statement()
+#' names(purpose)
 #' @export
 copper_CREED_purpose_statement <- function() {
   read_yaml(system.file(
@@ -535,6 +548,16 @@ copper_CREED_purpose_statement <- function() {
 #' @description summarise session user data into pretty strings for CREED reliability criteria
 #' @param sessionData session$userData$reactiveValues object
 #' @return tibble of Reliability criteria fields ("field") and pretty strings ("value")
+#' @family summarise
+#' @importFrom glue glue
+#' @importFrom shiny isTruthy
+#' @importFrom tibble tribble
+#' @examples
+#' \dontrun{
+#'   # sessionData is the reactiveValues object from the Shiny app
+#'   reliability <- summarise_CREED_reliability(session$userData)
+#'   reliability
+#' }
 #' @export
 summarise_CREED_reliability <- function(sessionData) {
   # Helper function to check if a dataset exists and has content
@@ -706,6 +729,16 @@ summarise_CREED_reliability <- function(sessionData) {
 #' @description summarise session user data into pretty strings for CREED relevance criteria
 #' @param sessionData session$userData$reactiveValues object
 #' @return tibble of Relevance criteria fields ("field") and pretty strings ("value")
+#' @family summarise
+#' @importFrom glue glue
+#' @importFrom shiny isTruthy
+#' @importFrom tibble tribble
+#' @examples
+#' \dontrun{
+#'   # sessionData is the reactiveValues object from the Shiny app
+#'   relevance <- summarise_CREED_relevance(session$userData)
+#'   relevance
+#' }
 #' @export
 summarise_CREED_relevance <- function(sessionData) {
   # Helper function to check if a dataset exists and has content
@@ -916,8 +949,18 @@ autopop_relevance_fields <- function(sessionData) {
 #' @param input the shiny input object for the module
 #' @param criteria_config the CREED criteria for either reliability or relevance
 #'
+#' @examples
+#' \dontrun{
+#'   # Used inside a Shiny module server function
+#'   config <- CREED_reliability_criteria_config()
+#'   scores <- collect_CREED_data(config, input)
+#'   scores
+#' }
+#'
 #' @importFrom tibble add_row
 #' @importFrom shiny isTruthy
+#' @importFrom dplyr mutate
+#' @importFrom rlang `%||%`
 #' @export
 collect_CREED_data <- function(criteria_config, input) {
   # Start from standardised empty structure
@@ -984,6 +1027,10 @@ collect_CREED_data <- function(criteria_config, input) {
 #' RB8 (Accreditation/QMS) is a shortcut criterion: if fully met, RB9-RB12 may be skipped.
 #'
 #' @seealso [CREED_relevance_criteria_config()], [collect_CREED_data()]
+#' @examples
+#' config <- CREED_reliability_criteria_config()
+#' names(config)
+#' config$RB1
 #' @export
 CREED_reliability_criteria_config <- function() {
   list(
@@ -1038,6 +1085,10 @@ CREED_reliability_criteria_config <- function() {
 #' - RV11: Supporting parameters
 #'
 #' @seealso [CREED_reliability_criteria_config()], [collect_CREED_data()]
+#' @examples
+#' config <- CREED_relevance_criteria_config()
+#' names(config)
+#' config$RV1
 #' @export
 CREED_relevance_criteria_config <- function() {
   list(

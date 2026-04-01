@@ -4,6 +4,10 @@
 #' See `?golem::get_golem_options` for more details.
 #' @inheritParams shiny::shinyApp
 #'
+#' @examples
+#' \dontrun{
+#'   run_app()
+#' }
 #' @export
 #' @importFrom shiny shinyApp
 #' @importFrom golem with_golem_options

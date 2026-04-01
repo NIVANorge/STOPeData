@@ -1,12 +1,23 @@
 #' Get parameter names for a specific parameter type
 #'
-#' @param param_type Character string specifying the parameter type
-#' @param dummy_parameters Dataframe containing base parameters
+#' @description Returns a character vector of parameter names for the given type,
+#'   combining base parameters with any session-specific parameters.
+#' @param param_type Character string specifying the parameter type. Must be a
+#'   value from [eDataDRF::parameter_types_vocabulary()].
+#' @param dummy_parameters Dataframe containing base parameters. Use
+#'   [eDataDRF::parameters_vocabulary()] to obtain the full parameter list.
 #' @param session_parameters Optional list containing session-specific parameters
 #'
 #' @return Character vector of parameter names
 #' @importFrom dplyr filter pull
+#' @importFrom rlang `%||%`
 #' @import eDataDRF
+#' @seealso [eDataDRF::parameters_vocabulary()],
+#'   [eDataDRF::parameter_types_vocabulary()],
+#'   [eDataDRF::parameter_types_sub_vocabulary()]
+#' @examples
+#' params <- get_parameters_of_types("Chemical", eDataDRF::parameters_vocabulary())
+#' head(params)
 #' @export
 get_parameters_of_types <- function(
   param_type,
@@ -31,13 +42,21 @@ get_parameters_of_types <- function(
 
 #' Create new blank parameter row
 #'
-#' @param param_type Character string specifying the parameter type
+#' @description Creates a single-row template tibble with default values for a new parameter.
+#' @param param_type Character string specifying the parameter type. Must be a
+#'   value from [eDataDRF::parameter_types_vocabulary()].
 #' @param entered_by Character string specifying who entered the parameter
 #'
 #' @return tibble with blank parameter template
+#' @family create
+#' @importFrom dplyr add_row
 #' @import eDataDRF
+#' @seealso [eDataDRF::initialise_parameters_tibble()],
+#'   [eDataDRF::parameter_types_vocabulary()],
+#'   [eDataDRF::measured_types_vocabulary()]
+#' @examples
+#' create_new_parameter("Chemical", "Jane Smith")
 #' @export
-#' @seealso \code{\link{initialise_parameters_tibble}}
 create_new_parameter <- function(param_type, entered_by) {
   template <- initialise_parameters_tibble()
 
@@ -59,16 +78,27 @@ create_new_parameter <- function(param_type, entered_by) {
 
 #' Create parameter row from existing parameter data
 #'
-#' @param param_type Character string specifying the parameter type
-#' @param param_name Character string specifying the parameter name
-#' @param dummy_parameters Dataframe containing base parameters
+#' @description Looks up an existing parameter by name and type, returning a populated
+#'   tibble row or NULL if not found.
+#' @param param_type Character string specifying the parameter type. Must be a
+#'   value from [eDataDRF::parameter_types_vocabulary()].
+#' @param param_name Character string specifying the parameter name. Must be a
+#'   value from [eDataDRF::parameters_vocabulary()].
+#' @param dummy_parameters Dataframe containing base parameters. Use
+#'   [eDataDRF::parameters_vocabulary()] to obtain the full parameter list.
 #' @param session_parameters Optional dataframe containing session-specific parameters
 #'
 #' @return tibble with parameter information or NULL if not found
+#' @family create
 #' @importFrom dplyr filter slice add_row
+#' @importFrom rlang `%||%`
 #' @import eDataDRF
+#' @seealso [eDataDRF::initialise_parameters_tibble()],
+#'   [eDataDRF::parameters_vocabulary()],
+#'   [eDataDRF::parameter_types_vocabulary()]
+#' @examples
+#' create_existing_parameter("Chemical", "Cadmium", eDataDRF::parameters_vocabulary())
 #' @export
-#' @seealso \code{\link{initialise_parameters_tibble}}
 create_existing_parameter <- function(
   param_type,
   param_name,
@@ -113,13 +143,25 @@ create_existing_parameter <- function(
 
 #' Get parameter names filtered by type and optionally subtype
 #'
-#' @param param_type Character string specifying the parameter type
-#' @param param_subtype Character string specifying the parameter subtype (optional)
-#' @param dummy_parameters Dataframe containing base parameters
+#' @description Returns a character vector of parameter names filtered by type and
+#'   optionally by subtype, combining base parameters with session-specific parameters.
+#' @param param_type Character string specifying the parameter type. Must be a
+#'   value from [eDataDRF::parameter_types_vocabulary()].
+#' @param param_subtype Character string specifying the parameter subtype (optional).
+#'   Must be a value from [eDataDRF::parameter_types_sub_vocabulary()].
+#' @param dummy_parameters Dataframe containing base parameters. Use
+#'   [eDataDRF::parameters_vocabulary()] to obtain the full parameter list.
 #' @param session_parameters Optional list containing session-specific parameters
 #'
 #' @return Character vector of parameter names
 #' @importFrom dplyr filter pull
+#' @importFrom rlang `%||%`
+#' @seealso [eDataDRF::parameters_vocabulary()],
+#'   [eDataDRF::parameter_types_vocabulary()],
+#'   [eDataDRF::parameter_types_sub_vocabulary()]
+#' @examples
+#' get_parameters_filtered("Stressor", "Homogeneous metal compounds", eDataDRF::parameters_vocabulary())
+#' get_parameters_filtered("Chemical", dummy_parameters = eDataDRF::parameters_vocabulary())
 #' @export
 get_parameters_filtered <- function(
   param_type,

@@ -176,7 +176,6 @@ mod_parameters_ui <- function(id) {
 #' @importFrom golem print_dev
 #' @importFrom glue glue
 #' @importFrom dplyr mutate bind_rows pull filter arrange select distinct
-#' @importFrom arrow read_parquet
 #' @importFrom purrr negate
 #' @importFrom tibble tibble
 #' @importFrom stats setNames

@@ -1,24 +1,16 @@
 # Zenodo Helper Functions and Static Data ----
 
-#' Zenodo license options tibble
-#'
-#' @description Returns a tibble of Zenodo license options as of March 2026.
-#' Includes `id`, `title`, `description`, `url`, `schema`, `osi_approved`, `revision_id`,
-#' `created`, `updated`, and `popular`, a custom boolean highlighting the most commonly
-#' used licenses.
-#'
-#' @importFrom tibble as_tibble
-#' @export
-zenodo_licenses <- readRDS("inst/extdata/clean/Zenodo_Licenses_2026_03.rds") |>
-  tibble::as_tibble()
-
 #' Zenodo resource type options vector
 #'
 #' @description Named character vector of Zenodo resource types.
 #'   Names are display labels; values are Zenodo resource type identifiers.
-#'   See \url{https://help.zenodo.org/docs/deposit/describe-records/resource-type/}
+#'   See <https://help.zenodo.org/docs/deposit/describe-records/resource-type/>
 #'   for more details. Filtered to values likely to be used in this application.
 #'
+#' @family zenodo
+#' @examples
+#' zenodo_resource_types
+#' zenodo_resource_types["Dataset"]
 #' @export
 zenodo_resource_types <- c(
   "Book" = "publication-book",
@@ -46,6 +38,19 @@ zenodo_resource_types <- c(
 #'
 #' @return Character string containing the full README in markdown format.
 #'
+#' @family zenodo
+#' @examples
+#' readme <- generate_zenodo_readme(
+#'   title = "Marine contaminant monitoring 2020-2022",
+#'   description = "Trace metal concentrations in blue mussels from Norwegian fjords.",
+#'   authors = list(
+#'     list(first = "Jane", last = "Smith", affiliation = "NIVA", orcid = "")
+#'   ),
+#'   license_id = "cc-by-4.0",
+#'   contact_name = "Jane Smith",
+#'   contact_email = "jane.smith@niva.no"
+#' )
+#' cat(readme)
 #' @importFrom glue glue
 #' @export
 generate_zenodo_readme <- function(
