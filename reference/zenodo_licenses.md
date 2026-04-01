@@ -1,9 +1,9 @@
 # Zenodo license options tibble
 
-Returns a tibble of Zenodo license options as of March 2026. Includes
-`id`, `title`, `description`, `url`, `schema`, `osi_approved`,
-`revision_id`, `created`, `updated`, and `popular`, a custom boolean
-highlighting the most commonly used licenses.
+A tibble of Zenodo license options as of March 2026. Includes `id`,
+`title`, `description`, `url`, `schema`, `osi_approved`, `revision_id`,
+`created`, `updated`, and `popular`, a custom boolean highlighting the
+most commonly used licenses.
 
 ## Usage
 
@@ -13,8 +13,53 @@ zenodo_licenses
 
 ## Format
 
-An object of class `tbl_df` (inherits from `tbl`, `data.frame`) with 444
-rows and 10 columns.
+A tibble with 444 rows and 10 columns:
+
+- id:
+
+  Character. Zenodo license identifier, e.g. `"cc-by-4.0"`.
+
+- title:
+
+  Character. Human-readable license name.
+
+- description:
+
+  Character. License description.
+
+- url:
+
+  Character. URL to the full license text.
+
+- schema:
+
+  Character. License schema identifier.
+
+- osi_approved:
+
+  Logical. Whether the license is OSI-approved.
+
+- revision_id:
+
+  Integer. Zenodo internal revision identifier.
+
+- created:
+
+  Character. ISO 8601 creation timestamp.
+
+- updated:
+
+  Character. ISO 8601 last-updated timestamp.
+
+- popular:
+
+  Logical. Custom flag for licenses commonly used in scientific
+  datasets.
+
+## Source
+
+Zenodo REST API: `GET https://zenodo.org/api/licenses?size=1000`
+Retrieved March 2026. See `data-raw/zenodo_licenses.R` for details.
 
 ## See also
 

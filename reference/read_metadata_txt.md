@@ -1,4 +1,4 @@
-# Read metadata from text file —-
+# Read metadata from text file
 
 Read metadata from a human-readable text file
 

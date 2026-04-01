@@ -49,7 +49,7 @@ Validate data formats and structures.
 - [`validate_and_parse_bibtex()`](https://nivanorge.github.io/STOPeData/reference/validate_and_parse_bibtex.md)
   : Validate and parse BibTeX string with error handling
 - [`validate_dataset_structure()`](https://nivanorge.github.io/STOPeData/reference/validate_dataset_structure.md)
-  : Validate dataset structure —-
+  : Validate dataset structure
 - [`validate_doi_format()`](https://nivanorge.github.io/STOPeData/reference/validate_doi_format.md)
   : Validate DOI format
 - [`validate_pmid_format()`](https://nivanorge.github.io/STOPeData/reference/validate_pmid_format.md)
@@ -109,17 +109,17 @@ Build and download session data as ZIP archives and metadata files.
 Import session data from exported ZIP archives.
 
 - [`read_zip_metadata()`](https://nivanorge.github.io/STOPeData/reference/read_zip_metadata.md)
-  : Read metadata from ZIP file —-
+  : Read metadata from ZIP file
 - [`import_session_from_zip()`](https://nivanorge.github.io/STOPeData/reference/import_session_from_zip.md)
-  : Import data from exported ZIP file —-
+  : Import data from exported ZIP file
 - [`import_module_table()`](https://nivanorge.github.io/STOPeData/reference/import_module_table.md)
-  : Import module dataset from CSV —-
+  : Import module dataset from CSV
 - [`detect_dataset_type()`](https://nivanorge.github.io/STOPeData/reference/detect_dataset_type.md)
-  : Detect dataset type from filename —-
+  : Detect dataset type from filename
 - [`get_reactiveValues_key()`](https://nivanorge.github.io/STOPeData/reference/get_reactiveValues_key.md)
-  : Get reactiveValues key for dataset type —-
+  : Get reactiveValues key for dataset type
 - [`read_metadata_txt()`](https://nivanorge.github.io/STOPeData/reference/read_metadata_txt.md)
-  : Read metadata from text file —-
+  : Read metadata from text file
 
 ## Reference Management
 
@@ -155,10 +155,6 @@ Look up and generate IDs for parameters, samples, and protocols.
   : Get parameter names for a specific parameter type
 - [`get_parameters_filtered()`](https://nivanorge.github.io/STOPeData/reference/get_parameters_filtered.md)
   : Get parameter names filtered by type and optionally subtype
-- [`generate_sample_id_with_components()`](https://nivanorge.github.io/STOPeData/reference/generate_sample_id_with_components.md)
-  : Generate Sample ID with Components —-
-- [`generate_protocol_id()`](https://nivanorge.github.io/STOPeData/reference/generate_protocol_id.md)
-  : Generate Protocol ID —-
 
 ## CREED Utilities
 

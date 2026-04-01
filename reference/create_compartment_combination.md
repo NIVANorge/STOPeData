@@ -28,7 +28,7 @@ create_compartment_combination(compartment, sub_compartment, category)
 - category:
 
   Character string specifying the measured category
-  (`eDataDRF::measured_category_vocabulary()`)
+  ([`eDataDRF::measured_categories_vocabulary()`](https://NIVANorge.github.io/eDataDRF/reference/measured_categories_vocabulary.html))
 
 ## Value
 

@@ -27,8 +27,6 @@
 <url><loc>https://nivanorge.github.io/STOPeData/reference/download_all_data.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/extract_clean_doi.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/extract_clean_pmid.html</loc></url>
-<url><loc>https://nivanorge.github.io/STOPeData/reference/generate_protocol_id.html</loc></url>
-<url><loc>https://nivanorge.github.io/STOPeData/reference/generate_sample_id_with_components.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/generate_zenodo_readme.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/get_dataset_display_name.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/get_export_metadata.html</loc></url>

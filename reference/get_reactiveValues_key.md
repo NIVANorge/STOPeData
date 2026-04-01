@@ -1,4 +1,4 @@
-# Get reactiveValues key for dataset type —-
+# Get reactiveValues key for dataset type
 
 Map dataset type to reactiveValues key
 

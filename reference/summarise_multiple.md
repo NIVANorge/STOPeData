@@ -49,7 +49,7 @@ Other summarise:
 
 ``` r
 summarise_multiple(c("Norway", "Sweden", "Denmark"), "Countries")
-#> [1] "Countries (3): Norway, Sweden, Denmark"
+#> Countries (3): Norway, Sweden, Denmark
 summarise_multiple(c("NO", "NO", "SE"), "Countries")
-#> [1] "Countries (2): NO, SE"
+#> Countries (2): NO, SE
 ```

@@ -1,4 +1,4 @@
-# Detect dataset type from filename —-
+# Detect dataset type from filename
 
 Determine which type of dataset based on filename patterns. Dataset
 types correspond to eDataDRF tables — see

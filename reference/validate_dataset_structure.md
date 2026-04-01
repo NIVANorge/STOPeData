@@ -1,4 +1,4 @@
-# Validate dataset structure —-
+# Validate dataset structure
 
 Basic validation of dataset structure
 

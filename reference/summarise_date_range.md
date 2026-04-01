@@ -1,6 +1,8 @@
 # Calculate Date Range
 
-Creates a date range string from vector of dates with count and interval
+Creates a date range string from vector of dates with count and
+interval. Format is:
+`"YYYY-MM-DD to YYYY-MM-DD (n = ..., ... days (to nearest day))"`
 
 ## Usage
 
@@ -41,7 +43,7 @@ Other summarise:
 
 ``` r
 summarise_date_range(as.Date(c("2020-01-15", "2021-06-01", "2022-03-10")))
-#> [1] "2020-01-15 to 2022-03-10 (n=3, 785 days (to nearest day))"
+#> 2020-01-15 to 2022-03-10 (n=3, 785 days (to nearest day))
 summarise_date_range(as.Date(c("2021-07-01", "2021-07-01")))
-#> [1] "2021-07-01 (n=1)"
+#> 2021-07-01 (n=1)
 ```

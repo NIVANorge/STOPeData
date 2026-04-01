@@ -1,4 +1,4 @@
-# Read metadata from ZIP file —-
+# Read metadata from ZIP file
 
 Extract and read metadata from a ZIP file without importing data
 

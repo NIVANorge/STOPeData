@@ -1,4 +1,4 @@
-# Import data from exported ZIP file —-
+# Import data from exported ZIP file
 
 Import datasets from a ZIP file created by mod_export
 
