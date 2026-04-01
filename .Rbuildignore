@@ -24,3 +24,4 @@ _\.new\.png$
 ^vignettes/articles$
 ^vignettes/\.quarto$
 ^vignettes/*_files$
+^codecov\.yml$

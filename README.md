@@ -70,6 +70,7 @@ This app is part of the [Source to Outcome Pathway/Risk assessment database](htt
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/NIVANorge/STOPeData/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NIVANorge/STOPeData/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/NIVANorge/STOPeData/graph/badge.svg)](https://app.codecov.io/gh/NIVANorge/STOPeData)
 <!-- badges: end -->
 
 
