@@ -34,7 +34,8 @@ write_metadata_txt <- function(metadata_list, file_path) {
     "Application Information:",
     glue("  App Name: {metadata_list$app_name}"),
     glue("  App Version: {metadata_list$app_version}"),
-    glue("  Client Data: {metadata_list$clientData}"),
+    glue("  Format Version: {metadata_list$format_version}"),
+    glue("  Client Data:\n {metadata_list$clientData}"),
     "",
     "",
     "=" %r% 50,
@@ -113,6 +114,7 @@ get_export_metadata <- function(session = NULL) {
       "\n"
     ),
     app_version = get_golem_version() %||% "Version not available",
+    format_version = packageDescription("eDataDRF")$Version,
     user = rv$ENTERED_BY %||% "Unknown user"
   )
 }
