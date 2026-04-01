@@ -13,13 +13,16 @@ bibtex_article <- '
 }
 '
 
-bibtex_multi <- paste0(bibtex_article, '
+bibtex_multi <- paste0(
+  bibtex_article,
+  '
 @article{Other2022,
   author = {Other, A.},
   title  = {Another paper},
   year   = {2022}
 }
-')
+'
+)
 
 
 # clean_bibtex_text() -----------------------------------------------------
@@ -54,47 +57,6 @@ test_that("clean_bibtex_text strips leading and trailing whitespace", {
 
 test_that("clean_bibtex_text leaves plain ASCII text unchanged", {
   expect_equal(clean_bibtex_text("plain text"), "plain text")
-})
-
-
-# generate_reference_id() -------------------------------------------------
-
-test_that("generate_reference_id returns a non-empty character string", {
-  result <- generate_reference_id(
-    date   = 2023L,
-    author = "Smith, J.; Jones, A.; Williams, B.",
-    title  = "Heavy metal contamination in Norwegian coastal sediments"
-  )
-  expect_type(result, "character")
-  expect_true(nchar(result) > 0)
-})
-
-test_that("generate_reference_id starts with the year", {
-  result <- generate_reference_id(
-    date   = 2023L,
-    author = "Smith, J.",
-    title  = "Some title here"
-  )
-  expect_true(startsWith(result, "2023"))
-})
-
-test_that("generate_reference_id includes the first author last name", {
-  result <- generate_reference_id(
-    date   = 2023L,
-    author = "Smith, J.; Jones, A.",   # only first author used
-    title  = "Some title here"
-  )
-  expect_true(grepl("Smith", result))
-})
-
-test_that("generate_reference_id is consistent with example_references_tibble()", {
-  expected_id <- eDataDRF::example_references_tibble()$REFERENCE_ID
-  result <- generate_reference_id(
-    date   = 2023L,
-    author = "Smith, J.; Jones, A.; Williams, B.",
-    title  = "Heavy metal contamination in Norwegian coastal sediments"
-  )
-  expect_equal(result, expected_id)
 })
 
 
@@ -175,7 +137,9 @@ test_that("validate_doi_format accepts a plain valid DOI", {
 
 test_that("validate_doi_format accepts DOIs with URL prefixes", {
   expect_true(validate_doi_format("https://doi.org/10.1021/acs.est.2023.12345"))
-  expect_true(validate_doi_format("http://dx.doi.org/10.1021/acs.est.2023.12345"))
+  expect_true(validate_doi_format(
+    "http://dx.doi.org/10.1021/acs.est.2023.12345"
+  ))
 })
 
 test_that("validate_doi_format uses the DOI from example_references_tibble()", {
@@ -204,7 +168,7 @@ test_that("validate_pmid_format accepts PMIDs with PMID: prefix", {
 })
 
 test_that("validate_pmid_format rejects invalid inputs", {
-  expect_false(validate_pmid_format("123456789"))   # 9 digits — too long
+  expect_false(validate_pmid_format("123456789")) # 9 digits — too long
   expect_false(validate_pmid_format("not-a-pmid"))
   expect_false(validate_pmid_format(""))
   expect_false(validate_pmid_format(NA))
@@ -276,6 +240,8 @@ test_that("validate_and_lookup_identifier detects DOI format before lookup", {
   # Use skip_on_cran / skip_if_offline for the network call itself —
   # here we only verify the identifier_type returned on failure
   skip_if_offline()
-  result <- validate_and_lookup_identifier("10.9999/fake.doi.that.does.not.exist")
+  result <- validate_and_lookup_identifier(
+    "10.9999/fake.doi.that.does.not.exist"
+  )
   expect_equal(result$identifier_type, "doi")
 })

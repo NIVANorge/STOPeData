@@ -321,12 +321,13 @@ downloadable_text_datasets <- function() {
 #' @importFrom glue glue
 #' @importFrom zip zip
 #' @importFrom readr write_excel_csv
+#' @importFrom eDataDRF generate_reference_id
 #' @export
 build_session_zip <- function(session, moduleState, dest_file) {
   rv <- session$userData$reactiveValues
   metadata <- get_export_metadata(session = session)
 
-  temp_dir  <- tempdir()
+  temp_dir <- tempdir()
   timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 
   campaign <- if (nrow(rv$referenceData) > 0) {
@@ -352,12 +353,15 @@ build_session_zip <- function(session, moduleState, dest_file) {
         data <- rv[[dataset_name]]
 
         display_name <- gsub(" ", "_", get_dataset_display_name(dataset_name))
-        base_name    <- glue("{campaign}_{display_name}_{timestamp}")
+        base_name <- glue("{campaign}_{display_name}_{timestamp}")
 
         if (dataset_name %in% text_datasets) {
           if (!is.null(data)) {
             txt_file <- file.path(temp_dir, glue("{base_name}.txt"))
-            writeLines(object_to_text(data, dataset_name = display_name), txt_file)
+            writeLines(
+              object_to_text(data, dataset_name = display_name),
+              txt_file
+            )
             all_files <- c(all_files, txt_file)
           }
         } else {
@@ -370,7 +374,11 @@ build_session_zip <- function(session, moduleState, dest_file) {
       },
       error = function(e) {
         showNotification(
-          paste0("Error creating download data: ", e$message, " (Code: build_session_zip())"),
+          paste0(
+            "Error creating download data: ",
+            e$message,
+            " (Code: build_session_zip())"
+          ),
           type = "error",
           duration = NULL
         )
@@ -413,10 +421,13 @@ build_session_zip <- function(session, moduleState, dest_file) {
 #'   and campaign_name fields.
 #' @return A Shiny downloadHandler function
 #' @importFrom glue glue
+#' @importFrom eDataDRF generate_reference_id
 #' @export
 download_all_data <- function(session, moduleState = NULL) {
   if (is.null(moduleState) || is.null(session)) {
-    stop("moduleState & session reactive objects must be supplied to create CSVs")
+    stop(
+      "moduleState & session reactive objects must be supplied to create CSVs"
+    )
   }
 
   campaign_short <- function() {
@@ -434,7 +445,7 @@ download_all_data <- function(session, moduleState = NULL) {
   downloadHandler(
     filename = function() {
       timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
-      campaign  <- campaign_short()
+      campaign <- campaign_short()
       glue("{campaign}_AllData_{timestamp}.zip")
     },
     content = function(file) build_session_zip(session, moduleState, file),

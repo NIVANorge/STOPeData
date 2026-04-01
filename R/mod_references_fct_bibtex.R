@@ -185,102 +185,39 @@ validate_and_parse_bibtex <- function(bibtex_string, allow_multiple = FALSE) {
   tryCatch(
     {
       bibtex_df <- bib_string2df_alt(bibtex_string)
-      tryCatch(
-        {
-          bibtex_df <- bib_string2df_alt(bibtex_string)
 
-          # Check if we have data
-          if (nrow(bibtex_df) == 0) {
-            return(list(
-              success = FALSE,
-              data = NULL,
-              message = "No valid BibTeX entries found in the provided text",
-              warning = NULL
-            ))
-          }
-          # Check if we have data
-          if (nrow(bibtex_df) == 0) {
-            return(list(
-              success = FALSE,
-              data = NULL,
-              message = "No valid BibTeX entries found in the provided text",
-              warning = NULL
-            ))
-          }
+      # Check if we have data
+      if (nrow(bibtex_df) == 0) {
+        return(list(
+          success = FALSE,
+          data = NULL,
+          message = "No valid BibTeX entries found in the provided text",
+          warning = NULL
+        ))
+      }
 
-          # Check for multiple entries
-          warning_msg <- NULL
-          if (nrow(bibtex_df) > 1) {
-            if (!allow_multiple) {
-              warning_msg <- paste(
-                "Multiple BibTeX entries detected.",
-                "Only the first entry will be imported."
-              )
-            }
-          }
-          # Check for multiple entries
-          warning_msg <- NULL
-          if (nrow(bibtex_df) > 1) {
-            if (!allow_multiple) {
-              warning_msg <- paste(
-                "Multiple BibTeX entries detected.",
-                "Only the first entry will be imported."
-              )
-            }
-          }
+      # Check for multiple entries
+      warning_msg <- NULL
+      if (nrow(bibtex_df) > 1 && !allow_multiple) {
+        warning_msg <- "Multiple BibTeX entries detected. Only the first entry will be imported."
+      }
 
-          return(list(
-            success = TRUE,
-            data = bibtex_df,
-            message = "BibTeX data parsed successfully",
-            warning = warning_msg
-          ))
-        },
-        error = function(e) {
-          # Provide user-friendly error message
-          error_msg <- "BibTeX parsing failed"
-          return(list(
-            success = TRUE,
-            data = bibtex_df,
-            message = "BibTeX data parsed successfully",
-            warning = warning_msg
-          ))
-        },
-        error = function(e) {
-          # Provide user-friendly error message
-          error_msg <- "BibTeX parsing failed"
+      return(list(
+        success = TRUE,
+        data = bibtex_df,
+        message = "BibTeX data parsed successfully",
+        warning = warning_msg
+      ))
+    },
+    error = function(e) {
+      error_msg <- if (grepl("unexpected", e$message, ignore.case = TRUE)) {
+        "BibTeX parsing failed - check for syntax errors in BibTeX format"
+      } else if (grepl("file", e$message, ignore.case = TRUE)) {
+        "BibTeX parsing failed - internal file handling error"
+      } else {
+        glue::glue("BibTeX parsing failed - {e$message}")
+      }
 
-          # Try to provide more specific error information
-          if (grepl("unexpected", e$message, ignore.case = TRUE)) {
-            error_msg <- paste(
-              error_msg,
-              "- check for syntax errors in BibTeX format"
-            )
-          } else if (grepl("file", e$message, ignore.case = TRUE)) {
-            error_msg <- paste(error_msg, "- internal file handling error")
-          } else {
-            error_msg <- paste(error_msg, "-", e$message)
-          }
-          # Try to provide more specific error information
-          if (grepl("unexpected", e$message, ignore.case = TRUE)) {
-            error_msg <- paste(
-              error_msg,
-              "- check for syntax errors in BibTeX format"
-            )
-          } else if (grepl("file", e$message, ignore.case = TRUE)) {
-            error_msg <- paste(error_msg, "- internal file handling error")
-          } else {
-            error_msg <- paste(error_msg, "-", e$message)
-          }
-
-          return(list(
-            success = FALSE,
-            data = NULL,
-            message = error_msg,
-            warning = NULL
-          ))
-        }
-      )
       return(list(
         success = FALSE,
         data = NULL,
@@ -414,34 +351,4 @@ clean_bibtex_text <- function(text) {
   }
 
   return(text)
-}
-
-#' Generate Reference ID
-#' @param date Date (ACCESS_DATE or current date)
-#' @param author Author string
-#' @param title Title string
-#' @return Character string with format DateAuthorFirstThreeWords
-#' @importFrom stringr str_to_title
-generate_reference_id <- function(date, author, title) {
-  # Format date as YYYYMMDD
-  date_part <- date
-
-  # Extract first author's last name
-  author_part <- ""
-  if (!is.null(author) && nchar(trimws(author)) > 0) {
-    # Split by semicolon and take first author
-    first_author <- trimws(strsplit(author, ";")[[1]][1])
-    # Extract last name (part before first comma)
-    author_part <- trimws(strsplit(first_author, ",")[[1]][1])
-    # Remove any non-alphanumeric characters and limit length
-    author_part <- gsub("[^A-Za-z0-9]", "", author_part)
-    author_part <- substr(author_part, 1, 10) # Limit author part length
-  }
-
-  # Extract first three words from title
-  title_part <- abbreviate_string(title, 3, case = "title")
-  # Combine parts
-  reference_id <- paste0(date_part, author_part, title_part)
-
-  return(reference_id)
 }
