@@ -14,7 +14,8 @@
       "Bash(Rscript --vanilla -e \"suppressMessages\\(devtools::load_all\\(''.'', quiet=TRUE\\)\\); cat\\(''rows:'', nrow\\(zenodo_licenses\\), ''\\\\n''\\); cat\\(''popular n:'', sum\\(zenodo_licenses$popular\\), ''\\\\n''\\)\")",
       "Bash(Rscript --vanilla -e \"suppressMessages\\(devtools::document\\(quiet=TRUE\\)\\)\")",
       "Bash(Rscript --vanilla -e \"devtools::document\\(quiet=TRUE\\)\")",
-      "Bash(Rscript --vanilla -e \"load\\(''data/zenodo_licenses.rda''\\); cat\\(''loaded, rows:'', nrow\\(zenodo_licenses\\), ''\\\\n''\\)\")"
+      "Bash(Rscript --vanilla -e \"load\\(''data/zenodo_licenses.rda''\\); cat\\(''loaded, rows:'', nrow\\(zenodo_licenses\\), ''\\\\n''\\)\")",
+      "Bash(Rscript -e \"devtools::test\\(filter = ''samples''\\)\")"
     ]
   }
 }

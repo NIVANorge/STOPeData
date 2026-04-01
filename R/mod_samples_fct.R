@@ -133,9 +133,10 @@ update_compartments_selectize <- function(session, compartments_data) {
 
 #' Parse Compartment Selections
 #' @description Parse merged compartment selections back to individual components
+#' @details Dependent on [eDataDRF::initialise_compartments_tibble()] and will break the former is changed
 #' @param compartment_selections Vector of merged compartment selections like "Aquatic | Freshwater"
-#' @param available_compartments Available compartments data frame
-#' @return Data frame with separate ENVIRON_COMPARTMENT, ENVIRON_COMPARTMENT_SUB, MEASURED_CATEGORY columns
+#' @param available_compartments Available compartments data frame (selected in `mod_samples`)
+#' @return Data frame with separate `ENVIRON_COMPARTMENT`, `ENVIRON_COMPARTMENT_SUB`, `MEASURED_CATEGORY` columns
 #' @importFrom tibble tibble
 #' @noRd
 parse_compartment_selections <- function(
@@ -176,6 +177,8 @@ parse_compartment_selections <- function(
 }
 
 #' Check if Sample Combination with Components Exists
+#'
+#' @details Dependent on [eDataDRF::initialise_compartments_tibble()] and will break the former is changed
 #' @param existing_data Existing samples data frame
 #' @param site Site code
 #' @param parameter Parameter name
@@ -211,12 +214,27 @@ combination_exists_with_components <- function(
   )
 }
 
+#' Parse Subsample String
+#' @description Splits a comma-separated subsample identifier string into a
+#' trimmed character vector. Coerces numeric input to character first.
+#' @param subsamples A comma-separated string of subsample identifiers, or a
+#'   single value (numeric or character).
+#' @return A character vector of trimmed subsample identifiers.
+#' @examples
+#' parse_subsamples("1, 2, 3")     # c("1", "2", "3")
+#' parse_subsamples("A, B, C")     # c("A", "B", "C")
+#' parse_subsamples(1)             # c("1")
+#' @noRd
+parse_subsamples <- function(subsamples) {
+  trimws(strsplit(as.character(subsamples), split = ",")[[1]])
+}
+
 #' Create Sample Combinations with Separate Compartment Components
 #' @description
 #' Create all valid combinations of sites, parameters, compartments, dates, and subsamples,
 #' except for those already found in existing_data. Now handles separate compartment columns.
 #' Fixed to handle Date objects properly and avoid class-stripping in loops.
-#'
+#' @details Dependent on [eDataDRF::initialise_samples_tibble()] and will break the former is changed
 #' @param sites Vector of site codes
 #' @param parameters Vector of parameter names
 #' @param compartment_selections Vector of merged compartment selections like "Aquatic | Freshwater"
@@ -280,11 +298,8 @@ create_sample_combinations <- function(
       SAMPLING_DATE = date_char
     )
 
-    # Split subsamples cs-string into a vector, if possible
-    # do some fairly careful checking of subsamples to see if it's empty
-    # todo: we run this exact same code outside the function as well. could be consolidated.
-    subsamples <- subsamples |> as.character()
-    subsamples <- trimws(strsplit(subsamples, split = ",")[[1]])
+    # Split subsamples cs-string into a trimmed character vector
+    subsamples <- parse_subsamples(subsamples)
 
     # Process each base combination with compartments and subsamples
     date_combinations <- tibble()
@@ -419,6 +434,7 @@ create_sample_combinations <- function(
 
 #' Update Combination Preview
 #' @description Generates a preview div showing the total number of sample combinations.
+#' @details Dependent on [eDataDRF::initialise_samples_tibble()] and will break the former is changed
 #' @param sites_count Number of selected sites
 #' @param params_count Number of selected parameters
 #' @param comps_count Number of selected compartments

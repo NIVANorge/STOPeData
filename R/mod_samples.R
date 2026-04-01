@@ -44,24 +44,10 @@ mod_samples_ui <- function(id) {
               choices = NULL,
               multiple = TRUE,
               options = list(
-                placeholder = "No sites available - add sites first"
+                placeholder = "No sites available - add sites first",
+                `actions-box` = TRUE
               ),
               width = "100%"
-            ),
-            div(
-              style = "margin-top: 5px;",
-              actionButton(
-                ns("add_all_sites"),
-                "Add All",
-                class = "btn-sm btn-primary",
-                style = "margin-right: 5px;"
-              ) |>
-                disabled(),
-              actionButton(
-                ns("remove_all_sites"),
-                "Remove All",
-                class = "btn-sm btn-danger"
-              )
             )
           ),
 
@@ -76,24 +62,10 @@ mod_samples_ui <- function(id) {
               choices = NULL,
               multiple = TRUE,
               options = list(
-                placeholder = "No parameters available - add parameters first"
+                placeholder = "No parameters available - add parameters first",
+                `actions-box` = TRUE
               ),
               width = "100%"
-            ),
-            div(
-              style = "margin-top: 5px;",
-              actionButton(
-                ns("add_all_parameters"),
-                "Add All",
-                class = "btn-sm btn-primary",
-                style = "margin-right: 5px;"
-              ) |>
-                disabled(),
-              actionButton(
-                ns("remove_all_parameters"),
-                "Remove All",
-                class = "btn-sm btn-danger"
-              )
             )
           ),
 
@@ -108,24 +80,10 @@ mod_samples_ui <- function(id) {
               choices = NULL,
               multiple = TRUE,
               options = list(
-                placeholder = "No compartments available - add compartments first"
+                placeholder = "No compartments available - add compartments first",
+                `actions-box` = TRUE
               ),
               width = "100%"
-            ),
-            div(
-              style = "margin-top: 5px;",
-              actionButton(
-                ns("add_all_compartments"),
-                "Add All",
-                class = "btn-sm btn-primary",
-                style = "margin-right: 5px;"
-              ) |>
-                disabled(),
-              actionButton(
-                ns("remove_all_compartments"),
-                "Remove All",
-                class = "btn-sm btn-danger"
-              )
             )
           ),
 
@@ -138,20 +96,12 @@ mod_samples_ui <- function(id) {
                 "Dates when samples were collected. The selector here is a bit unreliable, so please deselect using the calendar picker or Remove All button, not Backspace"
               ),
               dateFormat = "yyyy-MM-dd",
+              clearButton = TRUE,
               width = "100%",
               multiple = TRUE,
               todayButton = TRUE,
               update_on = "change",
               addon = "none"
-            ),
-            div(
-              style = "margin-top: 5px;",
-              actionButton(
-                ns("remove_all_dates"),
-                "Remove All",
-                class = "btn-sm btn-danger"
-              ) |>
-                disabled()
             )
           ),
 
@@ -242,7 +192,6 @@ mod_samples_server <- function(id) {
     ## InputValidator for table-level validation ----
     iv <- InputValidator$new()
     iv$add_rule("samples_table_validation", function(value) {
-      # CHANGED: Reference userData instead of moduleState
       if (nrow(session$userData$reactiveValues$samplesData) == 0) {
         "At least one sample combination must be generated"
       } else {
@@ -464,511 +413,6 @@ mod_samples_server <- function(id) {
         ignoreNULL = FALSE
       )
 
-    ## observe ~bindEvent(add_all_sites): Add all sites ----
-    # upstream: user clicks input$add_all_sites
-    # downstream: input$sites_select
-    observe({
-      tryCatch(
-        {
-          if (
-            isTruthy(moduleState$available_sites) &&
-              nrow(moduleState$available_sites) > 0
-          ) {
-            updatePickerInput(
-              session,
-              "sites_select",
-              selected = session$userData$reactiveValues$sitesData$SITE_CODE
-            )
-            enable(id = "add_all_sites")
-            enable(id = "sites_select")
-          } else {
-            disable(id = "add_all_sites")
-            disable(id = "sites_select")
-          }
-        },
-        error = function(e) {
-          showNotification(
-            paste0(
-              "Error adding all sites: ",
-              e$message,
-              " (Code: mod_samples_add_all_sites)"
-            ),
-            type = "error",
-            duration = NULL
-          )
-        },
-        warning = function(w) {
-          showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_samples_add_all_sites)"
-            ),
-            type = "warning",
-            duration = 10
-          )
-        }
-      )
-    }) |>
-      bindEvent(
-        label = "mod_samples_add_all_sites",
-        input$add_all_sites,
-        moduleState$available_sites,
-        ignoreInit = TRUE
-      )
-
-    ## observe ~bindEvent(remove_all_sites): Remove all sites ----
-    # upstream: user clicks input$remove_all_sites
-    # downstream: input$sites_select
-    observe({
-      tryCatch(
-        {
-          updatePickerInput(
-            session,
-            "sites_select",
-            selected = character(0)
-          )
-        },
-        error = function(e) {
-          showNotification(
-            paste0(
-              "Error removing all sites: ",
-              e$message,
-              " (Code: mod_samples_remove_all_sites)"
-            ),
-            type = "error",
-            duration = NULL
-          )
-        },
-        warning = function(w) {
-          showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_samples_remove_all_sites)"
-            ),
-            type = "warning",
-            duration = 10
-          )
-        }
-      )
-    }) |>
-      bindEvent(
-        label = "mod_samples_remove_all_sites",
-        input$remove_all_sites
-      )
-
-    ## observe ~bindEvent(add_all_parameters): Add all parameters ----
-    # upstream: user clicks input$add_all_parameters
-    # downstream: input$parameters_select
-    observe({
-      tryCatch(
-        {
-          if (
-            isTruthy(moduleState$available_parameters) &&
-              nrow(moduleState$available_parameters) > 0
-          ) {
-            updatePickerInput(
-              session,
-              "parameters_select",
-              selected = session$userData$reactiveValues$parametersData$PARAMETER_NAME
-            )
-            enable(id = "add_all_parameters")
-            enable(id = "parameters_select")
-          } else {
-            disable(id = "add_all_parameters")
-            disable(id = "parameters_select")
-          }
-        },
-        error = function(e) {
-          showNotification(
-            paste0(
-              "Error adding all parameters: ",
-              e$message,
-              " (Code: mod_samples_add_all_parameters)"
-            ),
-            type = "error",
-            duration = NULL
-          )
-        },
-        warning = function(w) {
-          showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_samples_add_all_parameters)"
-            ),
-            type = "warning",
-            duration = 10
-          )
-        }
-      )
-    }) |>
-      bindEvent(
-        label = "mod_samples_add_all_parameters",
-        input$add_all_parameters,
-        moduleState$available_parameters,
-        ignoreInit = TRUE
-      )
-
-    ## observe ~bindEvent(remove_all_parameters): Remove all parameters ----
-    # upstream: user clicks input$remove_all_parameters
-    # downstream: input$parameters_select
-    observe({
-      tryCatch(
-        {
-          updatePickerInput(
-            session,
-            "parameters_select",
-            selected = character(0)
-          )
-        },
-        error = function(e) {
-          showNotification(
-            paste0(
-              "Error removing all parameters: ",
-              e$message,
-              " (Code: mod_samples_remove_all_parameters)"
-            ),
-            type = "error",
-            duration = NULL
-          )
-        },
-        warning = function(w) {
-          showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_samples_remove_all_parameters)"
-            ),
-            type = "warning",
-            duration = 10
-          )
-        }
-      )
-    }) |>
-      bindEvent(
-        label = "mod_samples_remove_all_parameters",
-        input$remove_all_parameters
-      )
-
-    ## observe ~bindEvent(add_all_compartments): Add all compartments ----
-    # upstream: user clicks input$add_all_compartments
-    # downstream: input$compartments_select
-    observe({
-      tryCatch(
-        {
-          if (
-            isTruthy(moduleState$available_compartments) &&
-              nrow(moduleState$available_compartments) > 0
-          ) {
-            # Create merged values matching the selectize format
-            comp_values <- paste(
-              session$userData$reactiveValues$compartmentsData$ENVIRON_COMPARTMENT,
-              session$userData$reactiveValues$compartmentsData$ENVIRON_COMPARTMENT_SUB,
-              sep = " | "
-            )
-            updatePickerInput(
-              session,
-              "compartments_select",
-              selected = comp_values
-            )
-            enable(id = "add_all_compartments")
-            enable(id = "compartments_select")
-          } else {
-            disable(id = "add_all_compartments")
-            disable(id = "compartments_select")
-          }
-        },
-        error = function(e) {
-          showNotification(
-            paste0(
-              "Error adding all compartments: ",
-              e$message,
-              " (Code: mod_samples_add_all_compartments)"
-            ),
-            type = "error",
-            duration = NULL
-          )
-        },
-        warning = function(w) {
-          showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_samples_add_all_compartments)"
-            ),
-            type = "warning",
-            duration = 10
-          )
-        }
-      )
-    }) |>
-      bindEvent(
-        label = "mod_samples_add_all_compartments",
-        input$add_all_compartments,
-        moduleState$available_compartments,
-        ignoreInit = TRUE
-      )
-
-    ## observe ~bindEvent(remove_all_compartments): Remove all compartments ----
-    # upstream: user clicks input$remove_all_compartments
-    # downstream: input$compartments_select
-    observe({
-      tryCatch(
-        {
-          updatePickerInput(
-            session,
-            "compartments_select",
-            selected = character(0)
-          )
-        },
-        error = function(e) {
-          showNotification(
-            paste0(
-              "Error removing all compartments: ",
-              e$message,
-              " (Code: mod_samples_remove_all_compartments)"
-            ),
-            type = "error",
-            duration = NULL
-          )
-        },
-        warning = function(w) {
-          showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_samples_remove_all_compartments)"
-            ),
-            type = "warning",
-            duration = 10
-          )
-        }
-      )
-    }) |>
-      bindEvent(
-        label = "mod_samples_remove_all_compartments",
-        input$remove_all_compartments
-      )
-
-    ## observe: Enable/disable remove all sites button ----
-    # upstream: input$sites_select
-    # downstream: remove_all_sites button state
-    observe({
-      tryCatch(
-        {
-          if (isTruthy(input$sites_select) && length(input$sites_select) > 0) {
-            enable("remove_all_sites")
-          } else {
-            disable("remove_all_sites")
-          }
-        },
-        error = function(e) {
-          showNotification(
-            paste0(
-              "Error toggling remove sites button: ",
-              e$message,
-              " (Code: mod_samples_toggle_remove_sites)"
-            ),
-            type = "error",
-            duration = NULL
-          )
-        },
-        warning = function(w) {
-          showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_samples_toggle_remove_sites)"
-            ),
-            type = "warning",
-            duration = 10
-          )
-        }
-      )
-    }) |>
-      bindEvent(
-        label = "mod_samples_toggle_remove_sites",
-        input$sites_select,
-        ignoreNULL = FALSE
-      )
-
-    ## observe: Enable/disable remove all parameters button ----
-    # upstream: input$parameters_select
-    # downstream: remove_all_parameters button state
-    observe({
-      tryCatch(
-        {
-          if (
-            isTruthy(input$parameters_select) &&
-              length(input$parameters_select) > 0
-          ) {
-            enable("remove_all_parameters")
-          } else {
-            disable("remove_all_parameters")
-          }
-        },
-        error = function(e) {
-          showNotification(
-            paste0(
-              "Error toggling remove parameters button: ",
-              e$message,
-              " (Code: mod_samples_toggle_remove_parameters)"
-            ),
-            type = "error",
-            duration = NULL
-          )
-        },
-        warning = function(w) {
-          showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_samples_toggle_remove_parameters)"
-            ),
-            type = "warning",
-            duration = 10
-          )
-        }
-      )
-    }) |>
-      bindEvent(
-        label = "mod_samples_toggle_remove_parameters",
-        input$parameters_select,
-        ignoreNULL = FALSE
-      )
-
-    ## observe: Enable/disable remove all compartments button ----
-    # upstream: input$compartments_select
-    # downstream: remove_all_compartments button state
-    observe({
-      tryCatch(
-        {
-          if (
-            isTruthy(input$compartments_select) &&
-              length(input$compartments_select) > 0
-          ) {
-            enable("remove_all_compartments")
-          } else {
-            disable("remove_all_compartments")
-          }
-        },
-        error = function(e) {
-          showNotification(
-            paste0(
-              "Error toggling remove compartments button: ",
-              e$message,
-              " (Code: mod_samples_toggle_remove_compartments)"
-            ),
-            type = "error",
-            duration = NULL
-          )
-        },
-        warning = function(w) {
-          showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_samples_toggle_remove_compartments)"
-            ),
-            type = "warning",
-            duration = 10
-          )
-        }
-      )
-    }) |>
-      bindEvent(
-        label = "mod_samples_toggle_remove_compartments",
-        input$compartments_select,
-        ignoreNULL = FALSE
-      )
-
-    ## observe: Enable/disable remove all dates button ----
-    # upstream: input$sampling_date
-    # downstream: remove_all_dates button state
-    observe({
-      tryCatch(
-        {
-          if (
-            isTruthy(input$sampling_date) && length(input$sampling_date) > 0
-          ) {
-            enable("remove_all_dates")
-          } else {
-            disable("remove_all_dates")
-          }
-        },
-        error = function(e) {
-          showNotification(
-            paste0(
-              "Error toggling remove dates button: ",
-              e$message,
-              " (Code: mod_samples_toggle_remove_dates)"
-            ),
-            type = "error",
-            duration = NULL
-          )
-        },
-        warning = function(w) {
-          showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_samples_toggle_remove_dates)"
-            ),
-            type = "warning",
-            duration = 10
-          )
-        }
-      )
-    }) |>
-      bindEvent(
-        label = "mod_samples_toggle_remove_dates",
-        input$sampling_date,
-        ignoreNULL = FALSE
-      )
-
-    ## observe ~bindEvent(remove_all_dates): Remove all dates ----
-    # upstream: user clicks input$remove_all_dates
-    # downstream: input$sampling_date
-    observe({
-      tryCatch(
-        {
-          updateAirDateInput(
-            session,
-            "sampling_date",
-            clear = TRUE
-          )
-        },
-        error = function(e) {
-          showNotification(
-            paste0(
-              "Error removing all dates: ",
-              e$message,
-              " (Code: mod_samples_remove_all_dates)"
-            ),
-            type = "error",
-            duration = NULL
-          )
-        },
-        warning = function(w) {
-          showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_samples_remove_all_dates)"
-            ),
-            type = "warning",
-            duration = 10
-          )
-        }
-      )
-    }) |>
-      bindEvent(
-        label = "mod_samples_remove_all_dates",
-        input$remove_all_dates
-      )
-
     ## observe ~bindEvent: Enable generate button when options valid ----
     observe({
       tryCatch(
@@ -1045,7 +489,6 @@ mod_samples_server <- function(id) {
             return()
           }
 
-          # CHANGED: Pass userData instead of moduleState to helper function
           # Create combinations with duplicate checking
           result <- create_sample_combinations(
             sites,
@@ -1061,7 +504,6 @@ mod_samples_server <- function(id) {
           new_combinations <- result$combinations
           skipped_count <- result$skipped
 
-          # CHANGED: Add to userData instead of moduleState
           if (nrow(new_combinations) > 0) {
             session$userData$reactiveValues$samplesData <- rbind(
               session$userData$reactiveValues$samplesData,
@@ -1157,7 +599,7 @@ mod_samples_server <- function(id) {
         {
           validation_result <- iv$is_valid()
 
-          # CHANGED: Update validation status in userData
+          # Update validation status in userData
           if (
             validation_result &&
               nrow(session$userData$reactiveValues$samplesData) > 0
@@ -1200,7 +642,7 @@ mod_samples_server <- function(id) {
 
     ## observer: receive data from session$userData$reactiveValues$samplesData (import) ----
     ## and update module data
-    # CHANGED: Data is already in userData, just ensure SUBSAMPLE is character
+    # ensure SUBSAMPLE is character
     observe({
       tryCatch(
         {
@@ -1255,10 +697,7 @@ mod_samples_server <- function(id) {
           params_count <- length(input$parameters_select %||% character(0))
           comps_count <- length(input$compartments_select %||% character(0))
           dates_count <- length(input$sampling_date %||% character(0))
-          replicates_count <- length(strsplit(input$subsample, split = ",")[[
-            1
-          ]]) %||%
-            1
+          replicates_count <- length(parse_subsamples(input$subsample)) %||% 1
 
           update_combination_preview(
             sites_count,
@@ -1301,7 +740,6 @@ mod_samples_server <- function(id) {
     output$samples_table <- renderRHandsontable({
       tryCatch(
         {
-          # CHANGED: Reference userData instead of moduleState
           if (nrow(session$userData$reactiveValues$samplesData) == 0) {
             # Show empty table structure
             rhandsontable(
@@ -1388,7 +826,6 @@ mod_samples_server <- function(id) {
             NULL
           }
 
-          # CHANGED: Reference userData validation status instead of moduleState
           validation_status <- if (
             session$userData$reactiveValues$samplesDataValid
           ) {
@@ -1442,7 +879,6 @@ mod_samples_server <- function(id) {
     output$validated_data_display <- renderText({
       tryCatch(
         {
-          # CHANGED: Show data only when valid, reference userData
           if (
             session$userData$reactiveValues$samplesDataValid &&
               nrow(session$userData$reactiveValues$samplesData) > 0
