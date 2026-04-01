@@ -174,3 +174,39 @@ generate_zenodo_readme <- function(
     .sep = "\n"
   )
 }
+
+#' Parse author string into first/last name components
+#'
+#' @description Splits a semicolon-separated author string in `"Last, First"`
+#'   format into a list of named lists, one per author. Used to pre-fill Zenodo
+#'   author rows from reference data.
+#'
+#' @param author_string A character string of semicolon-separated authors in
+#'   `"Last, First"` format, e.g. `"Smith, J.; Jones, A."`.
+#'
+#' @return A list of named lists, each with elements `first` (character) and
+#'   `last` (character). Returns an empty list for NULL, NA, or blank input.
+#'
+#' @family zenodo
+#' @importFrom stringr str_split str_trim
+#' @importFrom purrr map
+#' @noRd
+parse_author_string <- function(author_string) {
+  if (
+    is.null(author_string) ||
+    is.na(author_string) ||
+    !nzchar(trimws(author_string))
+  ) {
+    return(list())
+  }
+
+  str_split(author_string, ";")[[1]] |>
+    str_trim() |>
+    map(~ {
+      parts <- str_split(.x, ",")[[1]] |> str_trim()
+      list(
+        last  = if (length(parts) >= 1) parts[1] else "",
+        first = if (length(parts) >= 2) parts[2] else ""
+      )
+    })
+}

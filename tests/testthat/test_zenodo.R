@@ -152,3 +152,84 @@ test_that("generate_zenodo_readme handles a single author correctly", {
   # Citation format: "Brown A."
   expect_true(grepl("Brown A\\.",     result))
 })
+
+
+# =========================================================================
+# parse_author_string() TESTS
+# =========================================================================
+
+test_that("parse_author_string returns empty list for NULL, NA, and blank input", {
+  expect_equal(parse_author_string(NULL),  list())
+  expect_equal(parse_author_string(NA),    list())
+  expect_equal(parse_author_string(""),    list())
+  expect_equal(parse_author_string("   "), list())
+})
+
+test_that("parse_author_string parses a single 'Last, First' author", {
+  result <- parse_author_string("Smith, J.")
+  expect_length(result, 1)
+  expect_equal(result[[1]]$last,  "Smith")
+  expect_equal(result[[1]]$first, "J.")
+})
+
+test_that("parse_author_string parses multiple semicolon-separated authors", {
+  result <- parse_author_string("Smith, J.; Jones, A.; Williams, B.")
+  expect_length(result, 3)
+  expect_equal(result[[1]]$last,  "Smith")
+  expect_equal(result[[2]]$last,  "Jones")
+  expect_equal(result[[3]]$last,  "Williams")
+  expect_equal(result[[3]]$first, "B.")
+})
+
+test_that("parse_author_string sets first to empty string when no comma in entry", {
+  result <- parse_author_string("Smith")
+  expect_equal(result[[1]]$last,  "Smith")
+  expect_equal(result[[1]]$first, "")
+})
+
+test_that("parse_author_string trims whitespace around names", {
+  result <- parse_author_string("  Smith  ,  J.  ;  Jones  ,  A.  ")
+  expect_equal(result[[1]]$last,  "Smith")
+  expect_equal(result[[1]]$first, "J.")
+  expect_equal(result[[2]]$last,  "Jones")
+})
+
+test_that("parse_author_string is consistent with example_references_tibble() author format", {
+  author_str <- eDataDRF::example_references_tibble()$AUTHOR
+  result <- parse_author_string(author_str)
+  # example data has "Smith, J.; Jones, A.; Williams, B."
+  expect_length(result, 3)
+  expect_equal(result[[1]]$last,  "Smith")
+  expect_equal(result[[1]]$first, "J.")
+})
+
+
+# =========================================================================
+# extract_campaign_name() TESTS
+# (lives in fct_download.R; directly used by the Zenodo module for pre-filling)
+# =========================================================================
+
+test_that("extract_campaign_name returns NULL for NULL input", {
+  expect_null(extract_campaign_name(NULL))
+})
+
+test_that("extract_campaign_name returns NULL for empty tibble", {
+  expect_null(extract_campaign_name(eDataDRF::initialise_campaign_tibble()))
+})
+
+test_that("extract_campaign_name returns the campaign name from example data", {
+  result <- extract_campaign_name(eDataDRF::example_campaign_tibble())
+  expect_type(result, "character")
+  expect_equal(result, "Test Campaign 2023: Heavy Metals in Coastal Sediments")
+})
+
+test_that("extract_campaign_name returns NULL when CAMPAIGN_NAME is NA", {
+  bad_data <- eDataDRF::example_campaign_tibble()
+  bad_data$CAMPAIGN_NAME[1] <- NA_character_
+  expect_null(extract_campaign_name(bad_data))
+})
+
+test_that("extract_campaign_name returns NULL when CAMPAIGN_NAME column is absent", {
+  bad_data <- eDataDRF::example_campaign_tibble()[, names(eDataDRF::example_campaign_tibble()) != "CAMPAIGN_NAME"]
+  expect_null(extract_campaign_name(bad_data))
+})

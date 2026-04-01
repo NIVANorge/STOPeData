@@ -515,27 +515,14 @@ mod_Zenodo_server <- function(id) {
             return()
           }
 
-          parsed <- str_split(ref$AUTHOR[1], ";")[[1]] |>
-            str_trim() |>
-            map(
-              ~ {
-                parts <- str_split(.x, ",")[[1]] |> str_trim()
-                list(
-                  last = if (length(parts) >= 1) parts[1] else "",
-                  first = if (length(parts) >= 2) parts[2] else ""
-                )
-              }
-            )
-
+          parsed <- parse_author_string(ref$AUTHOR[1])
           author_count(length(parsed))
           parsed_authors(parsed)
         },
         error = function(e) {
           showNotification(
-            paste0(
-              "Error pre-filling authors: ",
-              e$message,
-              " (Code: mod_zenodo_prefill_authors)"
+            glue(
+              "Error pre-filling authors: {e$message} (Code: mod_zenodo_prefill_authors)"
             ),
             type = "error",
             duration = NULL
@@ -543,10 +530,8 @@ mod_Zenodo_server <- function(id) {
         },
         warning = function(w) {
           showNotification(
-            paste0(
-              "Warning: ",
-              w$message,
-              " (Code: mod_zenodo_prefill_authors)"
+            glue(
+              "Warning: {w$message} (Code: mod_zenodo_prefill_authors)"
             ),
             type = "warning",
             duration = 10
@@ -892,10 +877,8 @@ mod_Zenodo_server <- function(id) {
         },
         error = function(e) {
           showNotification(
-            paste0(
-              "Error generating README preview: ",
-              e$message,
-              " (Code: mod_zenodo_preview_readme)"
+            glue(
+              "Error generating README preview: {e$message} (Code: mod_zenodo_preview_readme)"
             ),
             type = "error",
             duration = NULL
@@ -962,10 +945,8 @@ mod_Zenodo_server <- function(id) {
         },
         error = function(e) {
           showNotification(
-            paste0(
-              "Error updating environment label: ",
-              e$message,
-              " (Code: mod_zenodo_env_label)"
+            glue(
+              "Error updating environment label: e$message (Code: mod_zenodo_env_label)"
             ),
             type = "error",
             duration = NULL
