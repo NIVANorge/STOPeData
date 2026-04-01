@@ -57,6 +57,14 @@ Module servers are instantiated in `R/app_server.R`. Data flows in/out via `sess
 
 ---
 
+### UI/Shiny
+
+Prefer bslib functions for UI and modern shiny.
+- Use `input_task_button()` rather than `actionButton()`
+- Use `observe() |> bindEvent()` rather than `observeEvent()`
+- All `bindEvent()` calls should be labelled with a short, descriptive name
+- Observers should use `tryCatch()` to catch warnings/errors and return them at the UI level, with observer label, via `showNotifications()` + `glue()` 
+
 ## Key Dependencies
 
 | Package | Role |
