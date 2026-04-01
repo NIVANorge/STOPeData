@@ -745,7 +745,7 @@ mod_references_server <- function(id) {
         updateTextInput(session, "doi_lookup", value = "")
         updateTextAreaInput(session, "bibtex_import", value = "")
 
-        # CHANGED: Clear validation state in userData
+        # Clear validation state in userData
         session$userData$reactiveValues$referenceData <- initialise_references_tibble()
         session$userData$reactiveValues$referenceDataValid <- FALSE
       } |>
