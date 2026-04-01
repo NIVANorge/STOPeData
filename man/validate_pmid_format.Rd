@@ -16,3 +16,16 @@ Logical indicating whether the input is a valid PMID format
 Validates whether a string contains a valid PubMed ID (PMID) format.
 PMIDs are numeric identifiers, typically 1-8 digits.
 }
+\examples{
+validate_pmid_format("12345678")
+validate_pmid_format("PMID: 9876543")
+validate_pmid_format("not-a-pmid")
+}
+\seealso{
+Other validate: 
+\code{\link{validate_and_lookup_identifier}()},
+\code{\link{validate_and_parse_bibtex}()},
+\code{\link{validate_dataset_structure}()},
+\code{\link{validate_doi_format}()}
+}
+\concept{validate}

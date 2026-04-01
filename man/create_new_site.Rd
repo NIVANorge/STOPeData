@@ -17,10 +17,36 @@ session$userData$reactiveValues$campaignData$ENTERED_BY.}
 }
 \value{
 A tibble with one row containing the new site record, initialized with
-  default values according to the eDataDRF sites schema.
+default values according to the eDataDRF sites schema
+(\code{\link[eDataDRF:initialise_sites_tibble]{eDataDRF::initialise_sites_tibble()}}).
 }
 \description{
 Creates a new site record with auto-generated site code and default values.
 The site code is generated using either a base code or a default "SITE_" prefix,
 followed by a zero-padded three-digit number.
+
+The record structure follows \code{\link[eDataDRF:initialise_sites_tibble]{eDataDRF::initialise_sites_tibble()}}. Default
+values for geographic feature, coordinate system, and altitude unit are drawn
+from the relevant controlled vocabularies.
 }
+\examples{
+\dontrun{
+  # session is the Shiny session object from the module server function
+  new_site <- create_new_site(site_number = 1, base_code = "FJORD", session = session)
+  new_site$SITE_CODE
+}
+}
+\seealso{
+\code{\link[eDataDRF:initialise_sites_tibble]{eDataDRF::initialise_sites_tibble()}}, \code{\link[eDataDRF:example_sites_tibble]{eDataDRF::example_sites_tibble()}},
+\code{\link[eDataDRF:geographic_features_vocabulary]{eDataDRF::geographic_features_vocabulary()}},
+\code{\link[eDataDRF:coordinate_systems_vocabulary]{eDataDRF::coordinate_systems_vocabulary()}},
+\code{\link[eDataDRF:countries_vocabulary]{eDataDRF::countries_vocabulary()}}, \code{\link[eDataDRF:ocean_vocabulary]{eDataDRF::ocean_vocabulary()}},
+\code{\link[eDataDRF:altitude_units_vocabulary]{eDataDRF::altitude_units_vocabulary()}}
+
+Other create: 
+\code{\link{create_compartment_combination}()},
+\code{\link{create_dummy_session_data}()},
+\code{\link{create_existing_parameter}()},
+\code{\link{create_new_parameter}()}
+}
+\concept{create}

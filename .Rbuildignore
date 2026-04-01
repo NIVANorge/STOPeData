@@ -16,3 +16,12 @@ _\.new\.png$
 .github/*
 .vscode/*
 ^\.github$
+^_pkgdown\.yml$
+^docs$
+^pkgdown$
+^vignettes/articles/\.quarto$
+^vignettes/articles/*_files$
+^vignettes/articles$
+^vignettes/\.quarto$
+^vignettes/*_files$
+^codecov\.yml$

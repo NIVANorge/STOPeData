@@ -13,7 +13,7 @@
 #'   expected output format (e.g., S7 class with properties).
 #' @param max_tokens Integer. Maximum tokens for the API response.
 #'
-#' @returns Named list with three elements:
+#' @return Named list with three elements:
 #'   \describe{
 #'     \item{result}{The structured extraction result from the LLM}
 #'     \item{metadata}{List containing cost information or error details}
@@ -21,6 +21,7 @@
 #'   }
 #'
 #' @importFrom ellmer chat_anthropic params content_pdf_file
+#' @noRd
 extract_pdf_with_llm <- function(
   pdf_path,
   api_key,
@@ -67,7 +68,7 @@ extract_pdf_with_llm <- function(
 #'
 #' @param api_key Character. API key to validate.
 #'
-#' @returns TRUE if valid (invisibly). Throws error if invalid.
+#' @return TRUE if valid (invisibly). Throws error if invalid.
 #'
 #' @noRd
 validate_api_key <- function(api_key) {
@@ -84,7 +85,7 @@ validate_api_key <- function(api_key) {
 #'
 #' @param api_key Character. Anthropic API key to test.
 #'
-#' @returns TRUE if connection successful (invisibly). Throws error if failed.
+#' @return TRUE if connection successful (invisibly). Throws error if failed.
 #'
 #' @importFrom ellmer chat_anthropic params
 #'

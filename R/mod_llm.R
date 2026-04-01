@@ -493,7 +493,8 @@ mod_llm_server <- function(id) {
           if (!is.null(moduleState$structured_data$parameters)) {
             parameters_data <- create_parameters_from_llm(
               moduleState$structured_data$parameters,
-              session = session
+              session = session,
+              chemical_parameters = eDataDRF::parameters_vocabulary()
             )
             session$userData$reactiveValues$parametersDataLLM <- parameters_data
           }

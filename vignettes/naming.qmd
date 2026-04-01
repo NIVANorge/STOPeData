@@ -1,0 +1,31 @@
+---
+title: "Naming Conventions"
+vignette: >
+  %\VignetteIndexEntry{Naming Conventions}
+  %\VignetteEngine{quarto::html}
+  %\VignetteEncoding{UTF-8}
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r}
+#| label: setup
+library(STOPeData)
+```
+
+
+No strict naming conventions (which should probably be fixed). But some guidelines:
+ 
+ - Most R functions, etc. use tidyverse style conventions - snake_case()
+ - In some cases camel case is used - particularly for reactive data stuff or in proximity to Shiny functions, which often use it
+ - DRF table columns use SCREAMING_SNAKE for historical reasons - they're based on RAdb, which was written for ORACLE, where this is the convention. I don't find it particularly readable, so it may be changed in the future
+ - .R files follow (mostly) Golem's naming conventions:
+  - `mod_*.R` for a module's UI and server functions
+  - `mod_*_fct_*.R` and `fct_*.R` for functions used in a specific module (a bit inconsistent)
+  - `utils_*.R` for more generic functions. 
+
+I've tried to use a vaguely consistent set of verbs for the functions themselves. For example:
+- `initialise_*_tibble()` functions from eDataDRF, and their cousins `example_*_tibble()`
+- `summarise_*_()` functions turn extracted data into text summaries for CREED reporting. there's almost certainly better names for this (especially because `summarise()` is already a `dplyr` function), but I don't know what to call them

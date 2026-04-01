@@ -70,6 +70,7 @@ This app is part of the [Source to Outcome Pathway/Risk assessment database](htt
 
 <!-- badges: start -->
 [![R-CMD-check](https://github.com/NIVANorge/STOPeData/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NIVANorge/STOPeData/actions/workflows/R-CMD-check.yaml)
+[![Codecov test coverage](https://codecov.io/gh/NIVANorge/STOPeData/graph/badge.svg)](https://app.codecov.io/gh/NIVANorge/STOPeData)
 <!-- badges: end -->
 
 
@@ -79,8 +80,6 @@ This app is part of the [Source to Outcome Pathway/Risk assessment database](htt
 <!-- GETTING STARTED -->
 ## Getting Started
 
-I haven't tested setting the app up to run locally on systems other than my home PC. It *should* work following the below instructions, although it depends on quite a lot of R packages which you will have to download. In general, I recommend 
-
 ### Prerequisites
 
 * R version 4.5.2
@@ -88,20 +87,25 @@ I haven't tested setting the app up to run locally on systems other than my home
 
 ### Installation
 
-1. (Optional) Get an [Anthropic API key](https://console.anthropic.com) for LLM data extraction
+1. (Optional) Get an [Anthropic API key](https://console.anthropic.com) for LLM data extraction, and Zenodo/Zenodo Sandbox tokens for upload to Zenodo
+   
 2a. Clone the repo, or
    ```sh
    git clone https://github.com/NIVANorge/STOPeData.git
    ```
+
 2b. Download the package with devtools/pak
   ```R
   devtools::install_github("NIVANorge/STOPeData")
   # pak::pak("NIVANorge/STOPeData")
   ```
+
 3. Install missing R packages
-4. (Optional) Enter your API in your `.Renviron` file 
-   ```js
-   ANTHROPIC_API_KEY = 'sk-ant-api03-...';
+4. (Optional) Enter your API keys/tokens in your `.Renviron` file 
+   ```
+   ANTHROPIC_API_KEY="sk-ant-api03-..."
+   ZENODO_TOKEN="..."
+   ZENODO_SANDBOX_TOKEN="..."
    ```
 5. Change git remote url to avoid accidental pushes to base project
    ```sh

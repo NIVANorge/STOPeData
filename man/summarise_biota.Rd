@@ -14,17 +14,23 @@ summarise_biota(
 )
 }
 \arguments{
-\item{biotaData}{The biota dataset}
+\item{biotaData}{The biota dataset. Use \code{\link[eDataDRF:example_biota_tibble]{eDataDRF::example_biota_tibble()}} to
+generate an example input.}
 
-\item{SPECIES_GROUP}{Logical. Include species group summary?}
+\item{SPECIES_GROUP}{Logical. Include species group summary? See
+\code{\link[eDataDRF:species_groups_vocabulary]{eDataDRF::species_groups_vocabulary()}} for valid groups.}
 
-\item{SAMPLE_SPECIES}{Logical. Include sample species summary?}
+\item{SAMPLE_SPECIES}{Logical. Include sample species summary? See
+\code{\link[eDataDRF:species_names_vocabulary]{eDataDRF::species_names_vocabulary()}} for valid species.}
 
-\item{SAMPLE_TISSUE}{Logical. Include tissue type summary?}
+\item{SAMPLE_TISSUE}{Logical. Include tissue type summary? See
+\code{\link[eDataDRF:tissue_types_vocabulary]{eDataDRF::tissue_types_vocabulary()}} for valid tissue types.}
 
-\item{SAMPLE_SPECIES_LIFESTAGE}{Logical. Include life stage summary?}
+\item{SAMPLE_SPECIES_LIFESTAGE}{Logical. Include life stage summary? See
+\code{\link[eDataDRF:lifestage_vocabulary]{eDataDRF::lifestage_vocabulary()}} for valid life stages.}
 
-\item{SAMPLE_SPECIES_GENDER}{Logical. Include gender summary?}
+\item{SAMPLE_SPECIES_GENDER}{Logical. Include gender summary? See
+\code{\link[eDataDRF:gender_vocabulary]{eDataDRF::gender_vocabulary()}} for valid gender values.}
 }
 \value{
 Character string summarising biota, or "Relevant data not found"
@@ -32,3 +38,30 @@ Character string summarising biota, or "Relevant data not found"
 \description{
 Creates a summary string of biota including species, tissues, and life stages
 }
+\examples{
+summarise_biota(eDataDRF::example_biota_tibble(), SAMPLE_SPECIES = TRUE, SAMPLE_TISSUE = TRUE)
+}
+\seealso{
+\code{\link[eDataDRF:example_biota_tibble]{eDataDRF::example_biota_tibble()}},
+\code{\link[eDataDRF:species_groups_vocabulary]{eDataDRF::species_groups_vocabulary()}}, \code{\link[eDataDRF:species_names_vocabulary]{eDataDRF::species_names_vocabulary()}},
+\code{\link[eDataDRF:tissue_types_vocabulary]{eDataDRF::tissue_types_vocabulary()}}, \code{\link[eDataDRF:lifestage_vocabulary]{eDataDRF::lifestage_vocabulary()}},
+\code{\link[eDataDRF:gender_vocabulary]{eDataDRF::gender_vocabulary()}}
+
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_sites}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

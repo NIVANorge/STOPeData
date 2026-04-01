@@ -9,7 +9,7 @@ bib_string2df_alt(string, ...)
 \arguments{
 \item{string}{A BibTeX formatted string containing one or more entries}
 
-\item{...}{Additional arguments passed to \code{\link[bib2df]{bib2df}}}
+\item{...}{Additional arguments passed to \code{\link[bib2df:bib2df]{bib2df::bib2df()}}}
 }
 \value{
 A tibble/data frame with parsed BibTeX entries
@@ -24,6 +24,18 @@ This approach uses temporary files to work around the limitation that
 \code{bib2df::bib2df} only accepts file paths, not strings directly.
 The temporary file is created in the system temp directory and removed
 automatically, even if an error occurs.
+}
+\examples{
+\dontrun{
+  bibtex_str <- "@article{smith2022,
+    author  = {Smith, Jane},
+    title   = {Marine pollution},
+    journal = {Marine Pollution Bulletin},
+    year    = {2022}
+  }"
+  df <- bib_string2df_alt(bibtex_str)
+  df$TITLE
+}
 }
 \author{
 Philipp Ottolinger (original function), Sam Welch (added string wrapper)

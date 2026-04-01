@@ -442,7 +442,7 @@ mod_data_server <- function(id, parent_session) {
           # we need to be a little bit careful to avoid including parameters that the user hasn't specifically
           # added in mod_samples
           # apparently under some circumstances this can return multiple PARAMETER_NAMES
-          filter(PARAMETER_NAME %in% samplesData$PARAMETER_NAME |> unique()),
+          filter(PARAMETER_NAME %in% unique(samplesData$PARAMETER_NAME)),
         by = "PARAMETER_NAME"
       ) |>
         mutate(
@@ -528,7 +528,7 @@ mod_data_server <- function(id, parent_session) {
     # upstream: all session$userData$reactiveValues validation flags
     # downstream: moduleState$data_entry_ready, session$userData$reactiveValues$measurementsData
     observe({
-      # req(isFALSE(session$userData$reactiveValues$saveExtractionSuccessful)) # need to be a little careful here, as if we upload measurments data
+      # req(isFALSE(session$userData$reactiveValues$saveExtractionSuccessful)) # need to be a little careful here, as if we upload measurements data
       # the observer will create combinations and upload existing data, resulting in n new entries each time.
       if (modulesStatus()) {
         moduleState$data_entry_ready <- TRUE
@@ -879,7 +879,7 @@ mod_data_server <- function(id, parent_session) {
           hot_col(
             "MEASURED_FLAG",
             type = "dropdown",
-            source = measured_flags_vocabulary(),
+            source = measured_flag_vocabulary(),
             strict = TRUE
           ) |>
           hot_col(

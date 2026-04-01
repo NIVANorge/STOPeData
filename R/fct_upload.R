@@ -1,7 +1,7 @@
 # Import Helper Functions ----
 # Functions to handle importing data from ZIP files exported by mod_export
 
-#' Read metadata from ZIP file ----
+#' Read metadata from ZIP file
 #'
 #' @description Extract and read metadata from a ZIP file without importing data
 #' @param zip_path Path to the ZIP file
@@ -9,6 +9,11 @@
 #' @importFrom utils unzip
 #' @importFrom glue glue
 #' @importFrom golem print_dev
+#' @examples
+#' \dontrun{
+#'   metadata <- read_zip_metadata("path/to/session_export.zip")
+#'   metadata$campaign_name
+#' }
 #' @export
 read_zip_metadata <- function(zip_path) {
   # Validate inputs ----
@@ -66,7 +71,7 @@ read_zip_metadata <- function(zip_path) {
   )
 }
 
-#' Import data from exported ZIP file ----
+#' Import data from exported ZIP file
 #'
 #' @description Import datasets from a ZIP file created by mod_export
 #' @param zip_path Path to the ZIP file
@@ -77,6 +82,13 @@ read_zip_metadata <- function(zip_path) {
 #' @importFrom tibble as_tibble
 #' @importFrom glue glue
 #' @importFrom golem print_dev
+#' @importFrom rlang `%||%`
+#' @examples
+#' \dontrun{
+#'   # session is the Shiny session object from the module server function
+#'   result <- import_session_from_zip("path/to/session_export.zip", session)
+#'   result$success
+#' }
 #' @export
 import_session_from_zip <- function(zip_path, session) {
   # Validate inputs ----
@@ -182,7 +194,7 @@ import_session_from_zip <- function(zip_path, session) {
   }
 }
 
-#' Import module dataset from CSV ----
+#' Import module dataset from CSV
 #'
 #' @description Import a single dataset and add to session reactiveValues
 #' @param csv_path Path to CSV file
@@ -192,9 +204,15 @@ import_session_from_zip <- function(zip_path, session) {
 #' @importFrom tibble as_tibble
 #' @importFrom glue glue
 #' @importFrom golem print_dev
+#' @examples
+#' \dontrun{
+#'   # session is the Shiny session object from the module server function
+#'   result <- import_module_table("path/to/Sites_export.csv", session)
+#'   result$rows_imported
+#' }
 #' @export
 import_module_table <- function(csv_path, session) {
-  # Determine dataset type from filename ----
+  # Determine dataset type from filename
   filename <- basename(csv_path)
   dataset_type <- detect_dataset_type(filename)
 
@@ -206,7 +224,7 @@ import_module_table <- function(csv_path, session) {
     ))
   }
 
-  # Read and validate CSV ----
+  # Read and validate CSV
   tryCatch(
     {
       data <- read.csv(csv_path, stringsAsFactors = FALSE) |>
@@ -231,7 +249,7 @@ import_module_table <- function(csv_path, session) {
     }
   )
 
-  # Validate dataset structure ----
+  # Validate dataset structure
   validation_result <- validate_dataset_structure(data, dataset_type)
 
   if (!validation_result$valid) {
@@ -242,7 +260,7 @@ import_module_table <- function(csv_path, session) {
     ))
   }
 
-  # Add to session reactiveValues ----
+  # Add to session reactiveValues
   rv_key <- get_reactiveValues_key(dataset_type)
 
   if (is.null(rv_key)) {
@@ -275,13 +293,20 @@ import_module_table <- function(csv_path, session) {
   )
 }
 
-#' Detect dataset type from filename ----
+#' Detect dataset type from filename
 #'
-#' @description Determine which type of dataset based on filename patterns
+#' @description Determine which type of dataset based on filename patterns.
+#'   Dataset types correspond to eDataDRF tables — see [eDataDRF::initialise_sites_tibble()],
+#'   [eDataDRF::initialise_measurements_tibble()], etc. for the full set.
 #' @param filename Name of the file
 #' @return Character string of dataset type or NULL if not recognized
-#' @importFrom glue glue
-#' @importFrom golem print_dev
+#' @seealso [eDataDRF::initialise_sites_tibble()],
+#'   [eDataDRF::initialise_measurements_tibble()],
+#'   [eDataDRF::initialise_campaign_tibble()]
+#' @examples
+#' detect_dataset_type("Campaign_Sites_20241024.csv")
+#' detect_dataset_type("Measurements_export.csv")
+#' detect_dataset_type("unknown_file.csv")
 #' @export
 detect_dataset_type <- function(filename) {
   # Remove timestamp and campaign name patterns to get core name
@@ -321,11 +346,14 @@ detect_dataset_type <- function(filename) {
   return(NULL)
 }
 
-#' Get reactiveValues key for dataset type ----
+#' Get reactiveValues key for dataset type
 #'
 #' @description Map dataset type to reactiveValues key
 #' @param dataset_type Character string of dataset type
 #' @return Character string of reactiveValues key or NULL
+#' @examples
+#' get_reactiveValues_key("Sites")
+#' get_reactiveValues_key("CREED_RB")
 #' @export
 get_reactiveValues_key <- function(dataset_type) {
   key_mapping <- list(
@@ -346,12 +374,20 @@ get_reactiveValues_key <- function(dataset_type) {
   return(key_mapping[[dataset_type]])
 }
 
-#' Validate dataset structure ----
+#' Validate dataset structure
 #'
 #' @description Basic validation of dataset structure
-#' @param data Tibble/data.frame to validate
-#' @param dataset_type Character string of dataset type
+#' @param data Tibble/data.frame to validate. Use [eDataDRF::example_sites_tibble()]
+#'   or other `example_*_tibble()` functions to generate valid example inputs.
+#' @param dataset_type Character string of dataset type, as returned by
+#'   [detect_dataset_type()]
 #' @return List with valid (logical) and message (character)
+#' @family validate
+#' @seealso [detect_dataset_type()], [eDataDRF::initialise_sites_tibble()]
+#' @examples
+#' validate_dataset_structure(eDataDRF::example_sites_tibble(), "Sites")
+#' validate_dataset_structure(eDataDRF::example_measurements_tibble(), "Measurements")
+#' validate_dataset_structure(data.frame(), "Sites")
 #' @export
 validate_dataset_structure <- function(data, dataset_type) {
   # Basic validation - just check that it's a data.frame/tibble with columns
@@ -374,11 +410,16 @@ validate_dataset_structure <- function(data, dataset_type) {
   ))
 }
 
-#' Read metadata from text file ----
+#' Read metadata from text file
 #'
 #' @description Read metadata from a human-readable text file
 #' @param file_path Path to the metadata text file
 #' @return List with metadata or NULL if not found/readable
+#' @examples
+#' \dontrun{
+#'   metadata <- read_metadata_txt("path/to/export_metadata.txt")
+#'   metadata$campaign_name
+#' }
 #' @export
 read_metadata_txt <- function(file_path) {
   if (!file.exists(file_path)) {

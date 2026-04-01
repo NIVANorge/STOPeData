@@ -14,10 +14,23 @@ Should contain at least one row of BibTeX entry data.}
 }
 \value{
 A named list containing mapped field values for all reference input fields.
-  Values are NA for fields not present in the BibTeX entry.
+Values are NA for fields not present in the BibTeX entry.
 }
 \description{
 Converts parsed BibTeX data from bib2df format into a list of values
 that correspond to the reference module input fields. Handles field
 mapping between BibTeX conventions and the reference data structure.
+}
+\examples{
+\dontrun{
+  bibtex_str <- "@article{smith2022,
+    author  = {Smith, Jane},
+    title   = {Marine pollution},
+    journal = {Marine Pollution Bulletin},
+    year    = {2022}
+  }"
+  df <- bib_string2df_alt(bibtex_str)
+  fields <- map_bibtex_to_reference_fields(df)
+  fields$TITLE
+}
 }

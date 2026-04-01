@@ -14,13 +14,13 @@
 #' @noRd
 
 # Set background processe for running tasks
-daemons(1)
+mirai::daemons(1)
 # make sure this process can access the llm extraction function, etc.
-everywhere(source("R/mod_llm_fct_extract.R"))
-everywhere(library(ellmer))
-everywhere(library(shiny))
+mirai::everywhere(source("R/mod_llm_fct_extract.R"))
+mirai::everywhere(library(ellmer))
+mirai::everywhere(library(shiny))
 # Reset when the app is stopped
-onStop(function() daemons(0))
+onStop(function() mirai::daemons(0))
 
 # -----------------------
 # ---- userData ----
@@ -84,7 +84,7 @@ initialise_userData <- function() {
     # LLM extraction status flags ----
     llmExtractionComplete = FALSE, # tracks if the LLM data extraction process has completed, or the user has pressed the dummy data button
     llmExtractionSuccessful = FALSE, # tracks if the LLM data extraction process (or dummy data) returned a tibble in the expected format
-    llmPopulateModules = FALSE, # tracks if the user has sent LLM data to modukles
+    llmPopulateModules = FALSE, # tracks if the user has sent LLM data to modules
 
     llmExtractionComments = tibble(NULL),
 

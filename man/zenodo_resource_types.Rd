@@ -12,8 +12,18 @@ zenodo_resource_types
 }
 \description{
 Named character vector of Zenodo resource types.
-  Names are display labels; values are Zenodo resource type identifiers.
-  See \url{https://help.zenodo.org/docs/deposit/describe-records/resource-type/}
-  for more details. Filtered to values likely to be used in this application.
+Names are display labels; values are Zenodo resource type identifiers.
+See \url{https://help.zenodo.org/docs/deposit/describe-records/resource-type/}
+for more details. Filtered to values likely to be used in this application.
 }
+\examples{
+zenodo_resource_types
+zenodo_resource_types["Dataset"]
+}
+\seealso{
+Other zenodo: 
+\code{\link{generate_zenodo_readme}()},
+\code{\link{zenodo_licenses}}
+}
+\concept{zenodo}
 \keyword{datasets}

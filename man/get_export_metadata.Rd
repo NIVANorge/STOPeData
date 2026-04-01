@@ -13,5 +13,18 @@ get_export_metadata(session = NULL)
 List containing export metadata fields (campaign_name, export_datetime, app_name, etc.)
 }
 \description{
-Gather metadata about the current export session
+Gather metadata about the current export session. The
+\code{campaign_name} field is drawn from the \code{CAMPAIGN_NAME} column of the
+campaign table (see \code{\link[eDataDRF:initialise_campaign_tibble]{eDataDRF::initialise_campaign_tibble()}}).
+}
+\examples{
+\dontrun{
+  # session is the Shiny session object from the module server function
+  meta <- get_export_metadata(session)
+  meta$campaign_name
+}
+}
+\seealso{
+\code{\link[eDataDRF:initialise_campaign_tibble]{eDataDRF::initialise_campaign_tibble()}},
+\code{\link[eDataDRF:example_campaign_tibble]{eDataDRF::example_campaign_tibble()}}
 }

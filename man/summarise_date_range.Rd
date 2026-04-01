@@ -13,5 +13,29 @@ summarise_date_range(dates)
 Character string with date range, sample count, and interval in days
 }
 \description{
-Creates a date range string from vector of dates with count and interval
+Creates a date range string from vector of dates with count and interval.
+Format is: \code{"YYYY-MM-DD to YYYY-MM-DD (n = ..., ... days (to nearest day))"}
 }
+\examples{
+summarise_date_range(as.Date(c("2020-01-15", "2021-06-01", "2022-03-10")))
+summarise_date_range(as.Date(c("2021-07-01", "2021-07-01")))
+}
+\seealso{
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_sites}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

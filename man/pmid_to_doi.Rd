@@ -11,9 +11,11 @@ pmid_to_doi(pmid)
 }
 \value{
 List with components:
-  - success: Logical indicating whether conversion succeeded
-  - doi: DOI string (if success = TRUE) or NULL
-  - message: Status message for user feedback
+\itemize{
+\item success: Logical indicating whether conversion succeeded
+\item doi: DOI string (if success = TRUE) or NULL
+\item message: Status message for user feedback
+}
 }
 \description{
 Attempts to convert a PubMed ID to a DOI by querying the PubMed API.
@@ -23,4 +25,10 @@ This is necessary because Crossref doesn't directly support PMID lookup.
 Uses the PubMed E-utilities API to fetch article information and extract DOI.
 Requires internet connection. May fail if PubMed is unavailable or if the
 article doesn't have a DOI registered.
+}
+\examples{
+\dontrun{
+  result <- pmid_to_doi("12345678")
+  result$doi
+}
 }

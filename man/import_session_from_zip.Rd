@@ -2,7 +2,7 @@
 % Please edit documentation in R/fct_upload.R
 \name{import_session_from_zip}
 \alias{import_session_from_zip}
-\title{Import data from exported ZIP file ----}
+\title{Import data from exported ZIP file}
 \usage{
 import_session_from_zip(zip_path, session)
 }
@@ -16,4 +16,11 @@ List with success status and user-facing message
 }
 \description{
 Import datasets from a ZIP file created by mod_export
+}
+\examples{
+\dontrun{
+  # session is the Shiny session object from the module server function
+  result <- import_session_from_zip("path/to/session_export.zip", session)
+  result$success
+}
 }

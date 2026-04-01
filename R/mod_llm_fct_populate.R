@@ -8,8 +8,10 @@
 #' @description Updates campaign module input fields with LLM extracted data
 #' @param session Shiny session object
 #' @param llm_campaign_data Campaign data extracted by LLM
-#' @noRd
+#' @return NULL invisibly.
 #' @importFrom shiny updateTextInput updateDateInput updateSelectInput updateTextAreaInput
+#' @importFrom golem print_dev
+#' @noRd
 # ! FORMAT-BASED
 # TODO: Rewrite to account for the fact that it now is used for save imports as well as the LLM
 # Should probably accept tibbles as an input too
@@ -106,7 +108,11 @@ populate_campaign_from_llm <- function(session, llm_campaign_data) {
 #' @description Updates references module input fields with LLM extracted data
 #' @param session Shiny session object
 #' @param llm_references_data References data extracted by LLM
+#' @return NULL invisibly.
 #' @importFrom dplyr rename_with
+#' @importFrom shiny updateSelectInput updateTextInput updateTextAreaInput updateNumericInput updateDateInput showNotification
+#' @importFrom golem print_dev
+#' @importFrom eDataDRF generate_reference_id
 #' @noRd
 # ! FORMAT-BASED
 populate_references_from_llm <- function(session, llm_references_data) {
@@ -251,6 +257,9 @@ populate_references_from_llm <- function(session, llm_references_data) {
 #' @param llm_campaign_data Campaign data frame extracted by LLM (used for generating sites codes)
 #' @param session get session object for ENTERED_BY
 #' @return Data frame in sites module format
+#' @importFrom glue glue
+#' @importFrom golem print_dev
+#' @importFrom tibble tibble
 #' @noRd
 # ! FORMAT-BASED
 create_sites_from_llm <- function(
@@ -328,6 +337,9 @@ create_sites_from_llm <- function(
 #' @param session get session object for ENTERED_BY
 #' @return Data frame in parameters module format
 #' @importFrom purrr map_dfr
+#' @importFrom glue glue
+#' @importFrom golem print_dev
+#' @importFrom tibble tibble
 #' @noRd
 # ! FORMAT-BASED
 create_parameters_from_llm <- function(
@@ -378,7 +390,11 @@ create_parameters_from_llm <- function(
       PARAMETER_NAME = param_name,
       PARAMETER_NAME_SUB = "",
       INCHIKEY_SD = if (!is.null(db_match)) db_match$INCHIKEY_SD else "",
-      PUBCHEM_CID = if (!is.null(db_match)) db_match$PUBCHEM_CID else "",
+      PUBCHEM_CID = if (!is.null(db_match)) {
+        as.character(db_match$PUBCHEM_CID) # sometimes causes problems
+      } else {
+        ""
+      },
       CAS_RN = cas_rn,
       ENTERED_BY = session$userData$reactiveValues$ENTERED_BY %|truthy|% "",
       PARAMETER_COMMENT = param_comment,
@@ -392,9 +408,11 @@ create_parameters_from_llm <- function(
 ## mod_parameters helper functions ----
 
 #' Safely extract field from LLM data object
+#' @description Safely extract a field from an LLM data object, returning a default if missing or invalid.
 #' @param data_obj The data object (list or atomic)
 #' @param field_name Name of field to extract
 #' @param default Default value if field missing or null
+#' @return The field value, or `default` if missing or invalid.
 #' @noRd
 safe_extract_field <- function(data_obj, field_name, default = NA) {
   tryCatch(
@@ -417,7 +435,13 @@ safe_extract_field <- function(data_obj, field_name, default = NA) {
   )
 }
 
-# Helper function to find database match ----
+#' Find parameter lookup match in chemical database
+#' @description Attempts to match a parameter by name then CAS RN against a chemical reference database.
+#' @param param_name Character. Parameter name to search for.
+#' @param cas_rn Character. CAS Registry Number to search for.
+#' @param chemical_parameters Data frame. Chemical reference database.
+#' @return A single-row data frame from `chemical_parameters` if found, or NULL.
+#' @noRd
 find_parameter_lookup_match <- function(
   param_name,
   cas_rn,
@@ -458,6 +482,9 @@ find_parameter_lookup_match <- function(
 #' @description Creates compartments data frame from LLM extracted compartments data frame
 #' @param llm_compartments_data Compartments data frame extracted by LLM
 #' @return Data frame in compartments module format
+#' @importFrom glue glue
+#' @importFrom golem print_dev
+#' @importFrom tibble tibble
 #' @noRd
 # ! FORMAT-BASED
 create_compartments_from_llm <- function(llm_compartments_data) {
@@ -502,6 +529,8 @@ create_compartments_from_llm <- function(llm_compartments_data) {
 
 #' Map compartment to strict controlled vocabulary
 #' @description Maps to the exact controlled vocabulary used in compartments module
+#' @param compartment Character. Compartment value to map.
+#' @return Character. Controlled vocabulary compartment value.
 #' @noRd
 map_compartment_strict <- function(compartment) {
   if (is.null(compartment) || compartment == "") {
@@ -528,6 +557,8 @@ map_compartment_strict <- function(compartment) {
 
 #' Map compartment sub to strict controlled vocabulary
 #' @description Maps to the exact controlled vocabulary used in compartments module
+#' @param compartment_sub Character. Sub-compartment value to map.
+#' @return Character. Controlled vocabulary sub-compartment value.
 #' @noRd
 map_compartment_sub_strict <- function(compartment_sub) {
   if (is.null(compartment_sub) || compartment_sub == "") {
@@ -621,6 +652,8 @@ map_compartment_sub_strict <- function(compartment_sub) {
 
 #' Map measured category to strict controlled vocabulary
 #' @description Maps to the exact controlled vocabulary used in compartments module
+#' @param category Character. Measured category value to map.
+#' @return Character. Controlled vocabulary measured category value.
 #' @noRd
 map_measured_category_strict <- function(category) {
   if (is.null(category) || category == "") {
@@ -643,6 +676,9 @@ map_measured_category_strict <- function(category) {
 }
 
 #' Validate latitude value
+#' @description Validates a latitude value, returning NA if out of range or non-numeric.
+#' @param lat Numeric or character. Latitude to validate.
+#' @return Numeric latitude, or NA if invalid.
 #' @noRd
 validate_latitude <- function(lat) {
   if (is.null(lat) || is.na(lat)) {
@@ -656,6 +692,9 @@ validate_latitude <- function(lat) {
 }
 
 #' Validate longitude value
+#' @description Validates a longitude value, returning NA if out of range or non-numeric.
+#' @param lon Numeric or character. Longitude to validate.
+#' @return Numeric longitude, or NA if invalid.
 #' @noRd
 validate_longitude <- function(lon) {
   if (is.null(lon) || is.na(lon)) {
@@ -675,6 +714,9 @@ validate_longitude <- function(lon) {
 #' @description Creates biota data frame from LLM extracted biota data frame
 #' @param llm_biota_data Biota data frame extracted by LLM
 #' @return Data frame in biota module format
+#' @importFrom glue glue
+#' @importFrom golem print_dev
+#' @importFrom tibble tibble
 #' @noRd
 # ! FORMAT-BASED
 create_biota_from_llm <- function(llm_biota_data) {
@@ -923,7 +965,12 @@ validate_species_against_database <- function(biota_data, species_database) {
 #' @description Creates methods data frame from LLM extracted methods data frame.
 #' Ensures all four protocol categories are present, adding "Not reported" entries for missing categories.
 #' @param llm_methods_data Methods data frame extracted by LLM
+#' @param llm_campaign_data Campaign data frame extracted by LLM (used for campaign name and ID generation)
 #' @return Data frame in methods module format
+#' @importFrom glue glue
+#' @importFrom golem print_dev
+#' @importFrom tibble tibble
+#' @importFrom dplyr group_by mutate ungroup select relocate add_row
 #' @noRd
 # ! FORMAT-BASED
 create_methods_from_llm <- function(llm_methods_data, llm_campaign_data) {
@@ -1016,6 +1063,11 @@ create_methods_from_llm <- function(llm_methods_data, llm_campaign_data) {
   return(methods_tibble)
 }
 
+#' Create Samples Data from LLM Data
+#' @description Extracts sampling dates from LLM extracted samples data.
+#' @param llm_samples_data Samples data frame extracted by LLM
+#' @return Character vector of sampling dates, or empty vector if no data.
+#' @noRd
 create_samples_from_llm <- function(llm_samples_data) {
   # Currently we only send SAMPLING_DATE to the samples module
   if (is.null(llm_samples_data) || length(llm_samples_data) == 0) {

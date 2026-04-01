@@ -15,3 +15,6 @@ Tibble with Property and Value columns
 \description{
 Convert metadata list to tibble format suitable for Excel sheets
 }
+\examples{
+create_metadata_tibble(list(campaign = "North Sea 2022", version = "1.0", user = "Jane"))
+}

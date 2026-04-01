@@ -14,15 +14,20 @@ summarise_sites(
 )
 }
 \arguments{
-\item{sitesData}{The sites dataset}
+\item{sitesData}{The sites dataset. Use \code{\link[eDataDRF:example_sites_tibble]{eDataDRF::example_sites_tibble()}} to
+generate an example input.}
 
-\item{COUNTRY_ISO}{Logical. Include country summary?}
+\item{COUNTRY_ISO}{Logical. Include country summary? See
+\code{\link[eDataDRF:countries_vocabulary]{eDataDRF::countries_vocabulary()}} for valid country codes.}
 
-\item{OCEAN_IHO}{Logical. Include area summary?}
+\item{OCEAN_IHO}{Logical. Include area summary? See \code{\link[eDataDRF:ocean_vocabulary]{eDataDRF::ocean_vocabulary()}}
+for valid ocean areas.}
 
-\item{SITE_GEOGRAPHIC_FEATURE}{Logical. Include geographic feature summary?}
+\item{SITE_GEOGRAPHIC_FEATURE}{Logical. Include geographic feature summary? See
+\code{\link[eDataDRF:geographic_features_vocabulary]{eDataDRF::geographic_features_vocabulary()}} for valid features.}
 
-\item{SITE_GEOGRAPHIC_FEATURE_SUB}{Logical. Include geographic feature sub summary?}
+\item{SITE_GEOGRAPHIC_FEATURE_SUB}{Logical. Include geographic feature sub summary?
+See \code{\link[eDataDRF:geographic_features_sub_vocabulary]{eDataDRF::geographic_features_sub_vocabulary()}} for valid sub-features.}
 
 \item{PRECISION}{Logical. Include coordinate precision?}
 }
@@ -32,3 +37,29 @@ Character string summarising sites, or "Relevant data not found"
 \description{
 Creates a summary string of sites including countries and areas
 }
+\examples{
+summarise_sites(eDataDRF::example_sites_tibble(), COUNTRY_ISO = TRUE, PRECISION = TRUE)
+}
+\seealso{
+\code{\link[eDataDRF:example_sites_tibble]{eDataDRF::example_sites_tibble()}}, \code{\link[eDataDRF:countries_vocabulary]{eDataDRF::countries_vocabulary()}},
+\code{\link[eDataDRF:ocean_vocabulary]{eDataDRF::ocean_vocabulary()}}, \code{\link[eDataDRF:geographic_features_vocabulary]{eDataDRF::geographic_features_vocabulary()}},
+\code{\link[eDataDRF:geographic_features_sub_vocabulary]{eDataDRF::geographic_features_sub_vocabulary()}}
+
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

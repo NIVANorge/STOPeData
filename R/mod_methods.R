@@ -107,7 +107,6 @@ mod_methods_ui <- function(id) {
 #' @importFrom shiny moduleServer reactive reactiveValues observe renderText renderUI showNotification updateSelectInput
 #' @importFrom rhandsontable renderRHandsontable rhandsontable hot_to_r hot_col hot_context_menu
 #' @importFrom shinyjs enable disable
-#' @importFrom arrow read_parquet
 #' @importFrom tibble tibble deframe
 #' @importFrom dplyr filter select ungroup row_number relocate
 #' @importFrom purrr is_empty

@@ -2,14 +2,16 @@
 % Please edit documentation in R/fct_upload.R
 \name{validate_dataset_structure}
 \alias{validate_dataset_structure}
-\title{Validate dataset structure ----}
+\title{Validate dataset structure}
 \usage{
 validate_dataset_structure(data, dataset_type)
 }
 \arguments{
-\item{data}{Tibble/data.frame to validate}
+\item{data}{Tibble/data.frame to validate. Use \code{\link[eDataDRF:example_sites_tibble]{eDataDRF::example_sites_tibble()}}
+or other \verb{example_*_tibble()} functions to generate valid example inputs.}
 
-\item{dataset_type}{Character string of dataset type}
+\item{dataset_type}{Character string of dataset type, as returned by
+\code{\link[=detect_dataset_type]{detect_dataset_type()}}}
 }
 \value{
 List with valid (logical) and message (character)
@@ -17,3 +19,18 @@ List with valid (logical) and message (character)
 \description{
 Basic validation of dataset structure
 }
+\examples{
+validate_dataset_structure(eDataDRF::example_sites_tibble(), "Sites")
+validate_dataset_structure(eDataDRF::example_measurements_tibble(), "Measurements")
+validate_dataset_structure(data.frame(), "Sites")
+}
+\seealso{
+\code{\link[=detect_dataset_type]{detect_dataset_type()}}, \code{\link[eDataDRF:initialise_sites_tibble]{eDataDRF::initialise_sites_tibble()}}
+
+Other validate: 
+\code{\link{validate_and_lookup_identifier}()},
+\code{\link{validate_and_parse_bibtex}()},
+\code{\link{validate_doi_format}()},
+\code{\link{validate_pmid_format}()}
+}
+\concept{validate}

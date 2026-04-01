@@ -7,7 +7,8 @@
 summarise_compartments(compartmentsData)
 }
 \arguments{
-\item{compartmentsData}{The compartments dataset}
+\item{compartmentsData}{The compartments dataset. Use
+\code{\link[eDataDRF:example_compartments_tibble]{eDataDRF::example_compartments_tibble()}} to generate an example input.}
 }
 \value{
 Character string summarising compartments, or "Relevant data not found"
@@ -15,3 +16,29 @@ Character string summarising compartments, or "Relevant data not found"
 \description{
 Creates a summary string of compartments from session data
 }
+\examples{
+summarise_compartments(eDataDRF::example_compartments_tibble())
+}
+\seealso{
+\code{\link[eDataDRF:example_compartments_tibble]{eDataDRF::example_compartments_tibble()}},
+\code{\link[eDataDRF:environ_compartments_vocabulary]{eDataDRF::environ_compartments_vocabulary()}},
+\code{\link[eDataDRF:environ_compartments_sub_vocabulary]{eDataDRF::environ_compartments_sub_vocabulary()}}
+
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_measured_units}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_sites}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

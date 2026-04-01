@@ -2,7 +2,7 @@
 % Please edit documentation in R/fct_upload.R
 \name{read_metadata_txt}
 \alias{read_metadata_txt}
-\title{Read metadata from text file ----}
+\title{Read metadata from text file}
 \usage{
 read_metadata_txt(file_path)
 }
@@ -14,4 +14,10 @@ List with metadata or NULL if not found/readable
 }
 \description{
 Read metadata from a human-readable text file
+}
+\examples{
+\dontrun{
+  metadata <- read_metadata_txt("path/to/export_metadata.txt")
+  metadata$campaign_name
+}
 }

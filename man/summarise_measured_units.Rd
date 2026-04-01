@@ -7,13 +7,45 @@
 summarise_measured_units(measurement_data, parameters_data)
 }
 \arguments{
-\item{measurement_data}{Measurement data frame}
+\item{measurement_data}{Measurement data frame. Use
+\code{\link[eDataDRF:example_measurements_tibble]{eDataDRF::example_measurements_tibble()}} to generate an example input.}
 
-\item{parameters_data}{Parameters data frame}
+\item{parameters_data}{Parameters data frame. Use
+\code{\link[eDataDRF:example_parameters_tibble]{eDataDRF::example_parameters_tibble()}} to generate an example input.}
 }
 \value{
 Character string with units grouped by parameter
 }
 \description{
-Creates a summary of measurement units grouped by parameter name
+Creates a summary of measurement units grouped by parameter name.
+Valid unit values are defined by \code{\link[eDataDRF:parameter_unit_vocabulary]{eDataDRF::parameter_unit_vocabulary()}}.
 }
+\examples{
+summarise_measured_units(
+  eDataDRF::example_measurements_tibble(),
+  eDataDRF::example_parameters_tibble()
+)
+}
+\seealso{
+\code{\link[eDataDRF:example_measurements_tibble]{eDataDRF::example_measurements_tibble()}},
+\code{\link[eDataDRF:example_parameters_tibble]{eDataDRF::example_parameters_tibble()}},
+\code{\link[eDataDRF:parameter_unit_vocabulary]{eDataDRF::parameter_unit_vocabulary()}}
+
+Other summarise: 
+\code{\link{calculate_coordinate_precision}()},
+\code{\link{manual_completion_message}()},
+\code{\link{summarise_CREED_details}()},
+\code{\link{summarise_CREED_relevance}()},
+\code{\link{summarise_CREED_reliability}()},
+\code{\link{summarise_biota}()},
+\code{\link{summarise_compartments}()},
+\code{\link{summarise_date_range}()},
+\code{\link{summarise_lod_loq}()},
+\code{\link{summarise_multiple}()},
+\code{\link{summarise_protocols}()},
+\code{\link{summarise_reference}()},
+\code{\link{summarise_sig_figs}()},
+\code{\link{summarise_sites}()},
+\code{\link{summarise_uncertainty_comments}()}
+}
+\concept{summarise}

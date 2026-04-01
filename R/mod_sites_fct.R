@@ -5,6 +5,10 @@
 #' The site code is generated using either a base code or a default "SITE_" prefix,
 #' followed by a zero-padded three-digit number.
 #'
+#' The record structure follows [eDataDRF::initialise_sites_tibble()]. Default
+#' values for geographic feature, coordinate system, and altitude unit are drawn
+#' from the relevant controlled vocabularies.
+#'
 #' @param site_number Integer. The site number to use in the site code. Default is 1.
 #' @param base_code Character. Optional prefix for the site code. If empty or NULL,
 #'   defaults to "SITE_". Default is "".
@@ -12,8 +16,22 @@
 #'   session$userData$reactiveValues$campaignData$ENTERED_BY.
 #'
 #' @return A tibble with one row containing the new site record, initialized with
-#'   default values according to the eDataDRF sites schema.
+#'   default values according to the eDataDRF sites schema
+#'   ([eDataDRF::initialise_sites_tibble()]).
+#' @family create
 #' @importFrom eDataDRF initialise_sites_tibble
+#' @importFrom dplyr add_row
+#' @seealso [eDataDRF::initialise_sites_tibble()], [eDataDRF::example_sites_tibble()],
+#'   [eDataDRF::geographic_features_vocabulary()],
+#'   [eDataDRF::coordinate_systems_vocabulary()],
+#'   [eDataDRF::countries_vocabulary()], [eDataDRF::ocean_vocabulary()],
+#'   [eDataDRF::altitude_units_vocabulary()]
+#' @examples
+#' \dontrun{
+#'   # session is the Shiny session object from the module server function
+#'   new_site <- create_new_site(site_number = 1, base_code = "FJORD", session = session)
+#'   new_site$SITE_CODE
+#' }
 #' @export
 create_new_site <- function(site_number = 1, base_code = "", session) {
   # Generate site code ----

@@ -8,10 +8,10 @@ CREED_relevance_criteria_config()
 }
 \value{
 A named list where each element is a criterion configuration with:
-  \describe{
-    \item{title}{Character. Human-readable criterion title.}
-    \item{type}{Character. Either "Required" or "Recommended".}
-  }
+\describe{
+\item{title}{Character. Human-readable criterion title.}
+\item{type}{Character. Either "Required" or "Recommended".}
+}
 }
 \description{
 Returns the configuration list for all 11 CREED relevance
@@ -20,13 +20,20 @@ Required or Recommended.
 }
 \details{
 Relevance criteria assess the fitness-for-purpose of the data:
-- RV1-RV2: Media (sample medium, collection method)
-- RV3-RV4: Spatial (study area, site type)
-- RV5-RV7: Temporal (timespan, frequency, conditions)
-- RV8-RV9: Analytical (analyte, sensitivity)
-- RV10: Data handling (summary statistics)
-- RV11: Supporting parameters
+\itemize{
+\item RV1-RV2: Media (sample medium, collection method)
+\item RV3-RV4: Spatial (study area, site type)
+\item RV5-RV7: Temporal (timespan, frequency, conditions)
+\item RV8-RV9: Analytical (analyte, sensitivity)
+\item RV10: Data handling (summary statistics)
+\item RV11: Supporting parameters
+}
+}
+\examples{
+config <- CREED_relevance_criteria_config()
+names(config)
+config$RV1
 }
 \seealso{
-[CREED_reliability_criteria_config()], [collect_CREED_data()]
+\code{\link[=CREED_reliability_criteria_config]{CREED_reliability_criteria_config()}}, \code{\link[=collect_CREED_data]{collect_CREED_data()}}
 }

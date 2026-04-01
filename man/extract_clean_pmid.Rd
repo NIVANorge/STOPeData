@@ -15,3 +15,7 @@ Clean PMID string or the original input if no cleaning needed
 \description{
 Extracts a clean PMID string by removing PMID: prefixes and whitespace.
 }
+\examples{
+extract_clean_pmid("PMID: 12345678")
+extract_clean_pmid("9876543")
+}
