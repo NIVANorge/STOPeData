@@ -634,14 +634,14 @@ summarise_date_range <- function(dates) {
   max_date <- max(valid_dates)
 
   if (min_date == max_date) {
-    return(paste0(as.character(min_date), " (n=", n_unique, ")"))
+    return(glue("{min_date} (n={n_unique})"))
   } else {
     # Calculate interval in days
     interval_days <- as.numeric(difftime(max_date, min_date, units = "days")) |>
       round(digits = 0)
 
     return(glue(
-      "{min_date} to {max_date} (n=n_unique, {interval_days} days to nearest day)"
+      "{min_date} to {max_date} (n={n_unique}, {interval_days} days (to nearest day))"
     ))
   }
 }
