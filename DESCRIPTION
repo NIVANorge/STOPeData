@@ -62,8 +62,9 @@ Suggests:
 Config/testthat/edition: 3
 URL: https://github.com/NIVANorge/STOPeData, https://nivanorge.github.io/STOPeData/
 BugReports: https://github.com/NIVANorge/STOPeData/issues
-Remotes: 
-    NIVANorge/eDataDRF
+Remotes:  
+    NIVANorge/eDataDRF,
+    NIVANorge/STOPeData
 Config/Needs/website: quarto
 VignetteBuilder: knitr, quarto
 Roxygen: list(markdown = TRUE)
