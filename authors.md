@@ -9,7 +9,7 @@
 ## Citation
 
 Source:
-[`DESCRIPTION`](https://github.com/NIVANorge/STOPeData/blob/pkgdown/DESCRIPTION)
+[`DESCRIPTION`](https://github.com/NIVANorge/STOPeData/blob/main/DESCRIPTION)
 
 Welch S (2026). *STOPeData: eData - A data entry, formatting, and review
 tool for exposure data*. R package version 0.0.0.9010,
