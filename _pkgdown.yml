@@ -70,8 +70,6 @@ reference:
     contents:
       - get_parameters_of_types
       - get_parameters_filtered
-      - generate_sample_id_with_components
-      - generate_protocol_id
 
   - title: "CREED Utilities"
     desc: "Configuration and helper functions for CREED quality assessment criteria."
