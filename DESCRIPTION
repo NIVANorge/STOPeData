@@ -35,6 +35,7 @@ Imports:
     rcrossref (>= 1.2.0),
     readr,
     rhandsontable,
+    rlang,
     shiny (>= 1.11.1),
     shinyjs,
     shinyvalidate,
