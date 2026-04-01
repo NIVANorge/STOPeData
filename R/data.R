@@ -28,5 +28,4 @@
 #' @examples
 #' # Show only popular licenses
 #' zenodo_licenses[zenodo_licenses$popular, c("id", "title")]
-#' @export
 "zenodo_licenses"
