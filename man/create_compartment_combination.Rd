@@ -11,7 +11,7 @@ create_compartment_combination(compartment, sub_compartment, category)
 
 \item{sub_compartment}{Character string specifying the sub-compartment (\code{\link[eDataDRF:environ_compartments_sub_vocabulary]{eDataDRF::environ_compartments_sub_vocabulary()}})}
 
-\item{category}{Character string specifying the measured category (\code{\link[eDataDRF:measured_category_vocabulary]{eDataDRF::measured_category_vocabulary()}})}
+\item{category}{Character string specifying the measured category (\code{\link[eDataDRF:measured_categories_vocabulary]{eDataDRF::measured_categories_vocabulary()}})}
 }
 \value{
 tibble with one row containing the specified compartment information

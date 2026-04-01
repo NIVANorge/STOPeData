@@ -2,7 +2,7 @@
 % Please edit documentation in R/fct_upload.R
 \name{get_reactiveValues_key}
 \alias{get_reactiveValues_key}
-\title{Get reactiveValues key for dataset type ----}
+\title{Get reactiveValues key for dataset type}
 \usage{
 get_reactiveValues_key(dataset_type)
 }

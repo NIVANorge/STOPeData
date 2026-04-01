@@ -13,7 +13,8 @@ summarise_date_range(dates)
 Character string with date range, sample count, and interval in days
 }
 \description{
-Creates a date range string from vector of dates with count and interval
+Creates a date range string from vector of dates with count and interval.
+Format is: \code{"YYYY-MM-DD to YYYY-MM-DD (n = ..., ... days (to nearest day))"}
 }
 \examples{
 summarise_date_range(as.Date(c("2020-01-15", "2021-06-01", "2022-03-10")))

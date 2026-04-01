@@ -2,7 +2,7 @@
 % Please edit documentation in R/fct_upload.R
 \name{read_zip_metadata}
 \alias{read_zip_metadata}
-\title{Read metadata from ZIP file ----}
+\title{Read metadata from ZIP file}
 \usage{
 read_zip_metadata(zip_path)
 }

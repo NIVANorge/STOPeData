@@ -570,6 +570,7 @@ summarise_reference <- function(ref_data) {
 #' @param prefix Optional prefix for output
 #' @param max_display Maximum items to display before truncating
 #' @return Character string summary
+#' @importFrom glue glue
 #' @family summarise
 #' @examples
 #' summarise_multiple(c("Norway", "Sweden", "Denmark"), "Countries")
@@ -590,18 +591,15 @@ summarise_multiple <- function(values, prefix = "", max_display = 10) {
     result <- paste(unique_values, collapse = ", ")
   } else {
     displayed <- paste(unique_values[1:max_display], collapse = ", ")
-    result <- paste0(
-      displayed,
-      " (and ",
-      length(unique_values) - max_display,
-      " more)"
+    result <- glue(
+      "{displayed} (and {length(unique_values) - max_display} more)"
     )
   }
 
   if (prefix != "" && length(unique_values) > 1) {
-    result <- paste0(prefix, " (", length(unique_values), "): ", result)
+    result <- glue("{prefix} ({length(unique_values)}): {result}")
   } else if (prefix != "") {
-    result <- paste0(prefix, ": ", result)
+    result <- glue("{prefix}: {result}")
   }
 
   return(result)
@@ -609,9 +607,11 @@ summarise_multiple <- function(values, prefix = "", max_display = 10) {
 
 #' Calculate Date Range
 #'
-#' @description Creates a date range string from vector of dates with count and interval
+#' @description Creates a date range string from vector of dates with count and interval.
+#' Format is: `"YYYY-MM-DD to YYYY-MM-DD (n = ..., ... days (to nearest day))"`
 #' @param dates Vector of dates
 #' @return Character string with date range, sample count, and interval in days
+#' @importFrom glue glue
 #' @family summarise
 #' @examples
 #' summarise_date_range(as.Date(c("2020-01-15", "2021-06-01", "2022-03-10")))
@@ -640,15 +640,8 @@ summarise_date_range <- function(dates) {
     interval_days <- as.numeric(difftime(max_date, min_date, units = "days")) |>
       round(digits = 0)
 
-    return(paste0(
-      min_date,
-      " to ",
-      max_date,
-      " (n=",
-      n_unique,
-      ", ",
-      interval_days,
-      " days (to nearest day))"
+    return(glue(
+      "{min_date} to {max_date} (n=n_unique, {interval_days} days to nearest day)"
     ))
   }
 }

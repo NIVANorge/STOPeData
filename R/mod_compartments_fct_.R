@@ -7,7 +7,7 @@
 #'
 #' @param compartment Character string specifying the environmental compartment ([eDataDRF::environ_compartments_vocabulary()])
 #' @param sub_compartment Character string specifying the sub-compartment ([eDataDRF::environ_compartments_sub_vocabulary()])
-#' @param category Character string specifying the measured category ([eDataDRF::measured_category_vocabulary()])
+#' @param category Character string specifying the measured category ([eDataDRF::measured_categories_vocabulary()])
 #'
 #' @return tibble with one row containing the specified compartment information
 #' @family create

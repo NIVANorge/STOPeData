@@ -2,7 +2,7 @@
 % Please edit documentation in R/fct_upload.R
 \name{import_session_from_zip}
 \alias{import_session_from_zip}
-\title{Import data from exported ZIP file ----}
+\title{Import data from exported ZIP file}
 \usage{
 import_session_from_zip(zip_path, session)
 }

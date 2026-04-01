@@ -2,7 +2,7 @@
 % Please edit documentation in R/fct_upload.R
 \name{detect_dataset_type}
 \alias{detect_dataset_type}
-\title{Detect dataset type from filename ----}
+\title{Detect dataset type from filename}
 \usage{
 detect_dataset_type(filename)
 }

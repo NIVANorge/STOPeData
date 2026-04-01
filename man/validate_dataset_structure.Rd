@@ -2,7 +2,7 @@
 % Please edit documentation in R/fct_upload.R
 \name{validate_dataset_structure}
 \alias{validate_dataset_structure}
-\title{Validate dataset structure ----}
+\title{Validate dataset structure}
 \usage{
 validate_dataset_structure(data, dataset_type)
 }

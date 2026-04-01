@@ -2,7 +2,7 @@
 % Please edit documentation in R/fct_upload.R
 \name{import_module_table}
 \alias{import_module_table}
-\title{Import module dataset from CSV ----}
+\title{Import module dataset from CSV}
 \usage{
 import_module_table(csv_path, session)
 }
