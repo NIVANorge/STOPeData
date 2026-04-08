@@ -1,8 +1,8 @@
 # Help
 
-Please refer to the [format documentation](https://nivanorge.github.io/eDataDRF/) for more information on the tables, variables and controlled vocabulary. In case of a question or feedback concerning format coverage, please open an issue here: https://github.com/NIVANorge/eDataDRF/issues. 
+Please refer to the format documentation for more information on the tables, variables and controlled vocabulary. In case of a question or feedback concerning format coverage, please open an issue here. 
 
-In case of questions and feedback concerning the application itself, please open an issue here: https://github.com/NIVANorge/STOPeData/issues.
+In case of questions and feedback concerning the application itself, please open an issue here.
 
 For more information and documentation on the application, please see the following paper: link to follow.
 

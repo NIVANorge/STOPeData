@@ -1,8 +1,0 @@
-services:
-  stopedata:
-    container_name: stopedata
-    build: .
-
-    ports:
-      - 3838:3838
- 

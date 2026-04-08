@@ -17,7 +17,7 @@
 #' The temporary file is created in the system temp directory and removed
 #' automatically, even if an error occurs.
 #'
-#' @author Philipp Ottolinger (original function), Sam Welch (added string wrapper)
+#' @author Philipp Ottolinger (original function)
 #'
 #' @importFrom bib2df bib2df
 #' @examples

@@ -22,13 +22,6 @@ golem::fill_desc(
   pkg_name = "STOPeData", # The name of the golem package containing the app (typically lowercase, no underscore or periods)
   pkg_title = "eData - A data entry, formatting, and review tool for exposure data", # What the Package Does (One Line, Title Case, No Period)
   pkg_description = "A Shiny app to import environmental monitoring data from papers or other data sources, formatting with the eData format and validating. Review data, export, and check data quality against the CREED criteria.", # What the package does (one paragraph).
-  authors = person(
-    given = "Sam A.", # Your First Name
-    family = "Welch", # Your Last Name
-    email = "saw@niva.no", # Your email
-    role = c("aut", "cre") # Your role (here author/creator)
-  ),
-  repo_url = "https://github.com/sawelch-NIVA/STOPeData", # The URL of the GitHub repo (optional),
   pkg_version = "0.0.0.9002", # The version of the package containing the app
   set_options = TRUE # Set the global golem options
 )
@@ -62,11 +55,6 @@ golem::use_utils_server(with_test = TRUE)
 
 ## Use git ----
 usethis::use_git()
-## Sets the remote associated with 'name' to 'url'
-usethis::use_git_remote(
-  name = "origin",
-  url = "https://github.com/sawelch-NIVA/STOPeData.git"
-)
 
 # You're now set! ----
 

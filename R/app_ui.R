@@ -202,7 +202,7 @@ app_ui <- function(request) {
         tooltip(
           tags$a(
             bsicons::bs_icon("github"),
-            href = "https://github.com/NIVANorge/STOPeData",
+            href = "https://github.com/",
             target = "_blank",
             class = "nav-link"
           ),
@@ -251,21 +251,6 @@ app_ui <- function(request) {
             )),
             type = "primary"
           )
-        ),
-        div(
-          style = "margin: 0px 5px 10px 15px; font-size: var(--font-size-sm)",
-          HTML(paste0(
-            "This app is developed by Sam Welch with assistance from Viviane Giradin, Kim Leirvik, and Knut Erik Tollefsen. Work on this tool has been funded by ",
-            '<a href="https://www.niva.no/en/projects/parc">PARC</a>,',
-            ' <a href="https://www.niva.no/en/projects/expect">EXPECT</a>,',
-            ' and <a href="https://www.niva.no/en/featured-pages/nctp">NCTP</a>.',
-            " This app is currently in development and no responsibility is accepted for crashes or data loss. ",
-            "App Version: ",
-            "<em>",
-            golem::get_golem_version(),
-            "</em>",
-            "."
-          ))
         )
       )
     )

@@ -44,11 +44,11 @@ zenodo_resource_types <- c(
 #'   title = "Marine contaminant monitoring 2020-2022",
 #'   description = "Trace metal concentrations in blue mussels from Norwegian fjords.",
 #'   authors = list(
-#'     list(first = "Jane", last = "Smith", affiliation = "NIVA", orcid = "")
+#'     list(first = "Jane", last = "Smith", affiliation = "Misc", orcid = "")
 #'   ),
 #'   license_id = "cc-by-4.0",
 #'   contact_name = "Jane Smith",
-#'   contact_email = "jane.smith@niva.no"
+#'   contact_email = "jane.smith@misc.com"
 #' )
 #' cat(readme)
 #' @importFrom glue glue

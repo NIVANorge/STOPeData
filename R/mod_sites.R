@@ -64,7 +64,7 @@ mod_sites_ui <- function(id) {
                 "Project/Campaign-related short name to append to all site codes in format base_nnn"
               ),
               value = "",
-              placeholder = "e.g., NIVA_AQUAMONITOR_",
+              placeholder = "e.g., AQUAMONITOR_",
               width = "200px"
             ),
 
