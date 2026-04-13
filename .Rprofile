@@ -54,7 +54,7 @@ if (interactive()) {
   message("Session User: ", Sys.info()["user"])
 }
 
-cli::cli_rule(left = "Session ready")
+
 
 options(
   prompt = "R > ",
