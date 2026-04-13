@@ -1,14 +1,14 @@
 source("renv/activate.R")
 #### -- Consistent File Downloads -- ####
-if (.Platform$OS.type == "windows") {
-  options(
-    download.file.method = "wininet"
-  )
-} else {
-  options(
-    download.file.method = "libcurl"
-  )
-}
+# if (.Platform$OS.type == "windows") {
+#   options(
+#     download.file.method = "wininet"
+#   )
+# } else {
+#   options(
+#     download.file.method = "libcurl"
+#   )
+# }
 
 #### -- Set CRAN -- ####
 options(
@@ -53,7 +53,6 @@ if (interactive()) {
   message("Session Info: ", utils::sessionInfo()[[4]])
   message("Session User: ", Sys.info()["user"])
 }
-
 
 
 options(
