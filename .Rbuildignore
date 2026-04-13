@@ -25,3 +25,4 @@ _\.new\.png$
 ^vignettes/\.quarto$
 ^vignettes/*_files$
 ^codecov\.yml$
+^README\.Qmd$

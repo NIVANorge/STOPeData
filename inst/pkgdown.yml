@@ -1,11 +1,11 @@
-pandoc: '3.9'
+pandoc: 3.9.0.2
 pkgdown: 2.2.0
 pkgdown_sha: ~
 articles:
   articles/application: application.html
   application_data: application_data.html
   naming: naming.html
-last_built: 2026-04-01T12:50Z
+last_built: 2026-04-13T10:46Z
 urls:
   reference: https://nivanorge.github.io/STOPeData/reference
   article: https://nivanorge.github.io/STOPeData/articles

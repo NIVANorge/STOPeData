@@ -1,5 +1,14 @@
+# Needed for docker/kubernetes
 # Install pak
-install.packages("pak", repos = sprintf("https://r-lib.github.io/p/pak/stable/%s/%s/%s", .Platform$pkgType, R.Version()$os, R.Version()$arch))
+install.packages(
+  "pak",
+  repos = sprintf(
+    "https://r-lib.github.io/p/pak/stable/%s/%s/%s",
+    .Platform$pkgType,
+    R.Version()$os,
+    R.Version()$arch
+  )
+)
 
 # Install all packages in one call for better dependency resolution
 pak::pkg_install(c(

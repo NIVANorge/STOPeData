@@ -1,0 +1,70 @@
+---
+format: 
+  html: default
+  gfm: default
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# STOPeData
+
+<!-- badges: start -->
+[![R](https://img.shields.io/badge/R-%23276DC3.svg?logo=r&logoColor=white)](#)
+[![R-CMD-check](https://github.com/NIVANorge/STOPeData/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NIVANorge/STOPeData/actions/workflows/R-CMD-check.yaml)
+<!-- badges: end -->
+
+This app designed to guide users through the formatting, cleaning and annotation of exposure/pollution/monitoring data (e.g. mg/L of a chemical in an environmental matrix). Published studies and reports are an important source of this data, but it is often fragmented and difficult to analyse without extensive data cleaning and transformation. By assisting and automating this step, we hope to make exposure assessment - and therefore the risk assessment of chemicals in the environment - as easy as possible.
+
+## Installation
+
+You can install the development version of STOPeData from the [GitHub Repository](https://github.com/NIVANorge/STOPeData) with the `{devtools}` package:
+
+```{r}
+devtools::install_github("NIVANorge/STOPeData")
+```
+
+This will also install [eDataDRF](github.com/NIVANorge/eDataDRF), which defines the format. Run the Shiny application as below.
+
+```{r}
+STOPeData::run_app()
+```
+
+Some functionality will be unavailable until you add the appropriate API keys/variables to your `.Renviron` file.
+
+## About
+
+This app is part of the [Source to Outcome Pathway/Risk assessment database](https://www.niva.no/radb) family of R Shiny apps, and provides one-half of the data necessary for environmental risk assessment. Its counterpart for toxicity/bioassay data is [STOP qData](https://github.com/NIVANorge/stop-q-data). Environmental risk predictions can be viewed at the [Source To Outcome Predictor](https://github.com/NIVANorge/STOP). 
+
+### Environmental Variables
+
+```{toml}
+# Local Information
+EDATA_USERNAME = "" # Application will attempt to get your username from here or the HTTP header if you're logged in 
+EDATA_BUILD = "Local" # Or Dev, Prod
+# API Keys
+ANTHROPIC_API_KEY="sk-ant-api03-..."
+ZENODO_TOKEN="..."
+ZENODO_SANDBOX_TOKEN="..."
+```
+
+
+## Acknowledgments
+
+* Project Lead: Knut Erik Tollefsen
+* Funding: [EXPECT](https://www.niva.no/en/projects/expect), [PARC](https://www.eu-parc.eu/), and [NCTP](https://www.niva.no/radb) Projects
+* Testers: Li Xi, Knut Erik Tollefsen, Sophie Mentzel, Pierre Blévin, Camden Karon Klefbom
+* Support and Advice: Viviane Giradin, Andrea Merlina, Kim Leirvik, Jemmima Knight, Malcolm Reid
+* An LLM (Anthropic Claude Sonnet 4.5) was used in the creation of this app and its code.
+* Readme template repo: [Best-README-Template](https://github.com/othneildrew/Best-README-Template/blob/main/BLANK_README.md)
+* (If I've left you off please let me know!)
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
