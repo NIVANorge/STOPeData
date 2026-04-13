@@ -30,10 +30,6 @@ jobs:
       R_KEEP_PKG_SOURCE: yes
 
     steps:
-      - name: dependencies on Linux
-        if: runner.os == 'Linux'
-        run: sudo apt-get install -y make libicu-dev libxml2-dev libssl-dev pandoc librdf0-dev libnode-dev libcurl4-gnutls-dev
-
       - uses: actions/checkout@v4
 
       - uses: r-lib/actions/setup-pandoc@v2
@@ -46,8 +42,13 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::rcmdcheck, local::. 
+          extra-packages: any::rcmdcheck
           needs: check
+
+      # Needed or vignettes fail on Windows CHECK
+      - name: Install package
+        run: R CMD INSTALL --no-multiarch --with-keep.source .
+        shell: bash
 
       - uses: r-lib/actions/check-r-package@v2
         with:
