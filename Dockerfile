@@ -17,14 +17,10 @@ RUN apt-get update && apt-get install -y \
 
 WORKDIR /home/shiny/stopedata
 
-
-COPY renv.lock renv.lock
-RUN R -e "install.packages(c('renv', 'pak'), repos = c(CRAN = 'https://cloud.r-project.org'))"
-RUN R -s -e "options(renv.config.pak.enabled = TRUE); renv::restore()"
-# Set the working directory *inside the shiny home directory*
+COPY ./DESCRIPTION ./DESCRIPTION
+RUN R -s -e "install.packages('pak', repos = sprintf('https://r-lib.github.io/p/pak/stable/%s/%s/%s', .Platform\$pkgType, R.Version()\$os, R.Version()\$arch)); pak::local_install_deps()"
 
 COPY manifest.json ./manifest.json
-COPY ./DESCRIPTION ./DESCRIPTION
 COPY ./NAMESPACE ./NAMESPACE
 COPY ./app.R ./app.R 
 COPY ./R ./R
