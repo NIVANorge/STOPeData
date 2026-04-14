@@ -28,7 +28,7 @@ Character vector suitable for use with writeLines()
 
 ``` r
 object_to_text(list(a = 1, b = "hello"), dataset_name = "my_list")
-#> [1] "# my_list"                       "# Exported: 2026-04-01 16:58:20"
+#> [1] "# my_list"                       "# Exported: 2026-04-14 13:22:58"
 #> [3] "# Type: List"                    ""                               
 #> [5] "# Structure:"                    "list(a = 1, b = \"hello\")"     
 object_to_text("already a string")
