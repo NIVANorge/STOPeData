@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     libfribidi-dev \
     libfreetype6-dev \
     libpng-dev \
+    libgdal-dev \
     libtiff5-dev \
     libjpeg-dev \
     && rm -rf /var/lib/apt/lists/*
