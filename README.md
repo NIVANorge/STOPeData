@@ -5,7 +5,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/NIVANorge/STOPeData">
-    <img src="images/stopsquarecropped.png" alt="Logo" width="80" height="80">
+    <img src="main/inst/images/eData_DRF_logo.svg" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">STOP Exposure Data App</h3>
