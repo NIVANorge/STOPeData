@@ -5,7 +5,7 @@
 <br />
 <div align="center">
   <a href="https://github.com/NIVANorge/STOPeData">
-    <img src="main/inst/images/eData_DRF_logo.svg" alt="Logo" width="80" height="80">
+    <img src="https://github.com/NIVANorge/STOPeData/blob/main/inst/images/eData_DRF_logo.svg" alt="Logo" width="80" height="80">
   </a>
 
 <h3 align="center">STOP Exposure Data App</h3>
@@ -24,44 +24,12 @@
   </p>
 </div>
 
-
-
-<!-- TABLE OF CONTENTS -->
-<details>
-  <summary>Table of Contents</summary>
-  <ol>
-    <li>
-      <a href="#about-the-project">About The Project</a>
-      <ul>
-        <li><a href="#built-with">Built With</a></li>
-      </ul>
-    </li>
-    <li>
-      <a href="#getting-started">Getting Started</a>
-      <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
-        <li><a href="#installation">Installation</a></li>
-      </ul>
-    </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contact">Contact</a></li>
-    <li><a href="#acknowledgments">Acknowledgments</a></li>
-  </ol>
-</details>
-
-
-
 <!-- ABOUT THE PROJECT -->
 ## About The Project
-
-![workflow]
 
 This app designed to guide users through the formatting, cleaning and annotation of exposure/pollution/monitoring data (e.g. mg/L of a chemical in an environmental matrix). Published studies and reports are an important source of this data, but it is often fragmented and difficult to analyse without extensive data cleaning and transformation. By assisting and automating this step, we hope to make exposure assessment - and therefore the risk assessment of chemicals in the environment - as easy as possible.
 
 This app is part of the [Source to Outcome Pathway/Risk assessment database](https://www.niva.no/radb) family of R Shiny apps, and provides one-half of the data necessary for environmental risk assessment. Its counterpart for toxicity/bioassay data is [STOP qData](https://github.com/NIVANorge/stop-q-data). Environmental risk predictions can be viewed at the [Source To Outcome Predictor](https://github.com/NIVANorge/STOP). 
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 ### Built With
@@ -72,10 +40,6 @@ This app is part of the [Source to Outcome Pathway/Risk assessment database](htt
 [![R-CMD-check](https://github.com/NIVANorge/STOPeData/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/NIVANorge/STOPeData/actions/workflows/R-CMD-check.yaml)
 [![Codecov test coverage](https://codecov.io/gh/NIVANorge/STOPeData/graph/badge.svg)](https://app.codecov.io/gh/NIVANorge/STOPeData)
 <!-- badges: end -->
-
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
 
 <!-- GETTING STARTED -->
 ## Getting Started
@@ -89,18 +53,19 @@ This app is part of the [Source to Outcome Pathway/Risk assessment database](htt
 
 1. (Optional) Get an [Anthropic API key](https://console.anthropic.com) for LLM data extraction, and Zenodo/Zenodo Sandbox tokens for upload to Zenodo
    
-2a. Clone the repo, or
+  2a. Clone the repo, or
    ```sh
    git clone https://github.com/NIVANorge/STOPeData.git
    ```
 
-2b. Download the package with devtools/pak
+  2b. Download the package with devtools/pak
   ```R
   devtools::install_github("NIVANorge/STOPeData")
   # pak::pak("NIVANorge/STOPeData")
   ```
 
 3. Install missing R packages
+   
 4. (Optional) Enter your API keys/tokens in your `.Renviron` file 
    ```
    ANTHROPIC_API_KEY="sk-ant-api03-..."
@@ -116,46 +81,9 @@ This app is part of the [Source to Outcome Pathway/Risk assessment database](htt
    ```r
    golem::run_dev()
    ```
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-<!-- USAGE EXAMPLES -->
-## Usage
-
-This version of the app demo is hosted on Posit Connect Cloud on my personal account: https://sawelch-niva-stopedata.share.connect.posit.cloud/. This will be migrated to NIVA's standard severs when practical.
-
 ### Screenshots and Diagrams
 
-
-![complicated_workflow]
-An overview of the manual/LLM assisted workflow.
-
-![sites]
-Entering data on sampling sites.
-
-![biota]
-Entering data about sampled organisms.
-
-![creed]
-Assisted assessment of data quality using the CREED framework.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-<!-- ROADMAP -->
-## Roadmap
-
-- [ ] Better test architecture and general bug fixes
-- [ ] More user-friendly session saving
-- [ ] Data extraction from structured formats (e.g. Excel spreadsheets, API calls)
-- [ ] Connection to the Risk Assessment database for lookups and long-term storage
-- [ ] Support for more formats
-
-See the [open issues](https://github.com/NIVANorge/STOPeData/issues) for a full list of proposed features (and known issues).
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
+TODO
 
 <!-- CONTACT -->
 ## Contact
@@ -163,8 +91,6 @@ See the [open issues](https://github.com/NIVANorge/STOPeData/issues) for a full 
 Sam Welch - sam.welch@niva.no
 
 Project Link: [https://github.com/NIVANorge/STOPeData](https://github.com/NIVANorge/STOPeData)
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 
 <!-- ACKNOWLEDGMENTS -->
@@ -176,16 +102,4 @@ Project Link: [https://github.com/NIVANorge/STOPeData](https://github.com/NIVANo
 * Support and Advice: Viviane Giradin, Andrea Merlina, Kim Leirvik, Jemmima Knight, Malcolm Reid
 * An LLM (Anthropic Claude Sonnet 4.5) was used in the creation of this app and its code.
 * Readme template repo: [Best-README-Template](https://github.com/othneildrew/Best-README-Template/blob/main/BLANK_README.md)
-* (If I've left you off please let me know!)
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-[workflow]: images/efve.png
-[sites]: images/mod_sites_screenshot.png
-[creed]: images/mod_creed_screenshot.png
-[biota]: images/mod_biota_screenshot.png
-[complicated_workflow]: inst/app/www/app_mapp.png
