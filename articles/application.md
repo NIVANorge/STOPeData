@@ -1,12 +1,14 @@
 # eData Application
 
 ``` r
+
 library(STOPeData)
 ```
 
 This is how we run the application on our server (see `Dockerfile`):
 
 ``` r
+
 shiny::runApp('app.R', host='0.0.0.0', port=3838)
 
 # this is how I run the app locally when I'm developing it
@@ -19,6 +21,7 @@ options, and calls
 located in `~.R`.
 
 ``` r
+
 logger::log_appender(logger::appender_stdout)
 logger::log_layout(logger::layout_json())
 logger::log_threshold(logger::INFO)
@@ -43,6 +46,7 @@ calls `~/R/run_app.R`, which is a wrapper function created by the
 `Golem` package.
 
 ``` r
+
 run_app <- function(
   onStart = NULL,
   options = list(),
@@ -72,6 +76,7 @@ the ui and server objects created by `~/R/app_ui.R` and
 `~R/app_server.R`.
 
 ``` r
+
 app_ui <- function(request) {
  # ui goes here
 }

@@ -1,6 +1,6 @@
   
 
-[![Logo](images/stopsquarecropped.png)](https://github.com/NIVANorge/STOPeData)
+[![Logo](main/inst/images/eData_DRF_logo.svg)](https://github.com/NIVANorge/STOPeData)
 
 ### STOP Exposure Data App
 
@@ -95,6 +95,7 @@ Predictor](https://github.com/NIVANorge/STOP).
 6.  Run app locally:
 
     ``` r
+
     golem::run_dev()
     ```
 

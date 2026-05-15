@@ -1,6 +1,7 @@
 # Application Data
 
 ``` r
+
 library(STOPeData)
 ```
 
@@ -11,6 +12,7 @@ that is, almost all the app’s data is stored in a big reactiveValues
 object in the main server function.
 
 ``` r
+
 initialise_userData <- function() {
   list(
     ENTERED_BY = character(0),
