@@ -19,3 +19,4 @@ deployment/prod/secrets.env
 docs
 **/.quarto/
 inst/doc
+.vscode/*

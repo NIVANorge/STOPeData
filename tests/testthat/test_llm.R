@@ -7,7 +7,7 @@
 
 # test_chat <- NULL
 # test_chat <- chat_anthropic(
-#   model = "claude-sonnet-4-20250514",
+#   model = "claude-sonnet-4-5-20250929",
 #   params = params(max_tokens = 50)
 # )
 # test_response <- tryCatch(
@@ -24,7 +24,7 @@
 # }
 
 # chat <- chat_anthropic(
-#   model = "claude-sonnet-4-20250514",
+#   model = "claude-sonnet-4-5-20250929",
 #   params = params(max_tokens = 6000)
 # )
 
