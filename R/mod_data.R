@@ -10,7 +10,7 @@
 #' @importFrom rhandsontable rHandsontableOutput
 #' @importFrom shinyjs useShinyjs show hide hidden
 #' @import eDataDRF
-mod_data_ui <- function(id) {
+mod_measurements_ui <- function(id) {
   ns <- NS(id)
 
   tagList(
@@ -116,7 +116,7 @@ mod_data_ui <- function(id) {
 #' @importFrom utils capture.output head
 #' @importFrom purrr is_empty map_lgl
 #' @import eDataDRF
-mod_data_server <- function(id, parent_session) {
+mod_measurements_server <- function(id, parent_session) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
 
@@ -542,7 +542,7 @@ mod_data_server <- function(id, parent_session) {
 
           session$userData$reactiveValues$measurementsData <- new_combinations
           print_dev(glue(
-            "mod_data: All modules validated, created {nrow(session$userData$reactiveValues$measurementsData)} measurement combinations"
+            "mod_measurements: All modules validated, created {nrow(session$userData$reactiveValues$measurementsData)} measurement combinations"
           ))
         }
       } else if (
@@ -550,7 +550,7 @@ mod_data_server <- function(id, parent_session) {
       ) {
         moduleState$data_entry_ready <- FALSE
         session$userData$reactiveValues$measurementsData <- initialise_measurements_tibble()
-        print_dev("mod_data: Some modules pending, data entry disabled")
+        print_dev("mod_measurements: Some modules pending, data entry disabled")
       }
       # We shouldn't need an explicit case for when all modules validate and a save extraction was successful, because
       # that should be covered by the existing code in fct_import.R. hopefully...
@@ -1001,7 +1001,7 @@ mod_data_server <- function(id, parent_session) {
 }
 
 ## To be copied in the UI ----
-# mod_data_ui("data_1")
+# mod_measurements_ui("data_1")
 
 ## To be copied in the server ----
-# mod_data_server("data_1")
+# mod_measurements_server("data_1")

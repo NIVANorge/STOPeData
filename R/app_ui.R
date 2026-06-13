@@ -156,8 +156,8 @@ app_ui <- function(request) {
           "9. Data",
           "Enter measured values, units, and uncertainty."
         ),
-        value = "09-data",
-        mod_data_ui("data"),
+        value = "09-measurements",
+        mod_measurements_ui("measurements"),
         icon = bs_icon("app")
       ),
       nav_panel(

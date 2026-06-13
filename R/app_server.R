@@ -133,8 +133,8 @@ app_server <- function(input, output, session) {
   moduleMethods <- mod_methods_server("methods")
   moduleSamples <- mod_samples_server("samples")
   moduleBiota <- mod_biota_server("biota")
-  moduleData <- mod_data_server(
-    "data",
+  moduleMeasurements <- mod_measurements_server(
+    "measurements",
     parent_session = session
   )
   moduleReview <- mod_review_server(
@@ -160,7 +160,7 @@ app_server <- function(input, output, session) {
     "06-methods",
     "07-samples",
     "08-biota",
-    "09-data",
+    "09-measurements",
     "10-review",
     "12-CREED",
     "13-Zenodo",
