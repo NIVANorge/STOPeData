@@ -162,6 +162,19 @@ mod_llm_ui <- function(id) {
             max = 20000,
             step = 1000,
             width = "100%"
+          ),
+          # TODO: Add warning (or better yet prevent entirely) when dependent data missing
+          selectizeInput(
+            inputId = ns("schema_components"),
+            label = tooltip(
+              list("Extract", bs_icon("info-circle-fill")),
+              "Choose which data sections to extract. All are included by default; deselect any you don't need to reduce cost and response time."
+            ),
+            choices = schema_component_choices,
+            selected = unname(schema_component_choices),
+            multiple = TRUE,
+            width = "100%",
+            options = list(plugins = list("remove_button"))
           )
         ),
 
@@ -195,7 +208,7 @@ mod_llm_ui <- function(id) {
                 bs_icon("cpu"),
                 "Extract Data from PDF"
               )),
-              class = "btn-info"
+              class = "btn-primary"
             ) |>
               disabled(),
             "Extract data from a .pdf using the chosen LLM. A PDF must be uploaded to enable this function."
@@ -206,7 +219,7 @@ mod_llm_ui <- function(id) {
               id = ns("load_dummy_data"),
               label = "Load Dummy Data",
               icon = icon("flask"),
-              class = "btn-info"
+              class = "btn-light"
             ),
             "Load a short dummy dataset for testing or demonstrations, as if you had extracted it from a paper."
           )
@@ -217,10 +230,11 @@ mod_llm_ui <- function(id) {
           uiOutput(ns("extraction_status"))
         ),
 
-        # Extraction self-appraisal
+        # Extraction appraisal
+        # TODO: Update styling
         div(
           h5(
-            "Extraction Self-Appraisal"
+            "Extraction Appraisal"
           ),
           htmlOutput(ns("extraction_comments"))
         ),
@@ -239,6 +253,7 @@ mod_llm_ui <- function(id) {
           )
         )
 
+        # TODO: Reduce sensitivity of module population triggers so they only fire if their data has been updated
         # ## Action buttons for extracted data  ----
         # layout_columns(
         #   fill = FALSE,
@@ -482,6 +497,9 @@ mod_llm_server <- function(id) {
         ),
         ## Prompt and Schema Configuration ----
 
+        # TODO: Add upload/download button for schema and prompt
+        # TODO: Make schema represent user options
+        # TODO: Make schema less ugly
         p("Modify Prompt and Data Structure (Advanced)"),
         div(
           textAreaInput(
@@ -516,14 +534,16 @@ mod_llm_server <- function(id) {
     }) |>
       bindEvent(input$llm_advanced_options)
 
-    ## # observe: Enable extract button when PDF and API key available ----
+    ## # observe: Enable extract/screen buttons when PDF and API key available ----
     # upstream: input$pdf_file, input$api_key, iv
-    # downstream: extract_data button state
+    # downstream: extract_data, screen_data button state
     observe({
       if (!is.null(input$pdf_file) && iv$is_valid()) {
         enable("extract_data")
+        enable("screen_data")
       } else {
         disable("extract_data")
+        disable("screen_data")
       }
     })
 
@@ -605,8 +625,9 @@ mod_llm_server <- function(id) {
         )
       }
     ) |>
-      # we need both this and to invoke in the below observer
-      bind_task_button("extract_data")
+      # we need both this and to invoke in the below observers
+      bind_task_button("extract_data") |>
+      bind_task_button("screen_data")
 
     ## # ExtendedTask: model connection test ----
     test_task <- ExtendedTask$new(
@@ -656,6 +677,48 @@ mod_llm_server <- function(id) {
       }
     })
 
+    ## # observe: Screen PDF (comments-only extraction) ----
+    # upstream: user clicks input$screen_data
+    observe({
+      req(input$pdf_file, input$api_key)
+
+      if (!iv$is_valid()) {
+        showNotification(
+          "Please fix validation errors before screening.",
+          type = "warning"
+        )
+        return()
+      }
+
+      tryCatch(
+        {
+          validate_api_key(input$api_key, input$select_provider)
+        },
+        error = function(e) {
+          showNotification(e$message, type = "warning")
+          return()
+        }
+      )
+
+      provider <- input$select_provider
+      llm_task$invoke(
+        pdf_path = input$pdf_file$datapath,
+        model_provider = provider,
+        model_name = input$select_model,
+        env_var = provider_options[[provider]]$env_var,
+        chat_fn = provider_options[[provider]]$fn,
+        api_key = input$api_key,
+        extraction_prompt = if (isTruthy(input$extraction_prompt)) {
+          input$extraction_prompt
+        } else {
+          create_extraction_prompt()
+        },
+        extraction_schema = create_extraction_schema(include = "comments"),
+        max_tokens = input$max_tokens
+      )
+    }) |>
+      bindEvent(input$screen_data)
+
     ## # observe: PDF data extraction ----
     # upstream: user clicks input$extract_data
     # downstream: moduleState$*, session$userData$reactiveValues$*DataLLM
@@ -683,20 +746,6 @@ mod_llm_server <- function(id) {
         }
       )
 
-      # # Optional: Test connection (also fast, but could be async too)
-      # tryCatch(
-      #   {
-      #     test_llm_connection(input$api_key)
-      #   },
-      #   error = function(e) {
-      #     showNotification(
-      #       paste("Connection failed:", e$message),
-      #       type = "error"
-      #     )
-      #     return()
-      #   }
-      # )
-
       # Launch async extraction
       provider <- input$select_provider
       llm_task$invoke(
@@ -711,7 +760,9 @@ mod_llm_server <- function(id) {
         } else {
           create_extraction_prompt()
         },
-        extraction_schema = create_extraction_schema(),
+        extraction_schema = create_extraction_schema(
+          include = input$schema_components
+        ),
         max_tokens = input$max_tokens
       )
     }) |>
@@ -1208,7 +1259,7 @@ render_extraction_comments <- function(named_list) {
         "paper_reliability" = "Reliability",
         "paper_data_source" = "Original Data",
         "paper_data_available" = "Data Availability",
-        "extraction_assessement" = "Extraction Grade"
+        "extraction_assessement" = "Extraction Suitability"
       )
       score_emoji <- c(
         # emoji coloured circles
