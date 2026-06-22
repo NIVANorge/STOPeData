@@ -1,6 +1,10 @@
 # LLM Extraction Module ----
 # A Shiny module for PDF upload and automated data extraction using Claude
 
+# TODO: Allow running paper "Inspection" before full call
+# TODO: Report paper size (mb and page number)
+# TODO: Parse HTTP error codes and provide useful feedback
+
 # hard-coded list of possible providers. will need to be updated manually.
 # can only call models_*() if an API key is already available
 provider_options <- list(
@@ -17,7 +21,7 @@ provider_options <- list(
   `Google Gemini` = list(
     env_var = "GOOGLE_API_KEY",
     fn = "chat_google_gemini",
-    models = c("gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash")
+    models = "models_google_gemini"
   )
 )
 
@@ -76,31 +80,39 @@ mod_llm_ui <- function(id) {
             buttonLabel = "Browse...",
           ),
 
+          ### Provider / model / advanced settings ----
+          selectInput(
+            inputId = ns("select_provider"),
+            label = tooltip(
+              list("Choose LLM provider", bs_icon("info-circle-fill")),
+              "Select the AI provider: Anthropic (Claude), OpenAI (GPT), or Google (Gemini)."
+            ),
+            choices = names(provider_options),
+            multiple = FALSE
+          ),
+          selectInput(
+            inputId = ns("select_model"),
+            label = tooltip(
+              list("Choose LLM", bs_icon("info-circle-fill")),
+              "Select the specific language model. Models are populated after a valid API key is detected."
+            ),
+            choices = c("Select a provider first"),
+            multiple = FALSE
+          ),
+          actionButton(
+            inputId = ns("llm_advanced_options"),
+            label = tagList(bs_icon("sliders"), "Advanced"),
+            class = "btn-secondary"
+          ),
           ### API key input ----
-          selectInput(
-            inputId = "select_provider",
-            label = "Choose LLM provider",
-            choices = c("A", "B", "C"),
-            multiple = FALSE
-          ),
-          selectInput(
-            inputId = "select_model",
-            label = "Choose LLM",
-            choices = c("LLM1", "LLM2"),
-            multiple = FALSE
-          ),
-          input_task_button(
-            id = "llm_advanced_options",
-            label = list(bsicons::bs_icon("bing"))
-          ),
           passwordInput(
             inputId = ns("api_key"),
             label = tooltip(
-              list("Anthropic API Key", bs_icon("info-circle-fill")),
-              "Your Anthropic API key for Claude access. Set ANTHROPIC_API_KEY environment variable to avoid entering this each time."
+              list("LLM API Key", bs_icon("info-circle-fill")),
+              "Your API key for the selected provider. Set the corresponding environment variable (ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY) to avoid re-entering it each session."
             ),
             value = Sys.getenv("ANTHROPIC_API_KEY", unset = ""),
-            placeholder = "sk-ant-...",
+            placeholder = "e.g. sk-ant-..., sk-..., or AIza...",
             width = "100%"
           ),
           ### max_tokens input ----
@@ -238,7 +250,7 @@ mod_llm_ui <- function(id) {
 #' LLM Extraction Server Functions ----
 #'
 #' @noRd
-#' @importFrom shiny moduleServer reactive reactiveValues observe renderText renderUI showNotification updateTextAreaInput ExtendedTask
+#' @importFrom shiny moduleServer reactive reactiveValues observe renderText renderUI showNotification updateTextAreaInput ExtendedTask showModal modalDialog modalButton updateSelectInput
 #' @importFrom shinyvalidate InputValidator sv_required
 #' @importFrom mirai mirai
 #' @importFrom shinyjs enable disable
@@ -271,8 +283,26 @@ mod_llm_server <- function(id) {
 
     iv$add_rule("api_key", sv_required())
     iv$add_rule("api_key", function(value) {
-      if (isTruthy(value) && !startsWith(value, "sk-ant")) {
-        "API key must start with 'sk-ant'"
+      if (!isTruthy(value)) {
+        return(NULL)
+      }
+      provider <- input$select_provider
+      valid <- switch(
+        provider %||% "Anthropic",
+        "Anthropic" = startsWith(value, "sk-ant-"),
+        "OpenAI" = startsWith(value, "sk-") && !startsWith(value, "sk-ant-"),
+        "Google Gemini" = startsWith(value, "AIza"),
+        TRUE
+      )
+      if (!valid) {
+        hint <- switch(
+          provider %||% "Anthropic",
+          "Anthropic" = "'sk-ant-'",
+          "OpenAI" = "'sk-'",
+          "Google Gemini" = "'AIza'",
+          "the expected prefix"
+        )
+        paste0("API keys for ", provider, " should start ", hint)
       }
     })
     iv$add_rule("api_key", function(value) {
@@ -309,6 +339,95 @@ mod_llm_server <- function(id) {
       showNotification("Configuration reset to defaults", type = "message")
     }) |>
       bindEvent(input$reset_defaults)
+
+    ## # observe: Update API key field when provider changes ----
+    observe({
+      provider <- input$select_provider
+      req(provider)
+      env_var <- provider_options[[provider]]$env_var
+      updateTextInput(
+        session,
+        "api_key",
+        value = Sys.getenv(env_var, unset = "")
+      )
+    }) |>
+      bindEvent(input$select_provider, ignoreInit = TRUE)
+
+    ## # observe: Update model list when provider or API key changes ----
+    observe({
+      provider <- input$select_provider
+      api_key <- input$api_key
+      # TODO: Only check if API key actually valid form
+      req(provider)
+
+      model_spec <- provider_options[[provider]]$models
+
+      if (is.character(model_spec) && length(model_spec) > 1) {
+        # Static list (e.g. Google Gemini)
+        updateSelectInput(session, "select_model", choices = model_spec)
+      } else if (
+        is.character(model_spec) && length(model_spec) == 1 && isTruthy(api_key)
+      ) {
+        # Dynamic: call ellmer::models_*() if a key is present
+        tryCatch(
+          {
+            models <- do.call(
+              getExportedValue("ellmer", model_spec),
+              list()
+            )
+
+            # currently only Anthropic models have names
+            model_names <- if ("name" %in% colnames(models)) {
+              pull(models, "name")
+            } else {
+              pull(models, "id")
+            }
+
+            updateSelectInput(session, "select_model", choices = model_names)
+          },
+          error = function(e) {
+            updateSelectInput(
+              session,
+              "select_model",
+              choices = c("Could not fetch models - check API key")
+            )
+          }
+        )
+      } else {
+        updateSelectInput(
+          session,
+          "select_model",
+          choices = c("Enter a valid API key to load models")
+        )
+      }
+    }) |>
+      bindEvent(input$select_provider, input$api_key)
+
+    ## # observe: Advanced settings modal ----
+    observe({
+      showModal(modalDialog(
+        title = tagList(bs_icon("sliders"), " Advanced LLM Settings"),
+        span(
+          "Check to enable all offered LLMs as options, even those that might not work"
+        ),
+        #todo: make this work
+        # todo: add an optional param call
+        checkboxInput(
+          ns("enable_all_models"),
+          label = "Enable all LLMs as choices"
+        ),
+        p("Status Dashboards - Check Provider Status"),
+        span(
+          "https://status.claude.com/",
+          "https://status.openai.com/",
+          "https://aistudio.google.com/status"
+        ),
+        footer = modalButton("Close"),
+        easyClose = TRUE,
+        size = "m"
+      ))
+    }) |>
+      bindEvent(input$llm_advanced_options)
 
     ## # observe: Enable extract button when PDF and API key available ----
     # upstream: input$pdf_file, input$api_key, iv
