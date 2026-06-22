@@ -7,21 +7,39 @@
 
 # hard-coded list of possible providers. will need to be updated manually.
 # can only call models_*() if an API key is already available
+# curated_models: named vector (display name = API id) of recommended mid-tier models.
+# Update when providers release new generations. Current as of June 2026.
 provider_options <- list(
   Anthropic = list(
     env_var = "ANTHROPIC_API_KEY",
     fn = "chat_anthropic",
-    models = "models_anthropic"
+    models = "models_anthropic",
+    curated_models = c(
+      "Claude Haiku 4.5" = "claude-haiku-4-5",
+      "Claude Sonnet 4.6" = "claude-sonnet-4-6",
+      "Claude Opus 4.7" = "claude-opus-4-7",
+      "Claude Opus 4.8" = "claude-opus-4-8"
+    )
   ),
   OpenAI = list(
     env_var = "OPENAI_API_KEY",
     fn = "chat_openai",
-    models = "models_openai"
+    models = "models_openai",
+    curated_models = c(
+      "GPT-5.4 Mini" = "gpt-5.4-mini",
+      "GPT-5.4" = "gpt-5.4",
+      "GPT-5.5" = "gpt-5.5"
+    )
   ),
   `Google Gemini` = list(
     env_var = "GOOGLE_API_KEY",
     fn = "chat_google_gemini",
-    models = "models_google_gemini"
+    models = "models_google_gemini",
+    curated_models = c(
+      "Gemini 2.5 Flash" = "gemini-2.5-flash",
+      "Gemini 3.1 Pro" = "gemini-3.1-pro",
+      "Gemini 3.5 Flash" = "gemini-3.5-flash"
+    )
   )
 )
 
@@ -84,25 +102,35 @@ mod_llm_ui <- function(id) {
           selectInput(
             inputId = ns("select_provider"),
             label = tooltip(
-              list("Choose LLM provider", bs_icon("info-circle-fill")),
+              list("Choose provider", bs_icon("info-circle-fill")),
               "Select the AI provider: Anthropic (Claude), OpenAI (GPT), or Google (Gemini)."
             ),
             choices = names(provider_options),
             multiple = FALSE
           ),
-          selectInput(
-            inputId = ns("select_model"),
-            label = tooltip(
-              list("Choose LLM", bs_icon("info-circle-fill")),
-              "Select the specific language model. Models are populated after a valid API key is detected."
+          div(
+            class = "d-flex align-items-end gap-2",
+            div(
+              class = "flex-grow-1",
+              selectInput(
+                inputId = ns("select_model"),
+                label = tooltip(
+                  list("Choose LLM", bs_icon("info-circle-fill")),
+                  "Select the specific language model. Models are populated after a valid API key is detected."
+                ),
+                choices = c("Select a provider first"),
+                multiple = FALSE,
+                width = "100%"
+              )
             ),
-            choices = c("Select a provider first"),
-            multiple = FALSE
-          ),
-          actionButton(
-            inputId = ns("llm_advanced_options"),
-            label = tagList(bs_icon("sliders"), "Advanced"),
-            class = "btn-secondary"
+            tooltip(
+              input_task_button(
+                id = ns("test_model"),
+                label = bs_icon("plug"),
+                class = "btn-secondary mb-3"
+              ),
+              "Ping the selected model with a minimal request to check your key and connection."
+            )
           ),
           ### API key input ----
           passwordInput(
@@ -112,7 +140,7 @@ mod_llm_ui <- function(id) {
               "Your API key for the selected provider. Set the corresponding environment variable (ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY) to avoid re-entering it each session."
             ),
             value = Sys.getenv("ANTHROPIC_API_KEY", unset = ""),
-            placeholder = "e.g. sk-ant-..., sk-..., or AIza...",
+            placeholder = "e.g. sk-ant-..., sk-..., or AQ...",
             width = "100%"
           ),
           ### max_tokens input ----
@@ -129,42 +157,16 @@ mod_llm_ui <- function(id) {
             width = "100%"
           )
         ),
-
-        ## Prompt and Schema Configuration ----
-        accordion(
-          id = ns("config_accordion"),
-          open = FALSE,
-          accordion_panel(
-            title = "Modify Prompt and Data Structure (Advanced)",
-            icon = bs_icon("gear"),
-            div(
-              textAreaInput(
-                inputId = ns("extraction_prompt"),
-                label = "Extraction Instructions",
-                value = create_extraction_prompt(),
-                rows = 8,
-                width = "100%"
-              ),
-
-              textAreaInput(
-                inputId = ns("extraction_schema_display"),
-                label = "Schema Definition",
-                value = get_schema_display(),
-                rows = 12,
-                width = "100%"
-              ),
-
-              div(
-                style = "margin-top: 10px;",
-                actionButton(
-                  ns("reset_defaults"),
-                  "Reset to Defaults",
-                  class = "btn-secondary btn-sm"
-                )
-              )
-            )
-          )
+        tooltip(
+          actionButton(
+            inputId = ns("llm_advanced_options"),
+            label = tagList(bs_icon("sliders")),
+            class = "btn-secondary"
+          ),
+          "Advanced settings for LLM extraction. Recommended for experienced users."
         ),
+
+        uiOutput("pdf_info_ui"),
 
         ## Extract buttons ----
         layout_columns(
@@ -260,6 +262,7 @@ mod_llm_ui <- function(id) {
 #' @importFrom ellmer chat_anthropic params content_pdf_file type_object type_string type_integer type_number type_array
 #' @importFrom utils str
 #' @importFrom tibble as_tibble
+#' @importFrom pdftools pdf_info
 mod_llm_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
@@ -291,7 +294,7 @@ mod_llm_server <- function(id) {
         provider %||% "Anthropic",
         "Anthropic" = startsWith(value, "sk-ant-"),
         "OpenAI" = startsWith(value, "sk-") && !startsWith(value, "sk-ant-"),
-        "Google Gemini" = startsWith(value, "AIza"),
+        "Google Gemini" = startsWith(value, "AQ."),
         TRUE
       )
       if (!valid) {
@@ -299,7 +302,7 @@ mod_llm_server <- function(id) {
           provider %||% "Anthropic",
           "Anthropic" = "'sk-ant-'",
           "OpenAI" = "'sk-'",
-          "Google Gemini" = "'AIza'",
+          "Google Gemini" = "'AQ.'",
           "the expected prefix"
         )
         paste0("API keys for ", provider, " should start ", hint)
@@ -323,6 +326,15 @@ mod_llm_server <- function(id) {
     )
 
     # 2. Observers and Reactives ----
+
+    # reactive: PDF metadata — fires immediately on upload, no API call needed
+    pdf_meta <- reactive({
+      req(input$pdf_file)
+      path <- input$pdf_file$datapath
+      info <- pdf_info(path)
+      size <- file.size(path)
+      list(pages = info$pages, size = size)
+    })
 
     ## # observe: Reset configuration to defaults ----
     observe({
@@ -353,22 +365,27 @@ mod_llm_server <- function(id) {
     }) |>
       bindEvent(input$select_provider, ignoreInit = TRUE)
 
-    ## # observe: Update model list when provider or API key changes ----
+    ## # observe: Update model list when provider, key, or filter changes ----
     observe({
       provider <- input$select_provider
       api_key <- input$api_key
-      # TODO: Only check if API key actually valid form
       req(provider)
 
-      model_spec <- provider_options[[provider]]$models
+      # NULL before modal is opened = default curated view
+      show_all <- isTRUE(input$enable_all_models)
 
-      if (is.character(model_spec) && length(model_spec) > 1) {
-        # Static list (e.g. Google Gemini)
-        updateSelectInput(session, "select_model", choices = model_spec)
-      } else if (
-        is.character(model_spec) && length(model_spec) == 1 && isTruthy(api_key)
-      ) {
-        # Dynamic: call ellmer::models_*() if a key is present
+      if (!show_all) {
+        updateSelectInput(
+          session,
+          "select_model",
+          choices = provider_options[[provider]]$curated_models
+        )
+        return()
+      }
+
+      # Full model list via ellmer API call
+      model_spec <- provider_options[[provider]]$models
+      if (isTruthy(api_key)) {
         tryCatch(
           {
             models <- do.call(
@@ -376,14 +393,14 @@ mod_llm_server <- function(id) {
               list()
             )
 
-            # currently only Anthropic models have names
-            model_names <- if ("name" %in% colnames(models)) {
-              pull(models, "name")
+            # Use named vector: label = pretty name, value = bare ID
+            model_choices <- if ("name" %in% colnames(models)) {
+              setNames(pull(models, "id"), pull(models, "name"))
             } else {
               pull(models, "id")
             }
 
-            updateSelectInput(session, "select_model", choices = model_names)
+            updateSelectInput(session, "select_model", choices = model_choices)
           },
           error = function(e) {
             updateSelectInput(
@@ -401,30 +418,83 @@ mod_llm_server <- function(id) {
         )
       }
     }) |>
-      bindEvent(input$select_provider, input$api_key)
+      bindEvent(
+        input$select_provider,
+        input$api_key,
+        input$enable_all_models,
+        ignoreNULL = FALSE
+      )
 
     ## # observe: Advanced settings modal ----
     observe({
       showModal(modalDialog(
         title = tagList(bs_icon("sliders"), " Advanced LLM Settings"),
-        span(
-          "Check to enable all offered LLMs as options, even those that might not work"
-        ),
-        #todo: make this work
-        # todo: add an optional param call
+        h6("Model Selection"),
         checkboxInput(
           ns("enable_all_models"),
-          label = "Enable all LLMs as choices"
+          label = "Show all available models",
+          value = isTRUE(input$enable_all_models)
         ),
-        p("Status Dashboards - Check Provider Status"),
-        span(
-          "https://status.claude.com/",
-          "https://status.openai.com/",
-          "https://aistudio.google.com/status"
+        helpText(
+          "By default only recommended mid-tier models are shown. Check to display all available models (including those which probably won't work)."
+        ),
+        tags$hr(),
+        h6("Provider Status"),
+        p("Check provider status dashboard for any reported model issues."),
+        tags$ul(
+          tags$li(tags$a(
+            "Anthropic",
+            href = "https://status.anthropic.com/",
+            target = "_blank"
+          )),
+          tags$li(tags$a(
+            "OpenAI",
+            href = "https://status.openai.com/",
+            target = "_blank"
+          )),
+          tags$li(tags$a(
+            "Google AI",
+            href = "https://aistudio.google.com/status",
+            target = "_blank"
+          ))
+        ),
+        tags$hr(),
+        h6("Call Parameters"),
+        p(
+          "Additional LLM call settings (temperature, retry behaviour, etc.) will appear here."
+        ),
+        ## Prompt and Schema Configuration ----
+
+        p("Modify Prompt and Data Structure (Advanced)"),
+        div(
+          textAreaInput(
+            inputId = ns("extraction_prompt"),
+            label = "Extraction Instructions",
+            value = create_extraction_prompt(),
+            rows = 8,
+            width = "100%"
+          ),
+
+          textAreaInput(
+            inputId = ns("extraction_schema_display"),
+            label = "Schema Definition",
+            value = get_schema_display(),
+            rows = 12,
+            width = "100%"
+          ),
+
+          div(
+            style = "margin-top: 10px;",
+            actionButton(
+              ns("reset_defaults"),
+              "Reset to Defaults",
+              class = "btn-secondary btn-sm"
+            )
+          )
         ),
         footer = modalButton("Close"),
         easyClose = TRUE,
-        size = "m"
+        size = "xl"
       ))
     }) |>
       bindEvent(input$llm_advanced_options)
@@ -483,6 +553,10 @@ mod_llm_server <- function(id) {
     llm_task <- ExtendedTask$new(
       function(
         pdf_path,
+        model_provider,
+        model_name,
+        env_var,
+        chat_fn,
         api_key,
         extraction_prompt,
         extraction_schema,
@@ -492,6 +566,10 @@ mod_llm_server <- function(id) {
           {
             extract_pdf_with_llm(
               pdf_path,
+              model_provider,
+              model_name,
+              env_var,
+              chat_fn,
               api_key,
               extraction_prompt,
               extraction_schema,
@@ -499,6 +577,10 @@ mod_llm_server <- function(id) {
             )
           },
           pdf_path = pdf_path,
+          model_provider = model_provider,
+          model_name = model_name,
+          env_var = env_var,
+          chat_fn = chat_fn,
           api_key = api_key,
           extraction_prompt = extraction_prompt,
           extraction_schema = extraction_schema,
@@ -508,6 +590,54 @@ mod_llm_server <- function(id) {
     ) |>
       # we need both this and to invoke in the below observer
       bind_task_button("extract_data")
+
+    ## # ExtendedTask: model connection test ----
+    test_task <- ExtendedTask$new(
+      function(model_provider, model_name, env_var, chat_fn, api_key) {
+        mirai(
+          {
+            test_llm_connection(
+              model_provider,
+              model_name,
+              env_var,
+              chat_fn,
+              api_key
+            )
+          },
+          model_provider = model_provider,
+          model_name = model_name,
+          env_var = env_var,
+          chat_fn = chat_fn,
+          api_key = api_key
+        )
+      }
+    ) |>
+      bind_task_button("test_model")
+
+    ## # observe: invoke model connection test ----
+    observe({
+      req(input$api_key, input$select_model, input$select_provider)
+      provider <- input$select_provider
+      test_task$invoke(
+        model_provider = provider,
+        model_name = input$select_model,
+        env_var = provider_options[[provider]]$env_var,
+        chat_fn = provider_options[[provider]]$fn,
+        api_key = input$api_key
+      )
+    }) |>
+      bindEvent(input$test_model)
+
+    ## # observe: show test result notification ----
+    observe({
+      result <- test_task$result()
+      req(!is.null(result))
+      if (isTRUE(result$success)) {
+        showNotification(result$message, type = "message", duration = 10)
+      } else {
+        showNotification(result$message, type = "error", duration = 15)
+      }
+    })
 
     ## # observe: PDF data extraction ----
     # upstream: user clicks input$extract_data
@@ -528,7 +658,7 @@ mod_llm_server <- function(id) {
       # Synchronous validation (fast)
       tryCatch(
         {
-          validate_api_key(input$api_key)
+          validate_api_key(input$api_key, input$select_provider)
         },
         error = function(e) {
           showNotification(e$message, type = "warning")
@@ -551,8 +681,13 @@ mod_llm_server <- function(id) {
       # )
 
       # Launch async extraction
+      provider <- input$select_provider
       llm_task$invoke(
         pdf_path = input$pdf_file$datapath,
+        model_provider = provider,
+        model_name = input$select_model,
+        env_var = provider_options[[provider]]$env_var,
+        chat_fn = provider_options[[provider]]$fn,
         api_key = input$api_key,
         extraction_prompt = if (isTruthy(input$extraction_prompt)) {
           input$extraction_prompt
@@ -795,6 +930,24 @@ mod_llm_server <- function(id) {
 
     # 3. Outputs ----
 
+    ## # output: pdf basic info ----
+    output$pdf_info_ui <- renderUI({
+      m <- pdf_meta()
+      div(
+        class = "d-flex gap-3 mb-2",
+        div(
+          class = "text-center flex-fill border rounded p-2",
+          div(class = "fs-4 fw-bold text-primary", m$pages),
+          div(class = "small text-muted", "pages")
+        ),
+        div(
+          class = "text-center flex-fill border rounded p-2",
+          div(class = "fs-4 fw-bold text-primary", fmt_bytes(m$size)),
+          div(class = "small text-muted", "file size")
+        )
+      )
+    })
+
     ## # output: extraction_status ----
     # upstream: moduleState
     # downstream: UI status display
@@ -842,6 +995,7 @@ mod_llm_server <- function(id) {
         # Build status message
         status_text <- "Extraction successful."
 
+        # TODO: Fix cost being NA
         if (!is.null(result$metadata$total_cost)) {
           metadata_text <- paste0(
             " (Cost: $",
@@ -867,6 +1021,12 @@ mod_llm_server <- function(id) {
         moduleState$error_message <- error_msg
         session$userData$reactiveValues$llmExtractionComplete <- TRUE
         session$userData$reactiveValues$llmExtractionSuccessful <- FALSE
+
+        showNotification(
+          paste("Extraction failed:", error_msg),
+          type = "error",
+          duration = 15
+        )
 
         div(
           bs_icon("exclamation-triangle"),

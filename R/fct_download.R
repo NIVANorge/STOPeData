@@ -94,7 +94,11 @@ get_export_metadata <- function(session = NULL) {
     campaign_name = rv$campaignData$CAMPAIGN_NAME,
     export_datetime = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"),
     app_name = "STOPeData",
-    llm_version = "claude-sonnet-4-5-20250929", # set manually in mod_llm_fct_extract
+    # TODO: Add missing LLM data
+    llm_provider = "FIXME",
+    llm_version = "claude-sonnet-4-5-20250929", # TODO: set manually in mod_llm_fct_extract
+    llm_extraction_cost = "fixme",
+    llm_extraction_time_expended = "fixme",
     clientData = paste(
       sep = "",
       "protocol: ",
@@ -115,7 +119,10 @@ get_export_metadata <- function(session = NULL) {
     ),
     app_version = get_golem_version() %||% "Version not available",
     format_version = packageDescription("eDataDRF")$Version,
-    user = rv$ENTERED_BY %||% "Unknown user"
+    user = rv$ENTERED_BY %||% "Unknown user",
+    # TODO: Add missing user data
+    user_email = "fixme",
+    username = "fixme"
   )
 }
 
