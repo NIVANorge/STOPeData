@@ -1,6 +1,27 @@
 # LLM Extraction Module ----
 # A Shiny module for PDF upload and automated data extraction using Claude
 
+# hard-coded list of possible providers. will need to be updated manually.
+# can only call models_*() if an API key is already available
+provider_options <- list(
+  Anthropic = list(
+    env_var = "ANTHROPIC_API_KEY",
+    fn = "chat_anthropic",
+    models = "models_anthropic"
+  ),
+  OpenAI = list(
+    env_var = "OPENAI_API_KEY",
+    fn = "chat_openai",
+    models = "models_openai"
+  ),
+  `Google Gemini` = list(
+    env_var = "GOOGLE_API_KEY",
+    fn = "chat_google_gemini",
+    models = c("gemini-2.0-flash", "gemini-1.5-pro", "gemini-1.5-flash")
+  )
+)
+
+
 #' LLM Extraction UI Function ----
 #' @noRd
 #'
@@ -56,6 +77,22 @@ mod_llm_ui <- function(id) {
           ),
 
           ### API key input ----
+          selectInput(
+            inputId = "select_provider",
+            label = "Choose LLM provider",
+            choices = c("A", "B", "C"),
+            multiple = FALSE
+          ),
+          selectInput(
+            inputId = "select_model",
+            label = "Choose LLM",
+            choices = c("LLM1", "LLM2"),
+            multiple = FALSE
+          ),
+          input_task_button(
+            id = "llm_advanced_options",
+            label = list(bsicons::bs_icon("bing"))
+          ),
           passwordInput(
             inputId = ns("api_key"),
             label = tooltip(
