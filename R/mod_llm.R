@@ -3,7 +3,7 @@
 
 # TODO: Allow running paper "Inspection" before full call
 # TODO: Report paper size (mb and page number)
-# TODO: Parse HTTP error codes and provide useful feedback
+# TODO: Remove excessively complicated BS layout code
 
 # hard-coded list of possible providers. will need to be updated manually.
 # can only call models_*() if an API key is already available
@@ -36,8 +36,10 @@ provider_options <- list(
     fn = "chat_google_gemini",
     models = "models_google_gemini",
     curated_models = c(
+      # TODO: Check these all actually work
+      # TODO: So far, none of them do...
       "Gemini 2.5 Flash" = "gemini-2.5-flash",
-      "Gemini 3.1 Pro" = "gemini-3.1-pro",
+      "Gemini 3.1 Pro" = "gemini-3.1-pro-preview",
       "Gemini 3.5 Flash" = "gemini-3.5-flash"
     )
   )
@@ -98,6 +100,9 @@ mod_llm_ui <- function(id) {
             buttonLabel = "Browse...",
           ),
 
+          # TODO: Make smaller, add some contextual information about page limits and file sizes
+          uiOutput(ns("pdf_info_ui")),
+
           ### Provider / model / advanced settings ----
           selectInput(
             inputId = ns("select_provider"),
@@ -123,6 +128,7 @@ mod_llm_ui <- function(id) {
                 width = "100%"
               )
             ),
+            # TODO: Align button properly with dropdown
             tooltip(
               input_task_button(
                 id = ns("test_model"),
@@ -158,20 +164,30 @@ mod_llm_ui <- function(id) {
             width = "100%"
           )
         ),
-        tooltip(
-          actionButton(
-            inputId = ns("llm_advanced_options"),
-            label = tagList(bs_icon("sliders")),
-            class = "btn-secondary"
-          ),
-          "Advanced settings for LLM extraction. Recommended for experienced users."
-        ),
-
-        uiOutput("pdf_info_ui"),
 
         ## Extract buttons ----
         layout_columns(
           fill = FALSE,
+          tooltip(
+            actionButton(
+              inputId = ns("llm_advanced_options"),
+              label = tagList(bs_icon("sliders")),
+              class = "btn-secondary",
+            ),
+            "Advanced settings for LLM extraction. Recommended for experienced users."
+          ),
+          tooltip(
+            input_task_button(
+              id = ns("screen_data"),
+              label = HTML(paste(
+                bs_icon("lightning-charge"),
+                "Screen PDF for extraction"
+              )),
+              class = "btn-info"
+            ) |>
+              disabled(),
+            "LLM Rapidly screens the PDF for its suitability in answering your research question."
+          ),
           tooltip(
             input_task_button(
               id = ns("extract_data"),
@@ -182,7 +198,7 @@ mod_llm_ui <- function(id) {
               class = "btn-info"
             ) |>
               disabled(),
-            "Extract data from a .pdf using the Claude Sonnet 4.5 LLM. A PDF must be uploaded to enable this function."
+            "Extract data from a .pdf using the chosen LLM. A PDF must be uploaded to enable this function."
           ),
 
           tooltip(
