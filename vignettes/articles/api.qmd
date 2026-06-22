@@ -1,0 +1,59 @@
+---
+title: "API Keys"
+subtitle: "Getting and using API keys with eData"
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r}
+#| label: setup
+library(STOPeData)
+```
+
+API stands for **Application Programming Interface**. When we talk to a Large Language Model via a chat interface, we're using an interface designed for human interaction (often a Graphical User Interface or GUI). But when software talks to software, it needs an efficient, consistent way to do this. This is what an API is.
+
+When we send a PDF to an LLM for extraction, they expect us to pay the cost of using their model, extracting the data, and of course a margin. Data centers aren't free. So they expect us to provide what is, in essence, a billing code (and password). Many providers offer free services in some form or another, but if we're using the API, we need to pay for it.
+
+Getting an API key for a given service is a pretty simple process (they want to make it as easy as possible for us to give them money), but it can be intimidating if it's a new concept for you.
+
+To get an API key, go to the developer/API portal of the relevant provider:
+
+- Anthropic (Claude) - https://platform.claude.com/
+- OpenAI (ChatGPT) - https://platform.openai.com/
+- Google (Gemini) - https://aistudio.google.com/app/apikey
+
+Note that while you may already have a monthly subscription to one LLM service or another, that typically does not cover API keys. You're going to have to do this separately. You will likely have to provide a payment card, or purchase a certain amount of credits. It's possible to set up automatic payment once your credit drops below a certain threshhold, but I recommend just topping up your account unless you're doing really serious work.
+
+Once you have an API key, keep it secret and safe. This is, in essence, the numbers on the front of your card (for this account), the three on the back and the expiry date. Anyone with this API key can provide it to the relevant service as proof that they can spend whatever funds are credited to the account (this is why no API keys are provided with this application). Keep it stored somewhere locally on your computer, and be extra careful about not sharing it in repositories or with files. If you accidentally do share it, you can easily deactivate it from the relevant portal and get a new one, but it's best avoided.
+
+Once you have an API key, you can paste it into the API key field in the UI. Note that different providers use different styles of API key - the app will check if they start with the right characters and are of sufficient length (>20 characters):
+
+- Anthropic - `sk-ant-...`
+- OpenAI - `sk-...`
+- Google - `AQ`
+
+Your API key is your property and is never saved by the app, but if you want to test that it works you can "ping" the selected model by hitting the button to the right of the "Choose LLM" dropdown. This will send the model a quick message asking for a reply; if it gets one back, that's reported as a success. Note that this costs some tiny amount of money, so if your account has no funds on it the connection will be refused and the test will return a failure.
+
+If you get bored of repeately entering an API key, you may wish to save these values to your local environment. This is essentially a text file where you store important information like API keys that should never leave your computer. In R, you can find and edit your local environment with the `usethis` package command `usethis::edit_r_environ()`. This opens your `.renviron` file your code editor.
+
+My `.renviron` file looks a little like the below. I've removed the full API keys for the reasons I just got into above, but essentially it's a big list of keys (like `ANTHROPIC_API_KEY`) and values. If you're opening `.renviron` for the first time it'll probably be empty.
+
+```{r}
+#| label: my_renviron
+### Anthropic
+ANTHROPIC_API_KEY <- "sk-ant-..."
+# OpenAI
+OPENAI_API_KEY <- "sk-proj-..."
+# Google
+GOOGLE_API_KEY <- "AQ...."
+```
+
+When you run eData, it checks its local environment for an `.renviron` file. If any of the above keys are defined, then when you select the relevant provider, it'll automatically get the relevant API key (using `Sys.getenv("KEY_NAME")`) and use it to fill the LLM API Key field.
+
+So, if you need to do a lot of extractions, I strongly recommend setting up an `.Renviron` file. A few tips:
+
+- By default, `.Renviron` is created in your My Documents folder
+- If you're on a company device that uses OneDrive, it may "hijack" this folder. Getting environmental variables is slower when the `.Renviron` file is hosted on a networked service like OneDrive, so I recommend specifying a local `.Renviron` file by setting a user-level environmental variable (`Start > Edit environmental variables for your account`) path like `R_ENVIRON_USER` = `C:/Users/.../Local Documents/dotfiles/.Renviron`. I'm sorry this is so complicated. 
+- Add your `.Renviron` file to `.gitignore` if you're using Git to avoid accidentally pushing it to a remote repository.

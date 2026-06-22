@@ -126,10 +126,11 @@ mod_llm_ui <- function(id) {
             tooltip(
               input_task_button(
                 id = ns("test_model"),
-                label = bs_icon("plug"),
-                class = "btn-secondary mb-3"
+                label = bs_icon("activity"),
+                label_busy = "",
+                class = "btn-secondary"
               ),
-              "Ping the selected model with a minimal request to check your key and connection."
+              "Ping the selected model with a minimal request to check your key and connection. Requires a functioning API key."
             )
           ),
           ### API key input ----

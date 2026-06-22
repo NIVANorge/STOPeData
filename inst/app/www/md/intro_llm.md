@@ -1,2 +1,3 @@
 - Extract data from PDFs using a [Large Language Model](https://ig.ft.com/generative-ai/) (LLM)
 - LLMs make mistakes! Use the data modules and validation tools to check extractions.
+- Use (including testing) of models requires an [API key](https://en.wikipedia.org/wiki/API_key) for the relevant provider
