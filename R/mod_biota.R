@@ -179,6 +179,7 @@ mod_biota_server <- function(id) {
       llm_lookup_validation = FALSE
     )
 
+    # TODO: Can this be simplified? Then again, I guess we don't want to load the data multiple times.
     moduleState$species_options <- species_names_vocabulary()
 
     ## InputValidator for table-level validation ----
@@ -211,7 +212,7 @@ mod_biota_server <- function(id) {
           "SAMPLE_SPECIES_GENDER"
         )
 
-        for (i in 1:nrow(session$userData$reactiveValues$biotaData)) {
+        for (i in seq_len(nrow(session$userData$reactiveValues$biotaData))) {
           for (field in required_biota_fields) {
             field_value <- session$userData$reactiveValues$biotaData[i, field]
             if (
@@ -306,7 +307,7 @@ mod_biota_server <- function(id) {
       }
 
       # Update biota rows with validated data
-      for (i in 1:nrow(biota_data)) {
+      for (i in seq_len(nrow(biota_data))) {
         sample_id <- biota_data$SAMPLE_ID[i]
         row_idx <- which(samples_data$SAMPLE_ID == sample_id)
 
@@ -616,8 +617,8 @@ mod_biota_server <- function(id) {
         species_groups <- sort(unique(
           moduleState$species_options$SPECIES_GROUP
         ))
-        tbl = session$userData$reactiveValues$biotaData
-        dynamic_height = rHandsontableGetHeight(dataTable = tbl)
+        tbl <- session$userData$reactiveValues$biotaData
+        dynamic_height <- rHandsontableGetHeight(dataTable = tbl)
         rhandsontable(
           tbl,
           stretchH = "all",

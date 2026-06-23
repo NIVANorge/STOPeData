@@ -45,7 +45,12 @@ extract_pdf_with_llm <- function(
       )
 
       # Prepare content ----
-      pdf_content <- content_pdf_file(pdf_path)
+      # Slightly different workflows for Google vs Anthropic & OpenAI
+      if (model_provider == "Google") {
+        pdf_content <- google_upload(pdf_path)
+      } else {
+        pdf_content <- content_pdf_file(pdf_path)
+      }
 
       # Extract data (the blocking operation) ----
       result <- chat$chat_structured(

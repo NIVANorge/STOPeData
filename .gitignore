@@ -20,3 +20,4 @@ docs
 **/.quarto/
 inst/doc
 .vscode/*
+.posit/assistant/settings.json

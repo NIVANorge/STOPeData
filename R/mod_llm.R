@@ -37,7 +37,7 @@ provider_options <- list(
     curated_models = c(
       # TODO: Check these all actually work
       # TODO: So far, none of them do...
-      "Gemini 2.5 Flash" = "gemini-2.5-flash",
+      "Gemini 2.5 Pro" = "gemini-2.5-pro",
       "Gemini 3.1 Pro" = "gemini-3.1-pro-preview",
       "Gemini 3.5 Flash" = "gemini-3.5-flash"
     )
@@ -167,6 +167,7 @@ mod_llm_ui <- function(id) {
             width = "100%"
           ),
           # TODO: Add warning (or better yet prevent entirely) when dependent data missing
+          # TODO: Rename comments to "Screening" for consistency
           selectizeInput(
             inputId = ns("schema_components"),
             label = tooltip(
@@ -193,6 +194,7 @@ mod_llm_ui <- function(id) {
             "Advanced settings for LLM extraction. Recommended for experienced users."
           ),
           # TODO: Enable cancellation of started extraction
+          # TODO: Important - population doesn't re-trigger if you screen then extract!!!
           tooltip(
             input_task_button(
               id = ns("screen_data"),
@@ -203,7 +205,7 @@ mod_llm_ui <- function(id) {
               class = "btn-info"
             ) |>
               disabled(),
-            "LLM Rapidly screens the .pdf for its suitability in answering your research question."
+            "LLM Rapidly screens the .pdf for its suitability in answering your research question. Equivalent to setting Extract to Comments only."
           ),
           tooltip(
             input_task_button(
@@ -1068,7 +1070,7 @@ mod_llm_server <- function(id) {
         # Build status message
         status_text <- "Extraction successful."
 
-        # TODO: Fix cost being NA
+        # TODO: Fix cost being NA (sometimes)
         if (!is.null(result$metadata$total_cost)) {
           metadata_text <- paste0(
             " (Cost: $",

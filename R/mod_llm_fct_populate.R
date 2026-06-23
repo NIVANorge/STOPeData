@@ -775,7 +775,7 @@ create_biota_from_llm <- function(llm_biota_data) {
   }
 
   print_dev(glue("Created {nrow(biota_tibble)} biota entries from LLM data"))
-  # FIXME: Warning: Unknown or uninitialised column: `REFERENCE_ID`.
+  # TODO: Warning: Unknown or uninitialised column: `REFERENCE_ID`.
   return(biota_tibble)
 }
 #' Validate Species Against Database
@@ -787,6 +787,8 @@ create_biota_from_llm <- function(llm_biota_data) {
 #' @noRd
 # ! FORMAT-BASED
 validate_species_against_database <- function(biota_data, species_database) {
+  # TODO: This function is a big complicated nightmare that doesn't work.
+  # TODO: Add manual tests
   if (is.null(biota_data) || nrow(biota_data) == 0) {
     return(list(
       validation_text = "No biota samples to validate.",
@@ -811,22 +813,21 @@ validate_species_against_database <- function(biota_data, species_database) {
   }
 
   for (species_name in unique_species) {
-    output_lines <- c(output_lines, paste0("Species: \"", species_name, "\""))
+    output_lines <- c(output_lines, glue('Species: "{species_name}"'))
 
     # Try exact scientific name match first (case insensitive)
-    scientific_matches <- species_database[
-      tolower(species_database$SPECIES_NAME) == tolower(species_name),
-    ]
+    scientific_matches <- species_database |>
+      filter(
+        tolower(SPECIES_NAME) == tolower(species_name)
+      )
 
     if (nrow(scientific_matches) > 0) {
       output_lines <- c(output_lines, "  \u2713 Found as scientific name")
       if (nrow(scientific_matches) > 1) {
         output_lines <- c(
           output_lines,
-          paste0(
-            "    \u2192 Multiple entries found (",
-            nrow(scientific_matches),
-            " matches)"
+          glue(
+            "    \u2192 Multiple entries found ({nrow(scientific_matches)} matches)"
           )
         )
         has_warnings <- TRUE
@@ -834,13 +835,14 @@ validate_species_against_database <- function(biota_data, species_database) {
       # Show the canonical scientific name
       output_lines <- c(
         output_lines,
-        paste0("    \u2192 Canonical: ", scientific_matches$SPECIES_NAME[1])
+        glue("    \u2192 Canonical: {scientific_matches$SPECIES_NAME[1]}")
       )
     } else {
       # Try common name match
-      common_matches <- species_database[
-        tolower(species_database$SPECIES_COMMON_NAME) == tolower(species_name),
-      ]
+      common_matches <- species_database |>
+        filter(
+          tolower(SPECIES_COMMON_NAME) == tolower(species_name)
+        )
 
       if (nrow(common_matches) > 0) {
         output_lines <- c(output_lines, "  \u26A0 Found as common name")
@@ -849,10 +851,8 @@ validate_species_against_database <- function(biota_data, species_database) {
         if (nrow(common_matches) > 1) {
           output_lines <- c(
             output_lines,
-            paste0(
-              "    \u2192 Multiple species match this common name (",
-              nrow(common_matches),
-              " matches)"
+            glue(
+              "    \u2192 Multiple species match this common name ({nrow(common_matches)} matches)"
             )
           )
           output_lines <- c(output_lines, "    \u2192 Manual review required:")
@@ -862,26 +862,19 @@ validate_species_against_database <- function(biota_data, species_database) {
           for (i in 1:display_count) {
             output_lines <- c(
               output_lines,
-              paste0("       \u2022 ", common_matches$SPECIES_NAME[i])
+              glue("       \u2022 {common_matches$SPECIES_NAME[i]}")
             )
           }
           if (nrow(common_matches) > 10) {
             output_lines <- c(
               output_lines,
-              paste0(
-                "       ... and ",
-                nrow(common_matches) - 10,
-                " more matches"
-              )
+              glue("       ... and {nrow(common_matches) - 10} more matches")
             )
           }
         } else {
           output_lines <- c(
             output_lines,
-            paste0(
-              "    \u2192 Scientific name: ",
-              common_matches$SPECIES_NAME[1]
-            )
+            glue("    \u2192 Scientific name: {common_matches$SPECIES_NAME[1]}")
           )
         }
       } else {
@@ -923,19 +916,19 @@ validate_species_against_database <- function(biota_data, species_database) {
   output_lines <- c(output_lines, "Summary:")
   output_lines <- c(
     output_lines,
-    paste0("  Species processed: ", total_species)
+    glue("  Species processed: {total_species}")
   )
   output_lines <- c(
     output_lines,
-    paste0("  Found as scientific names: ", scientific_found)
+    glue("  Found as scientific names: {scientific_found}")
   )
   output_lines <- c(
     output_lines,
-    paste0("  Found as common names: ", common_found)
+    glue("  Found as common names: {common_found}")
   )
   output_lines <- c(
     output_lines,
-    paste0("  Not found in database: ", not_found)
+    glue("  Not found in database: {not_found}")
   )
 
   if (has_warnings) {
@@ -1075,7 +1068,7 @@ create_samples_from_llm <- function(llm_samples_data) {
   } else {
     dates_vector <- c()
 
-    for (row in 1:nrow(llm_samples_data)) {
+    for (row in seq_len(nrow(llm_samples_data))) {
       date <- llm_samples_data$sampling_dates[row]
       print(date)
       dates_vector <- append(dates_vector, date)
