@@ -1,7 +1,6 @@
 # LLM Extraction Module ----
 # A Shiny module for PDF upload and automated data extraction using Claude
 
-# TODO: Allow running paper "Inspection" before full call
 # TODO: Report paper size (mb and page number)
 # TODO: Remove excessively complicated BS layout code
 
@@ -114,7 +113,7 @@ mod_llm_ui <- function(id) {
             multiple = FALSE
           ),
           div(
-            class = "d-flex align-items-end gap-2",
+            class = "input-group",
             div(
               class = "flex-grow-1",
               selectInput(
@@ -128,15 +127,18 @@ mod_llm_ui <- function(id) {
                 width = "100%"
               )
             ),
-            # TODO: Align button properly with dropdown
-            tooltip(
-              input_task_button(
-                id = ns("test_model"),
-                label = bs_icon("activity"),
-                label_busy = "",
-                class = "btn-secondary"
-              ),
-              "Ping the selected model with a minimal request to check your key and connection. Requires a functioning API key."
+            div(
+              class = "input-group-append",
+              # TODO: Align button properly with dropdown
+              tooltip(
+                input_task_button(
+                  id = ns("test_model"),
+                  label = bs_icon("activity"),
+                  label_busy = "",
+                  class = "btn-secondary-sm"
+                ),
+                "Ping the selected model with a minimal request to check your key and connection. Requires a functioning API key."
+              )
             )
           ),
           ### API key input ----
@@ -151,11 +153,12 @@ mod_llm_ui <- function(id) {
             width = "100%"
           ),
           ### max_tokens input ----
+          # TODO: Slider?
           numericInput(
             inputId = ns("max_tokens"),
             label = tooltip(
               list("Max Tokens", bs_icon("info-circle-fill")),
-              "Defines the quantity of information the extraction returns. 6000 is a sensible default, but longer papers may need more. This will increase cost, so use sparingly."
+              "Defines the quantity of information the extraction returns. 6000 is a sensible default, but longer papers/more complex models may need more. This will increase cost, so use sparingly."
             ),
             value = 6000,
             min = 1000,
@@ -184,34 +187,35 @@ mod_llm_ui <- function(id) {
           tooltip(
             actionButton(
               inputId = ns("llm_advanced_options"),
-              label = tagList(bs_icon("sliders")),
+              label = tagList(bs_icon("gear")),
               class = "btn-secondary",
             ),
             "Advanced settings for LLM extraction. Recommended for experienced users."
           ),
+          # TODO: Enable cancellation of started extraction
           tooltip(
             input_task_button(
               id = ns("screen_data"),
               label = HTML(paste(
                 bs_icon("lightning-charge"),
-                "Screen PDF for extraction"
+                "Screen PDF"
               )),
               class = "btn-info"
             ) |>
               disabled(),
-            "LLM Rapidly screens the PDF for its suitability in answering your research question."
+            "LLM Rapidly screens the .pdf for its suitability in answering your research question."
           ),
           tooltip(
             input_task_button(
               id = ns("extract_data"),
               label = HTML(paste(
                 bs_icon("cpu"),
-                "Extract Data from PDF"
+                "Extract Data"
               )),
               class = "btn-primary"
             ) |>
               disabled(),
-            "Extract data from a .pdf using the chosen LLM. A PDF must be uploaded to enable this function."
+            "Extract data from a .pdf using the chosen LLM. A .pdf must be uploaded to enable this function."
           ),
 
           tooltip(
@@ -232,6 +236,7 @@ mod_llm_ui <- function(id) {
 
         # Extraction appraisal
         # TODO: Update styling
+        # TODO: Add comments to downloadable data
         div(
           h5(
             "Extraction Appraisal"
