@@ -60,6 +60,7 @@ extract_pdf_with_llm <- function(
       )
 
       # Get cost info ----
+      # TODO: get_cost() works in a mre, so there's presumably somethign wrong in our logic
       api_metadata <- tryCatch(
         list(total_cost = chat$get_cost(include = "all")),
         error = function(e) list(cost_error = e$message)

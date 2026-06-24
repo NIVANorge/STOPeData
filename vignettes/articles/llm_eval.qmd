@@ -1,0 +1,36 @@
+---
+title: "LLM Evaluation"
+subtitle: "Comparing the quality, speed, and cost of LLM extraction"
+knitr:
+  opts_chunk:
+    collapse: true
+    comment: '#>'
+---
+
+```{r}
+#| label: setup
+library(STOPeData)
+```
+
+The `ellmer` package includes functions that connect to a wide variety of local and remote APIs from a variety of providers. Put simply, we have a great many options. Which are better, and which are worse? We might assume that more expensive models are more effective at data extraction, and that larger and more complex files are more difficult - and require more tokens - than simpler models when extracting data. But can we prove any of these assumptions?
+
+The question of how we evaluate different LLMs is an important one. I'm not quite sure how to do it. There are some obvious measures:
+
+- Time
+- Cost
+- Does the model fail entirely?
+- Does the model hit a token limit, or otherwise fail totally?
+- Is the data returned obviously wrong/incomplete?
+
+All of these are easy to measure, but the question of the overall quality and accuracy of extracted data are more complicated. We can run our `eDataDRF` validation functions against whatever we get out, but they won't be a perfect fit as they're designed to work with data after human extraction. Still, it may be the easiest approach.
+
+We definitely want to evaluate our "recommended" models from Anthropic, OpenAI and Google. I don't anticipate any major differences. I'd also like to try some of the most popular models from LM Studio, as it supports PDF data extraction out the box, although I haven't been able to get it working yet. 
+
+I then suggest some sort of the following experimental design:
+
+- 3 providers x 2 models, + 1 LM Studio (n = 7)
+- 3 different papers of varying lengths (n = 3)
+- 3 different token limits, small, medium, and large (n = 3)
+- 3 replicates (n = 3)
+
+This will give us 7 * 27 = 189 cases. Which is quite a lot, but we can probably batch them and let them get on with themselves. 

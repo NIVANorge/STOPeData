@@ -14,7 +14,6 @@ cite.r
 .env
 deployment/test/secrets.env
 .gitignore
-deployment/prod/secrets.env
 
 docs
 **/.quarto/
