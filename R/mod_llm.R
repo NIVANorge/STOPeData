@@ -88,19 +88,19 @@ mod_llm_ui <- function(id) {
             placeholder = "Ole Nordman",
             width = "100%"
           ),
-          fileInput(
-            inputId = ns("pdf_file"),
-            label = tooltip(
-              list("Upload PDF", bs_icon("info-circle-fill")),
-              "Upload a research paper or report (pdf) containing environmental exposure data."
+          div(
+            fileInput(
+              inputId = ns("pdf_file"),
+              label = tooltip(
+                list("Upload PDF", bs_icon("info-circle-fill")),
+                "Upload a research paper or report (pdf) of up to 100 pages/30 MB containing environmental exposure data."
+              ),
+              accept = ".pdf",
+              width = "100%",
+              buttonLabel = "Browse...",
             ),
-            accept = ".pdf",
-            width = "100%",
-            buttonLabel = "Browse...",
+            uiOutput(ns("pdf_info_ui"))
           ),
-
-          # TODO: Make smaller, add some contextual information about page limits and file sizes
-          uiOutput(ns("pdf_info_ui")),
 
           ### Provider / model / advanced settings ----
           selectInput(
@@ -128,14 +128,15 @@ mod_llm_ui <- function(id) {
               )
             ),
             div(
-              class = "input-group-append",
-              # TODO: Align button properly with dropdown
+              style = "align-items: end; display: flex;",
               tooltip(
                 input_task_button(
                   id = ns("test_model"),
                   label = bs_icon("activity"),
                   label_busy = "",
-                  class = "btn-secondary-sm"
+                  class = "btn-info-sm",
+                  style = "height: calc(1.5em + 0.75rem + calc(var(--bs-border-width) * 2));
+                  --bs-btn-padding-y: 0.25em; margin-bottom: 1rem;"
                 ),
                 "Ping the selected model with a minimal request to check your key and connection. Requires a functioning API key."
               )
@@ -148,6 +149,7 @@ mod_llm_ui <- function(id) {
               list("LLM API Key", bs_icon("info-circle-fill")),
               "Your API key for the selected provider. Set the corresponding environment variable (ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY) to avoid re-entering it each session."
             ),
+            # TODO: Is it a good idea to use Anthropic by default?
             value = Sys.getenv("ANTHROPIC_API_KEY", unset = ""),
             placeholder = "e.g. sk-ant-..., sk-..., or AQ...",
             width = "100%"
@@ -1005,21 +1007,16 @@ mod_llm_server <- function(id) {
 
     # 3. Outputs ----
 
-    ## # output: pdf basic info ----
+    ## # output: pdf_info_ui ----
+    # reports page number and size of uploaded PDFs
     output$pdf_info_ui <- renderUI({
       m <- pdf_meta()
       div(
-        class = "d-flex gap-3 mb-2",
-        div(
-          class = "text-center flex-fill border rounded p-2",
-          div(class = "fs-4 fw-bold text-primary", m$pages),
-          div(class = "small text-muted", "pages")
-        ),
-        div(
-          class = "text-center flex-fill border rounded p-2",
-          div(class = "fs-4 fw-bold text-primary", fmt_bytes(m$size)),
-          div(class = "small text-muted", "file size")
-        )
+        class = "text-muted small",
+        style = "margin-top: -1rem;",
+        m$pages,
+        "pages, ",
+        fmt_bytes(m$size)
       )
     })
 
