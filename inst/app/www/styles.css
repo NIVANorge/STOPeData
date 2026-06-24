@@ -84,6 +84,11 @@ pre,
     font-family: var(--font-code);
 }
 
+/* TODO: Doesn't work! */
+textarea#llm_params.form-control.shinyjs-resettable.shiny-bound-input {
+    font-family: var(--font-code);
+}
+
 .validation-container {
     flex-grow: 1;
 }

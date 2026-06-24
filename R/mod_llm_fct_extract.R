@@ -1,4 +1,4 @@
-# R/mod_llm_fct_api.R ----
+# R/mod_llm_fct_api.R
 
 #' Core async function for LLM extraction
 #'
@@ -12,6 +12,7 @@
 #' @param extraction_schema List or S7 class. The structured schema defining
 #'   expected output format (e.g., S7 class with properties).
 #' @param max_tokens Integer. Maximum tokens for the API response.
+#' @param params Function. Maximum tokens for the API response.
 #'
 #' @return Named list with three elements:
 #'   \describe{
@@ -21,6 +22,7 @@
 #'   }
 #'
 #' @importFrom ellmer chat_anthropic params content_pdf_file
+#' @importFrom glue glue
 #' @noRd
 extract_pdf_with_llm <- function(
   pdf_path,
@@ -29,22 +31,36 @@ extract_pdf_with_llm <- function(
   env_var,
   chat_fn,
   api_key,
+  params = NULL,
   extraction_prompt,
   extraction_schema,
   max_tokens
 ) {
   tryCatch(
     {
-      # Set the provider-specific API key env var ----
+      # Set the provider-specific API key env var
       do.call(Sys.setenv, setNames(list(api_key), env_var))
 
-      # Initialise chat using the provider-specific ellmer function ----
-      chat <- do.call(
-        getExportedValue("ellmer", chat_fn),
-        list(model = model_name, params = params(max_tokens = max_tokens))
+      # allow for the user to manually specify all params via advanced options if designed
+      # will override max_tokens input
+      if (is.null(params)) {
+        params <- params(max_tokens = max_tokens)
+      }
+
+      # Initialise chat using the provider-specific ellmer function
+      tryCatch(
+        {
+          chat <- do.call(
+            getExportedValue("ellmer", chat_fn),
+            list(model = model_name, params = params)
+          )
+        },
+        error = function(e) {
+          glue("Error initialising LLM chat: {e}")
+        }
       )
 
-      # Prepare content ----
+      # Prepare content
       # Slightly different workflows for Google vs Anthropic & OpenAI
       if (model_provider == "Google") {
         pdf_content <- google_upload(pdf_path)
@@ -52,21 +68,21 @@ extract_pdf_with_llm <- function(
         pdf_content <- content_pdf_file(pdf_path)
       }
 
-      # Extract data (the blocking operation) ----
+      # Extract data (the blocking operation)
       result <- chat$chat_structured(
         extraction_prompt,
         pdf_content,
         type = extraction_schema
       )
 
-      # Get cost info ----
+      # Get cost info
       # TODO: get_cost() works in a mre, so there's presumably somethign wrong in our logic
       api_metadata <- tryCatch(
         list(total_cost = chat$get_cost(include = "all")),
         error = function(e) list(cost_error = e$message)
       )
 
-      # Return results ----
+      # Return results
       list(
         result = result,
         metadata = api_metadata,

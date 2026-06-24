@@ -502,14 +502,38 @@ mod_llm_server <- function(id) {
         tags$hr(),
         h6("Call Parameters"),
         p(
-          "Additional LLM call settings (temperature, retry behaviour, etc.) will appear here."
+          "See ",
+          tags$a("https://ellmer.tidyverse.org/reference/params.html"),
+          " for more details"
+        ),
+        # TODO: Not actually functional yet. Needs tooltips, more info, and ideally some more code-like styling for the interior
+        textAreaInput(
+          inputId = "llm_params",
+          label = "Arguments to LLM chat via ellmer::param() function",
+          width = "100%",
+          rows = 15,
+          value = glue(
+            "params(
+              temperature = NULL,
+              top_p = NULL,
+              top_k = NULL,
+              frequency_penalty = NULL,
+              presence_penalty = NULL,
+              seed = NULL,
+              max_tokens = NULL,
+              log_probs = NULL,
+              stop_sequences = NULL,
+              reasoning_effort = NULL,
+              reasoning_tokens = NULL,
+              ...
+          )"
+          )
         ),
         ## Prompt and Schema Configuration ----
 
         # TODO: Add upload/download button for schema and prompt
         # TODO: Make schema represent user options
         # TODO: Make schema less ugly
-        p("Modify Prompt and Data Structure (Advanced)"),
         div(
           textAreaInput(
             inputId = ns("extraction_prompt"),
@@ -606,7 +630,8 @@ mod_llm_server <- function(id) {
         api_key,
         extraction_prompt,
         extraction_schema,
-        max_tokens
+        max_tokens,
+        params
       ) {
         mirai(
           {
@@ -619,7 +644,8 @@ mod_llm_server <- function(id) {
               api_key,
               extraction_prompt,
               extraction_schema,
-              max_tokens
+              max_tokens,
+              params
             )
           },
           pdf_path = pdf_path,
@@ -630,7 +656,8 @@ mod_llm_server <- function(id) {
           api_key = api_key,
           extraction_prompt = extraction_prompt,
           extraction_schema = extraction_schema,
-          max_tokens = max_tokens
+          max_tokens = max_tokens,
+          params = params
         )
       }
     ) |>
