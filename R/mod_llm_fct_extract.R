@@ -23,7 +23,7 @@
 #'
 #' @importFrom ellmer chat_anthropic params content_pdf_file
 #' @importFrom glue glue
-#' @noRd
+#' @export
 extract_pdf_with_llm <- function(
   pdf_path,
   model_provider,

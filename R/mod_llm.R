@@ -362,12 +362,13 @@ mod_llm_server <- function(id) {
       extraction_successful = FALSE,
       raw_extraction = NULL,
       structured_data = NULL,
-      error_message = NULL
+      error_message = NULL,
+      llm_status = "not_yet_started"
     )
 
     # 2. Observers and Reactives ----
 
-    # reactive: PDF metadata — fires immediately on upload, no API call needed
+    # reactive: PDF metadata — fires immediately on upload
     pdf_meta <- reactive({
       req(input$pdf_file)
       path <- input$pdf_file$datapath
@@ -659,6 +660,7 @@ mod_llm_server <- function(id) {
       # set success flags last
       session$userData$reactiveValues$llmExtractionComplete <- TRUE
       session$userData$reactiveValues$llmExtractionSuccessful <- TRUE
+      moduleState$llm_status <- "successful"
 
       # need to set populate modules to trigger some downstream logic (why?)
       session$userData$reactiveValues$llmPopulateModules <- TRUE
@@ -672,7 +674,7 @@ mod_llm_server <- function(id) {
       bindEvent(input$load_dummy_data)
 
     ## # ExtendedTask: PDF data extraction ----
-    # upstream: user clicks input$extract_data
+    # upstream: user clicks input$extract_data or input$screen_data
 
     # I don't know enough about mirai to know if this incredible degree of redundancy is actually necessary.
     llm_task <- ExtendedTask$new(
@@ -758,6 +760,7 @@ mod_llm_server <- function(id) {
       bindEvent(input$test_model)
 
     ## # observe: show test result notification ----
+    # TODO: Should have bindEvent?
     observe({
       result <- test_task$result()
       req(!is.null(result))
@@ -800,6 +803,7 @@ mod_llm_server <- function(id) {
       )
 
       provider <- input$select_provider
+      moduleState$llm_status <- "busy"
       llm_task$invoke(
         pdf_path = input$pdf_file$datapath,
         model_provider = provider,
@@ -835,7 +839,7 @@ mod_llm_server <- function(id) {
         return()
       }
 
-      # Synchronous validation (fast)
+      # Check API key format again (using regex)
       tryCatch(
         {
           validate_api_key(input$api_key, input$select_provider)
@@ -848,6 +852,7 @@ mod_llm_server <- function(id) {
 
       # Launch async extraction
       provider <- input$select_provider
+      moduleState$llm_status <- "busy"
       llm_task$invoke(
         pdf_path = input$pdf_file$datapath,
         model_provider = provider,
@@ -870,12 +875,16 @@ mod_llm_server <- function(id) {
       bindEvent(input$extract_data)
 
     ## # observe: Enable download button when extraction is complete ----
-    # upstream: session$userData$reactiveValues$llmExtractionComplete, session$userData$reactiveValues$llmExtractionSuccessful
+    # upstream: extraction or screening completed & successful
     # downstream: download_extraction button state
     observe({
+      # TODO: This logic could be significantly better-structured
+      # It also fails because of a missing value. Why
       if (
-        session$userData$reactiveValues$llmExtractionComplete &&
-          session$userData$reactiveValues$llmExtractionSuccessful
+        (session$userData$reactiveValues$llmExtractionComplete &&
+          session$userData$reactiveValues$llmExtractionSuccessful) ||
+          session$userData$reactiveValues$llmScreeningComplete &
+            session$userData$reactiveValues$llmScreeningSuccessful
       ) {
         enable("download_extraction")
       } else {
@@ -884,14 +893,23 @@ mod_llm_server <- function(id) {
     }) |>
       bindEvent(
         session$userData$reactiveValues$llmExtractionComplete,
-        session$userData$reactiveValues$llmExtractionSuccessful
+        session$userData$reactiveValues$llmExtractionSuccessful,
+        session$userData$reactiveValues$llmScreeningComplete,
+        session$userData$reactiveValues$llmScreeningSuccessful
       )
 
     ## # observe: Populate forms with extracted data ----
     # upstream: user clicks input$populate_forms
     # downstream: trigger form population in other modules
     observe({
-      req(!is.null(moduleState$structured_data))
+      req(moduleState$llm_status == "successful")
+      req(
+        (!is.null(moduleState$structured_data$sites) &&
+          nrow(moduleState$structured_data$sites) > 0) ||
+          (!is.null(moduleState$structured_data$references) &&
+            nrow(moduleState$structured_data$references) > 0) ||
+          isTruthy(session$userData$reactiveValues$llmScreeningComments)
+      )
 
       # Campaign data
       tryCatch(
@@ -912,7 +930,10 @@ mod_llm_server <- function(id) {
       # References data
       tryCatch(
         {
-          if (!is.null(moduleState$structured_data$references)) {
+          if (
+            !is.null(moduleState$structured_data$references) &&
+              nrow(moduleState$structured_data$references) > 0
+          ) {
             session$userData$reactiveValues$referenceDataLLM <- moduleState$structured_data$references |>
               as_tibble()
           }
@@ -929,7 +950,10 @@ mod_llm_server <- function(id) {
       # Sites data
       tryCatch(
         {
-          if (!is.null(moduleState$structured_data$sites)) {
+          if (
+            !is.null(moduleState$structured_data$sites) &&
+              nrow(moduleState$structured_data$sites) > 0
+          ) {
             sites_data <- create_sites_from_llm(
               moduleState$structured_data$sites,
               moduleState$structured_data$campaign,
@@ -950,7 +974,10 @@ mod_llm_server <- function(id) {
       # Parameters data
       tryCatch(
         {
-          if (!is.null(moduleState$structured_data$parameters)) {
+          if (
+            !is.null(moduleState$structured_data$parameters) &&
+              nrow(moduleState$structured_data$parameters) > 0
+          ) {
             parameters_data <- create_parameters_from_llm(
               moduleState$structured_data$parameters,
               session = session,
@@ -971,7 +998,10 @@ mod_llm_server <- function(id) {
       # Compartments data
       tryCatch(
         {
-          if (!is.null(moduleState$structured_data$compartments)) {
+          if (
+            !is.null(moduleState$structured_data$compartments) &&
+              nrow(moduleState$structured_data$compartments) > 0
+          ) {
             compartments_data <- create_compartments_from_llm(
               moduleState$structured_data$compartments
             )
@@ -990,7 +1020,10 @@ mod_llm_server <- function(id) {
       # Biota data
       tryCatch(
         {
-          if (!is.null(moduleState$structured_data$biota)) {
+          if (
+            !is.null(moduleState$structured_data$biota) &&
+              nrow(moduleState$structured_data$biota) > 0
+          ) {
             biota_data <- create_biota_from_llm(
               moduleState$structured_data$biota
             )
@@ -1009,7 +1042,10 @@ mod_llm_server <- function(id) {
       # Methods data
       tryCatch(
         {
-          if (!is.null(moduleState$structured_data$methods)) {
+          if (
+            !is.null(moduleState$structured_data$methods) &&
+              nrow(moduleState$structured_data$methods) > 0
+          ) {
             methods_data <- create_methods_from_llm(
               moduleState$structured_data$methods,
               moduleState$structured_data$campaign
@@ -1029,7 +1065,10 @@ mod_llm_server <- function(id) {
       # Samples data
       tryCatch(
         {
-          if (!is.null(moduleState$structured_data$samples)) {
+          if (
+            !is.null(moduleState$structured_data$samples) &&
+              nrow(moduleState$structured_data$samples) > 0
+          ) {
             samples_data <- create_samples_from_llm(
               moduleState$structured_data$samples
             )
@@ -1053,7 +1092,7 @@ mod_llm_server <- function(id) {
         type = "message"
       )
     }) |>
-      bindEvent(isTRUE(session$userData$reactiveValues$llmExtractionSuccessful))
+      bindEvent(moduleState$llm_status, ignoreInit = TRUE)
 
     ## # observe: Clear extraction ----
     # upstream: user clicks input$clear_extraction
@@ -1113,79 +1152,34 @@ mod_llm_server <- function(id) {
       )
     })
 
-    ## # output: extraction_status ----
-    # upstream: moduleState
-    # downstream: UI status display
-    output$extraction_status <- renderUI({
-      # Changed from renderText to renderUI
-
-      # Check if task is still running
-      if (identical(llm_task$status(), "running")) {
-        return(div(
-          bs_icon("hourglass-split"),
-          "Extracting data from PDF... This may take 30-60 seconds.",
-          class = "validation-status validation-info"
-        ))
-      }
-
-      # Try to get result (won't block if not ready)
+    ## # observe: Handle LLM task result ----
+    # upstream: llm_task completes
+    # downstream: moduleState$llm_status, moduleState$structured_data, session flags
+    observe({
+      # TODO: Modify logic to better reflect screening vs. full extraction
       result <- llm_task$result()
 
-      if (is.null(result)) {
-        # No extraction attempted yet
-        div(
-          bs_icon("info-circle"),
-          "Upload a PDF and provide your API key to begin extraction, or use dummy data for testing.",
-          class = "validation-status validation-info"
-        )
-      } else if (!is.null(result$success) && result$success) {
-        # Store successful results
-        # TODO: This probably shouldn't be in an output block...
+      if (!is.null(result$success) && result$success) {
         moduleState$structured_data <- result$result
         moduleState$api_metadata <- result$metadata
         moduleState$raw_extraction <- result$result
+        moduleState$error_message <- NULL
 
-        # Update session data
         session$userData$reactiveValues$rawLLM <- result$result
         session$userData$reactiveValues$llmExtractionComplete <- TRUE
         session$userData$reactiveValues$llmExtractionSuccessful <- TRUE
 
-        # FIXME: This is probably the cause of our subscript out of bounds error
         if (!is.null(result$result$comments)) {
-          session$userData$reactiveValues$llmExtractionComments <- result$result$comments
+          session$userData$reactiveValues$llmScreeningComments <- result$result$comments
         }
 
-        # Enable buttons
-        # enable("populate_forms")
         enable("clear_extraction")
-
-        # Build status message
-        status_text <- "Extraction successful."
-
-        # TODO: Fix cost being NA (sometimes)
-        if (!is.null(result$metadata$total_cost)) {
-          metadata_text <- paste0(
-            " (Cost: $",
-            round(result$metadata$total_cost, 2),
-            ")"
-          )
-          status_text <- paste0(status_text, metadata_text)
-        }
-
-        div(
-          bs_icon("check-circle"),
-          status_text,
-          class = "validation-status validation-complete"
-        )
+        moduleState$llm_status <- "successful"
       } else {
-        # Extraction failed
-        error_msg <- if (!is.null(result$error)) {
-          result$error
-        } else {
-          "Unknown error occurred"
-        }
-
+        error_msg <- result$error %||% "Unknown error occurred"
         moduleState$error_message <- error_msg
+        moduleState$llm_status <- "failed"
+
         session$userData$reactiveValues$llmExtractionComplete <- TRUE
         session$userData$reactiveValues$llmExtractionSuccessful <- FALSE
 
@@ -1194,13 +1188,60 @@ mod_llm_server <- function(id) {
           type = "error",
           duration = 15
         )
+      }
+    }) |>
+      bindEvent(llm_task$result())
 
-        div(
+    ## # output: extraction_status ----
+    # upstream: moduleState$llm_status
+    # downstream: UI status display
+    output$extraction_status <- renderUI({
+      # Running state is detected via the task directly so the spinner
+      # appears immediately on invoke, before the result observer fires.
+      if (identical(llm_task$status(), "running")) {
+        # TODO: Isn't this a bit redundant with the below switch statement?
+        return(div(
+          bs_icon("hourglass-split"),
+          "Extracting data from PDF... This may take 30-60 seconds depending on model, file size and token count.",
+          class = "validation-status validation-info"
+        ))
+      }
+
+      cost_suffix <- if (
+        moduleState$llm_status == "successful" &&
+          !is.null(moduleState$api_metadata$total_cost)
+      ) {
+        glue(" (Cost: ${round(moduleState$api_metadata$total_cost, 2)})")
+      } else {
+        ""
+      }
+
+      switch(
+        moduleState$llm_status,
+        not_yet_started = div(
+          bs_icon("info-circle"),
+          "Upload a PDF and provide your API key to begin extraction, or use dummy data for testing.",
+          class = "validation-status validation-info"
+        ),
+        busy = div(
+          bs_icon("hourglass-split"),
+          "Extracting data from PDF... This may take 30-60 seconds depending on model, file size and token count.",
+          class = "validation-status validation-info"
+        ),
+        successful = div(
+          bs_icon("check-circle"),
+          paste0("Extraction successful.", cost_suffix),
+          class = "validation-status validation-complete"
+        ),
+        failed = div(
           bs_icon("exclamation-triangle"),
-          paste("Extraction failed:", error_msg),
+          paste(
+            "Extraction failed:",
+            moduleState$error_message %||% "Unknown error"
+          ),
           class = "validation-status validation-warning"
         )
-      }
+      )
     })
 
     ## # output: extraction_results ----
@@ -1303,19 +1344,19 @@ mod_llm_server <- function(id) {
     output$extraction_comments <- renderUI({
       if (
         !is.null(
-          session$userData$reactiveValues$llmExtractionComments
+          session$userData$reactiveValues$llmScreeningComments
         ) &
-          length(session$userData$reactiveValues$llmExtractionComments) != 0
+          length(session$userData$reactiveValues$llmScreeningComments) != 0
       ) {
         render_extraction_comments(
-          session$userData$reactiveValues$llmExtractionComments
+          session$userData$reactiveValues$llmScreeningComments
         )
       } else {
         "The LLM's self-appraisal of its performance will appear here once you extract data."
       }
     }) |>
       bindEvent(
-        session$userData$reactiveValues$llmExtractionComments,
+        session$userData$reactiveValues$llmScreeningComments,
         ignoreNULL = TRUE,
         ignoreInit = FALSE
       )

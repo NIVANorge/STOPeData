@@ -86,7 +86,10 @@ initialise_userData <- function() {
     llmExtractionSuccessful = FALSE, # tracks if the LLM data extraction process (or dummy data) returned a tibble in the expected format
     llmPopulateModules = FALSE, # tracks if the user has sent LLM data to modules
 
-    llmExtractionComments = tibble(NULL),
+    # track screening (in essence a very limited extraction) separately
+    llmScreeningComplete = FALSE,
+    llmScreeningComments = tibble(NULL),
+    llmScreeningSuccessful = FALSE,
 
     # Import data from save status flags ----
     saveExtractionComplete = FALSE,

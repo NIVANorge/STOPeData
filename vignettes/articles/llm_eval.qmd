@@ -10,6 +10,9 @@ knitr:
 ```{r}
 #| label: setup
 library(STOPeData)
+library(ellmer)
+library(tidyverse)
+library(flextable)
 ```
 
 The `ellmer` package includes functions that connect to a wide variety of local and remote APIs from a variety of providers. Put simply, we have a great many options. Which are better, and which are worse? We might assume that more expensive models are more effective at data extraction, and that larger and more complex files are more difficult - and require more tokens - than simpler models when extracting data. But can we prove any of these assumptions?
@@ -34,3 +37,140 @@ I then suggest some sort of the following experimental design:
 - 3 replicates (n = 3)
 
 This will give us 7 * 27 = 189 cases. Which is quite a lot, but we can probably batch them and let them get on with themselves. 
+
+
+
+```{r}
+#| label: pdfs
+
+pdfs <- tibble(
+  id = c("a", "b", "c"),
+  path = c(
+    "data-raw/norheim_1987.pdf",
+    "data-raw/wojtasik-2021.pdf",
+    "data-raw/zauke-1999.pdf"
+  ),
+  comment = c(
+    "Well-OCR'd text, some tables (difficult to read). Copper concentrations reported explicitly in tables. Score: 4.",
+    "More recent, clear layout with some (irrelevant) images. Score: 4.",
+    "Well laid out with extremely large quantity of data on different species."
+  ),
+  # Fill in after reviewing each PDF
+  num_images = c(NA_integer_, NA_integer_, NA_integer_),
+  num_tables = c(NA_integer_, NA_integer_, NA_integer_)
+) |>
+  mutate(
+    info = map(path, pdftools::pdf_info),
+    file_size_kb = map_dbl(path, \(p) file.size(p) / 1024),
+    num_pages = map_int(info, \(x) x$pages)
+  ) |>
+  select(-info)
+
+# TODO: Add more paper details, default rounding
+pdfs |>
+  flextable() |>
+  autofit()
+```
+
+Sources for model comparisons: https://platform.claude.com/docs/en/about-claude/models/overview, https://developers.openai.com/api/docs/models/compare, https://ai.google.dev/gemini-api/docs/models
+
+
+```{r}
+#| label: models
+
+models_tbl <- tribble(
+  ~provider          , ~model_label        , ~model_id                ,
+  ~release_date      , ~context_window_k   , ~max_output_k            ,
+  ~cost_input_mtok   , ~cost_output_mtok   ,
+  ~knowledge_cutoff  , ~training_cutoff    , ~niche                   ,
+  # ---- Anthropic ---------------------------------------------------------------
+  "Anthropic"        , "Claude Haiku 4.5"  , "claude-haiku-4-5"       ,
+  "release_date"     , "200k"              , "64k"                    ,
+  "$1"               , "$5"                ,
+  "Feb 2025"         , "Jul 2025"          , "niche"                  ,
+  #
+  "Anthropic"        , "Claude Sonnet 4.6" , "claude-sonnet-4-6"      ,
+  "release_date"     , "1M"                , "128k"                   ,
+  "$3"               , "$15"               ,
+  "Aug 2025"         , "Jan 2026"          , "niche"                  ,
+  #
+  "Anthropic"        , "Claude Opus 4.7"   , "claude-opus-4-7"        ,
+  "release_date"     , "context_window_k"  , "max_output_k"           ,
+  "cost_input_mtok"  , "cost_output_mtok"  ,
+  "knowledge_cutoff" , "training_cutoff"   , "niche"                  ,
+  #
+  "Anthropic"        , "Claude Opus 4.8"   , "claude-opus-4-8"        ,
+  "release_date"     , "1M"                , "128k"                   ,
+  "$5"               , "$25"               ,
+  "Jan 2026"         , "Jan 2026"          , "niche"                  ,
+  # ---- OpenAI ------------------------------------------------------------------
+  # TODO: OpenAI distinguishes between input and cached input cost. Wwhat does this mean? I used regular input for now.
+  # Also only provides "knowledge cutoff"
+  "OpenAI"           , "GPT-5.4 Mini"      , "gpt-5.4-mini"           ,
+  "release_date"     , "400"               , "128"                    ,
+  "0.75"             , "4.50"              ,
+  "Aug 2025"         , "training_cutoff"   , "niche"                  ,
+  #
+  "OpenAI"           , "GPT-5.4"           , "gpt-5.4"                ,
+  "release_date"     , "1050"              , "128"                    ,
+  "2.5"              , "15.0"              ,
+  "Aug 2025"         , "training_cutoff"   , "niche"                  ,
+  #
+  "OpenAI"           , "GPT-5.5"           , "gpt-5.5"                ,
+  "release_date"     , "1050"              , "128"                    ,
+  "cost_input_mtok"  , "30.0"              ,
+  "Dec 2025"         , "training_cutoff"   , "niche"                  ,
+  # ---- Google Gemini -----------------------------------------------------------
+  "Google Gemini"    , "Gemini 2.5 Pro"    , "gemini-2.5-pro"         ,
+  "release_date"     , "context_window_k"  , "max_output_k"           ,
+  "cost_input_mtok"  , "cost_output_mtok"  ,
+  "knowledge_cutoff" , "training_cutoff"   , "niche"                  ,
+  #
+  "Google Gemini"    , "Gemini 3.1 Pro"    , "gemini-3.1-pro-preview" ,
+  "release_date"     , "context_window_k"  , "max_output_k"           ,
+  "cost_input_mtok"  , "cost_output_mtok"  ,
+  "knowledge_cutoff" , "training_cutoff"   , "niche"                  ,
+  #
+  "Google Gemini"    , "Gemini 3.5 Flash"  , "gemini-3.5-flash"       ,
+  "release_date"     , "context_window_k"  , "max_output_k"           ,
+  "cost_input_mtok"  , "cost_output_mtok"  ,
+  "knowledge_cutoff" , "training_cutoff"   , "niche"
+)
+# Named vector for use in experimental_setup (label -> API id)
+models <- setNames(models_tbl$model_id, models_tbl$model_label)
+
+
+models_tbl |> flextable() |> autofit()
+```
+
+So, what experiments do we want to run?
+
+```{r}
+#| label: experimental_design
+
+experimental_setup <-
+  expand.grid(
+    pdf = c("a", "b", "c"),
+    models = models,
+    tokens = c("1000", "5000", "10000"),
+    replicate = 1:3
+  ) |>
+  as_tibble()
+```
+
+
+```{r}
+#| label: API_calls
+
+call1 <- extract_pdf_with_llm(
+  pdf = pdf_1,
+  model_provider = "Anthropic",
+  model_name = "claude-haiku-4-5",
+  env_var = "ANTHROPIC_API_KEY",
+  chat_fn = "chat_anthropic",
+  extraction_prompt = create_extraction_prompt(),
+  extraction_schema = create_extraction_schema(),
+  api_key = Sys.getenv("ANTHROPIC_API_KEY"),
+  max_tokens = 6000
+)
+```
