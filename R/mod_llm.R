@@ -1,7 +1,6 @@
 # LLM Extraction Module ----
 # A Shiny module for PDF upload and automated data extraction using Claude
 
-# TODO: Report paper size (mb and page number)
 # TODO: Remove excessively complicated BS layout code
 
 # hard-coded list of possible providers. will need to be updated manually.
@@ -35,8 +34,6 @@ provider_options <- list(
     fn = "chat_google_gemini",
     models = "models_google_gemini",
     curated_models = c(
-      # TODO: Check these all actually work
-      # TODO: So far, none of them do...
       "Gemini 2.5 Pro" = "gemini-2.5-pro",
       "Gemini 3.1 Pro" = "gemini-3.1-pro-preview",
       "Gemini 3.5 Flash" = "gemini-3.5-flash"
@@ -52,6 +49,7 @@ provider_options <- list(
 #' @importFrom bslib card card_body accordion accordion_panel tooltip layout_column_wrap input_task_button accordion_panel_open bind_task_button
 #' @importFrom bsicons bs_icon
 #' @importFrom shinyjs useShinyjs disabled
+#' @importFrom glue glue
 #' @import eDataDRF
 mod_llm_ui <- function(id) {
   ns <- NS(id)
@@ -360,6 +358,7 @@ mod_llm_server <- function(id) {
 
     ## # ReactiveValues: moduleState -----
     moduleState <- reactiveValues(
+      screening_successful = FALSE,
       extraction_successful = FALSE,
       raw_extraction = NULL,
       structured_data = NULL,
@@ -392,6 +391,56 @@ mod_llm_server <- function(id) {
       showNotification("Configuration reset to defaults", type = "message")
     }) |>
       bindEvent(input$reset_defaults)
+
+    ## # reactiveVal + observer: parse and validate llm_params text area ----
+    llm_params_parsed <- reactiveVal(NULL)
+    llm_params_status <- reactiveVal(list(state = "idle"))
+
+    observe({
+      raw <- trimws(input$llm_params %||% "")
+
+      if (!nzchar(raw)) {
+        llm_params_parsed(NULL)
+        llm_params_status(list(state = "idle"))
+        return()
+      }
+
+      # Syntactic check
+      parsed_expr <- tryCatch(
+        parse(text = raw, keep.source = FALSE),
+        error = function(e) {
+          llm_params_parsed(NULL)
+          llm_params_status(list(
+            state = "error",
+            message = paste0("Syntax error: ", e$message)
+          ))
+          NULL
+        }
+      )
+      if (is.null(parsed_expr)) {
+        return()
+      }
+
+      # Evaluate with ellmer::params in scope
+      result <- tryCatch(
+        eval(parsed_expr, envir = list(params = ellmer::params)),
+        error = function(e) {
+          llm_params_parsed(NULL)
+          llm_params_status(list(
+            state = "error",
+            message = paste0("Evaluation error: ", e$message)
+          ))
+          NULL
+        }
+      )
+      if (is.null(result)) {
+        return()
+      }
+
+      llm_params_parsed(result)
+      llm_params_status(list(state = "valid"))
+    }) |>
+      bindEvent(input$llm_params, ignoreNULL = FALSE, ignoreInit = TRUE)
 
     ## # observe: Update API key field when provider changes ----
     observe({
@@ -470,7 +519,7 @@ mod_llm_server <- function(id) {
     observe({
       showModal(modalDialog(
         title = tagList(bs_icon("sliders"), " Advanced LLM Settings"),
-        h6("Model Selection"),
+        h5("Model Selection"),
         checkboxInput(
           ns("enable_all_models"),
           label = "Show all available models",
@@ -480,7 +529,7 @@ mod_llm_server <- function(id) {
           "By default only recommended mid-tier models are shown. Check to display all available models (including those which probably won't work)."
         ),
         tags$hr(),
-        h6("Provider Status"),
+        h5("Provider Status"),
         p("Check provider status dashboard for any reported model issues."),
         tags$ul(
           tags$li(tags$a(
@@ -500,16 +549,17 @@ mod_llm_server <- function(id) {
           ))
         ),
         tags$hr(),
-        h6("Call Parameters"),
-        p(
-          "See ",
-          tags$a("https://ellmer.tidyverse.org/reference/params.html"),
-          " for more details"
-        ),
-        # TODO: Not actually functional yet. Needs tooltips, more info, and ideally some more code-like styling for the interior
+        h5("Call Parameters"),
         textAreaInput(
-          inputId = "llm_params",
-          label = "Arguments to LLM chat via ellmer::param() function",
+          inputId = ns("llm_params"),
+          label = tagList(
+            "Arguments via ",
+            tags$a(
+              "ellmer::params()",
+              href = "https://ellmer.tidyverse.org/reference/params.html",
+              target = "_blank"
+            )
+          ),
           width = "100%",
           rows = 15,
           value = glue(
@@ -519,16 +569,17 @@ mod_llm_server <- function(id) {
               top_k = NULL,
               frequency_penalty = NULL,
               presence_penalty = NULL,
-              seed = NULL,
+              seed = NULL, 
               max_tokens = NULL,
               log_probs = NULL,
               stop_sequences = NULL,
               reasoning_effort = NULL,
-              reasoning_tokens = NULL,
-              ...
+              reasoning_tokens = NULL
+              # add additional parameters here
           )"
           )
         ),
+        uiOutput(ns("llm_params_status")),
         ## Prompt and Schema Configuration ----
 
         # TODO: Add upload/download button for schema and prompt
@@ -586,6 +637,7 @@ mod_llm_server <- function(id) {
     observe({
       # disable buttons where simultaneous running could cause problems
       disable("extract_data")
+      disable("screen_data")
 
       populate_session_with_dummy_data(session = session)
 
@@ -615,11 +667,14 @@ mod_llm_server <- function(id) {
       enable("populate_forms")
       enable("clear_extraction")
       enable("extract_data")
+      enable("screen_data")
     }) |>
       bindEvent(input$load_dummy_data)
 
     ## # ExtendedTask: PDF data extraction ----
     # upstream: user clicks input$extract_data
+
+    # I don't know enough about mirai to know if this incredible degree of redundancy is actually necessary.
     llm_task <- ExtendedTask$new(
       function(
         pdf_path,
@@ -636,16 +691,16 @@ mod_llm_server <- function(id) {
         mirai(
           {
             extract_pdf_with_llm(
-              pdf_path,
-              model_provider,
-              model_name,
-              env_var,
-              chat_fn,
-              api_key,
-              extraction_prompt,
-              extraction_schema,
-              max_tokens,
-              params
+              pdf_path = pdf_path,
+              model_provider = model_provider,
+              model_name = model_name,
+              env_var = env_var,
+              chat_fn = chat_fn,
+              api_key = api_key,
+              params = params,
+              extraction_prompt = extraction_prompt,
+              extraction_schema = extraction_schema,
+              max_tokens = max_tokens
             )
           },
           pdf_path = pdf_path,
@@ -707,9 +762,17 @@ mod_llm_server <- function(id) {
       result <- test_task$result()
       req(!is.null(result))
       if (isTRUE(result$success)) {
-        showNotification(result$message, type = "message", duration = 10)
+        showNotification(
+          result$message,
+          type = "message",
+          duration = 10
+        )
       } else {
-        showNotification(result$message, type = "error", duration = 15)
+        showNotification(
+          result$message,
+          type = "error",
+          duration = 15
+        )
       }
     })
 
@@ -750,7 +813,8 @@ mod_llm_server <- function(id) {
           create_extraction_prompt()
         },
         extraction_schema = create_extraction_schema(include = "comments"),
-        max_tokens = input$max_tokens
+        max_tokens = input$max_tokens,
+        params = llm_params_parsed()
       )
     }) |>
       bindEvent(input$screen_data)
@@ -799,7 +863,8 @@ mod_llm_server <- function(id) {
         extraction_schema = create_extraction_schema(
           include = input$schema_components
         ),
-        max_tokens = input$max_tokens
+        max_tokens = input$max_tokens,
+        params = llm_params_parsed()
       )
     }) |>
       bindEvent(input$extract_data)
@@ -992,6 +1057,7 @@ mod_llm_server <- function(id) {
 
     ## # observe: Clear extraction ----
     # upstream: user clicks input$clear_extraction
+    # TODO: This button doesn't exist anymore, actually
     # downstream: reset module state and session data
     observe({
       # Clear module state
@@ -1083,6 +1149,8 @@ mod_llm_server <- function(id) {
         session$userData$reactiveValues$rawLLM <- result$result
         session$userData$reactiveValues$llmExtractionComplete <- TRUE
         session$userData$reactiveValues$llmExtractionSuccessful <- TRUE
+
+        # FIXME: This is probably the cause of our subscript out of bounds error
         if (!is.null(result$result$comments)) {
           session$userData$reactiveValues$llmExtractionComments <- result$result$comments
         }
@@ -1236,7 +1304,7 @@ mod_llm_server <- function(id) {
       if (
         !is.null(
           session$userData$reactiveValues$llmExtractionComments
-        ) &&
+        ) &
           length(session$userData$reactiveValues$llmExtractionComments) != 0
       ) {
         render_extraction_comments(
@@ -1251,6 +1319,30 @@ mod_llm_server <- function(id) {
         ignoreNULL = TRUE,
         ignoreInit = FALSE
       )
+
+    ## # output: llm_params_status ----
+    # TODO: De-AI this formatting
+    output$llm_params_status <- renderUI({
+      s <- llm_params_status()
+      switch(
+        s$state,
+        idle = span(
+          class = "text-muted small d-inline-flex align-items-center gap-1",
+          bs_icon("pencil"),
+          "Edit above to validate. Leave empty to use the Max Tokens input instead."
+        ),
+        valid = span(
+          class = "text-success small d-inline-flex align-items-center gap-1",
+          bs_icon("check-circle-fill"),
+          "Params valid \u2014 custom params will be used (overrides Max Tokens)."
+        ),
+        error = span(
+          class = "text-danger small d-inline-flex align-items-center gap-1",
+          bs_icon("x-circle-fill"),
+          s$message
+        )
+      )
+    })
   })
 }
 

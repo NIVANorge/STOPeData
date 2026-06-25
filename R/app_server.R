@@ -19,6 +19,7 @@ mirai::daemons(1)
 mirai::everywhere(source("R/mod_llm_fct_extract.R"))
 mirai::everywhere(library(ellmer))
 mirai::everywhere(library(shiny))
+mirai::everywhere(library(glue))
 # Reset when the app is stopped
 onStop(function() mirai::daemons(0))
 
@@ -79,7 +80,6 @@ initialise_userData <- function() {
     methodsDataLLM = tibble(NULL),
     samplesDataLLM = tibble(NULL),
     biotaDataLLM = tibble(NULL),
-    samplesDataLLM = tibble(NULL),
 
     # LLM extraction status flags ----
     llmExtractionComplete = FALSE, # tracks if the LLM data extraction process has completed, or the user has pressed the dummy data button

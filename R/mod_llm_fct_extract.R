@@ -40,7 +40,6 @@ extract_pdf_with_llm <- function(
     {
       # Set the provider-specific API key env var
       do.call(Sys.setenv, setNames(list(api_key), env_var))
-
       # allow for the user to manually specify all params via advanced options if designed
       # will override max_tokens input
       if (is.null(params)) {
@@ -55,9 +54,7 @@ extract_pdf_with_llm <- function(
             list(model = model_name, params = params)
           )
         },
-        error = function(e) {
-          glue("Error initialising LLM chat: {e}")
-        }
+        error = function(e) stop(glue("Error initialising LLM chat: {e}"))
       )
 
       # Prepare content
