@@ -147,7 +147,6 @@ mod_llm_ui <- function(id) {
               list("LLM API Key", bs_icon("info-circle-fill")),
               "Your API key for the selected provider. Set the corresponding environment variable (ANTHROPIC_API_KEY, OPENAI_API_KEY, GOOGLE_API_KEY) to avoid re-entering it each session."
             ),
-            # TODO: Is it a good idea to use Anthropic by default?
             value = Sys.getenv("ANTHROPIC_API_KEY", unset = ""),
             placeholder = "e.g. sk-ant-..., sk-..., or AQ...",
             width = "100%"
@@ -166,7 +165,6 @@ mod_llm_ui <- function(id) {
             step = 1000,
             width = "100%"
           ),
-          # TODO: Add warning (or better yet prevent entirely) when dependent data missing
           selectizeInput(
             inputId = ns("schema_components"),
             label = tooltip(
@@ -192,9 +190,6 @@ mod_llm_ui <- function(id) {
             ),
             "Advanced settings for LLM extraction. Recommended for experienced users."
           ),
-          # TODO: Enable cancellation of started extraction
-          # TODO: Important - population doesn't re-trigger if you screen then extract!!!
-          # Also, screening triggers auto-pop of other datasets for some reason
           tooltip(
             input_task_button(
               id = ns("screen_data"),
@@ -829,6 +824,7 @@ mod_llm_server <- function(id) {
       provider <- input$select_provider
       moduleState$llm_status <- "busy"
       moduleState$last_run_type <- "screening"
+      session$userData$reactiveValues$pdfPath <- input$pdf_file$datapath
       llm_task$invoke(
         pdf_path = input$pdf_file$datapath,
         model_provider = provider,
@@ -881,6 +877,7 @@ mod_llm_server <- function(id) {
 
       provider <- input$select_provider
       moduleState$llm_status <- "busy"
+      session$userData$reactiveValues$pdfPath <- input$pdf_file$datapath
       # schema_components == "comments" is functionally a screening even via the
       # extract_data button; treat it as such so populate forms is not triggered
       moduleState$last_run_type <- if (
@@ -1248,7 +1245,45 @@ mod_llm_server <- function(id) {
 
         if (!is.null(result$result$comments)) {
           session$userData$reactiveValues$llmScreeningComments <- result$result$comments
+          session$userData$reactiveValues$metaData$screening <- result$result$comments
         }
+
+        # Append extraction record to session metadata ----
+        rv_meta <- session$userData$reactiveValues
+        n_ex <- length(rv_meta$metaData$extractions) + 1L
+        ex_key <- paste0("extraction_", n_ex)
+        session_start_time <- tryCatch(
+          as.POSIXct(
+            rv_meta$metaData$session$session_start,
+            format = "%Y-%m-%d %H:%M:%S"
+          ),
+          error = function(e) Sys.time()
+        )
+        elapsed_secs <- as.numeric(difftime(
+          Sys.time(),
+          session_start_time,
+          units = "secs"
+        ))
+        api_meta <- result$metadata %||% list()
+
+        rv_meta$metaData$extractions[[ex_key]] <- list(
+          extraction_n = n_ex,
+          extraction_datetime = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"),
+          run_type = moduleState$last_run_type,
+          llm_provider = input$select_provider,
+          llm_version = input$select_model,
+          source_pdf = input$pdf_file$name %||% NA_character_,
+          llm_extraction_cost_USD = api_meta$total_cost %||% NA,
+          llm_input_tokens = api_meta$total_input_tokens %||% NA,
+          llm_output_tokens = api_meta$total_output_tokens %||% NA,
+          llm_call_count = api_meta$call_count %||% NA,
+          schema_components = if (moduleState$last_run_type == "screening") {
+            "screening"
+          } else {
+            as.list(input$schema_components)
+          },
+          time_from_session_start = format_duration(elapsed_secs)
+        )
 
         moduleState$llm_status <- "successful"
       } else {

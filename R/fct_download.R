@@ -1,9 +1,50 @@
 # Metadata Format Helper Functions
-# Functions to create and read human-readable metadata files
+# Functions to create and read metadata files
+
+#' Format a duration in seconds as a human-readable string
+#'
+#' @description Converts a numeric number of seconds into a readable string
+#'   such as "2 hours 13 minutes 51 seconds".
+#' @param seconds Numeric. Number of seconds to format.
+#' @return Character string.
+#' @examples
+#' format_duration(7451)   # "2 hours 4 minutes 11 seconds"
+#' format_duration(30)     # "30 seconds"
+#' @export
+format_duration <- function(seconds) {
+  seconds <- round(as.numeric(seconds))
+  h <- seconds %/% 3600
+  m <- (seconds %% 3600) %/% 60
+  s <- seconds %% 60
+  parts <- c(
+    if (h > 0) paste(h, if (h == 1) "hour" else "hours"),
+    if (m > 0) paste(m, if (m == 1) "minute" else "minutes"),
+    paste(s, if (s == 1) "second" else "seconds")
+  )
+  paste(parts, collapse = " ")
+}
+
+#' Write metadata as a YAML file
+#'
+#' @description Serialises a metadata list to a YAML file using the yaml package.
+#' @param metadata_list List. The metadata to write.
+#' @param file_path Character. Path where to write the YAML file.
+#' @return NULL (invisibly). File is written to disk as a side effect.
+#' @importFrom yaml write_yaml
+#' @examples
+#' \dontrun{
+#'   write_metadata_yaml(list(session = list(user = "Ole")), tempfile(fileext = ".yaml"))
+#' }
+#' @export
+write_metadata_yaml <- function(metadata_list, file_path) {
+  write_yaml(metadata_list, file_path)
+  invisible(NULL)
+}
 
 #' Create readable metadata text file
 #'
-#' @description Create a human-readable text file with export metadata
+#' @description Create a human-readable text file with export metadata.
+#'   Retained for backward compatibility; new exports use [write_metadata_yaml()].
 #' @param metadata_list List containing metadata fields (campaign_name, export_datetime, etc.)
 #' @param file_path Character. Path where to write the metadata file
 #' @return NULL (invisibly). File is written to disk as a side effect.
@@ -11,7 +52,7 @@
 #' @examples
 #' \dontrun{
 #'   meta <- list(campaign_name = "North Sea 2022", export_datetime = Sys.time(),
-#'                user = "Jane", app_name = "STOPeData", app_version = "1.0",
+#'                user = "Ole", app_name = "STOPeData", app_version = "1.0",
 #'                clientData = "localhost")
 #'   write_metadata_txt(meta, tempfile(fileext = ".txt"))
 #' }
@@ -89,41 +130,30 @@ get_export_metadata <- function(session = NULL) {
     stop("session reactive object must be supplied to create CSVs")
   }
   rv <- session$userData$reactiveValues
+  meta <- rv$metaData
 
-  list(
-    campaign_name = rv$campaignData$CAMPAIGN_NAME,
-    export_datetime = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"),
-    app_name = "STOPeData",
-    # TODO: Add missing LLM data
-    llm_provider = "FIXME",
-    llm_version = "claude-sonnet-4-5-20250929", # TODO: set manually in mod_llm_fct_extract
-    llm_extraction_cost = "fixme",
-    llm_extraction_time_expended = "fixme",
-    clientData = paste(
-      sep = "",
-      "protocol: ",
-      session$clientData$url_protocol,
-      "\n",
-      "hostname: ",
-      session$clientData$url_hostname,
-      "\n",
-      "pathname: ",
-      session$clientData$url_pathname,
-      "\n",
-      "port: ",
-      session$clientData$url_port,
-      "\n",
-      "search: ",
-      session$clientData$url_search,
-      "\n"
-    ),
-    app_version = get_golem_version() %||% "Version not available",
-    format_version = packageDescription("eDataDRF")$Version,
-    user = rv$ENTERED_BY %||% "Unknown user",
-    # TODO: Add missing user data
-    user_email = "fixme",
-    username = "fixme"
+  # Compute elapsed time from session start
+  session_start_time <- tryCatch(
+    as.POSIXct(meta$session$session_start, format = "%Y-%m-%d %H:%M:%S"),
+    error = function(e) Sys.time()
   )
+  elapsed_secs <- as.numeric(difftime(
+    Sys.time(),
+    session_start_time,
+    units = "secs"
+  ))
+
+  # Add export-level fields (assembled fresh at download time, not stored reactively)
+  meta$export <- list(
+    campaign_name = tryCatch(
+      rv$campaignData$CAMPAIGN_NAME[[1]],
+      error = function(e) NA_character_
+    ),
+    export_datetime = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"),
+    time_from_session_start = format_duration(elapsed_secs)
+  )
+
+  meta
 }
 
 #' Create metadata tibble
@@ -136,9 +166,28 @@ get_export_metadata <- function(session = NULL) {
 #' create_metadata_tibble(list(campaign = "North Sea 2022", version = "1.0", user = "Jane"))
 #' @export
 create_metadata_tibble <- function(metadata_list) {
+  s <- metadata_list$session %||% list()
+  e <- metadata_list$export %||% list()
+
+  flat <- list(
+    "Session: App" = s$app_name %||% NA_character_,
+    "Session: Version" = s$app_version %||% NA_character_,
+    "Session: Format Version" = s$format_version %||% NA_character_,
+    "Session: Start" = s$session_start %||% NA_character_,
+    "Session: User" = s$user %||% "Unknown",
+    "Export: Campaign" = e$campaign_name %||% NA_character_,
+    "Export: Datetime" = e$export_datetime %||% NA_character_,
+    "Export: Session Duration" = e$time_from_session_start %||% NA_character_,
+    "Extractions (YAML)" = if (length(metadata_list$extractions) > 0) {
+      as.yaml(metadata_list$extractions)
+    } else {
+      "None"
+    }
+  )
+
   tibble(
-    Property = names(metadata_list),
-    Value = as.character(unlist(metadata_list))
+    Property = names(flat),
+    Value = as.character(unlist(flat, use.names = FALSE))
   )
 }
 
@@ -167,6 +216,7 @@ get_dataset_display_name <- function(dataset_name) {
     schemaLLM = "LLM_Schema",
     promptLLM = "LLM_Prompt",
     rawLLM = "LLM_Raw_Response",
+    metaData = "Metadata",
     creedRelevance = "CREED_RV",
     creedReliability = "CREED_RB",
     creedScores = "CREED_Score"
@@ -357,6 +407,8 @@ downloadable_tabular_datasets <- function() {
 #' @return Character vector of dataset names.
 #' @noRd
 downloadable_text_datasets <- function() {
+  # Note: metaData is no longer exported as a text object — it is written as a
+  # dedicated YAML file by build_session_zip() / write_metadata_yaml().
   c("schemaLLM", "promptLLM", "rawLLM")
 }
 
@@ -382,6 +434,7 @@ downloadable_text_datasets <- function() {
 #' @importFrom golem print_dev
 #' @importFrom rlang `%||%`
 #' @importFrom shiny showNotification
+#' @importFrom eDataDRF generate_reference_id
 #' @seealso [eDataDRF::generate_reference_id()], [download_all_data()]
 #' @examples
 #' \dontrun{
@@ -397,7 +450,7 @@ build_session_zip <- function(session, moduleState, dest_file) {
   timestamp <- format(Sys.time(), "%Y%m%d_%H%M%S")
 
   campaign <- if (nrow(rv$referenceData) > 0) {
-    eDataDRF::generate_reference_id(
+    generate_reference_id(
       rv$referenceData$YEAR,
       rv$referenceData$AUTHOR,
       rv$referenceData$TITLE
@@ -406,6 +459,7 @@ build_session_zip <- function(session, moduleState, dest_file) {
     "ReferenceNotFound"
   }
 
+  # metaData is exported as a dedicated YAML file below, not via object_to_text()
   text_datasets <- c("schemaLLM", "promptLLM", "rawLLM")
   all_files <- character(0)
 
@@ -462,13 +516,23 @@ build_session_zip <- function(session, moduleState, dest_file) {
     all_files <- c(all_files, pdf_dest)
   }
 
-  # Write metadata file ----
+  # Write metadata YAML ----
   combined_metadata_file <- file.path(
     temp_dir,
-    glue("{campaign}_export_metadata_{timestamp}.txt")
+    glue("{campaign}_metadata_{timestamp}.yaml")
   )
-  write_metadata_txt(metadata, combined_metadata_file)
+  write_metadata_yaml(metadata, combined_metadata_file)
   all_files <- c(all_files, combined_metadata_file)
+
+  # Write screening comments as a separate YAML if present ----
+  if (!is.null(rv$metaData$screening) && length(rv$metaData$screening) > 0) {
+    screening_file <- file.path(
+      temp_dir,
+      glue("{campaign}_screening_comments_{timestamp}.yaml")
+    )
+    write_metadata_yaml(list(screening = rv$metaData$screening), screening_file)
+    all_files <- c(all_files, screening_file)
+  }
 
   # Create and cleanup ZIP archive ----
   zip(zipfile = dest_file, files = all_files, mode = "cherry-pick")

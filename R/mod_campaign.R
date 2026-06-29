@@ -354,6 +354,7 @@ mod_campaign_server <- function(id) {
           if (!isTruthy(session$userData$reactiveValues$ENTERED_BY)) {
             # Set the reactive value
             session$userData$reactiveValues$ENTERED_BY <- input$ENTERED_BY
+            session$userData$reactiveValues$metaData$user <- input$ENTERED_BY
 
             showNotification(
               glue("Saved your username {input$ENTERED_BY} to session data."),

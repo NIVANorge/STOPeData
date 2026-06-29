@@ -71,6 +71,21 @@ initialise_userData <- function() {
     schemaLLM = "",
     promptLLM = "",
     rawLLM = "",
+    metaData = list(
+      session = list(
+        app_name = "STOPeData",
+        app_version = get_golem_version() %||% "unknown",
+        format_version = tryCatch(
+          packageDescription("eDataDRF")$Version,
+          error = function(e) "unknown"
+        ),
+        session_start = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"),
+        user = character(0),
+        client = list()
+      ),
+      extractions = list(),
+      screening = NULL
+    ),
     pdfPath = NULL,
     campaignDataLLM = tibble(NULL),
     referenceDataLLM = tibble(NULL),
@@ -122,6 +137,18 @@ app_server <- function(input, output, session) {
     campaign_name = "Unknown_Campaign",
     dataset_dimensions = list()
   )
+
+  ## observe: Populate client metadata on session start ----
+  # TODO: I believe this is over-sensitive and slowing down startup
+  # upstream: fire whenever session data changes (although it shouldn't)
+  # downstream: rv$metaData$session$client populated with URL info
+  observe({
+    session$userData$reactiveValues$protocol$metaData$session$client <- session$clientData$url_protocol
+    session$userData$reactiveValues$protocol$metaData$session$hostname <- session$clientData$url_hostname
+    session$userData$reactiveValues$protocol$metaData$session$port <- session$clientData$url_port
+    session$userData$reactiveValues$protocol$metaData$session$pathname <- session$clientData$url_pathname
+  }) |>
+    bindEvent(session$clientData, ignoreInit = FALSE, ignoreNULL = TRUE)
 
   ## Module servers ----
   # upstream: session start
@@ -553,6 +580,7 @@ app_server <- function(input, output, session) {
 
         if (!is.null(email) && !is.na(email) && nchar(email) > 0) {
           session$userData$reactiveValues$ENTERED_BY <- email
+          session$userData$reactiveValues$metaData$session$user <- email
           showNotification(
             glue("Set username to {email}."),
             type = "message"

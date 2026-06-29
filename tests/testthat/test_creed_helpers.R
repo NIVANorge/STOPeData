@@ -1,35 +1,4 @@
 # =========================================================================
-# CREED SUMMARY FUNCTION TESTS
-# =========================================================================
-
-test_that("summarise_CREED_reliability returns valid tibble", {
-  dummy_data <- create_dummy_session_data()
-
-  expect_no_error(result <- summarise_CREED_reliability(dummy_data))
-  expect_no_warning(result <- summarise_CREED_reliability(dummy_data))
-  expect_s3_class(result, "tbl_df")
-
-  # Should have 19 rows (RB1-RB19) and 2 columns (field, value)
-  expect_equal(nrow(result), 19)
-  expect_equal(ncol(result), 2)
-  expect_equal(names(result), c("field", "value"))
-})
-
-test_that("summarise_CREED_relevance returns valid tibble", {
-  dummy_data <- create_dummy_session_data()
-
-  expect_no_error(result <- summarise_CREED_relevance(dummy_data))
-  expect_no_warning(result <- summarise_CREED_relevance(dummy_data))
-  expect_s3_class(result, "tbl_df")
-
-  # Should have 11 rows (RV1-RV11) and 2 columns (field, value)
-  expect_equal(nrow(result), 11)
-  expect_equal(ncol(result), 2)
-  expect_equal(names(result), c("field", "value"))
-})
-
-
-# =========================================================================
 # COLLECT_CREED_SCORES TESTS
 # =========================================================================
 

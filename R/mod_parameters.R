@@ -28,75 +28,73 @@ mod_parameters_ui <- function(id) {
         layout_columns(
           col_widths = c(8, 4),
 
-        ## Parameter selection controls ----
-        layout_columns(
-          col_widths = c(6, 6,12,12),
+          ## Parameter selection controls ----
+          layout_columns(
+            col_widths = c(6, 6, 12, 12),
 
-          pickerInput(
-            inputId = ns("parameter_type_select"),
-            label = tooltip(
-              list("Parameter Type", bs_icon("info-circle-fill")),
-              "Is the measured parameter a stressor (chemical, radiation, etc.), quality parameter (pH, nutrients, etc.), normalization (?) or background count(?)."
+            pickerInput(
+              inputId = ns("parameter_type_select"),
+              label = tooltip(
+                list("Parameter Type", bs_icon("info-circle-fill")),
+                "Is the measured parameter a stressor (chemical, radiation, etc.), quality parameter (pH, nutrients, etc.), normalization (?) or background count(?)."
+              ),
+              choices = c(
+                "Stressor" = "Stressor",
+                "Quality parameter" = "Quality parameter",
+                "Normalization" = "Normalization",
+                "Background" = "Background"
+              ),
+              selected = "Stressor",
+              width = "100%",
+              multiple = FALSE
             ),
-            choices = c(
-              "Stressor" = "Stressor",
-              "Quality parameter" = "Quality parameter",
-              "Normalization" = "Normalization",
-              "Background" = "Background"
-            ),
-            selected = "Stressor",
-            width = "100%",
-            multiple = FALSE
-          ),
 
-          pickerInput(
-            inputId = ns("parameter_subtype_select"),
-            label = tooltip(
-              list("Parameter Subtype", bs_icon("info-circle-fill")),
-              "Each parameter type is split into multiple subtypes. Use to filter the Parameter Name field."
+            pickerInput(
+              inputId = ns("parameter_subtype_select"),
+              label = tooltip(
+                list("Parameter Subtype", bs_icon("info-circle-fill")),
+                "Each parameter type is split into multiple subtypes. Use to filter the Parameter Name field."
+              ),
+              choices = c("Show all" = "Show all"),
+              selected = "Show all",
+              width = "100%",
+              multiple = FALSE,
+              options = pickerOptions(
+                actionsBox = TRUE,
+                liveSearch = TRUE,
+                virtualScroll = TRUE
+              )
             ),
-            choices = c("Show all" = "Show all"),
-            selected = "Show all",
-            width = "100%",
-            multiple = FALSE,
-            options = pickerOptions(
-              actionsBox = TRUE,
-              liveSearch = TRUE,
-              virtualScroll = TRUE
+            pickerInput(
+              inputId = ns("parameter_name_select"),
+              label = tooltip(
+                list("Parameter Name", bs_icon("info-circle-fill")),
+                "Press backspace to remove existing parameters. Start typing a name to search for parameters."
+              ),
+              choices = c("Select parameter type first..."),
+              width = "100%",
+              selected = "Formaldehyde",
+              options = pickerOptions(
+                actionsBox = TRUE,
+                liveSearch = TRUE,
+                virtualScroll = TRUE
+              ),
+              multiple = FALSE
+            ),
+            textAreaInput(
+              inputId = ns("parameter_comment"),
+              label = tooltip(
+                list("Parameter Comments", bs_icon("info-circle-fill")),
+                "Use this space to enter any potentially relevant or noteworthy comments or remarks about the measured parameter."
+              ),
+              placeholder = "Parameter notes (optional)",
+              width = "100%",
+              rows = 1
             )
           ),
-          pickerInput(
-            inputId = ns("parameter_name_select"),
-            label = tooltip(
-              list("Parameter Name", bs_icon("info-circle-fill")),
-              "Press backspace to remove existing parameters. Start typing a name to search for parameters."
-            ),
-            choices = c("Select parameter type first..."),
-            width = "100%",
-            selected = "Formaldehyde",
-            options = pickerOptions(
-              actionsBox = TRUE,
-              liveSearch = TRUE,
-              virtualScroll = TRUE
-            ),
-            multiple = FALSE
-          ),
-          textAreaInput(
-            inputId = ns("parameter_comment"),
-            label = tooltip(
-              list("Parameter Comments", bs_icon("info-circle-fill")),
-              "Use this space to enter any potentially relevant or noteworthy comments or remarks about the measured parameter."
-            ),
-            placeholder = "Parameter notes (optional)",
-            width = "100%",
-            rows = 1
-          )
+          ## Info accordion ----
+          info_accordion(content_file = "inst/app/www/md/intro_parameters.md")
         ),
-        ## Info accordion ----
-        info_accordion(content_file = "inst/app/www/md/intro_parameters.md")
-
-        ),
-
 
         ## Action buttons and validation status ----
         div(
@@ -212,7 +210,9 @@ mod_parameters_server <- function(id) {
           "ENTERED_BY"
         )
 
-        for (i in 1:nrow(session$userData$reactiveValues$parametersData)) {
+        for (i in seq_len(nrow(
+          session$userData$reactiveValues$parametersData
+        ))) {
           for (field in required_fields) {
             value <- session$userData$reactiveValues$parametersData[i, field]
             if (is.na(value) || value == "") {
@@ -370,7 +370,6 @@ mod_parameters_server <- function(id) {
           nrow(llm_parameters) > 0 &&
           session$userData$reactiveValues$llmExtractionComplete
       ) {
-        # CHANGED: Load to userData instead of moduleState
         session$userData$reactiveValues$parametersData <- llm_parameters
 
         # Run validation if chemical_parameters is available
@@ -381,41 +380,13 @@ mod_parameters_server <- function(id) {
           )
           moduleState$llm_validation_results <- validation_result
           moduleState$llm_lookup_validation <- TRUE
-
-          # Show notification based on validation
-          #   if (validation_result$has_warnings) {
-          #     showNotification(
-          #       paste(
-          #         "Populated",
-          #         nrow(llm_parameters),
-          #         "parameters (validation warning)"
-          #       ),
-          #       type = "warning"
-          #     )
-          #   } else {
-          #     showNotification(
-          #       paste(
-          #         "Populated",
-          #         nrow(llm_parameters),
-          #         "parameters (validated))"
-          #       ),
-          #       type = "message"
-          #     )
-          #   }
-          # } else {
-          #   showNotification(
-          #     paste(
-          #       "Populated",
-          #       nrow(llm_parameters),
-          #       "parameters. (validation not available)"
-          #     ),
-          #     type = "message"
-          #   )
           moduleState$llm_lookup_validation <- FALSE
         }
       }
     }) |>
       bindEvent(
+        label = "observe~bindEvent: load parameters data from LLM module",
+        session$userData$reactiveValues$parametersDataLLM,
         session$userData$reactiveValues$llmExtractionSuccessful,
         ignoreInit = TRUE,
         ignoreNULL = FALSE
@@ -441,7 +412,6 @@ mod_parameters_server <- function(id) {
         )
 
         if (!is.null(new_param)) {
-          # CHANGED: Update userData instead of moduleState
           session$userData$reactiveValues$parametersData <- rbind(
             session$userData$reactiveValues$parametersData,
             new_param
@@ -482,7 +452,6 @@ mod_parameters_server <- function(id) {
         ) |>
           mutate(PARAMETER_COMMENT)
 
-        # CHANGED: Update userData instead of moduleState
         session$userData$reactiveValues$parametersData <- rbind(
           session$userData$reactiveValues$parametersData,
           new_param
@@ -509,7 +478,7 @@ mod_parameters_server <- function(id) {
         updated_data <- hot_to_r(input$parameters_table)
 
         # Store any new parameters that were created in the session
-        for (i in 1:nrow(updated_data)) {
+        for (i in seq_len(nrow(updated_data))) {
           param_type <- updated_data[i, "PARAMETER_TYPE"]
           param_name <- updated_data[i, "PARAMETER_NAME"]
 
@@ -608,9 +577,8 @@ mod_parameters_server <- function(id) {
             )
           )
       } else {
-
-        tbl =  session$userData$reactiveValues$parametersData
-        dynamic_height = rHandsontableGetHeight(dataTable = tbl)
+        tbl <- session$userData$reactiveValues$parametersData
+        dynamic_height <- rHandsontableGetHeight(dataTable = tbl)
         rhandsontable(
           tbl,
           stretchH = "all",
@@ -734,7 +702,7 @@ mod_parameters_server <- function(id) {
       ) {
         # Format each parameter as a separate entry
         param_entries <- lapply(
-          1:nrow(session$userData$reactiveValues$parametersData),
+          seq_len(nrow(session$userData$reactiveValues$parametersData)),
           function(i) {
             param <- session$userData$reactiveValues$parametersData[i, ]
             param_lines <- sapply(names(param), function(name) {

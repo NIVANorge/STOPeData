@@ -914,7 +914,7 @@ mod_CREED_purpose_server <- function(id) {
 
       tryCatch(
         {
-          imported_data <- yaml::read_yaml(input$import_file$datapath)
+          imported_data <- read_yaml(input$import_file$datapath)
 
           # Update purpose statement
           if (!is.null(imported_data$purpose_statement)) {
@@ -1004,7 +1004,7 @@ mod_CREED_purpose_server <- function(id) {
       },
       content = function(file) {
         data <- collect_purpose_data()
-        yaml::write_yaml(data, file)
+        write_yaml(data, file)
       },
       contentType = "application/x-yaml"
     )

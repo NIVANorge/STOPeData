@@ -7,6 +7,7 @@
 #' @param zip_path Path to the ZIP file
 #' @return List with metadata information or NULL if not found/readable
 #' @importFrom utils unzip
+#' @importFrom yaml read_yaml
 #' @importFrom glue glue
 #' @importFrom golem print_dev
 #' @examples
@@ -36,25 +37,28 @@ read_zip_metadata <- function(zip_path) {
       # Extract ZIP
       extracted_files <- unzip(zip_path, exdir = extract_dir)
 
-      # Find metadata file
+      # Find metadata file — prefer YAML, fall back to legacy TXT
+      yaml_files <- extracted_files[grepl(
+        "_metadata\\.yaml$",
+        extracted_files,
+        ignore.case = TRUE
+      )]
       txt_files <- extracted_files[grepl(
         "\\.txt$",
         extracted_files,
         ignore.case = TRUE
       )]
-      metadata_file <- txt_files[grepl(
-        "metadata",
-        txt_files,
-        ignore.case = TRUE
-      )][1]
+      txt_files <- txt_files[grepl("metadata", txt_files, ignore.case = TRUE)]
 
-      if (is.na(metadata_file)) {
+      if (length(yaml_files) > 0) {
+        metadata <- read_yaml(yaml_files[[1]])
+      } else if (length(txt_files) > 0) {
+        metadata_file <- txt_files[[1]]
+        metadata <- read_metadata_txt(metadata_file)
+      } else {
         unlink(extract_dir, recursive = TRUE)
         return(NULL)
       }
-
-      # Read metadata
-      metadata <- read_metadata_txt(metadata_file)
 
       # Clean up
       unlink(extract_dir, recursive = TRUE)
@@ -80,6 +84,7 @@ read_zip_metadata <- function(zip_path) {
 #' @importFrom utils unzip read.csv
 #' @importFrom jsonlite fromJSON
 #' @importFrom tibble as_tibble
+#' @importFrom yaml read_yaml
 #' @importFrom glue glue
 #' @importFrom golem print_dev
 #' @importFrom rlang `%||%`
@@ -162,6 +167,32 @@ import_session_from_zip <- function(zip_path, session) {
       failed_imports <- c(failed_imports, failed_dataset)
       print_dev(glue("Failed to import {failed_dataset}: {result$message}"))
     }
+  }
+
+  # Restore session metadata from YAML if present ----
+  yaml_meta_files <- extracted_files[grepl(
+    "_metadata\\.yaml$",
+    extracted_files,
+    ignore.case = TRUE
+  )]
+  if (length(yaml_meta_files) > 0) {
+    tryCatch(
+      {
+        restored_meta <- read_yaml(yaml_meta_files[[1]])
+        session$userData$reactiveValues$metaData <- restored_meta
+        # Also restore screening comments to the dedicated reactiveValue for UI rendering
+        if (
+          !is.null(restored_meta$screening) &&
+            length(restored_meta$screening) > 0
+        ) {
+          session$userData$reactiveValues$llmScreeningComments <- restored_meta$screening
+        }
+        print_dev("Restored session metaData from YAML")
+      },
+      error = function(e) {
+        print_dev(glue("Could not restore metaData from YAML: {e$message}"))
+      }
+    )
   }
 
   # Clean up ----
