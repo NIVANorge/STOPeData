@@ -374,7 +374,11 @@ mod_llm_server <- function(id) {
       raw_extraction = NULL,
       structured_data = NULL,
       error_message = NULL,
-      llm_status = "not_yet_started"
+      llm_status = "not_yet_started",
+      # tracks what triggered the current/last llm_task run:
+      # "screening" = screen_data button, or extract with schema_components == "comments"
+      # "extraction" = extract_data button with substantive schema components
+      last_run_type = NULL
     )
 
     # 2. Observers and Reactives ----
@@ -848,6 +852,7 @@ mod_llm_server <- function(id) {
 
       provider <- input$select_provider
       moduleState$llm_status <- "busy"
+      moduleState$last_run_type <- "screening"
       llm_task$invoke(
         pdf_path = input$pdf_file$datapath,
         model_provider = provider,
@@ -900,6 +905,17 @@ mod_llm_server <- function(id) {
 
       provider <- input$select_provider
       moduleState$llm_status <- "busy"
+      # schema_components == "comments" is functionally a screening even via the
+      # extract_data button; treat it as such so populate forms is not triggered
+      moduleState$last_run_type <- if (
+        identical(input$schema_components, "comments") ||
+          (length(input$schema_components) == 1 &&
+            input$schema_components[[1]] == "comments")
+      ) {
+        "screening"
+      } else {
+        "extraction"
+      }
       llm_task$invoke(
         pdf_path = input$pdf_file$datapath,
         model_provider = provider,
@@ -926,11 +942,11 @@ mod_llm_server <- function(id) {
     # downstream: download_extraction button state
     observe({
       # TODO: This logic could be significantly better-structured
-      # It also fails because of a missing value. Why
+
       if (
         (session$userData$reactiveValues$llmExtractionComplete &&
           session$userData$reactiveValues$llmExtractionSuccessful) ||
-          session$userData$reactiveValues$llmScreeningComplete &
+          session$userData$reactiveValues$llmScreeningComplete &&
             session$userData$reactiveValues$llmScreeningSuccessful
       ) {
         enable("download_extraction")
@@ -942,7 +958,8 @@ mod_llm_server <- function(id) {
         session$userData$reactiveValues$llmExtractionComplete,
         session$userData$reactiveValues$llmExtractionSuccessful,
         session$userData$reactiveValues$llmScreeningComplete,
-        session$userData$reactiveValues$llmScreeningSuccessful
+        session$userData$reactiveValues$llmScreeningSuccessful,
+        ignoreInit = TRUE
       )
 
     ## # observe: Populate forms with extracted data ----
@@ -950,12 +967,14 @@ mod_llm_server <- function(id) {
     # downstream: trigger form population in other modules
     observe({
       req(moduleState$llm_status == "successful")
+      # Screening runs (screen_data button, or extract with comments-only schema)
+      # must not auto-populate downstream modules
+      req(moduleState$last_run_type == "extraction")
       req(
         (!is.null(moduleState$structured_data$sites) &&
           nrow(moduleState$structured_data$sites) > 0) ||
           (!is.null(moduleState$structured_data$references) &&
-            nrow(moduleState$structured_data$references) > 0) ||
-          isTruthy(session$userData$reactiveValues$llmScreeningComments)
+            nrow(moduleState$structured_data$references) > 0)
       )
 
       # Campaign data
@@ -1218,7 +1237,6 @@ mod_llm_server <- function(id) {
         return()
       }
 
-      # TODO: Modify logic to better reflect screening vs. full extraction
       result <- tryCatch(
         llm_task$result(),
         error = function(e) {
@@ -1243,22 +1261,32 @@ mod_llm_server <- function(id) {
         moduleState$error_message <- NULL
 
         session$userData$reactiveValues$rawLLM <- result$result
-        session$userData$reactiveValues$llmExtractionComplete <- TRUE
-        session$userData$reactiveValues$llmExtractionSuccessful <- TRUE
+
+        if (moduleState$last_run_type == "screening") {
+          session$userData$reactiveValues$llmScreeningComplete <- TRUE
+          session$userData$reactiveValues$llmScreeningSuccessful <- TRUE
+        } else {
+          session$userData$reactiveValues$llmExtractionComplete <- TRUE
+          session$userData$reactiveValues$llmExtractionSuccessful <- TRUE
+        }
 
         if (!is.null(result$result$comments)) {
           session$userData$reactiveValues$llmScreeningComments <- result$result$comments
         }
 
-        enable("clear_extraction")
         moduleState$llm_status <- "successful"
       } else {
         error_msg <- result$error %||% "Unknown error occurred"
         moduleState$error_message <- error_msg
         moduleState$llm_status <- "failed"
 
-        session$userData$reactiveValues$llmExtractionComplete <- TRUE
-        session$userData$reactiveValues$llmExtractionSuccessful <- FALSE
+        if (moduleState$last_run_type == "screening") {
+          session$userData$reactiveValues$llmScreeningComplete <- TRUE
+          session$userData$reactiveValues$llmScreeningSuccessful <- FALSE
+        } else {
+          session$userData$reactiveValues$llmExtractionComplete <- TRUE
+          session$userData$reactiveValues$llmExtractionSuccessful <- FALSE
+        }
 
         showNotification(
           paste("Extraction failed:", error_msg),
