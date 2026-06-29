@@ -46,7 +46,7 @@ provider_options <- list(
 #' @noRd
 #'
 #' @importFrom shiny NS tagList fileInput textInput actionButton downloadButton downloadHandler
-#' @importFrom bslib card card_body accordion accordion_panel tooltip layout_column_wrap input_task_button accordion_panel_open bind_task_button
+#' @importFrom bslib card card_body card_header accordion accordion_panel tooltip layout_column_wrap input_task_button accordion_panel_open bind_task_button
 #' @importFrom bsicons bs_icon
 #' @importFrom shinyjs useShinyjs disabled
 #' @importFrom glue glue
@@ -224,7 +224,7 @@ mod_llm_ui <- function(id) {
             disabled(
               actionButton(
                 inputId = ns("cancel_extraction"),
-                label = HTML(paste(bs_icon("sign-stop"), "Cancel extraction")),
+                label = HTML(paste(bs_icon("sign-stop"), "Cancel Extraction")),
                 class = "btn-danger"
               )
             ),
@@ -248,52 +248,28 @@ mod_llm_ui <- function(id) {
         ),
 
         # Extraction appraisal
-        # TODO: Update styling
         # TODO: Add comments to downloadable data
-        div(
-          h5(
+        card(
+          fill = FALSE,
+          card_header(
             "Extraction Appraisal"
           ),
-          htmlOutput(ns("extraction_comments"))
-        ),
+          card_body(htmlOutput(ns("extraction_comments")))
+        )
+      ),
 
-        ## Extraction results accordion ----
-        accordion(
-          id = ns("results_accordion"),
-          open = FALSE,
-          accordion_panel(
-            title = "Extraction Raw Data",
-            value = "extraction_results",
-            icon = bs_icon("cpu"),
-            div(
-              verbatimTextOutput(ns("extraction_results"))
-            )
+      ## Extraction results accordion ----
+      accordion(
+        id = ns("results_accordion"),
+        open = FALSE,
+        accordion_panel(
+          title = "Extraction Raw Data",
+          value = "extraction_results",
+          icon = bs_icon("cpu"),
+          div(
+            verbatimTextOutput(ns("extraction_results"))
           )
         )
-
-        # TODO: Reduce sensitivity of module population triggers so they only fire if their data has been updated
-        # ## Action buttons for extracted data  ----
-        # layout_columns(
-        #   fill = FALSE,
-        #   tooltip(
-        #     (input_task_button(
-        #       id = ns("populate_forms"),
-        #       label = "Populate Modules",
-        #       icon = icon("download"),
-        #       class = "btn-primary"
-        #     ) |>
-        #       disabled()),
-        #     "Send extracted data to the data entry modules for checking and validation."
-        #   ),
-
-        #   input_task_button(
-        #     id = ns("clear_extraction"),
-        #     label = "Clear Extraction",
-        #     icon = icon("trash"),
-        #     class = "btn-danger"
-        #   ) |>
-        #     disabled()
-        # )
       )
     )
   )
@@ -1486,68 +1462,6 @@ mod_llm_server <- function(id) {
       )
     })
   })
-}
-
-# 4. Helper Functions ----
-
-#' Create extraction prompt with controlled vocabulary
-#' @description Creates the system prompt for Claude extraction
-#' @importFrom readr read_file
-#' @noRd
-create_extraction_prompt <- function() {
-  read_file("inst/app/www/md/extraction_prompt.md")
-}
-
-#' Clear LLM data from session reactiveValues
-#' @param session Shiny session object
-#' @noRd
-clear_llm_data_from_session <- function(session) {
-  session$userData$reactiveValues$campaignDataLLM <- NULL
-  session$userData$reactiveValues$referenceDataLLM <- NULL
-  session$userData$reactiveValues$sitesDataLLM <- NULL
-  session$userData$reactiveValues$parametersDataLLM <- NULL
-  session$userData$reactiveValues$compartmentsDataLLM <- NULL
-  session$userData$reactiveValues$biotaDataLLM <- NULL
-  session$userData$reactiveValues$methodsDataLLM <- NULL
-  session$userData$reactiveValues$samplesDataLLM <- NULL
-  showNotification(
-    "Cleared all LLM extracted data from session",
-    type = "message"
-  )
-}
-
-render_extraction_comments <- function(named_list) {
-  tagList(
-    lapply(names(named_list), function(nm) {
-      pretty_name <- c(
-        "paper_relevance" = "Relevance",
-        "paper_reliability" = "Reliability",
-        "paper_data_source" = "Original Data",
-        "paper_data_available" = "Data Availability",
-        "extraction_assessement" = "Extraction Suitability"
-      )
-      score_emoji <- c(
-        # emoji coloured circles
-        "Score: 5" = "\U0001F7E2",
-        "Score: 4" = "\U0001F7E2",
-        "Score: 3" = "\U0001F7E1",
-        "Score: 2" = "\U0001F7E0",
-        "Score: 1" = "\U0001F534"
-      )
-      tags$div(
-        tags$strong(paste0(pretty_name[[nm]], ": ")),
-        score_emoji[[str_extract(
-          named_list[[nm]],
-          pattern = "Score: [1-5]"
-        )]],
-        str_replace(
-          string = named_list[[nm]],
-          pattern = "Score: [1-5]",
-          replacement = ""
-        )
-      )
-    })
-  )
 }
 
 ## To be copied in the UI ----

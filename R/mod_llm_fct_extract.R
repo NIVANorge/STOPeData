@@ -105,6 +105,7 @@ extract_pdf_with_llm <- function(
 #'
 #' @param e An error condition.
 #' @return Character string.
+#' @importFrom glue glue
 #' @noRd
 llm_http_error_message <- function(e) {
   msg <- conditionMessage(e)
@@ -125,7 +126,7 @@ llm_http_error_message <- function(e) {
       "529" = "API overloaded - the provider under high load; try again in a few minutes.",
       "Unexpected HTTP error."
     )
-    paste0("HTTP ", code, ": ", explanation)
+    glue("HTTP {code}: {explanation}")
   } else {
     msg
   }
@@ -139,6 +140,7 @@ llm_http_error_message <- function(e) {
 #'
 #' @return TRUE if valid (invisibly). Throws error if invalid.
 #'
+#' @importFrom glue glue
 #' @noRd
 validate_api_key <- function(api_key, provider = "Anthropic") {
   prefix <- switch(
@@ -149,7 +151,7 @@ validate_api_key <- function(api_key, provider = "Anthropic") {
     NULL
   )
   if (!is.null(prefix) && !startsWith(api_key, prefix)) {
-    stop(paste0("API key for ", provider, " should start with '", prefix, "'"))
+    stop(glue("API key for {provider} should start with '{prefix}'"))
   }
   invisible(TRUE)
 }
@@ -165,6 +167,7 @@ validate_api_key <- function(api_key, provider = "Anthropic") {
 #' @return Named list: \code{list(success, message)}.
 #'
 #' @importFrom ellmer params
+#' @importFrom glue glue
 #' @noRd
 test_llm_connection <- function(
   model_provider,
@@ -186,28 +189,97 @@ test_llm_connection <- function(
 
       list(
         success = TRUE,
-        message = paste0(
-          model_provider,
-          " / ",
-          model_name,
-          ": connected. ",
-          "Model replied: \"",
-          trimws(reply),
-          "\""
+        message = glue(
+          '{model_provider} / {model_name}: connected. Model replied: "{trimws(reply)}"'
         )
       )
     },
     error = function(e) {
       list(
         success = FALSE,
-        message = paste0(
-          model_provider,
-          " / ",
-          model_name,
-          ": ",
-          llm_http_error_message(e)
+        message = glue(
+          "{model_provider} / {model_name}: {llm_http_error_message(e)}"
         )
       )
     }
+  )
+}
+
+#' Create extraction prompt with controlled vocabulary
+#' @description Creates the system prompt for LLM structured extraction
+#' @importFrom readr read_file
+#' @noRd
+create_extraction_prompt <- function() {
+  read_file("inst/app/www/md/extraction_prompt.md")
+}
+
+#' Clear LLM data from session reactiveValues#
+#' @param session Shiny session object
+#' @noRd
+
+# TODO: Replace with regex to make more robust to changes in data structure?
+clear_llm_data_from_session <- function(session) {
+  session$userData$reactiveValues$campaignDataLLM <- NULL
+  session$userData$reactiveValues$referenceDataLLM <- NULL
+  session$userData$reactiveValues$sitesDataLLM <- NULL
+  session$userData$reactiveValues$parametersDataLLM <- NULL
+  session$userData$reactiveValues$compartmentsDataLLM <- NULL
+  session$userData$reactiveValues$biotaDataLLM <- NULL
+  session$userData$reactiveValues$methodsDataLLM <- NULL
+  session$userData$reactiveValues$samplesDataLLM <- NULL
+  showNotification(
+    "Cleared all LLM extracted data from session",
+    type = "message"
+  )
+}
+
+
+#' Render LLM extraction self-appraisal comments
+#'
+#' @param named_list Named list of appraisal comments from the LLM.
+#' @return A \code{shiny::tagList} containing styled appraisal entries.
+#'
+#' @importFrom glue glue
+#' @importFrom stringr str_extract str_replace
+#' @noRd
+render_extraction_comments <- function(named_list) {
+  pretty_name <- c(
+    "paper_relevance" = "Relevance",
+    "paper_reliability" = "Reliability",
+    "paper_data_source" = "Original Data",
+    "paper_data_available" = "Data Availability",
+    "extraction_assessement" = "Extraction Suitability"
+  )
+
+  # Parse score number and derive Bootstrap contextual colour
+  parse_score <- function(text) {
+    num <- as.integer(str_extract(text, "(?<=Score: )[1-5]"))
+    color <- if (is.na(num)) {
+      "secondary"
+    } else if (num >= 4) {
+      "success"
+    } else if (num == 3) {
+      "warning"
+    } else {
+      "danger"
+    }
+    list(num = num, color = color)
+  }
+
+  tagList(
+    lapply(names(named_list), function(nm) {
+      s <- parse_score(named_list[[nm]])
+      clean_text <- str_replace(named_list[[nm]], "\\s*Score: [1-5]\\s*", " ")
+      tags$div(
+        class = "mb-1",
+        tags$span(
+          class = glue(
+            "px-2 py-1 rounded fw-semibold bg-{s$color}-subtle text-{s$color}-emphasis me-1"
+          ),
+          glue("{pretty_name[[nm]]} ({s$num}/5):")
+        ),
+        tags$span(clean_text)
+      )
+    })
   )
 }
