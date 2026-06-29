@@ -353,7 +353,7 @@ schema_component_choices <- c(
   "Biota" = "biota",
   "Methods" = "methods",
   "Samples" = "samples",
-  "Comments" = "comments"
+  "Screening Comments" = "comments"
 )
 
 #' Create extraction schema with correct ellmer syntax
@@ -385,6 +385,70 @@ create_extraction_schema <- function(
   }
 
   do.call(type_object, args)
+}
+
+# !: Schema to JSON and associated functions are included as an attempt to do structured extraction without structured extraction.
+# * The ellmer schema type is surprisingly hard to convert back to JSON.
+#' Convert an ellmer type object to a JSON Schema string
+#'
+#' Recursively walks an ellmer S7 type tree (TypeObject, TypeArray, TypeBasic,
+#' TypeEnum) and produces a standard JSON Schema string suitable for embedding
+#' in a prompt when the provider does not support native structured output.
+#'
+#' @param type An ellmer Type object (e.g. from \code{create_extraction_schema()}).
+#' @param pretty Logical. Pretty-print the JSON? Default TRUE.
+#' @return A JSON Schema character string.
+#' @importFrom jsonlite toJSON
+#' @noRd
+schema_to_json <- function(type, pretty = TRUE) {
+  toJSON(
+    type_to_list(type),
+    pretty = pretty,
+    auto_unbox = TRUE,
+    null = "null"
+  )
+}
+
+# Internal: recursively convert an ellmer Type S7 object to a plain list
+# that mirrors standard JSON Schema structure.
+type_to_list <- function(type) {
+  if (S7::S7_inherits(type, TypeObject)) {
+    schema <- list(type = "object")
+    if (!is.null(type@description)) {
+      schema$description <- type@description
+    }
+    if (length(type@properties) > 0) {
+      schema$properties <- lapply(type@properties, type_to_list)
+    }
+    return(schema)
+  }
+
+  if (S7::S7_inherits(type, TypeArray)) {
+    schema <- list(type = "array", items = type_to_list(type@items))
+    if (!is.null(type@description)) {
+      schema$description <- type@description
+    }
+    return(schema)
+  }
+
+  if (S7::S7_inherits(type, TypeEnum)) {
+    schema <- list(type = "string", enum = type@values)
+    if (!is.null(type@description)) {
+      schema$description <- type@description
+    }
+    return(schema)
+  }
+
+  if (S7::S7_inherits(type, TypeBasic)) {
+    schema <- list(type = type@type)
+    if (!is.null(type@description)) {
+      schema$description <- type@description
+    }
+    return(schema)
+  }
+
+  # TypeIgnore or unknown — skip
+  list(type = "string")
 }
 
 #' Display extraction schema as string

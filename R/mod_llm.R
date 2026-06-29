@@ -167,7 +167,6 @@ mod_llm_ui <- function(id) {
             width = "100%"
           ),
           # TODO: Add warning (or better yet prevent entirely) when dependent data missing
-          # TODO: Rename comments to "Screening" for consistency
           selectizeInput(
             inputId = ns("schema_components"),
             label = tooltip(
@@ -195,6 +194,7 @@ mod_llm_ui <- function(id) {
           ),
           # TODO: Enable cancellation of started extraction
           # TODO: Important - population doesn't re-trigger if you screen then extract!!!
+          # Also, screening triggers auto-pop of other datasets for some reason
           tooltip(
             input_task_button(
               id = ns("screen_data"),
@@ -205,7 +205,7 @@ mod_llm_ui <- function(id) {
               class = "btn-info"
             ) |>
               disabled(),
-            "LLM Rapidly screens the .pdf for its suitability in answering your research question. Equivalent to setting Extract to Comments only."
+            "Rapidly screens the .pdf for its suitability in answering your research question. Equivalent to setting Extract to Screening Comments only."
           ),
           tooltip(
             input_task_button(
@@ -218,6 +218,17 @@ mod_llm_ui <- function(id) {
             ) |>
               disabled(),
             "Extract data from a .pdf using the chosen LLM. A .pdf must be uploaded to enable this function."
+          ),
+
+          tooltip(
+            disabled(
+              actionButton(
+                inputId = ns("cancel_extraction"),
+                label = HTML(paste(bs_icon("sign-stop"), "Cancel extraction")),
+                class = "btn-danger"
+              )
+            ),
+            "Cancel an extraction currently in process. No data will be extracted."
           ),
 
           tooltip(
@@ -293,7 +304,7 @@ mod_llm_ui <- function(id) {
 #' @noRd
 #' @importFrom shiny moduleServer reactive reactiveValues observe renderText renderUI showNotification updateTextAreaInput ExtendedTask showModal modalDialog modalButton updateSelectInput
 #' @importFrom shinyvalidate InputValidator sv_required
-#' @importFrom mirai mirai
+#' @importFrom mirai mirai stop_mirai
 #' @importFrom shinyjs enable disable
 #' @importFrom stringr str_replace str_extract
 #' @importFrom glue glue
@@ -368,7 +379,8 @@ mod_llm_server <- function(id) {
 
     # 2. Observers and Reactives ----
 
-    # reactive: PDF metadata — fires immediately on upload
+    ## # reactive: PDF metadata
+    # upstream: file uploaded to input$pdf_file
     pdf_meta <- reactive({
       req(input$pdf_file)
       path <- input$pdf_file$datapath
@@ -676,6 +688,11 @@ mod_llm_server <- function(id) {
     ## # ExtendedTask: PDF data extraction ----
     # upstream: user clicks input$extract_data or input$screen_data
 
+    # current_mirai holds a reference to the active mirai so stop_mirai() can
+    # cancel it. ExtendedTask doesn't expose its internal mirai, so we capture
+    # it via <<- inside the task function and return it so shiny awaits it.
+    current_mirai <- NULL
+
     # I don't know enough about mirai to know if this incredible degree of redundancy is actually necessary.
     llm_task <- ExtendedTask$new(
       function(
@@ -690,7 +707,7 @@ mod_llm_server <- function(id) {
         max_tokens,
         params
       ) {
-        mirai(
+        m <- mirai(
           {
             extract_pdf_with_llm(
               pdf_path = pdf_path,
@@ -716,6 +733,8 @@ mod_llm_server <- function(id) {
           max_tokens = max_tokens,
           params = params
         )
+        current_mirai <<- m
+        m
       }
     ) |>
       # we need both this and to invoke in the below observers
@@ -779,11 +798,32 @@ mod_llm_server <- function(id) {
       }
     })
 
+    ## # observe: enable cancel button
+    # upstream: llm_task is active
+    observe({
+      if (identical(llm_task$status(), "running")) {
+        enable("cancel_extraction")
+      } else {
+        disable("cancel_extraction")
+      }
+    })
+
+    ## # observe: cancel screening/full extraction
+    # upstream: user clicks input$cancel_extraction
+    observe({
+      if (!is.null(current_mirai)) {
+        stop_mirai(current_mirai)
+      }
+      moduleState$llm_status <- "cancelled"
+      enable("extract_data")
+      enable("screen_data")
+    }) |>
+      bindEvent(input$cancel_extraction)
+
     ## # observe: Screen PDF (comments-only extraction) ----
     # upstream: user clicks input$screen_data
     observe({
       req(input$pdf_file, input$api_key)
-
       if (!iv$is_valid()) {
         showNotification(
           "Please fix validation errors before screening.",
@@ -792,15 +832,19 @@ mod_llm_server <- function(id) {
         return()
       }
 
-      tryCatch(
+      key_ok <- tryCatch(
         {
           validate_api_key(input$api_key, input$select_provider)
+          TRUE
         },
         error = function(e) {
           showNotification(e$message, type = "warning")
-          return()
+          FALSE
         }
       )
+      if (!key_ok) {
+        return()
+      }
 
       provider <- input$select_provider
       moduleState$llm_status <- "busy"
@@ -840,17 +884,20 @@ mod_llm_server <- function(id) {
       }
 
       # Check API key format again (using regex)
-      tryCatch(
+      key_ok <- tryCatch(
         {
           validate_api_key(input$api_key, input$select_provider)
+          TRUE
         },
         error = function(e) {
           showNotification(e$message, type = "warning")
-          return()
+          FALSE
         }
       )
+      if (!key_ok) {
+        return()
+      }
 
-      # Launch async extraction
       provider <- input$select_provider
       moduleState$llm_status <- "busy"
       llm_task$invoke(
@@ -899,7 +946,7 @@ mod_llm_server <- function(id) {
       )
 
     ## # observe: Populate forms with extracted data ----
-    # upstream: user clicks input$populate_forms
+    # upstream: triggers automatically when data received from LLM call
     # downstream: trigger form population in other modules
     observe({
       req(moduleState$llm_status == "successful")
@@ -1156,8 +1203,38 @@ mod_llm_server <- function(id) {
     # upstream: llm_task completes
     # downstream: moduleState$llm_status, moduleState$structured_data, session flags
     observe({
+      # status() never throws, so it's safe to use as the bindEvent trigger.
+      # result() re-throws promise rejections (e.g. from cancellation), so we
+      # only call it when the task actually succeeded or failed non-cancelled.
+      status <- llm_task$status()
+      req(status %in% c("success", "error"))
+
+      if (moduleState$llm_status == "cancelled") {
+        showNotification(
+          "Extraction cancelled by user.",
+          type = "warning",
+          duration = 5
+        )
+        return()
+      }
+
       # TODO: Modify logic to better reflect screening vs. full extraction
-      result <- llm_task$result()
+      result <- tryCatch(
+        llm_task$result(),
+        error = function(e) {
+          moduleState$llm_status <- "failed"
+          moduleState$error_message <- conditionMessage(e)
+          showNotification(
+            paste("Extraction failed:", conditionMessage(e)),
+            type = "error",
+            duration = 15
+          )
+          NULL
+        }
+      )
+      if (is.null(result)) {
+        return()
+      }
 
       if (!is.null(result$success) && result$success) {
         moduleState$structured_data <- result$result
@@ -1190,23 +1267,14 @@ mod_llm_server <- function(id) {
         )
       }
     }) |>
-      bindEvent(llm_task$result())
+      bindEvent(llm_task$status())
 
     ## # output: extraction_status ----
     # upstream: moduleState$llm_status
     # downstream: UI status display
     output$extraction_status <- renderUI({
       # Running state is detected via the task directly so the spinner
-      # appears immediately on invoke, before the result observer fires.
-      if (identical(llm_task$status(), "running")) {
-        # TODO: Isn't this a bit redundant with the below switch statement?
-        return(div(
-          bs_icon("hourglass-split"),
-          "Extracting data from PDF... This may take 30-60 seconds depending on model, file size and token count.",
-          class = "validation-status validation-info"
-        ))
-      }
-
+      # appears immediately on invoke, before the result observer fires
       cost_suffix <- if (
         moduleState$llm_status == "successful" &&
           !is.null(moduleState$api_metadata$total_cost)
@@ -1221,6 +1289,11 @@ mod_llm_server <- function(id) {
         not_yet_started = div(
           bs_icon("info-circle"),
           "Upload a PDF and provide your API key to begin extraction, or use dummy data for testing.",
+          class = "validation-status validation-info"
+        ),
+        cancelled = div(
+          bs_icon("sign-stop"),
+          "Extraction cancelled.",
           class = "validation-status validation-info"
         ),
         busy = div(
@@ -1345,7 +1418,7 @@ mod_llm_server <- function(id) {
       if (
         !is.null(
           session$userData$reactiveValues$llmScreeningComments
-        ) &
+        ) &&
           length(session$userData$reactiveValues$llmScreeningComments) != 0
       ) {
         render_extraction_comments(

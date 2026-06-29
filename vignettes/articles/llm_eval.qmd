@@ -34,11 +34,11 @@ I then suggest some sort of the following experimental design:
 - 3 providers x 2 models, + 1 LM Studio (n = 7)
 - 3 different papers of varying lengths (n = 3)
 - 3 different token limits, small, medium, and large (n = 3)
-- 3 replicates (n = 3)
+- 3 replicates (n = 3) # increase once we've tested it
 
 This will give us 7 * 27 = 189 cases. Which is quite a lot, but we can probably batch them and let them get on with themselves. 
 
-
+Use multiple models to do a consensus thing and maybe compare against people doing the data extraction manually
 
 ```{r}
 #| label: pdfs
