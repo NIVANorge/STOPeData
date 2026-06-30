@@ -64,7 +64,7 @@
   <main id="main" class="col-md-9"><p><a id="readme-top"></a></p>
 <!-- PROJECT LOGO -->
 <br><div align="center">
-<p><a href="https://github.com/NIVANorge/STOPeData" class="external-link"> <img src="https://github.com/NIVANorge/STOPeData/blob/main/inst/images/eData_DRF_logo.svg" alt="Logo" width="80" height="80"></a></p>
+<p><a href="https://github.com/NIVANorge/STOPeData" class="external-link"> <img src="images/stopsquarecropped.png" alt="Logo" width="80" height="80"></a></p>
 <h3 align="center">
 STOP Exposure Data App
 </h3>
@@ -72,18 +72,61 @@ STOP Exposure Data App
 STOPeData is a data entry and formatting Shiny app in the Source to Outcome Pathway/Risk assessment database family, designed to make extracting data on chemical concentrations in the environment from papers and reports easier. <br><br><a href="https://edata.test-stop.niva.no" class="external-link">Test Version</a> (Login required) · <a href="https://edata.stop.niva.no" class="external-link">Prod</a> (Login required) · <a href="https://github.com/NIVANorge/STOPeData/issues/new?labels=bug&amp;template=bug-report---.md" class="external-link">Report Bug</a> · <a href="https://github.com/NIVANorge/STOPeData/issues/new?labels=enhancement&amp;template=feature-request---.md" class="external-link">Request Feature</a>
 </p>
 </div>
-<!-- ABOUT THE PROJECT -->
-<div class="section level2">
+<!-- TABLE OF CONTENTS -->
+<details><summary>
+Table of Contents
+</summary><ol>
+<li>
+<a href="#about-the-project">About The Project</a>
+<ul>
+<li>
+<a href="#built-with">Built With</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#getting-started">Getting Started</a>
+<ul>
+<li>
+<a href="#prerequisites">Prerequisites</a>
+</li>
+<li>
+<a href="#installation">Installation</a>
+</li>
+</ul>
+</li>
+<li>
+<a href="#usage">Usage</a>
+</li>
+<li>
+<a href="#roadmap">Roadmap</a>
+</li>
+<li>
+<a href="#contact">Contact</a>
+</li>
+<li>
+<a href="#acknowledgments">Acknowledgments</a>
+</li>
+</ol></details><!-- ABOUT THE PROJECT --><div class="section level2">
 <h2 id="about-the-project">About The Project<a class="anchor" aria-label="anchor" href="#about-the-project"></a>
 </h2>
+<div class="float">
+<img src="images/efve.png" alt="workflow"><div class="figcaption">workflow</div>
+</div>
 <p>This app designed to guide users through the formatting, cleaning and annotation of exposure/pollution/monitoring data (e.g. mg/L of a chemical in an environmental matrix). Published studies and reports are an important source of this data, but it is often fragmented and difficult to analyse without extensive data cleaning and transformation. By assisting and automating this step, we hope to make exposure assessment - and therefore the risk assessment of chemicals in the environment - as easy as possible.</p>
 <p>This app is part of the <a href="https://www.niva.no/radb" class="external-link">Source to Outcome Pathway/Risk assessment database</a> family of R Shiny apps, and provides one-half of the data necessary for environmental risk assessment. Its counterpart for toxicity/bioassay data is <a href="https://github.com/NIVANorge/stop-q-data" class="external-link">STOP qData</a>. Environmental risk predictions can be viewed at the <a href="https://github.com/NIVANorge/STOP" class="external-link">Source To Outcome Predictor</a>.</p>
+<p align="right">
+(<a href="#readme-top">back to top</a>)
+</p>
 <div class="section level3">
 <h3 id="built-with">Built With<a class="anchor" aria-label="anchor" href="#built-with"></a>
 </h3>
 <p><a href="#"><img src="https://img.shields.io/badge/R-%23276DC3.svg?logo=r&amp;logoColor=white" alt="R"></a></p>
 <!-- badges: start -->
 
+<p align="right">
+(<a href="#readme-top">back to top</a>)
+</p>
 <!-- GETTING STARTED -->
 </div>
 </div>
@@ -123,18 +166,55 @@ STOPeData is a data entry and formatting Shiny app in the Source to Outcome Path
 <p>Run app locally:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">golem</span><span class="fu">::</span><span class="fu"><a href="https://thinkr-open.github.io/golem/reference/run_dev.html" class="external-link">run_dev</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<h3 id="screenshots-and-diagrams">Screenshots and Diagrams</h3>
 </li>
 </ol>
-<p>TODO</p>
-<!-- CONTACT -->
+<p align="right">
+(<a href="#readme-top">back to top</a>)
+</p>
+<!-- USAGE EXAMPLES -->
 </div>
+</div>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
+<p>This version of the app demo is hosted on Posit Connect Cloud on my personal account: <a href="https://sawelch-niva-stopedata.share.connect.posit.cloud/" class="external-link uri">https://sawelch-niva-stopedata.share.connect.posit.cloud/</a>. This will be migrated to NIVA’s standard severs when practical.</p>
+<div class="section level3">
+<h3 id="screenshots-and-diagrams">Screenshots and Diagrams<a class="anchor" aria-label="anchor" href="#screenshots-and-diagrams"></a>
+</h3>
+<p><img src="inst/app/www/app_mapp.png" alt="complicated_workflow"> An overview of the manual/LLM assisted workflow.</p>
+<p><img src="images/mod_sites_screenshot.png" alt="sites"> Entering data on sampling sites.</p>
+<p><img src="images/mod_biota_screenshot.png" alt="biota"> Entering data about sampled organisms.</p>
+<p><img src="images/mod_creed_screenshot.png" alt="creed"> Assisted assessment of data quality using the CREED framework.</p>
+<p align="right">
+(<a href="#readme-top">back to top</a>)
+</p>
+<!-- ROADMAP -->
+</div>
+</div>
+<div class="section level2">
+<h2 id="roadmap">Roadmap<a class="anchor" aria-label="anchor" href="#roadmap"></a>
+</h2>
+<ul class="task-list">
+<li><label><input type="checkbox">Better test architecture and general bug fixes</label></li>
+<li><label><input type="checkbox">More user-friendly session saving</label></li>
+<li><label><input type="checkbox">Data extraction from structured formats (e.g. Excel spreadsheets, API calls)</label></li>
+<li><label><input type="checkbox">Connection to the Risk Assessment database for lookups and long-term storage</label></li>
+<li><label><input type="checkbox">Support for more formats</label></li>
+</ul>
+<p>See the <a href="https://github.com/NIVANorge/STOPeData/issues" class="external-link">open issues</a> for a full list of proposed features (and known issues).</p>
+<p align="right">
+(<a href="#readme-top">back to top</a>)
+</p>
+<!-- CONTACT -->
 </div>
 <div class="section level2">
 <h2 id="contact">Contact<a class="anchor" aria-label="anchor" href="#contact"></a>
 </h2>
 <p>Sam Welch - <a href="mailto:sam.welch@niva.no" class="email">sam.welch@niva.no</a></p>
 <p>Project Link: <a href="https://github.com/NIVANorge/STOPeData" class="external-link">https://github.com/NIVANorge/STOPeData</a></p>
+<p align="right">
+(<a href="#readme-top">back to top</a>)
+</p>
 <!-- ACKNOWLEDGMENTS -->
 </div>
 <div class="section level2">
@@ -148,7 +228,13 @@ STOPeData is a data entry and formatting Shiny app in the Source to Outcome Path
 <li>An LLM (Anthropic Claude Sonnet 4.5) was used in the creation of this app and its code.</li>
 <li>Readme template repo: <a href="https://github.com/othneildrew/Best-README-Template/blob/main/BLANK_README.md" class="external-link">Best-README-Template</a>
 </li>
+<li>(If I’ve left you off please let me know!)</li>
 </ul>
+<p align="right">
+(<a href="#readme-top">back to top</a>)
+</p>
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 </div>
 
   </main><aside class="col-md-3"><div class="links">

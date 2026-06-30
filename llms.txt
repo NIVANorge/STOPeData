@@ -1,6 +1,6 @@
   
 
-[![Logo](https://github.com/NIVANorge/STOPeData/blob/main/inst/images/eData_DRF_logo.svg)](https://github.com/NIVANorge/STOPeData)
+[![Logo](images/stopsquarecropped.png)](https://github.com/NIVANorge/STOPeData)
 
 ### STOP Exposure Data App
 
@@ -15,7 +15,23 @@ Bug](https://github.com/NIVANorge/STOPeData/issues/new?labels=bug&template=bug-r
 · [Request
 Feature](https://github.com/NIVANorge/STOPeData/issues/new?labels=enhancement&template=feature-request---.md)
 
+Table of Contents
+
+1.  [About The Project](#about-the-project)
+    - [Built With](#built-with)
+2.  [Getting Started](#getting-started)
+    - [Prerequisites](#prerequisites)
+    - [Installation](#installation)
+3.  [Usage](#usage)
+4.  [Roadmap](#roadmap)
+5.  [Contact](#contact)
+6.  [Acknowledgments](#acknowledgments)
+
 ## About The Project
+
+![workflow](images/efve.png)
+
+workflow
 
 This app designed to guide users through the formatting, cleaning and
 annotation of exposure/pollution/monitoring data (e.g. mg/L of a
@@ -34,9 +50,13 @@ qData](https://github.com/NIVANorge/stop-q-data). Environmental risk
 predictions can be viewed at the [Source To Outcome
 Predictor](https://github.com/NIVANorge/STOP).
 
+([back to top](#readme-top))
+
 ### Built With
 
 [![R](https://img.shields.io/badge/R-%23276DC3.svg?logo=r&logoColor=white)](#)
+
+([back to top](#readme-top))
 
 ## Getting Started
 
@@ -79,15 +99,57 @@ Predictor](https://github.com/NIVANorge/STOP).
     golem::run_dev()
     ```
 
-    ### Screenshots and Diagrams
+([back to top](#readme-top))
 
-TODO
+## Usage
+
+This version of the app demo is hosted on Posit Connect Cloud on my
+personal account:
+<https://sawelch-niva-stopedata.share.connect.posit.cloud/>. This will
+be migrated to NIVA’s standard severs when practical.
+
+### Screenshots and Diagrams
+
+![complicated_workflow](inst/app/www/app_mapp.png) An overview of the
+manual/LLM assisted workflow.
+
+![sites](images/mod_sites_screenshot.png) Entering data on sampling
+sites.
+
+![biota](images/mod_biota_screenshot.png) Entering data about sampled
+organisms.
+
+![creed](images/mod_creed_screenshot.png) Assisted assessment of data
+quality using the CREED framework.
+
+([back to top](#readme-top))
+
+## Roadmap
+
+Better test architecture and general bug fixes
+
+More user-friendly session saving
+
+Data extraction from structured formats (e.g. Excel spreadsheets, API
+calls)
+
+Connection to the Risk Assessment database for lookups and long-term
+storage
+
+Support for more formats
+
+See the [open issues](https://github.com/NIVANorge/STOPeData/issues) for
+a full list of proposed features (and known issues).
+
+([back to top](#readme-top))
 
 ## Contact
 
 Sam Welch - <sam.welch@niva.no>
 
 Project Link: <https://github.com/NIVANorge/STOPeData>
+
+([back to top](#readme-top))
 
 ## Acknowledgments
 
@@ -103,6 +165,9 @@ Project Link: <https://github.com/NIVANorge/STOPeData>
   app and its code.
 - Readme template repo:
   [Best-README-Template](https://github.com/othneildrew/Best-README-Template/blob/main/BLANK_README.md)
+- (If I’ve left you off please let me know!)
+
+([back to top](#readme-top))
 
 # Package index
 
