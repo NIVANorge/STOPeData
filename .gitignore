@@ -18,5 +18,6 @@ deployment/test/secrets.env
 docs
 **/.quarto/
 inst/doc
+*.pdf
 .vscode/*
 .posit/assistant/settings.json

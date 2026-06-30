@@ -255,17 +255,25 @@ mod_Zenodo_server <- function(id) {
     ## Initialise Zenodo managers once per session ----
     # Two managers are created at startup (sandbox + production) so switching
     # environments does not require a round-trip to re-initialise.
-    zenodo_sandbox <- ZenodoManager$new(
-      url = "http://sandbox.zenodo.org/api",
-      sandbox = TRUE,
-      token = Sys.getenv("ZENODO_SANDBOX_TOKEN"),
-      logger = "DEBUG"
-    )
-    zenodo_production <- ZenodoManager$new(
-      url = "https://zenodo.org/api",
-      sandbox = FALSE,
-      token = Sys.getenv("ZENODO_TOKEN"),
-      logger = "INFO"
+    # TODO: Make Zenodo uplink more robust and move to an aschynchronous
+    tryCatch(
+      {
+        zenodo_sandbox <- ZenodoManager$new(
+          url = "http://sandbox.zenodo.org/api",
+          sandbox = TRUE,
+          token = Sys.getenv("ZENODO_SANDBOX_TOKEN"),
+          logger = "DEBUG"
+        )
+        zenodo_production <- ZenodoManager$new(
+          url = "https://zenodo.org/api",
+          sandbox = FALSE,
+          token = Sys.getenv("ZENODO_TOKEN"),
+          logger = "INFO"
+        )
+      },
+      error = function(e) {
+        showNotification(type = "error", ui = glue("Zenodo returned error:"))
+      }
     )
 
     # Warn users if tokens not found
