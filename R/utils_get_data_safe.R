@@ -32,7 +32,7 @@ get_session_data_safe <- function(
   }
 
   # Check if data exists and has the requested variable column with content
-  if (nrow(table_data) > 0 & length(table_data[[variable_name]]) > 0) {
+  if (nrow(table_data) > 0 && length(table_data[[variable_name]]) > 0) {
     return(table_data[[variable_name]])
   } else {
     return(fallback_value)

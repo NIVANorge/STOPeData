@@ -314,7 +314,7 @@ create_samples_schema <- function() {
 #' @noRd
 create_comments_schema <- function() {
   type_object(
-    .description = "Commentary and metadata on the information quality of the paper, and of the LLM extraction. For scoring, 1 is worst, 5 is best.",
+    .description = "Commentary and metadata on the information quality of the paper, and of the LLM extraction. For scoring, 1 is worst, 5 is best. Keep extremely terse, full grammatical sentences not required.",
     paper_relevance = type_string(
       description = "A comment on the relevance of the paper to the questions posed in the prompt (2 sentences). Return in the format Score: {1-5}: {text}",
       required = TRUE
@@ -335,29 +335,120 @@ create_comments_schema <- function() {
       required = TRUE
     ),
     extraction_assessement = type_string(
-      description = "An assessment of how confident you the LLM are in the quality of the data extraction process. 
-      Has relevant data been lost? How confident are you that the information you returned matches that reported by the paper? Return in the format Score: {1-5}: {text}",
+      description = "An assessment of how confident you the LLM are in the quality of a potential data extraction process. 
+      Has relevant data been lost? How confident are you that the information that mgiht be returned matches that reported by the paper? Return in the format Score: {1-5}: {text}",
       required = TRUE
     )
   )
 }
 
-#' Create extraction schema with correct ellmer syntax
-#' @return An ellmer type object defining the full extraction schema.
+#' Valid schema component names (used for UI selectize choices and schema filtering)
 #' @noRd
-create_extraction_schema <- function() {
-  type_object(
-    .description = "Extract environmental exposure study data from this document",
-    campaign = create_campaign_schema(),
-    references = create_references_schema(),
-    sites = create_sites_schema(),
-    parameters = create_parameters_schema(),
-    compartments = create_compartments_schema(),
-    biota = create_biota_schema(),
-    methods = create_methods_schema(),
-    samples = create_samples_schema(),
-    comments = create_comments_schema()
+schema_component_choices <- c(
+  "Campaign" = "campaign",
+  "References" = "references",
+  "Sites" = "sites",
+  "Parameters" = "parameters",
+  "Compartments" = "compartments",
+  "Biota" = "biota",
+  "Methods" = "methods",
+  "Samples" = "samples",
+  "Screening Comments" = "comments"
+)
+
+#' Create extraction schema with correct ellmer syntax
+#' @param include Character vector of component names to include. Defaults to
+#'   all components. Valid values: "campaign", "references", "sites",
+#'   "parameters", "compartments", "biota", "methods", "samples", "comments".
+#' @return An ellmer type object defining the extraction schema.
+#' @noRd
+create_extraction_schema <- function(
+  include = unname(schema_component_choices)
+) {
+  schema_fns <- list(
+    campaign = create_campaign_schema,
+    references = create_references_schema,
+    sites = create_sites_schema,
+    parameters = create_parameters_schema,
+    compartments = create_compartments_schema,
+    biota = create_biota_schema,
+    methods = create_methods_schema,
+    samples = create_samples_schema,
+    comments = create_comments_schema
   )
+
+  args <- list(
+    .description = "Extract environmental exposure study data from this document"
+  )
+  for (nm in names(schema_fns)) {
+    if (nm %in% include) args[[nm]] <- schema_fns[[nm]]()
+  }
+
+  do.call(type_object, args)
+}
+
+# !: Schema to JSON and associated functions are included as an attempt to do structured extraction without structured extraction.
+# * The ellmer schema type is surprisingly hard to convert back to JSON.
+#' Convert an ellmer type object to a JSON Schema string
+#'
+#' Recursively walks an ellmer S7 type tree (TypeObject, TypeArray, TypeBasic,
+#' TypeEnum) and produces a standard JSON Schema string suitable for embedding
+#' in a prompt when the provider does not support native structured output.
+#'
+#' @param type An ellmer Type object (e.g. from \code{create_extraction_schema()}).
+#' @param pretty Logical. Pretty-print the JSON? Default TRUE.
+#' @return A JSON Schema character string.
+#' @importFrom jsonlite toJSON
+#' @noRd
+schema_to_json <- function(type, pretty = TRUE) {
+  toJSON(
+    type_to_list(type),
+    pretty = pretty,
+    auto_unbox = TRUE,
+    null = "null"
+  )
+}
+
+# Internal: recursively convert an ellmer Type S7 object to a plain list
+# that mirrors standard JSON Schema structure.
+type_to_list <- function(type) {
+  if (S7::S7_inherits(type, TypeObject)) {
+    schema <- list(type = "object")
+    if (!is.null(type@description)) {
+      schema$description <- type@description
+    }
+    if (length(type@properties) > 0) {
+      schema$properties <- lapply(type@properties, type_to_list)
+    }
+    return(schema)
+  }
+
+  if (S7::S7_inherits(type, TypeArray)) {
+    schema <- list(type = "array", items = type_to_list(type@items))
+    if (!is.null(type@description)) {
+      schema$description <- type@description
+    }
+    return(schema)
+  }
+
+  if (S7::S7_inherits(type, TypeEnum)) {
+    schema <- list(type = "string", enum = type@values)
+    if (!is.null(type@description)) {
+      schema$description <- type@description
+    }
+    return(schema)
+  }
+
+  if (S7::S7_inherits(type, TypeBasic)) {
+    schema <- list(type = type@type)
+    if (!is.null(type@description)) {
+      schema$description <- type@description
+    }
+    return(schema)
+  }
+
+  # TypeIgnore or unknown — skip
+  list(type = "string")
 }
 
 #' Display extraction schema as string

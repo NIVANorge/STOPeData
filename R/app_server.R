@@ -18,7 +18,9 @@ mirai::daemons(1)
 # make sure this process can access the llm extraction function, etc.
 mirai::everywhere(source("R/mod_llm_fct_extract.R"))
 mirai::everywhere(library(ellmer))
+mirai::everywhere(library(dplyr))
 mirai::everywhere(library(shiny))
+mirai::everywhere(library(glue))
 # Reset when the app is stopped
 onStop(function() mirai::daemons(0))
 
@@ -70,6 +72,21 @@ initialise_userData <- function() {
     schemaLLM = "",
     promptLLM = "",
     rawLLM = "",
+    metaData = list(
+      session = list(
+        app_name = "STOPeData",
+        app_version = get_golem_version() %||% "unknown",
+        format_version = tryCatch(
+          packageDescription("eDataDRF")$Version,
+          error = function(e) "unknown"
+        ),
+        session_start = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"),
+        user = character(0),
+        client = list()
+      ),
+      extractions = list(),
+      screening = NULL
+    ),
     pdfPath = NULL,
     campaignDataLLM = tibble(NULL),
     referenceDataLLM = tibble(NULL),
@@ -79,14 +96,16 @@ initialise_userData <- function() {
     methodsDataLLM = tibble(NULL),
     samplesDataLLM = tibble(NULL),
     biotaDataLLM = tibble(NULL),
-    samplesDataLLM = tibble(NULL),
 
     # LLM extraction status flags ----
     llmExtractionComplete = FALSE, # tracks if the LLM data extraction process has completed, or the user has pressed the dummy data button
     llmExtractionSuccessful = FALSE, # tracks if the LLM data extraction process (or dummy data) returned a tibble in the expected format
     llmPopulateModules = FALSE, # tracks if the user has sent LLM data to modules
 
-    llmExtractionComments = tibble(NULL),
+    # track screening (in essence a very limited extraction) separately
+    llmScreeningComplete = FALSE,
+    llmScreeningComments = tibble(NULL),
+    llmScreeningSuccessful = FALSE,
 
     # Import data from save status flags ----
     saveExtractionComplete = FALSE,
@@ -119,6 +138,18 @@ app_server <- function(input, output, session) {
     campaign_name = "Unknown_Campaign",
     dataset_dimensions = list()
   )
+
+  ## observe: Populate client metadata on session start ----
+  # TODO: I believe this is over-sensitive and slowing down startup
+  # upstream: fire whenever session data changes (although it shouldn't)
+  # downstream: rv$metaData$session$client populated with URL info
+  observe({
+    session$userData$reactiveValues$protocol$metaData$session$client <- session$clientData$url_protocol
+    session$userData$reactiveValues$protocol$metaData$session$hostname <- session$clientData$url_hostname
+    session$userData$reactiveValues$protocol$metaData$session$port <- session$clientData$url_port
+    session$userData$reactiveValues$protocol$metaData$session$pathname <- session$clientData$url_pathname
+  }) |>
+    bindEvent(session$clientData, ignoreInit = FALSE, ignoreNULL = TRUE)
 
   ## Module servers ----
   # upstream: session start
@@ -550,6 +581,7 @@ app_server <- function(input, output, session) {
 
         if (!is.null(email) && !is.na(email) && nchar(email) > 0) {
           session$userData$reactiveValues$ENTERED_BY <- email
+          session$userData$reactiveValues$metaData$session$user <- email
           showNotification(
             glue("Set username to {email}."),
             type = "message"

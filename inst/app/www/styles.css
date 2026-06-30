@@ -84,6 +84,11 @@ pre,
     font-family: var(--font-code);
 }
 
+textarea[id$="llm_params"].form-control {
+    font-family: var(--font-code);
+}
+
+
 .validation-container {
     flex-grow: 1;
 }

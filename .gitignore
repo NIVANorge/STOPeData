@@ -14,11 +14,10 @@ cite.r
 .env
 deployment/test/secrets.env
 .gitignore
-deployment/prod/secrets.env
 
 docs
 **/.quarto/
 inst/doc
 *.pdf
 .vscode/*
-
+.posit/assistant/settings.json

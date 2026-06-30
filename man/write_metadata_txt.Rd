@@ -15,12 +15,13 @@ write_metadata_txt(metadata_list, file_path)
 NULL (invisibly). File is written to disk as a side effect.
 }
 \description{
-Create a human-readable text file with export metadata
+Create a human-readable text file with export metadata.
+Retained for backward compatibility; new exports use \code{\link[=write_metadata_yaml]{write_metadata_yaml()}}.
 }
 \examples{
 \dontrun{
   meta <- list(campaign_name = "North Sea 2022", export_datetime = Sys.time(),
-               user = "Jane", app_name = "STOPeData", app_version = "1.0",
+               user = "Ole", app_name = "STOPeData", app_version = "1.0",
                clientData = "localhost")
   write_metadata_txt(meta, tempfile(fileext = ".txt"))
 }

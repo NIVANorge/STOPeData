@@ -185,6 +185,32 @@ info_accordion <- function(title = "Instructions", content_file, ...) {
   )
 }
 
+#' Format byte sizes as human-readable strings
+#'
+#' @description Converts a raw byte count into a compact, human-readable string
+#'   (e.g. "1.4 MB").
+#'
+#' @param bytes Numeric. File size in bytes.
+#' @param digits Integer. Number of significant digits to display. Default 2.
+#'
+#' @return A character string with the size and unit (B, KB, MB, or GB).
+#'
+#' @examples
+#' fmt_bytes(1500)      # "1.5 KB"
+#' fmt_bytes(2045000)   # "2.0 MB"
+#' @noRd
+fmt_bytes <- function(bytes, digits = 2) {
+  units <- c("B", "KB", "MB", "GB")
+  i <- 1L
+  size <- as.numeric(bytes)
+  while (size >= 1024 && i < length(units)) {
+    size <- size / 1024
+    i <- i + 1L
+  }
+  paste(round(size, digits), units[i])
+}
+
+
 #' Calculate rHandsontable height
 #' @description Calculates a pixel height for a rHandsontable widget based on
 #'   the number of data rows, clamped between a minimum and maximum value.
@@ -206,7 +232,7 @@ rHandsontableGetHeight <- function(
     defaultHeaderHeight
 
   if (calculated_height > maxHeight) {
-    calculated_height = maxHeight
+    calculated_height <- maxHeight
   }
 
   final_height <- max(minHeight, calculated_height)

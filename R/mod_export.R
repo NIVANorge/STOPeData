@@ -179,24 +179,24 @@ mod_export_server <- function(id) {
             base_name <- glue("{campaign}_{display_name}_{timestamp}")
 
             csv_file <- file.path(temp_dir, glue("{base_name}.csv"))
-            txt_file <- file.path(temp_dir, glue("{base_name}_metadata.txt"))
+            yaml_file <- file.path(temp_dir, glue("{base_name}_metadata.yaml"))
 
             # Write CSV
             write_excel_csv(data, file = csv_file, na = "NA")
 
-            # Write metadata TXT
-            write_metadata_txt(metadata, txt_file)
+            # Write metadata YAML
+            write_metadata_yaml(metadata, yaml_file)
 
             # Create zip file
             zip(
               zipfile = file,
-              files = c(csv_file, txt_file),
+              files = c(csv_file, yaml_file),
               mode = "cherry-pick"
             )
 
             # Clean up temp files
             unlink(csv_file)
-            unlink(txt_file)
+            unlink(yaml_file)
 
             print_dev(glue(
               "mod_export: ZIP export complete for {dataset_name} ({nrow(data)} rows)"

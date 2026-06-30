@@ -73,14 +73,15 @@ initialise_userData <- function() {
     methodsDataLLM = tibble(NULL),
     samplesDataLLM = tibble(NULL),
     biotaDataLLM = tibble(NULL),
-    samplesDataLLM = tibble(NULL),
 
     # LLM extraction status flags ----
     llmExtractionComplete = FALSE, # tracks if the LLM data extraction process has completed, or the user has pressed the dummy data button
     llmExtractionSuccessful = FALSE, # tracks if the LLM data extraction process (or dummy data) returned a tibble in the expected format
-    llmPopulateModules = FALSE, # tracks if the user has sent LLM data to modukles
+    llmPopulateModules = FALSE, # tracks if the user has sent LLM data to modules
 
-    llmExtractionComments = tibble(NULL),
+    # track screening (in essence a very limited extraction) separately
+    llmScreeningComments = tibble(NULL),
+    llmScreeningSuccessful = FALSE,
 
     # Import data from save status flags ----
     saveExtractionComplete = FALSE,
