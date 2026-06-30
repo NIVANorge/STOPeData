@@ -118,7 +118,6 @@ import_session_from_zip <- function(zip_path, session) {
 
       # Extract ZIP
       extracted_files <- unzip(zip_path, exdir = extract_dir)
-      print_dev(glue("Extracted {length(extracted_files)} files"))
     },
     error = function(e) {
       return(list(
@@ -143,8 +142,6 @@ import_session_from_zip <- function(zip_path, session) {
     ))
   }
 
-  print_dev(glue("Found {length(csv_files)} CSV files to process"))
-
   # Process each CSV file ----
   import_summaries <- character(0)
   failed_imports <- character(0)
@@ -160,18 +157,16 @@ import_session_from_zip <- function(zip_path, session) {
         import_summaries,
         glue("Imported {row_count} {dataset_name} rows from CSV<br>")
       )
-
-      print_dev(glue("Successfully imported {dataset_name}"))
     } else {
       failed_dataset <- result$dataset_type %||% basename(csv_file)
       failed_imports <- c(failed_imports, failed_dataset)
-      print_dev(glue("Failed to import {failed_dataset}: {result$message}"))
     }
   }
 
   # Restore session metadata from YAML if present ----
+  browser()
   yaml_meta_files <- extracted_files[grepl(
-    "_metadata\\.yaml$",
+    "_metadata_([0-9]{8}_[0-9]{6}).yaml",
     extracted_files,
     ignore.case = TRUE
   )]

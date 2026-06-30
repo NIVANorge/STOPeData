@@ -1,3 +1,4 @@
 - Extract data from PDFs using a [Large Language Model](https://ig.ft.com/generative-ai/) (LLM). Screen a paper to evaluate its suitability.
 - Set your research question and LLM parameters with the advanced settings button 
 - Use (including testing) of models requires an [API key](https://en.wikipedia.org/wiki/API_key) for the relevant provider
+- LLM call costs are calculated based on token consumption and cost per token, when known. 

@@ -1273,10 +1273,9 @@ mod_llm_server <- function(id) {
           llm_provider = input$select_provider,
           llm_version = input$select_model,
           source_pdf = input$pdf_file$name %||% NA_character_,
-          llm_extraction_cost_USD = api_meta$total_cost %||% NA,
-          llm_input_tokens = api_meta$total_input_tokens %||% NA,
-          llm_output_tokens = api_meta$total_output_tokens %||% NA,
-          llm_call_count = api_meta$call_count %||% NA,
+          llm_extraction_cost_USD = api_meta$cost %||% NA,
+          llm_input_tokens = api_meta$input_tokens %||% NA,
+          llm_output_tokens = api_meta$output %||% NA,
           schema_components = if (moduleState$last_run_type == "screening") {
             "screening"
           } else {
@@ -1316,11 +1315,12 @@ mod_llm_server <- function(id) {
       # appears immediately on invoke, before the result observer fires
       cost_suffix <- if (
         moduleState$llm_status == "successful" &&
-          !is.null(moduleState$api_metadata$total_cost)
+          !is.null(moduleState$api_metadata$total_cost) &&
+          !is.na(moduleState$api_metadata$total_cost)
       ) {
-        glue(" (Cost: ${round(moduleState$api_metadata$total_cost, 2)})")
+        glue(" (Cost: ${round(moduleState$api_metadata$total_cost, 3)})")
       } else {
-        ""
+        "Cost could not be calculated."
       }
 
       switch(
@@ -1464,7 +1464,10 @@ mod_llm_server <- function(id) {
           session$userData$reactiveValues$llmScreeningComments
         )
       } else {
-        "The LLM's self-appraisal of its performance will appear here once you extract data."
+        span(
+          "Comments on the PDF's suitability for answering your research question will appear here.",
+          class = "text-muted"
+        )
       }
     }) |>
       bindEvent(

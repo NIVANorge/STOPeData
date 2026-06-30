@@ -23,6 +23,7 @@
 #'
 #' @importFrom ellmer chat_anthropic params content_pdf_file
 #' @importFrom glue glue
+#' @importFrom dplyr reframe across where
 #' @export
 extract_pdf_with_llm <- function(
   pdf_path,
@@ -72,10 +73,15 @@ extract_pdf_with_llm <- function(
         type = extraction_schema
       )
 
-      # Get cost info
-      # TODO: get_cost() works in a mre, so there's presumably somethign wrong in our logic
+      # Get cost and token info
+      # Sum across the table, in the unlikely event we get stuff back across multiple chats?
+      # TODO: Fixme
+      total_values <- chat$get_tokens() |>
+        reframe(across(where(\(x) is.double(x)), sum)) |>
+        as.vector()
+
       api_metadata <- tryCatch(
-        list(total_cost = chat$get_cost(include = "all")),
+        total_values,
         error = function(e) list(cost_error = e$message)
       )
 

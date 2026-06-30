@@ -18,6 +18,7 @@ mirai::daemons(1)
 # make sure this process can access the llm extraction function, etc.
 mirai::everywhere(source("R/mod_llm_fct_extract.R"))
 mirai::everywhere(library(ellmer))
+mirai::everywhere(library(dplyr))
 mirai::everywhere(library(shiny))
 mirai::everywhere(library(glue))
 # Reset when the app is stopped
