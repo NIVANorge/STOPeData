@@ -94,7 +94,7 @@ get_export_metadata <- function(session = NULL) {
     campaign_name = rv$campaignData$CAMPAIGN_NAME,
     export_datetime = format(Sys.time(), "%Y-%m-%d %H:%M:%S %Z"),
     app_name = "STOPeData",
-    llm_version = "claude-sonnet-4-20250514", # set manually in mod_llm_fct_extract
+    llm_version = "claude-sonnet-4-5-20250929", # set manually in mod_llm_fct_extract
     clientData = paste(
       sep = "",
       "protocol: ",

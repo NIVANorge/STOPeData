@@ -34,7 +34,7 @@ extract_pdf_with_llm <- function(
 
   # Initialize chat ----
   chat <- chat_anthropic(
-    model = "claude-sonnet-4-20250514",
+    model = "claude-sonnet-4-5-20250929",
     params = params(max_tokens = max_tokens)
   )
 
@@ -96,7 +96,7 @@ test_llm_connection <- function(api_key) {
 
   # Create minimal chat instance ----
   test_chat <- chat_anthropic(
-    model = "claude-sonnet-4-20250514",
+    model = "claude-sonnet-4-5-20250929",
     params = params(max_tokens = 50)
   )
 

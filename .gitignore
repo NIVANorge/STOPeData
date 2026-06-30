@@ -20,3 +20,5 @@ docs
 **/.quarto/
 inst/doc
 *.pdf
+.vscode/*
+
