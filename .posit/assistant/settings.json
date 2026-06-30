@@ -1,0 +1,13 @@
+{
+  "permission": {
+    "edit": {
+      "*.R": "allow",
+      "*.md": "allow"
+    },
+    "bash": {
+      "cmd *": "allow",
+      "Rscript *": "allow",
+      "head *": "allow"
+    }
+  }
+}
