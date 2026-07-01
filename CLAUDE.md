@@ -89,3 +89,9 @@ Tests use `testthat` edition 3 (`Config/testthat/edition: 3`). Server-module log
 ## Secrets
 
 API keys/tokens (`ANTHROPIC_API_KEY`, `OPENAI_API_KEY`, `GOOGLE_API_KEY`, `ZENODO_TOKEN`, `ZENODO_SANDBOX_TOKEN`) are read from environment variables (`.Renviron`, gitignored) and/or entered by the user directly into the Extraction tab's password field — never hardcode these or commit `.Renviron`.
+
+## Syntax and Style
+
+As much as possible, code style should follow the Tidyverse style guide. Some particular notes:
+- All package functions inside functions should be namespaced with @importFrom package function calls, not `package::function()` in the body
+- `glue::glue()` is preferred to the `paste()` family of functions for constructing text strings

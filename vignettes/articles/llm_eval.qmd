@@ -13,6 +13,9 @@ library(STOPeData)
 library(ellmer)
 library(tidyverse)
 library(flextable)
+library(arrow)
+
+devtools::load_all()
 ```
 
 The `ellmer` package includes functions that connect to a wide variety of local and remote APIs from a variety of providers. Put simply, we have a great many options. Which are better, and which are worse? We might assume that more expensive models are more effective at data extraction, and that larger and more complex files are more difficult - and require more tokens - than simpler models when extracting data. But can we prove any of these assumptions?
@@ -46,7 +49,7 @@ Use multiple models to do a consensus thing and maybe compare against people doi
 pdfs <- tibble(
   id = c("a", "b", "c"),
   path = c(
-    "data-raw/norheim_1987.pdf",
+    "data-raw/norheim-1987.pdf",
     "data-raw/wojtasik-2021.pdf",
     "data-raw/zauke-1999.pdf"
   ),
@@ -162,15 +165,211 @@ experimental_setup <-
 ```{r}
 #| label: API_calls
 
-call1 <- extract_pdf_with_llm(
-  pdf = pdf_1,
-  model_provider = "Anthropic",
-  model_name = "claude-haiku-4-5",
-  env_var = "ANTHROPIC_API_KEY",
-  chat_fn = "chat_anthropic",
-  extraction_prompt = create_extraction_prompt(),
-  extraction_schema = create_extraction_schema(),
-  api_key = Sys.getenv("ANTHROPIC_API_KEY"),
-  max_tokens = 6000
-)
+pdf_1 <- "data-raw/norheim-1987.pdf"
+
+
+# Recursively walk the list, collecting path-as-vector as we go.
+# Each branch terminates at: (1) a data frame, (2) an atomic scalar.
+flatten_to_rows <- function(x, path = character()) {
+  if (is.data.frame(x)) {
+    # --- TIBBLE BRANCH ---
+    # Capture column types before pivoting (pivot coerces everything to one type)
+    col_types <- sapply(x, \(col) paste(class(col), collapse = "/"))
+
+    x |>
+      mutate(.row_idx = row_number()) |>
+      pivot_longer(
+        cols = -.row_idx,
+        names_to = "name",
+        values_to = "value",
+        values_transform = as.character # coerce all cells → chr for uniform value col
+      ) |>
+      mutate(
+        level_path = list(path), # store the full path as a list-col
+        row_idx = .row_idx,
+        type = col_types[name] # look up original type by col name
+      ) |>
+      select(level_path, name, row_idx, value, type)
+  } else if (is.list(x)) {
+    # --- LIST BRANCH: recurse into each named element ---
+    imap(x, \(item, nm) flatten_to_rows(item, c(path, nm))) |>
+      list_rbind()
+  } else {
+    # --- SCALAR BRANCH ---
+    # The last segment of path IS the name; everything before is the path.
+    tibble(
+      level_path = list(head(path, -1)),
+      name = tail(path, 1),
+      row_idx = NA_integer_,
+      value = as.character(x),
+      type = paste(class(x), collapse = "/")
+    )
+  }
+}
+
+# TODO: here()
+
+if (!file.exists("data-raw/llm_eval_output_flat.parquet")) {
+  {
+    call1 <- extract_pdf_with_llm(
+      pdf = pdf_1,
+      model_provider = "Anthropic",
+      model_name = "claude-haiku-4-5",
+      env_var = "ANTHROPIC_API_KEY",
+      chat_fn = "chat_anthropic",
+      extraction_prompt = create_extraction_prompt(),
+      extraction_schema = create_extraction_schema(),
+      api_key = Sys.getenv("ANTHROPIC_API_KEY"),
+      max_tokens = 6000
+    )
+  }
+
+  call2 <- extract_pdf_with_llm(
+    pdf = pdf_1,
+    model_provider = "Anthropic",
+    model_name = "claude-sonnet-4-6",
+    env_var = "ANTHROPIC_API_KEY",
+    chat_fn = "chat_anthropic",
+    extraction_prompt = create_extraction_prompt(),
+    extraction_schema = create_extraction_schema(),
+    api_key = Sys.getenv("ANTHROPIC_API_KEY"),
+    max_tokens = 6000
+  )
+
+  # Run it, then unpack the path list-col into discrete level_1 / level_2 columns
+  call1_flat <- flatten_to_rows(call1) |>
+    mutate(
+      level_1 = map_chr(level_path, \(p) {
+        if (length(p) >= 1) p[[1]] else NA_character_
+      }),
+      level_2 = map_chr(level_path, \(p) {
+        if (length(p) >= 2) p[[2]] else NA_character_
+      })
+    ) |>
+    select(level_1, level_2, name, row_idx, value, type)
+
+  call2_flat <- flatten_to_rows(call2) |>
+    mutate(
+      level_1 = map_chr(level_path, \(p) {
+        if (length(p) >= 1) p[[1]] else NA_character_
+      }),
+      level_2 = map_chr(level_path, \(p) {
+        if (length(p) >= 2) p[[2]] else NA_character_
+      })
+    ) |>
+    select(level_1, level_2, name, row_idx, value, type)
+
+  calls_flat <- bind_rows(call1_flat, call2_flat, .id = "id")
+
+  write_parquet(calls_flat, "data-raw/llm_eval_output_flat.parquet")
+} else {
+  message("LLM API call cached, skipping execution and loading from /data-raw")
+  calls_flat <- read_parquet("data-raw/llm_eval_output_flat.parquet")
+}
+```
+
+
+```{r}
+#| label: call-comparison
+calls_flat
+
+# KET is right, pairwise might get messy quickly
+
+# campaign and reference are easy.
+
+# almost certainly there are better options than identical()
+compare_campaign <- calls_flat |>
+  filter(level_2 == "campaign") |>
+  group_by(name) |>
+  distinct(value) |>
+  reframe(n = n()) |>
+  filter(n > 1)
+
+# no issues with references
+compare_references <- calls_flat |>
+  filter(level_2 == "references") |>
+  group_by(name) |>
+  distinct(value) |>
+  reframe(n = n()) |>
+  filter(n > 1)
+
+# sites...
+# issue: different calls return variables in different orders!
+# we can't automatically match sites to each other unless we assume that the lat/long are always equal (or, if we have a canonical point of comparison, I guess)
+compare_sites <- calls_flat |>
+  filter(level_2 == "sites") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# we can presumably compare distance with sf
+
+library(sf)
+# for example
+compare_sites |>
+  filter(name %in% c("latitude", "longitude")) |>
+  mutate(across(contains("call"), as.numeric))
+
+# how do we check if each value has an equivalent?
+# I guess we just group and ignore idx
+# we may have to call st_distance for g
+distances <- calls_flat |>
+  filter(level_2 == "sites") |>
+  filter(name %in% c("latitude", "longitude")) |>
+  mutate(across(contains("call"), as.numeric)) |>
+  group_by(id, row_idx) |>
+  pivot_wider(names_from = name, values_from = value) |>
+  st_as_sf(coords = c("latitude", "longitude"), na.fail = FALSE)
+
+# pair sites and check (great circle) distance?
+
+x <- distances[1:3, 6]
+y <- distances[4:6, 6]
+
+# I guess we make a distance matrix, which should have one value of approximately 0 and be... orthogonal?
+# I believe these distances are in km, would be good to check
+st_distance(x, y)
+
+# parameters should be easier, they have more-or-less canonical names
+compare_parameters <- calls_flat |>
+  filter(level_2 == "parameters") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# compartments - easy
+compare_compartments <- calls_flat |>
+  filter(level_2 == "compartments") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# biota
+# common or linnean name is acceptable as long as they agree
+compare_biota <- calls_flat |>
+  filter(level_2 == "biota") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# methods
+# again, pairing may be an issue here
+compare_methods <- calls_flat |>
+  filter(level_2 == "methods") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# samples
+# might not do the evaluation on this one, since we don't strictly speaking use it
+compare_samples <- calls_flat |>
+  filter(level_2 == "samples") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# comments are pleasantly easy
+compare_comments <- calls_flat |>
+  filter(level_2 == "comments") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call") |>
+  mutate(
+    score_1 = str_extract(call1, "(?!Score\\: )[1-5]"),
+    score_2 = str_extract(call2, "(?!Score\\: )[1-5]"),
+    .before = call1
+  )
 ```

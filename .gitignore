@@ -13,7 +13,6 @@ cite.r
 *.pdf
 .env
 deployment/test/secrets.env
-.gitignore
 
 docs
 **/.quarto/
@@ -21,3 +20,5 @@ inst/doc
 *.pdf
 .vscode/*
 .posit/assistant/settings.json
+.claude/settings.local.json
+CLAUDE.md
