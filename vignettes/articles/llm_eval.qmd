@@ -14,6 +14,9 @@ library(ellmer)
 library(tidyverse)
 library(flextable)
 library(arrow)
+library(sf)
+library(eDataDRF)
+library(pointblank)
 
 devtools::load_all()
 ```
@@ -43,24 +46,30 @@ This will give us 7 * 27 = 189 cases. Which is quite a lot, but we can probably 
 
 Use multiple models to do a consensus thing and maybe compare against people doing the data extraction manually
 
+Time to pick some different papers!
+
 ```{r}
 #| label: pdfs
 
+# TODO: Update with details of new papers
+
 pdfs <- tibble(
-  id = c("a", "b", "c"),
+  id = c("a", "b", "c", "d"),
   path = c(
-    "data-raw/norheim-1987.pdf",
-    "data-raw/wojtasik-2021.pdf",
-    "data-raw/zauke-1999.pdf"
+    "data-raw/1997RitterhoffTraceMetalsIn_MS.pdf",
+    "data-raw/2002HellandTransportAndSedimentation_MS.pdf",
+    "data-raw/2021WojtasikTemporalIsolationBetween_MS.pdf",
+    "data-raw/2022KohlerDistributionPatternOf_MS.pdf"
   ),
   comment = c(
-    "Well-OCR'd text, some tables (difficult to read). Copper concentrations reported explicitly in tables. Score: 4.",
-    "More recent, clear layout with some (irrelevant) images. Score: 4.",
-    "Well laid out with extremely large quantity of data on different species."
+    "Filler",
+    "Filler",
+    "Filler",
+    "Filler"
   ),
   # Fill in after reviewing each PDF
-  num_images = c(NA_integer_, NA_integer_, NA_integer_),
-  num_tables = c(NA_integer_, NA_integer_, NA_integer_)
+  num_images = c(0, 0, 0, 0),
+  num_tables = c(0, 0, 0, 0)
 ) |>
   mutate(
     info = map(path, pdftools::pdf_info),
@@ -80,6 +89,8 @@ Sources for model comparisons: https://platform.claude.com/docs/en/about-claude/
 
 ```{r}
 #| label: models
+
+# TODO: Fill out list
 
 models_tbl <- tribble(
   ~provider          , ~model_label        , ~model_id                ,
@@ -165,9 +176,6 @@ experimental_setup <-
 ```{r}
 #| label: API_calls
 
-pdf_1 <- "data-raw/norheim-1987.pdf"
-
-
 # Recursively walk the list, collecting path-as-vector as we go.
 # Each branch terminates at: (1) a data frame, (2) an atomic scalar.
 flatten_to_rows <- function(x, path = character()) {
@@ -207,65 +215,129 @@ flatten_to_rows <- function(x, path = character()) {
   }
 }
 
-# TODO: here()
+# Map provider display names → the ellmer chat function and API key env var.
+# model_provider is the string extract_pdf_with_llm() checks internally.
+provider_config <- tribble(
+  ~provider       , ~model_provider , ~env_var            , ~chat_fn             ,
+  "Anthropic"     , "Anthropic"     , "ANTHROPIC_API_KEY" , "chat_anthropic"     ,
+  "OpenAI"        , "OpenAI"        , "OPENAI_API_KEY"    , "chat_openai"        ,
+  "Google Gemini" , "Google"        , "GOOGLE_API_KEY"    , "chat_google_gemini"
+)
 
-if (!file.exists("data-raw/llm_eval_output_flat.parquet")) {
-  {
-    call1 <- extract_pdf_with_llm(
-      pdf = pdf_1,
-      model_provider = "Anthropic",
-      model_name = "claude-haiku-4-5",
-      env_var = "ANTHROPIC_API_KEY",
-      chat_fn = "chat_anthropic",
-      extraction_prompt = create_extraction_prompt(),
-      extraction_schema = create_extraction_schema(),
-      api_key = Sys.getenv("ANTHROPIC_API_KEY"),
-      max_tokens = 6000
-    )
-  }
-
-  call2 <- extract_pdf_with_llm(
-    pdf = pdf_1,
-    model_provider = "Anthropic",
-    model_name = "claude-sonnet-4-6",
-    env_var = "ANTHROPIC_API_KEY",
-    chat_fn = "chat_anthropic",
+# Run a single extraction. Looks up the API key from the env var at call time.
+run_extraction <- function(
+  pdf_path,
+  model_id,
+  max_tokens,
+  model_provider,
+  env_var,
+  chat_fn
+) {
+  extract_pdf_with_llm(
+    pdf_path = pdf_path,
+    model_provider = model_provider,
+    model_name = model_id,
+    env_var = env_var,
+    chat_fn = chat_fn,
+    api_key = Sys.getenv(env_var),
     extraction_prompt = create_extraction_prompt(),
     extraction_schema = create_extraction_schema(),
-    api_key = Sys.getenv("ANTHROPIC_API_KEY"),
-    max_tokens = 6000
+    max_tokens = as.integer(max_tokens)
+  )
+}
+
+# Unpack the level_path list-col into level_1 / level_2 character columns.
+flatten_call <- function(call_result) {
+  flatten_to_rows(call_result) |>
+    mutate(
+      level_1 = map_chr(level_path, \(p) {
+        if (length(p) >= 1) p[[1]] else NA_character_
+      }),
+      level_2 = map_chr(level_path, \(p) {
+        if (length(p) >= 2) p[[2]] else NA_character_
+      })
+    ) |>
+    select(level_1, level_2, name, row_idx, value, type)
+}
+
+# Build an experiment grid and run all extractions, returning a tibble with one
+# row per run and a `call` list-column holding the raw list(result, metadata, success).
+# TODO: Add better error checking for e.g. invalid pdf paths
+# pdf_ids:      character vector of PDF ids from the pdfs tibble (e.g. c("a", "b"))
+# model_ids:    character vector of model IDs from models_tbl$model_id
+# token_counts: integer vector of max_tokens values to test
+# n_replicates: how many times to repeat each combination
+run_extraction_batch <- function(
+  pdf_ids,
+  model_ids,
+  token_counts,
+  n_replicates
+) {
+  expand.grid(
+    pdf = pdf_ids,
+    models = model_ids,
+    tokens = token_counts,
+    replicate = seq_len(n_replicates),
+    stringsAsFactors = FALSE
+  ) |>
+    as_tibble() |>
+    left_join(pdfs |> select(id, path), by = c("pdf" = "id")) |>
+    left_join(
+      models_tbl |>
+        select(model_id, provider) |>
+        left_join(provider_config, by = "provider"),
+      by = c("models" = "model_id")
+    ) |>
+    mutate(
+      call = pmap(
+        list(
+          pdf_path = path,
+          model_id = models,
+          max_tokens = tokens,
+          model_provider = model_provider,
+          env_var = env_var,
+          chat_fn = chat_fn
+        ),
+        run_extraction
+      )
+    )
+}
+
+# TODO: Cache per call
+if (
+  !file.exists("data-raw/llm_cache/llm_eval_calls.rds") ||
+    !file.exists("data-raw/llm_cache/llm_eval_output_flat.parquet")
+) {
+  calls_results <- run_extraction_batch(
+    pdf_ids = "a",
+    model_ids = c("claude-haiku-4-5", "claude-sonnet-4-6"),
+    token_counts = 6000,
+    n_replicates = 5
   )
 
-  # Run it, then unpack the path list-col into discrete level_1 / level_2 columns
-  call1_flat <- flatten_to_rows(call1) |>
+  # Save raw results list for validation and per-call inspection
+  saveRDS(calls_results, "data-raw/llm_cache/llm_eval_calls.rds")
+
+  # Flatten successful calls; keep an id column for downstream pairwise code
+  calls_flat <- calls_results |>
+    filter(map_lgl(call, \(c) isTRUE(c$success))) |>
     mutate(
-      level_1 = map_chr(level_path, \(p) {
-        if (length(p) >= 1) p[[1]] else NA_character_
-      }),
-      level_2 = map_chr(level_path, \(p) {
-        if (length(p) >= 2) p[[2]] else NA_character_
-      })
+      id = as.character(row_number()),
+      flat = map(call, flatten_call)
     ) |>
-    select(level_1, level_2, name, row_idx, value, type)
+    select(id, pdf, models, tokens, replicate, flat) |>
+    unnest(flat)
 
-  call2_flat <- flatten_to_rows(call2) |>
-    mutate(
-      level_1 = map_chr(level_path, \(p) {
-        if (length(p) >= 1) p[[1]] else NA_character_
-      }),
-      level_2 = map_chr(level_path, \(p) {
-        if (length(p) >= 2) p[[2]] else NA_character_
-      })
-    ) |>
-    select(level_1, level_2, name, row_idx, value, type)
-
-  calls_flat <- bind_rows(call1_flat, call2_flat, .id = "id")
-
-  write_parquet(calls_flat, "data-raw/llm_eval_output_flat.parquet")
+  write_parquet(calls_flat, "data-raw/llm_cache/llm_eval_output_flat.parquet")
 } else {
-  message("LLM API call cached, skipping execution and loading from /data-raw")
-  calls_flat <- read_parquet("data-raw/llm_eval_output_flat.parquet")
+  message("LLM API calls cached, loading from /data-raw/llm_cache/")
+  calls_results <- readRDS("data-raw/llm_cache/llm_eval_calls.rds")
+  calls_flat <- read_parquet("data-raw/llm_cache/llm_eval_output_flat.parquet")
 }
+
+# Expose individual call objects for downstream compatibility
+call1 <- calls_results$call[[1]]
+call2 <- calls_results$call[[2]]
 ```
 
 
@@ -303,7 +375,6 @@ compare_sites <- calls_flat |>
 
 # we can presumably compare distance with sf
 
-library(sf)
 # for example
 compare_sites |>
   filter(name %in% c("latitude", "longitude")) |>
@@ -319,6 +390,7 @@ distances <- calls_flat |>
   group_by(id, row_idx) |>
   pivot_wider(names_from = name, values_from = value) |>
   st_as_sf(coords = c("latitude", "longitude"), na.fail = FALSE)
+
 
 # pair sites and check (great circle) distance?
 
@@ -372,4 +444,206 @@ compare_comments <- calls_flat |>
     score_2 = str_extract(call2, "(?!Score\\: )[1-5]"),
     .before = call1
   )
+```
+
+Now that I come to think of it we do already have canonical versions (even if they were partly LLM-assisted, they've been manually checked.) They're not quite in the perfect format, but we can work with them.
+
+Where does that leave us:
+
+1. Run the extraction (n = 1) for a paper
+2. Adapt validation functions to the extracted data (may be easier said than done)
+3. Do a second run of one of the papers. Do a pairwise comparison (as above) for consistency. How do we scale to n > 2?
+4. Scale...
+
+## eData Validation
+
+We have functions for this, but they're intended to deal with finished data, not fresh from extraction. Still
+
+
+```{r}
+#| label: edata-validation
+
+# One function per table. Each takes the raw LLM-extracted data frame,
+# adds dummy values for columns the LLM does not generate, and returns an
+# interrogated pointblank agent. Call get_agent_report(agent) to inspect
+# any individual table in detail.
+#
+# Dummied columns are noted inline. Steps that check generated fields
+# (SAMPLE_ID, PROTOCOL_ID) will fail — this is expected.
+#
+# Tables skipped:
+#   samples  — LLM schema (sampling_dates, sampling_site_code, …) does not
+#              map to the eData Samples table.
+#   comments — No pb_validate_*() function exists for this table.
+
+validate_llm_campaign <- function(tbl) {
+  tbl |>
+    rename_with(str_to_upper) |>
+    mutate(ENTERED_BY = "Dummy", ENTERED_DATE = today()) |>
+    pb_validate_campaign(agent = TRUE) |>
+    interrogate()
+}
+
+validate_llm_references <- function(tbl) {
+  tbl |>
+    rename_with(str_to_upper) |>
+    mutate(
+      REFERENCE_TYPE = "Journal Article",
+      REFERENCE_ID = generate_reference_id(YEAR, AUTHOR, TITLE),
+      ACCESS_DATE = today(),
+      INSTITUTION = "Dummy", # not extracted by LLM
+      DATA_SOURCE = "Primary" # not extracted by LLM
+    ) |>
+    pb_validate_reference(agent = TRUE) |>
+    interrogate()
+}
+
+validate_llm_sites <- function(tbl) {
+  # SITE_GEOGRAPHIC_FEATURE will likely fail: the LLM returns descriptive
+  # text rather than a controlled-vocabulary value.
+  tbl |>
+    rename_with(str_to_upper) |>
+    mutate(
+      ALTITUDE_VALUE = 0, # not extracted by LLM
+      ALTITUDE_UNIT = "km", # not extracted by LLM
+      SITE_COORDINATE_SYSTEM = "Not relevant", # not extracted by LLM
+      ENTERED_BY = "Dummy",
+      ENTERED_DATE = today()
+    ) |>
+    pb_validate_sites(agent = TRUE) |>
+    interrogate()
+}
+
+validate_llm_parameters <- function(tbl) {
+  tbl |>
+    rename_with(str_to_upper) |>
+    mutate(
+      ENTERED_BY = "Dummy",
+      MEASURED_TYPE = "Concentration" # not extracted by LLM
+    ) |>
+    pb_validate_parameters(agent = TRUE) |>
+    interrogate()
+}
+
+validate_llm_compartments <- function(tbl) {
+  # No pb_validate_compartments() in eDataDRF; build the agent inline.
+  tbl |>
+    rename_with(str_to_upper) |>
+    create_agent(label = "eData Compartments Validation") |>
+    col_vals_in_set(
+      columns = ENVIRON_COMPARTMENT,
+      set = environ_compartments_vocabulary()
+    ) |>
+    col_vals_in_set(
+      columns = MEASURED_CATEGORY,
+      set = unname(measured_categories_vocabulary())
+    ) |>
+    col_vals_in_set(
+      columns = ENVIRON_COMPARTMENT_SUB,
+      set = environ_compartments_sub_vocabulary() |> flatten()
+    ) |>
+    interrogate()
+}
+
+validate_llm_biota <- function(tbl) {
+  # SITE_CODE, PARAMETER_NAME, ENVIRON_COMPARTMENT, ENVIRON_COMPARTMENT_SUB
+  # are not extracted by the LLM and are dummied.
+  # SAMPLE_ID will fail the regex check — it is a generated field.
+  tbl |>
+    rename_with(str_to_upper) |>
+    mutate(
+      SITE_CODE = "Dummy",
+      PARAMETER_NAME = "Dummy",
+      ENVIRON_COMPARTMENT = "Biota",
+      ENVIRON_COMPARTMENT_SUB = first(
+        environ_compartments_sub_vocabulary()$Biota
+      )
+    ) |>
+    pb_validate_biota(agent = TRUE) |>
+    interrogate()
+}
+
+# TODO: Methods is definitely still a problem.
+validate_llm_methods <- function(tbl) {
+  # PROTOCOL_ID and CAMPAIGN_NAME are not extracted by the LLM and are dummied.
+  # PROTOCOL_ID will fail the regex check — it is a generated field.
+  # TODO: PROTOCOL_NAME is failing all time time
+  tbl |>
+    rename_with(str_to_upper) |>
+    mutate(
+      PROTOCOL_ID = "Dummy",
+      CAMPAIGN_NAME = "Dummy"
+    ) |>
+    pb_validate_methods(agent = TRUE) |>
+    interrogate()
+}
+
+# Thin wrapper: dispatches to each per-table function and returns a named
+# list of interrogated agents. NULL tables are silently skipped.
+validate_llm_extraction <- function(result) {
+  fns <- list(
+    campaign = validate_llm_campaign,
+    references = validate_llm_references,
+    sites = validate_llm_sites,
+    parameters = validate_llm_parameters,
+    compartments = validate_llm_compartments,
+    biota = validate_llm_biota,
+    methods = validate_llm_methods
+  )
+  imap(fns, \(fn, nm) if (!is.null(result[[nm]])) fn(result[[nm]])) |>
+    compact()
+}
+
+# Summarise failure counts across all tables in a validation list.
+# Returns one row per table with step-level and row-level failure counts.
+summarise_validation <- function(validation_list) {
+  imap(validation_list, \(agent, table_name) {
+    agent$validation_set |>
+      summarise(
+        table = table_name,
+        n_steps = n(),
+        n_steps_failed = sum(n_failed > 0, na.rm = TRUE),
+        rows_failed = sum(n_failed, na.rm = TRUE),
+        pct_steps_pass = mean(all_passed, na.rm = TRUE)
+      )
+  }) |>
+    list_rbind()
+}
+
+# Run validation across all successful calls and return a long tidy tibble:
+# one row per (call × table), with pdf / models / tokens / replicate attached.
+#
+# For an overall pass rate per call:
+#   validate_all_calls(calls_results) |>
+#     group_by(pdf, models, tokens, replicate) |>
+#     summarise(pct_pass = mean(pct_steps_pass))
+validate_all_calls <- function(calls_results) {
+  calls_results |>
+    filter(map_lgl(call, \(c) isTRUE(c$success))) |>
+    mutate(
+      validation_summary = map(call, \(c) {
+        validate_llm_extraction(c$result) |>
+          summarise_validation()
+      })
+    ) |>
+    select(pdf, models, tokens, replicate, validation_summary) |>
+    unnest(validation_summary)
+}
+
+# Keep named agents available for get_agent_report() inspection
+call1_validation <- validate_llm_extraction(call1$result)
+call2_validation <- validate_llm_extraction(call2$result)
+
+table_summary <- validate_all_calls(calls_results)
+```
+
+Ok, we have at least some data to play with. What do they look like?
+Boring!
+
+
+```{r}
+
+table_summary |>
+  ggplot(aes(x = table, y = pct_steps_pass, fill = models, group = replicate)) +
+  geom_col(position = "dodge")
 ```

@@ -58,24 +58,30 @@ create_references_schema <- function() {
         description = "Document title (max 1000 chars). Return NA if not found.",
         required = FALSE
       ),
+      reference_type = type_string(
+        description = as.character(glue(
+          "Type of reference. One of {reference_type_vocabulary()}."
+        )),
+        required = FALSE
+      ),
       year = type_integer(
         description = "Publication year (1800-2026). Return NA if not found.",
         required = FALSE
       ),
       periodical_journal = type_string(
-        description = "Journal name for articles. Return NA if not found.",
+        description = "Journal name for articles. Return NA if not found, or irrelevant.",
         required = FALSE
       ),
       volume = type_integer(
-        description = "Journal volume number. Return NA if not found.",
+        description = "Journal volume number. Return NA if not found, or irrelevant.",
         required = FALSE
       ),
       issue = type_integer(
-        description = "Journal issue number. Return NA if not found.",
+        description = "Journal issue number. Return NA if not found, or irrelevant.",
         required = FALSE
       ),
       publisher = type_string(
-        description = "Publisher name. Return NA if not found.",
+        description = "Publisher name. Return NA if not found, or irrelevant.",
         required = FALSE
       ),
       doi = type_string(
