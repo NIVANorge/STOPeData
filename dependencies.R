@@ -14,7 +14,6 @@ pak::pkg_install(c(
   "ellmer",
   "ggplot2",
   "glue",
-  "golem",
   "googledrive",
   "htmltools",
   "httr",
@@ -41,3 +40,8 @@ pak::pkg_install(c(
   "markdown",
   "shinytest2"
 ))
+
+# Avoid a later version of Golem, which breaks the app
+
+
+pak::pkg_install("https://github.com/ThinkR-open/golem/releases/tag/v0.5.1")
