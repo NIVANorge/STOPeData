@@ -11,14 +11,26 @@ knitr:
 #| label: setup
 library(STOPeData)
 library(ellmer)
-library(tidyverse)
+library(tidyverse, mask.ok = c("filter", "lag"))
 library(flextable)
 library(arrow)
 library(sf)
 library(eDataDRF)
 library(pointblank)
 
-devtools::load_all()
+devtools::load_all() # remove once STOPeData is rebuilt
+
+set_flextable_defaults(
+  font.size = 10,
+  font.family = 'Aptos',
+  digits = 2,
+  theme_fun = theme_vanilla,
+  padding = 1
+)
+
+# Create a location to save LLM API calls, if it doesn't exist.
+LLM_CACHE_DIR <- "data-raw/llm_cache/calls"
+dir.create(LLM_CACHE_DIR, recursive = TRUE, showWarnings = FALSE)
 ```
 
 The `ellmer` package includes functions that connect to a wide variety of local and remote APIs from a variety of providers. Put simply, we have a great many options. Which are better, and which are worse? We might assume that more expensive models are more effective at data extraction, and that larger and more complex files are more difficult - and require more tokens - than simpler models when extracting data. But can we prove any of these assumptions?
@@ -61,15 +73,22 @@ pdfs <- tibble(
     "data-raw/2021WojtasikTemporalIsolationBetween_MS.pdf",
     "data-raw/2022KohlerDistributionPatternOf_MS.pdf"
   ),
+  title = c(
+    "Trace metals in field samples of zooplankton from the Fram Strait and the Greenland Sea",
+    "Temporal isolation between two strongly differentiated stocks of the Greenland halibut (<i>Reinhardtius hippoglossoides</i> Walbaum, 1792) from the Western Barents Sea",
+    "Transport and sedimentation of Cu in a microtidal estuary, SE Norway",
+    "Distribution pattern of mercury in northern Barents Sea and Eurasian Basin surface sediment"
+  ),
+  year = c(1997L, 2002L, 2021L, 2022L),
   comment = c(
-    "Filler",
-    "Filler",
-    "Filler",
-    "Filler"
+    "Well-OCR'd paper with summary statistics of trace metal concentrations reported across wide range zooplankton taxa. Sampling sites reported in low-quality map. Complex, uneven data structure due to random nature of zooplankton sampling. Methodology reported in moderate detail.",
+    "Native PDF.  Sites reported in map. Cu concentrations (and flux) reported from a variety of sediment traps at different timepoints. Methodology reported in moderate detail.",
+    "Native PDF. Study primarily concerns evolution but includes heavy metal analysis. Sites reported as linear trawls with start/end coordinates. Raw Cu concentrations given for each individual, reported as table. Methodology reported in high detail.",
+    "Native PDF. Sampling sites and Cu concentrations only reported as summaries/graphics in paper, but raw data (Cu concentrations, site coordinates, depth) provided on request and prepended to file."
   ),
   # Fill in after reviewing each PDF
-  num_images = c(0, 0, 0, 0),
-  num_tables = c(0, 0, 0, 0)
+  num_images = c(1, 4, 8, 5),
+  num_tables = c(7, 2, 8, 2)
 ) |>
   mutate(
     info = map(path, pdftools::pdf_info),
@@ -78,10 +97,23 @@ pdfs <- tibble(
   ) |>
   select(-info)
 
-# TODO: Add more paper details, default rounding
+# TODO: Add more paper details
 pdfs |>
+  select(-path) |>
   flextable() |>
-  autofit()
+  autofit() |>
+  colformat_double(j = c("file_size_kb")) |>
+  colformat_int(j = c("year"), big.mark = "") |>
+  set_header_labels(
+    id = "ID",
+    title = "Title",
+    year = "Year",
+    comment = "Comment",
+    num_images = "n Images",
+    num_tables = "n Tables",
+    file_size_kb = "File Size (kb)",
+    num_pages = "n Pages"
+  )
 ```
 
 Sources for model comparisons: https://platform.claude.com/docs/en/about-claude/models/overview, https://developers.openai.com/api/docs/models/compare, https://ai.google.dev/gemini-api/docs/models
@@ -96,59 +128,59 @@ models_tbl <- tribble(
   ~provider          , ~model_label        , ~model_id                ,
   ~release_date      , ~context_window_k   , ~max_output_k            ,
   ~cost_input_mtok   , ~cost_output_mtok   ,
-  ~knowledge_cutoff  , ~training_cutoff    , ~niche                   ,
+  ~knowledge_cutoff  , ~training_cutoff    , ~complexity              ,
   # ---- Anthropic ---------------------------------------------------------------
   "Anthropic"        , "Claude Haiku 4.5"  , "claude-haiku-4-5"       ,
   "release_date"     , "200k"              , "64k"                    ,
   "$1"               , "$5"                ,
-  "Feb 2025"         , "Jul 2025"          , "niche"                  ,
+  "Feb 2025"         , "Jul 2025"          , "Low"                    ,
   #
   "Anthropic"        , "Claude Sonnet 4.6" , "claude-sonnet-4-6"      ,
   "release_date"     , "1M"                , "128k"                   ,
   "$3"               , "$15"               ,
-  "Aug 2025"         , "Jan 2026"          , "niche"                  ,
+  "Aug 2025"         , "Jan 2026"          , "Moderate"               ,
   #
   "Anthropic"        , "Claude Opus 4.7"   , "claude-opus-4-7"        ,
   "release_date"     , "context_window_k"  , "max_output_k"           ,
   "cost_input_mtok"  , "cost_output_mtok"  ,
-  "knowledge_cutoff" , "training_cutoff"   , "niche"                  ,
+  "knowledge_cutoff" , "training_cutoff"   , "High"                   ,
   #
   "Anthropic"        , "Claude Opus 4.8"   , "claude-opus-4-8"        ,
   "release_date"     , "1M"                , "128k"                   ,
   "$5"               , "$25"               ,
-  "Jan 2026"         , "Jan 2026"          , "niche"                  ,
+  "Jan 2026"         , "Jan 2026"          , "High"                   ,
   # ---- OpenAI ------------------------------------------------------------------
   # TODO: OpenAI distinguishes between input and cached input cost. Wwhat does this mean? I used regular input for now.
   # Also only provides "knowledge cutoff"
   "OpenAI"           , "GPT-5.4 Mini"      , "gpt-5.4-mini"           ,
   "release_date"     , "400"               , "128"                    ,
   "0.75"             , "4.50"              ,
-  "Aug 2025"         , "training_cutoff"   , "niche"                  ,
+  "Aug 2025"         , "training_cutoff"   , "Low"                    ,
   #
   "OpenAI"           , "GPT-5.4"           , "gpt-5.4"                ,
   "release_date"     , "1050"              , "128"                    ,
   "2.5"              , "15.0"              ,
-  "Aug 2025"         , "training_cutoff"   , "niche"                  ,
+  "Aug 2025"         , "training_cutoff"   , "Moderate"               ,
   #
   "OpenAI"           , "GPT-5.5"           , "gpt-5.5"                ,
   "release_date"     , "1050"              , "128"                    ,
   "cost_input_mtok"  , "30.0"              ,
-  "Dec 2025"         , "training_cutoff"   , "niche"                  ,
+  "Dec 2025"         , "training_cutoff"   , "Moderate"               ,
   # ---- Google Gemini -----------------------------------------------------------
   "Google Gemini"    , "Gemini 2.5 Pro"    , "gemini-2.5-pro"         ,
   "release_date"     , "context_window_k"  , "max_output_k"           ,
   "cost_input_mtok"  , "cost_output_mtok"  ,
-  "knowledge_cutoff" , "training_cutoff"   , "niche"                  ,
+  "knowledge_cutoff" , "training_cutoff"   , "High"                   ,
   #
   "Google Gemini"    , "Gemini 3.1 Pro"    , "gemini-3.1-pro-preview" ,
   "release_date"     , "context_window_k"  , "max_output_k"           ,
   "cost_input_mtok"  , "cost_output_mtok"  ,
-  "knowledge_cutoff" , "training_cutoff"   , "niche"                  ,
+  "knowledge_cutoff" , "training_cutoff"   , "High"                   ,
   #
   "Google Gemini"    , "Gemini 3.5 Flash"  , "gemini-3.5-flash"       ,
   "release_date"     , "context_window_k"  , "max_output_k"           ,
   "cost_input_mtok"  , "cost_output_mtok"  ,
-  "knowledge_cutoff" , "training_cutoff"   , "niche"
+  "knowledge_cutoff" , "training_cutoff"   , "Low"
 )
 # Named vector for use in experimental_setup (label -> API id)
 models <- setNames(models_tbl$model_id, models_tbl$model_label)
@@ -158,19 +190,6 @@ models_tbl |> flextable() |> autofit()
 ```
 
 So, what experiments do we want to run?
-
-```{r}
-#| label: experimental_design
-
-experimental_setup <-
-  expand.grid(
-    pdf = c("a", "b", "c"),
-    models = models,
-    tokens = c("1000", "5000", "10000"),
-    replicate = 1:3
-  ) |>
-  as_tibble()
-```
 
 
 ```{r}
@@ -260,9 +279,66 @@ flatten_call <- function(call_result) {
     select(level_1, level_2, name, row_idx, value, type)
 }
 
-# Build an experiment grid and run all extractions, returning a tibble with one
-# row per run and a `call` list-column holding the raw list(result, metadata, success).
-# TODO: Add better error checking for e.g. invalid pdf paths
+# --- Per-call RDS caching ----------------------------------------------------
+
+# Build a deterministic RDS path from the call parameters.
+call_rds_path <- function(
+  pdf,
+  model_id,
+  tokens,
+  replicate,
+  cache_dir = LLM_CACHE_DIR
+) {
+  # Replace path-unsafe characters in model_id (e.g. "/")
+  safe_model <- gsub("/", "-", model_id)
+  file.path(
+    cache_dir,
+    # TODO: Why double __?
+    glue("{pdf}__{safe_model}__{tokens}__rep{replicate}.rds")
+  )
+}
+
+# Run a single extraction, loading from RDS cache if already done.
+run_or_load_extraction <- function(
+  pdf_path,
+  model_id,
+  max_tokens,
+  model_provider,
+  env_var,
+  chat_fn,
+  pdf,
+  replicate
+) {
+  rds_path <- call_rds_path(pdf, model_id, max_tokens, replicate)
+
+  if (file.exists(rds_path)) {
+    message(glue("Cache hit — loading: {basename(rds_path)}"))
+    readRDS(rds_path)
+  } else {
+    message(glue("Cache miss — running API call: {basename(rds_path)}"))
+    result <- run_extraction(
+      pdf_path,
+      model_id,
+      max_tokens,
+      model_provider,
+      env_var,
+      chat_fn
+    )
+
+    # TODO: check each result, halt extraction if we hit an error that indicates we've run out of money
+    # For Claude, this is a 400 error
+    # Checking result$metadata$success may or may not be sufficient
+    if (!result$metadata$success) {stop("Extraction failed. ")}
+      saveRDS(result, rds_path)
+    }
+    result
+  }
+}
+
+# Build an experiment grid and run/load all extractions.
+# Each call is cached individually as an RDS keyed on its parameters.
+# Returns a tibble with a `call` list-column holding list(result, metadata, success).
+#
 # pdf_ids:      character vector of PDF ids from the pdfs tibble (e.g. c("a", "b"))
 # model_ids:    character vector of model IDs from models_tbl$model_id
 # token_counts: integer vector of max_tokens values to test
@@ -296,29 +372,24 @@ run_extraction_batch <- function(
           max_tokens = tokens,
           model_provider = model_provider,
           env_var = env_var,
-          chat_fn = chat_fn
+          chat_fn = chat_fn,
+          pdf = pdf,
+          replicate = replicate
         ),
-        run_extraction
+        run_or_load_extraction
       )
     )
 }
 
-# TODO: Cache per call
-if (
-  !file.exists("data-raw/llm_cache/llm_eval_calls.rds") ||
-    !file.exists("data-raw/llm_cache/llm_eval_output_flat.parquet")
+# Rebuild the flat parquet from all per-call RDS files present in the cache.
+# Called every time — cheap, since it just reads already-saved RDS files.
+# TODO: This seems to be doing something strange to our results and flagging calls as successful when they aren't?
+
+# Right, duhh. We only save successful calls to the parquet
+rebuild_flat_parquet <- function(
+  calls_results,
+  parquet_path = "data-raw/llm_cache/llm_eval_output_flat.parquet"
 ) {
-  calls_results <- run_extraction_batch(
-    pdf_ids = "a",
-    model_ids = c("claude-haiku-4-5", "claude-sonnet-4-6"),
-    token_counts = 6000,
-    n_replicates = 5
-  )
-
-  # Save raw results list for validation and per-call inspection
-  saveRDS(calls_results, "data-raw/llm_cache/llm_eval_calls.rds")
-
-  # Flatten successful calls; keep an id column for downstream pairwise code
   calls_flat <- calls_results |>
     filter(map_lgl(call, \(c) isTRUE(c$success))) |>
     mutate(
@@ -328,18 +399,118 @@ if (
     select(id, pdf, models, tokens, replicate, flat) |>
     unnest(flat)
 
-  write_parquet(calls_flat, "data-raw/llm_cache/llm_eval_output_flat.parquet")
-} else {
-  message("LLM API calls cached, loading from /data-raw/llm_cache/")
-  calls_results <- readRDS("data-raw/llm_cache/llm_eval_calls.rds")
-  calls_flat <- read_parquet("data-raw/llm_cache/llm_eval_output_flat.parquet")
+  write_parquet(calls_flat, parquet_path)
+  calls_flat
 }
 
-# Expose individual call objects for downstream compatibility
-call1 <- calls_results$call[[1]]
-call2 <- calls_results$call[[2]]
+# --- Run / load batch and rebuild parquet ------------------------------------
+
+# TODO: Better error checking. Currently when it fails, you don't find out until you dig into the output
+
+calls_results <- run_extraction_batch(
+  pdf_ids = c("a", "b", "c", "d"),
+  model_ids = c("claude-haiku-4-5", "claude-sonnet-4-6"),
+  token_counts = c(3000, 6000, 9000),
+  n_replicates = 5
+) |>
+  mutate(id = row_number(), .before = everything())
+
+# nb: the number of IDs in calls_results and calls_flats may not be the same, because the flat file also includes all previous calls in the folder
+calls_flat <- rebuild_flat_parquet(calls_results)
+
+# Named list of individual call objects, keyed by their parameter combination.
+# Scales automatically with whatever is in calls_results.
+calls <- setNames(
+  calls_results$call,
+  with(
+    calls_results,
+    paste(pdf, models, tokens, paste0("rep", replicate), sep = "__")
+  )
+)
+
+
+# make the flat groups back into a list of dataframes...
+# there's method to my madness, I promise
+calls_flat_grouped <- calls_flat |> group_by(id) |> group_split()
+
+
+# --- Empty-table detection ---------------------------------------------------
+# "Successful" API calls (success == TRUE) may still return all-NA tables if
+# the token limit was hit mid-response. Identify these cases here.
+# A table is "empty" if every value in it is NA.
+
+call_completeness <- calls_flat |>
+  group_by(id, table = level_2) |>
+  summarise(
+    n_non_na = sum(!is.na(value)),
+    is_empty = n_non_na == 0,
+    .groups = "drop"
+  ) |>
+  group_by(id) |>
+  summarise(
+    tables_with_data = sum(!is_empty),
+    tables_empty = sum(is_empty),
+    .groups = "drop"
+  )
+
+call_status <- calls_results |>
+  mutate(
+    id = as.character(row_number()),
+    api_success = map_lgl(call, \(c) isTRUE(c$success))
+  ) |>
+  left_join(call_completeness, by = "id") |>
+  replace_na(list(tables_with_data = 0L, tables_empty = 0L)) |>
+  mutate(
+    effectively_complete = api_success &
+      tables_empty == 0 &
+      tables_with_data > 0
+  ) |>
+  select(
+    pdf,
+    models,
+    tokens,
+    replicate,
+    api_success,
+    tables_with_data,
+    tables_empty,
+    effectively_complete
+  )
 ```
 
+```{r}
+#| label: tbl-all-calls
+
+call_status |> flextable() |> autofit()
+```
+
+What's up with these table numbers? The maths, as they say, isn't maths-ing.
+
+```{r}
+#| label: fig-all-calls
+
+call_status |>
+  ggplot(aes(x = tokens, y = tables_with_data, colour = models)) +
+  geom_point(position = "jitter") +
+  facet_wrap(facets = vars(pdf))
+
+api_failed_calls <- call_status |> filter(!api_success)
+```
+
+```{r}
+#| label: tbl-all-calls-summary
+
+call_status |>
+  group_by(pdf, models, tokens) |>
+  summarise(
+    n_calls = n(),
+    n_complete = sum(effectively_complete),
+    n_empty_tables = sum(api_success & !effectively_complete),
+    n_failed = sum(!api_success),
+    .groups = "drop"
+  ) |>
+  flextable() |>
+  autofit()
+```
 
 ```{r}
 #| label: call-comparison
@@ -630,9 +801,13 @@ validate_all_calls <- function(calls_results) {
     unnest(validation_summary)
 }
 
-# Keep named agents available for get_agent_report() inspection
-call1_validation <- validate_llm_extraction(call1$result)
-call2_validation <- validate_llm_extraction(call2$result)
+# Keep named agents available for get_agent_report() inspection.
+# call_validations$`a__claude-haiku-4-5__6000__rep1` etc.
+
+# TODO: Exclude
+successful_calls <- calls |> # TODO: How do?
+
+  call_validations <- map(calls, \(c) validate_llm_extraction(c$result))
 
 table_summary <- validate_all_calls(calls_results)
 ```
@@ -642,8 +817,453 @@ Boring!
 
 
 ```{r}
+# TODO: Jitter/dodge points
+# TODO: Why are some points not coloured?
+# TOOD: Replace boxplots with something better
+# This approach isn't very good for the sort of steppy data we have.
 
 table_summary |>
-  ggplot(aes(x = table, y = pct_steps_pass, fill = models, group = replicate)) +
-  geom_col(position = "dodge")
+  ggplot(aes(x = table, y = pct_steps_pass, fill = models)) +
+  geom_point(
+    aes(colour = models),
+    position = position_jitterdodge(dodge.width = 0.75)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 1),
+    name = "Proportion of Validation Passed"
+  )
+```
+
+
+```{r}
+#| label: compare-canonical
+
+# --- Load canonical datasets -------------------------------------------------
+
+pdf_zip_map <- c(
+  a = "data-raw/1997RitterhoffTraceMetalsIn_AllData_20251030_145522.zip",
+  b = "data-raw/2002HellandTransportAndSedimentation_AllData_20251104_075533.zip",
+  c = "data-raw/2021WojtasikTemporalIsolationBetween_AllData_20251030_163338.zip",
+  d = "data-raw/2022KohlerDistributionPatternOf_AllData_20251217_115443.zip"
+)
+
+load_canonical <- function(zip_path) {
+  tmp <- tempfile()
+  dir.create(tmp)
+  unzip(zip_path, exdir = tmp)
+  csvs <- list.files(tmp, full.names = TRUE, pattern = "\\.csv$")
+
+  patterns <- c(
+    campaign = "Campaign",
+    references = "Reference",
+    sites = "Sites",
+    parameters = "Parameters",
+    compartments = "Compartments",
+    biota = "Biota",
+    methods = "Methods"
+  )
+
+  imap(patterns, function(pat, nm) {
+    f <- csvs[grepl(pat, csvs, fixed = TRUE)]
+    if (length(f) == 0) {
+      return(NULL)
+    }
+    read_csv(f[1], show_col_types = FALSE) |> rename_with(tolower)
+  }) |>
+    compact()
+}
+
+# Load canonical data for all four papers (cached in-memory)
+canonical_data <- imap(pdf_zip_map, \(path, id) load_canonical(path))
+
+
+# --- Variable classification --------------------------------------------------
+# var_type:
+#   "controlled" — compare with case-insensitive exact match → boolean
+#   "continuous" — compute numeric delta (LLM − canonical)
+#   "free_text"  — excluded from comparison
+#
+# canonical_name uses lowercase column names (matching rename_with(tolower) above).
+# LLM schema names that differ from canonical names are mapped explicitly
+# (e.g. country_iso → country, ocean_iho → area).
+
+variable_meta <- tribble(
+  ~table         , ~llm_name                     , ~canonical_name               , ~var_type    ,
+  # campaign
+  "campaign"     , "campaign_start_date"         , "campaign_start_date"         , "continuous" ,
+  "campaign"     , "campaign_end_date"           , "campaign_end_date"           , "continuous" ,
+  "campaign"     , "campaign_name"               , NA_character_                 , "free_text"  ,
+  "campaign"     , "campaign_name_short"         , NA_character_                 , "free_text"  ,
+  "campaign"     , "organisation"                , "organisation"                , "free_text"  ,
+  "campaign"     , "campaign_comment"            , NA_character_                 , "free_text"  ,
+  "campaign"     , "campaign_rationale"          , NA_character_                 , "free_text"  ,
+  # references
+  "references"   , "reference_type"              , "reference_type"              , "controlled" ,
+  "references"   , "year"                        , "year"                        , "continuous" ,
+  "references"   , "volume"                      , "volume"                      , "continuous" ,
+  "references"   , "issue"                       , "issue"                       , "continuous" ,
+  "references"   , "author"                      , NA_character_                 , "free_text"  ,
+  "references"   , "title"                       , NA_character_                 , "free_text"  ,
+  "references"   , "doi"                         , NA_character_                 , "free_text"  ,
+  "references"   , "periodical_journal"          , NA_character_                 , "free_text"  ,
+  "references"   , "publisher"                   , NA_character_                 , "free_text"  ,
+  # sites
+  "sites"        , "latitude"                    , "latitude"                    , "continuous" ,
+  "sites"        , "longitude"                   , "longitude"                   , "continuous" ,
+  "sites"        , "country_iso"                 , "country"                     , "controlled" ,
+  "sites"        , "ocean_iho"                   , "area"                        , "controlled" ,
+  "sites"        , "site_geographic_feature"     , "site_geographic_feature"     , "controlled" ,
+  "sites"        , "site_geographic_feature_sub" , "site_geographic_feature_sub" , "controlled" ,
+  "sites"        , "site_code"                   , NA_character_                 , "free_text"  ,
+  "sites"        , "site_name"                   , NA_character_                 , "free_text"  ,
+  "sites"        , "site_comment"                , NA_character_                 , "free_text"  ,
+  # parameters
+  "parameters"   , "parameter_type"              , "parameter_type"              , "controlled" ,
+  "parameters"   , "cas_rn"                      , NA_character_                 , "free_text"  ,
+  "parameters"   , "parameter_name"              , NA_character_                 , "free_text"  ,
+  "parameters"   , "parameter_comment"           , NA_character_                 , "free_text"  ,
+  # compartments
+  "compartments" , "environ_compartment"         , "environ_compartment"         , "controlled" ,
+  "compartments" , "environ_compartment_sub"     , "environ_compartment_sub"     , "controlled" ,
+  "compartments" , "measured_category"           , "measured_category"           , "controlled" ,
+  # biota
+  "biota"        , "species_group"               , "species_group"               , "controlled" ,
+  "biota"        , "sample_tissue"               , "sample_tissue"               , "controlled" ,
+  "biota"        , "sample_species_lifestage"    , "sample_species_lifestage"    , "controlled" ,
+  "biota"        , "sample_species_gender"       , "sample_species_gender"       , "controlled" ,
+  "biota"        , "sample_species"              , NA_character_                 , "free_text"  ,
+  "biota"        , "sample_id"                   , NA_character_                 , "free_text"  ,
+  # methods
+  "methods"      , "protocol_category"           , "protocol_category"           , "controlled" ,
+  "methods"      , "protocol_name"               , "protocol_name"               , "controlled" ,
+  "methods"      , "protocol_comment"            , NA_character_                 , "free_text"  ,
+)
+
+# Row-matching key columns per table (NULL = single-row, match directly)
+# TODO: Site matching via rounded lat/lon is coarse (~111 m tolerance per 0.001°).
+#       Improve with st_nearest_feature() or site_name fuzzy matching.
+table_keys <- list(
+  campaign = NULL,
+  references = NULL,
+  sites = c("latitude", "longitude"),
+  parameters = "parameter_name",
+  compartments = c("environ_compartment", "environ_compartment_sub"),
+  biota = c("sample_species", "sample_tissue"),
+  methods = c("protocol_category", "protocol_name")
+)
+
+
+# --- Core comparison functions -----------------------------------------------
+
+# Compare one call's extracted table (wide) against the canonical version.
+# Returns a tibble: one row per (matched row × comparable variable).
+#
+# call_wide:  wide LLM data, one row per extracted row (row_idx + variable cols)
+# canonical:  canonical tibble with lowercase column names
+# meta:       variable_meta rows for this table, pre-filtered to non-free-text
+# keys:       key column names for row matching (NULL for single-row tables)
+compare_one_table <- function(call_wide, canonical, tbl_name, meta, keys) {
+  if (nrow(meta) == 0 || is.null(canonical) || nrow(canonical) == 0) {
+    return(tibble())
+  }
+
+  if (is.null(keys)) {
+    # Single-row table: align first rows via a dummy join key
+    llm_r <- call_wide |> slice(1) |> mutate(.k = 1L)
+    can_r <- canonical |> slice(1) |> mutate(.k = 1L)
+    joined <- left_join(llm_r, can_r, by = ".k", suffix = c("", ".can")) |>
+      select(-.k)
+  } else {
+    # Multi-row table: join on key columns
+    valid_keys <- keys[keys %in% names(canonical)]
+    if (length(valid_keys) == 0) {
+      return(tibble())
+    }
+
+    if (tbl_name == "sites") {
+      # TODO: Replace with spatial nearest-neighbour matching
+      call_wide <- call_wide |>
+        mutate(across(any_of(valid_keys), \(x) round(as.numeric(x), 3)))
+      canonical <- canonical |>
+        mutate(across(any_of(valid_keys), \(x) round(as.numeric(x), 3)))
+    } else {
+      call_wide <- call_wide |>
+        mutate(across(any_of(valid_keys), \(x) tolower(as.character(x))))
+      canonical <- canonical |>
+        mutate(across(any_of(valid_keys), \(x) tolower(as.character(x))))
+    }
+    joined <- left_join(
+      call_wide,
+      canonical,
+      by = valid_keys,
+      suffix = c("", ".can")
+    )
+  }
+
+  # For each comparable variable, extract llm and canonical values from joined
+  map_dfr(seq_len(nrow(meta)), function(i) {
+    ln <- meta$llm_name[i]
+    cn <- meta$canonical_name[i]
+    vt <- meta$var_type[i]
+
+    if (!(ln %in% names(joined))) {
+      return(tibble())
+    }
+
+    # Canonical column gets ".can" suffix when its name clashes with the LLM column
+    cn_col <- if (paste0(cn, ".can") %in% names(joined)) {
+      paste0(cn, ".can")
+    } else {
+      cn
+    }
+
+    can_vals <- if (cn_col %in% names(joined)) {
+      as.character(joined[[cn_col]])
+    } else {
+      rep(NA_character_, nrow(joined))
+    }
+
+    tibble(
+      llm_name = ln,
+      var_type = vt,
+      llm_value = as.character(joined[[ln]]),
+      can_value = can_vals,
+      matched = !is.na(can_vals)
+    )
+  })
+}
+
+# Run comparison across all tables, calls, and papers.
+# Returns a long tibble: one row per (call × table × matched row × variable).
+compute_canonical_comparison <- function(
+  calls_flat,
+  canonical_data,
+  variable_meta,
+  table_keys
+) {
+  map_dfr(unique(variable_meta$table), function(tbl_name) {
+    meta <- variable_meta |>
+      filter(table == tbl_name, var_type != "free_text", !is.na(canonical_name))
+    if (nrow(meta) == 0) {
+      return(tibble())
+    }
+
+    keys <- table_keys[[tbl_name]]
+
+    # Pivot to wide: one row per (call × row_idx), one col per variable
+    llm_wide <- calls_flat |>
+      filter(level_2 == tbl_name) |>
+      select(id, pdf, models, tokens, replicate, row_idx, name, value) |>
+      pivot_wider(
+        names_from = name,
+        values_from = value,
+        values_fill = NA,
+        values_fn = first # guard against any duplicate name/row_idx entries
+      )
+
+    if (nrow(llm_wide) == 0) {
+      return(tibble())
+    }
+
+    # group_map splits by call; tbl = data rows only, key = call identifiers
+    llm_wide |>
+      group_by(id, pdf, models, tokens, replicate) |>
+      group_map(function(tbl, key) {
+        can <- canonical_data[[key$pdf]][[tbl_name]]
+        cmp <- compare_one_table(tbl, can, tbl_name, meta, keys)
+        if (nrow(cmp) == 0) {
+          return(tibble())
+        }
+        cmp |>
+          mutate(
+            id = key$id,
+            pdf = key$pdf,
+            models = key$models,
+            tokens = key$tokens,
+            replicate = key$replicate,
+            table = tbl_name
+          )
+      }) |>
+      list_rbind()
+  })
+}
+
+
+# --- Run comparison ----------------------------------------------------------
+
+canonical_comparison_raw <- compute_canonical_comparison(
+  calls_flat,
+  canonical_data,
+  variable_meta,
+  table_keys
+)
+
+# Attach match / delta metrics (only on successfully matched rows)
+canonical_comparison <- canonical_comparison_raw |>
+  filter(matched) |>
+  mutate(
+    is_match = case_when(
+      var_type == "controlled" ~
+        tolower(llm_value) == tolower(can_value),
+      TRUE ~ NA
+    ),
+    delta = case_when(
+      var_type == "continuous" ~
+        suppressWarnings(as.numeric(llm_value) - as.numeric(can_value)),
+      TRUE ~ NA_real_
+    )
+  )
+
+
+# --- Summaries ---------------------------------------------------------------
+
+# Controlled variables: proportion of exact matches per experimental group
+controlled_summary <- canonical_comparison |>
+  filter(var_type == "controlled") |>
+  group_by(pdf, models, tokens) |>
+  summarise(
+    n_comparisons = n(),
+    n_match = sum(is_match, na.rm = TRUE),
+    prop_match = n_match / n_comparisons,
+    .groups = "drop"
+  )
+
+controlled_summary |> flextable() |> autofit()
+
+# Continuous variables: mean absolute delta per group × variable
+continuous_summary <- canonical_comparison |>
+  filter(var_type == "continuous", !is.na(delta)) |>
+  group_by(pdf, models, tokens, llm_name) |>
+  summarise(
+    n = n(),
+    mean_abs_delta = mean(abs(delta), na.rm = TRUE),
+    .groups = "drop"
+  )
+
+continuous_summary |> flextable() |> autofit()
+```
+
+
+```{r}
+#| label: compare-canonical-comments
+
+# Screening comments are a special case: there is no canonical ground truth
+# to compare against, so we assess inter-rater reliability between
+# models/replicates using Cohen's / Fleiss' kappa.
+#
+# Weighted kappa is used throughout: it penalises larger disagreements more
+# (e.g. 1 vs 5) than small ones (1 vs 2), which is appropriate for 1–5
+# ordinal scores.
+
+library(irr)
+
+score_vars <- c(
+  "paper_relevance",
+  "paper_reliability",
+  "paper_data_source",
+  "paper_data_available",
+  "extraction_assessement"
+)
+
+# Extract integer scores from the "Score: N: text" format
+scores_long <- calls_flat |>
+  filter(level_2 == "comments", name %in% score_vars) |>
+  select(id, pdf, models, tokens, replicate, name, value) |>
+  mutate(score = as.integer(str_extract(value, "(?<=Score:\\s)\\d"))) |>
+  select(-value)
+
+
+# --- Within-model kappa (consistency across replicates) ----------------------
+# For each (model, score_variable): matrix rows = pdfs, cols = replicates.
+# Multiple raters → Fleiss' kappa.
+
+within_model_kappa <- scores_long |>
+  group_by(models, name) |>
+  group_map(function(df, key) {
+    mat <- df |>
+      select(pdf, replicate, score) |>
+      pivot_wider(names_from = replicate, values_from = score) |>
+      select(-pdf) |>
+      as.matrix()
+
+    # Drop all-NA columns (failed/empty replicates)
+    mat <- mat[, colSums(!is.na(mat)) > 0, drop = FALSE]
+    if (ncol(mat) < 2 || nrow(mat) < 2) {
+      return(tibble())
+    }
+
+    res <- tryCatch(kappam.fleiss(mat), error = function(e) NULL)
+    if (is.null(res)) {
+      return(tibble())
+    }
+
+    tibble(
+      models = key$models,
+      score_var = key$name,
+      n_subjects = nrow(mat),
+      n_raters = ncol(mat),
+      kappa = round(res$value, 3),
+      z = round(res$statistic, 2),
+      p_value = round(res$p.value, 4),
+      comparison = "within_model (replicates)"
+    )
+  }) |>
+  list_rbind()
+
+
+# --- Cross-model kappa (agreement between models) ----------------------------
+# Average scores across replicates per (pdf, model) first, then compare models.
+# 2 models → weighted kappa2; >2 models → Fleiss kappa.
+
+cross_model_kappa <- scores_long |>
+  group_by(pdf, models, name) |>
+  summarise(mean_score = round(mean(score, na.rm = TRUE)), .groups = "drop") |>
+  group_by(name) |>
+  group_map(function(df, key) {
+    mat <- df |>
+      select(pdf, models, mean_score) |>
+      pivot_wider(names_from = models, values_from = mean_score) |>
+      select(-pdf) |>
+      as.matrix()
+
+    mat <- mat[, colSums(!is.na(mat)) > 0, drop = FALSE]
+    if (ncol(mat) < 2 || nrow(mat) < 2) {
+      return(tibble())
+    }
+
+    res <- tryCatch(
+      if (ncol(mat) == 2) {
+        kappa2(mat, weight = "equal")
+      } else {
+        kappam.fleiss(mat)
+      },
+      error = function(e) NULL
+    )
+    if (is.null(res)) {
+      return(tibble())
+    }
+
+    tibble(
+      models = "all",
+      score_var = key$name,
+      n_subjects = nrow(mat),
+      n_raters = ncol(mat),
+      kappa = round(res$value, 3),
+      z = round(res$statistic, 2),
+      p_value = round(res$p.value, 4),
+      comparison = "cross_model"
+    )
+  }) |>
+  list_rbind()
+```
+
+
+```{r}
+#| label:  tbl-combined-results
+
+# Combined results table
+bind_rows(within_model_kappa, cross_model_kappa) |>
+  arrange(comparison, score_var, models) |>
+  flextable() |>
+  autofit()
 ```

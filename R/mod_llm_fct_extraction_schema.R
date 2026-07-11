@@ -60,7 +60,7 @@ create_references_schema <- function() {
       ),
       reference_type = type_string(
         description = as.character(glue(
-          "Type of reference. One of {reference_type_vocabulary()}."
+          "Type of reference. One of {paste0(reference_type_vocabulary(), collapse = ';')}."
         )),
         required = FALSE
       ),

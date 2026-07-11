@@ -2,7 +2,8 @@
   "permission": {
     "edit": {
       "*.R": "allow",
-      "*.md": "allow"
+      "*.md": "allow",
+      "*.qmd": "allow"
     },
     "bash": {
       "cmd *": "allow",
@@ -12,5 +13,8 @@
     "executeCode": {
       "*": "allow"
     }
+  },
+  "sandbox": {
+    "enabled": false
   }
 }
