@@ -5,6 +5,8 @@ knitr:
   opts_chunk:
     collapse: true
     comment: '#>'
+execute:
+  error: true
 ---
 
 ```{r}
@@ -58,12 +60,44 @@ This will give us 7 * 27 = 189 cases. Which is quite a lot, but we can probably 
 
 Use multiple models to do a consensus thing and maybe compare against people doing the data extraction manually
 
-Time to pick some different papers!
+
+```{mermaid}
+%%| label: workflow-diagram
+%%| fig-cap: "Overview of the LLM evaluation pipeline."
+flowchart TD
+    pdfs["PDFs tibble<br>4 papers"]         --> grid
+    models["Models tibble<br>3 providers"]  --> grid
+    tok["Token limits<br>3k / 6k / 9k<br>n replicates"] --> grid
+
+    grid["Experiment grid<br>run_extraction_batch"]  --> cache
+
+    cache{"RDS cache hit?"}
+    cache -- Yes --> load["Load cached RDS"]
+    cache -- No  --> api["LLM API call<br>extract_pdf_with_llm"]
+
+    api -- success --> save["Save RDS"]
+    api -- failure --> err["Record error<br>HTTP code + message"]
+
+    save  --> results
+    load  --> results
+    err   --> results
+
+    results["calls_results<br>call list-column"]
+
+    results --> flat["rebuild_flat_parquet<br>Successful calls only"]
+    flat    --> parquet[("calls_flat parquet<br>long / flat format")]
+
+    results --> report["batch_run_report<br>success · error · tokens<br>by pdf · model · limit"]
+
+    parquet --> status["call_status<br>success · empty-table<br>effectiveness flags"]
+    parquet --> validate["validate_all_calls<br>pointblank agents<br>per table"]
+    parquet --> canon["Canonical comparison<br>vs. human-extracted data<br>controlled + continuous vars"]
+    parquet --> kappa["Kappa statistics<br>inter-rater reliability<br>within- and cross-model"]
+```
+
 
 ```{r}
 #| label: pdfs
-
-# TODO: Update with details of new papers
 
 pdfs <- tibble(
   id = c("a", "b", "c", "d"),
@@ -193,7 +227,7 @@ So, what experiments do we want to run?
 
 
 ```{r}
-#| label: API_calls
+#| label: API-calls-setup
 
 # Recursively walk the list, collecting path-as-vector as we go.
 # Each branch terminates at: (1) a data frame, (2) an atomic scalar.
@@ -293,8 +327,7 @@ call_rds_path <- function(
   safe_model <- gsub("/", "-", model_id)
   file.path(
     cache_dir,
-    # TODO: Why double __?
-    glue("{pdf}__{safe_model}__{tokens}__rep{replicate}.rds")
+    glue("{pdf}_{safe_model}_{tokens}_rep{replicate}.rds")
   )
 }
 
@@ -313,7 +346,7 @@ run_or_load_extraction <- function(
 
   if (file.exists(rds_path)) {
     message(glue("Cache hit — loading: {basename(rds_path)}"))
-    readRDS(rds_path)
+    result <- readRDS(rds_path)
   } else {
     message(glue("Cache miss — running API call: {basename(rds_path)}"))
     result <- run_extraction(
@@ -324,16 +357,11 @@ run_or_load_extraction <- function(
       env_var,
       chat_fn
     )
-
-    # TODO: check each result, halt extraction if we hit an error that indicates we've run out of money
-    # For Claude, this is a 400 error
-    # Checking result$metadata$success may or may not be sufficient
-    if (!result$metadata$success) {stop("Extraction failed. ")}
-      saveRDS(result, rds_path)
-    }
-    result
+    saveRDS(result, rds_path)
   }
+  result
 }
+
 
 # Build an experiment grid and run/load all extractions.
 # Each call is cached individually as an RDS keyed on its parameters.
@@ -402,16 +430,20 @@ rebuild_flat_parquet <- function(
   write_parquet(calls_flat, parquet_path)
   calls_flat
 }
+```
+
+```{r}
+#| label: api-calls
 
 # --- Run / load batch and rebuild parquet ------------------------------------
 
 # TODO: Better error checking. Currently when it fails, you don't find out until you dig into the output
 
 calls_results <- run_extraction_batch(
-  pdf_ids = c("a", "b", "c", "d"),
+  pdf_ids = c("a"),
   model_ids = c("claude-haiku-4-5", "claude-sonnet-4-6"),
-  token_counts = c(3000, 6000, 9000),
-  n_replicates = 5
+  token_counts = c(6000),
+  n_replicates = 3
 ) |>
   mutate(id = row_number(), .before = everything())
 
@@ -424,15 +456,9 @@ calls <- setNames(
   calls_results$call,
   with(
     calls_results,
-    paste(pdf, models, tokens, paste0("rep", replicate), sep = "__")
+    paste(pdf, models, tokens, paste0("rep", replicate), sep = "_")
   )
 )
-
-
-# make the flat groups back into a list of dataframes...
-# there's method to my madness, I promise
-calls_flat_grouped <- calls_flat |> group_by(id) |> group_split()
-
 
 # --- Empty-table detection ---------------------------------------------------
 # "Successful" API calls (success == TRUE) may still return all-NA tables if
@@ -478,23 +504,102 @@ call_status <- calls_results |>
 ```
 
 ```{r}
+#| label: batch-report
+
+# --- Batch run status report -------------------------------------------------
+# Inspect the call list-column directly — before any flattening — to report
+# on successes and errors with token counts, broken down by pdf, model, and
+# token limit.
+
+batch_run_report <- calls_results |>
+  mutate(
+    success = map_lgl(call, \(c) isTRUE(c$success)),
+    error_msg = map_chr(call, \(c) c$error %||% NA_character_),
+    # metadata is a named list of summed token counts for successful calls.
+    # Try both naming conventions used across ellmer versions.
+    input_tokens = map_int(call, \(c) {
+      tryCatch(
+        as.integer(
+          c$metadata[["input_tokens"]] %||% c$metadata[["input"]] %||% NA_real_
+        ),
+        error = \(e) NA_integer_
+      )
+    }),
+    output_tokens = map_int(call, \(c) {
+      tryCatch(
+        as.integer(
+          c$metadata[["output_tokens"]] %||%
+            c$metadata[["output"]] %||%
+            NA_real_
+        ),
+        error = \(e) NA_integer_
+      )
+    })
+  )
+
+# Per-replicate detail
+batch_run_report |>
+  select(
+    pdf,
+    models,
+    tokens,
+    replicate,
+    success,
+    error_msg,
+    input_tokens,
+    output_tokens
+  ) |>
+  flextable() |>
+  autofit() |>
+  set_header_labels(
+    pdf = "PDF",
+    models = "Model",
+    tokens = "Token Limit",
+    replicate = "Rep",
+    success = "Success",
+    error_msg = "Error",
+    input_tokens = "Input Tok",
+    output_tokens = "Output Tok"
+  ) |>
+  color(i = ~ !success, j = ~ success + error_msg, color = "firebrick")
+```
+
+```{r}
+#| label: batch-report-summary
+
+# Grouped summary: counts and mean token usage by pdf × model × token limit
+batch_run_report |>
+  group_by(pdf, models, tokens) |>
+  summarise(
+    n_calls = n(),
+    n_success = sum(success),
+    n_failed = sum(!success),
+    error_types = paste(sort(unique(na.omit(error_msg))), collapse = "; "),
+    mean_input_tok = round(mean(input_tokens, na.rm = TRUE)),
+    mean_output_tok = round(mean(output_tokens, na.rm = TRUE)),
+    .groups = "drop"
+  ) |>
+  flextable() |>
+  autofit() |>
+  set_header_labels(
+    pdf = "PDF",
+    models = "Model",
+    tokens = "Token Limit",
+    n_calls = "N",
+    n_success = "Success",
+    n_failed = "Failed",
+    error_types = "Error Types",
+    mean_input_tok = "Mean Input Tok",
+    mean_output_tok = "Mean Output Tok"
+  )
+```
+
+```{r}
 #| label: tbl-all-calls
 
 call_status |> flextable() |> autofit()
 ```
 
-What's up with these table numbers? The maths, as they say, isn't maths-ing.
-
-```{r}
-#| label: fig-all-calls
-
-call_status |>
-  ggplot(aes(x = tokens, y = tables_with_data, colour = models)) +
-  geom_point(position = "jitter") +
-  facet_wrap(facets = vars(pdf))
-
-api_failed_calls <- call_status |> filter(!api_success)
-```
 
 ```{r}
 #| label: tbl-all-calls-summary
@@ -512,111 +617,6 @@ call_status |>
   autofit()
 ```
 
-```{r}
-#| label: call-comparison
-calls_flat
-
-# KET is right, pairwise might get messy quickly
-
-# campaign and reference are easy.
-
-# almost certainly there are better options than identical()
-compare_campaign <- calls_flat |>
-  filter(level_2 == "campaign") |>
-  group_by(name) |>
-  distinct(value) |>
-  reframe(n = n()) |>
-  filter(n > 1)
-
-# no issues with references
-compare_references <- calls_flat |>
-  filter(level_2 == "references") |>
-  group_by(name) |>
-  distinct(value) |>
-  reframe(n = n()) |>
-  filter(n > 1)
-
-# sites...
-# issue: different calls return variables in different orders!
-# we can't automatically match sites to each other unless we assume that the lat/long are always equal (or, if we have a canonical point of comparison, I guess)
-compare_sites <- calls_flat |>
-  filter(level_2 == "sites") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# we can presumably compare distance with sf
-
-# for example
-compare_sites |>
-  filter(name %in% c("latitude", "longitude")) |>
-  mutate(across(contains("call"), as.numeric))
-
-# how do we check if each value has an equivalent?
-# I guess we just group and ignore idx
-# we may have to call st_distance for g
-distances <- calls_flat |>
-  filter(level_2 == "sites") |>
-  filter(name %in% c("latitude", "longitude")) |>
-  mutate(across(contains("call"), as.numeric)) |>
-  group_by(id, row_idx) |>
-  pivot_wider(names_from = name, values_from = value) |>
-  st_as_sf(coords = c("latitude", "longitude"), na.fail = FALSE)
-
-
-# pair sites and check (great circle) distance?
-
-x <- distances[1:3, 6]
-y <- distances[4:6, 6]
-
-# I guess we make a distance matrix, which should have one value of approximately 0 and be... orthogonal?
-# I believe these distances are in km, would be good to check
-st_distance(x, y)
-
-# parameters should be easier, they have more-or-less canonical names
-compare_parameters <- calls_flat |>
-  filter(level_2 == "parameters") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# compartments - easy
-compare_compartments <- calls_flat |>
-  filter(level_2 == "compartments") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# biota
-# common or linnean name is acceptable as long as they agree
-compare_biota <- calls_flat |>
-  filter(level_2 == "biota") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# methods
-# again, pairing may be an issue here
-compare_methods <- calls_flat |>
-  filter(level_2 == "methods") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# samples
-# might not do the evaluation on this one, since we don't strictly speaking use it
-compare_samples <- calls_flat |>
-  filter(level_2 == "samples") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# comments are pleasantly easy
-compare_comments <- calls_flat |>
-  filter(level_2 == "comments") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call") |>
-  mutate(
-    score_1 = str_extract(call1, "(?!Score\\: )[1-5]"),
-    score_2 = str_extract(call2, "(?!Score\\: )[1-5]"),
-    .before = call1
-  )
-```
-
 Now that I come to think of it we do already have canonical versions (even if they were partly LLM-assisted, they've been manually checked.) They're not quite in the perfect format, but we can work with them.
 
 Where does that leave us:
@@ -632,7 +632,7 @@ We have functions for this, but they're intended to deal with finished data, not
 
 
 ```{r}
-#| label: edata-validation
+#| label: edata-validation-setup
 
 # One function per table. Each takes the raw LLM-extracted data frame,
 # adds dummy values for columns the LLM does not generate, and returns an
@@ -652,7 +652,7 @@ validate_llm_campaign <- function(tbl) {
     rename_with(str_to_upper) |>
     mutate(ENTERED_BY = "Dummy", ENTERED_DATE = today()) |>
     pb_validate_campaign(agent = TRUE) |>
-    interrogate()
+    interrogate(progress = FALSE)
 }
 
 validate_llm_references <- function(tbl) {
@@ -666,7 +666,7 @@ validate_llm_references <- function(tbl) {
       DATA_SOURCE = "Primary" # not extracted by LLM
     ) |>
     pb_validate_reference(agent = TRUE) |>
-    interrogate()
+    interrogate(progress = FALSE)
 }
 
 validate_llm_sites <- function(tbl) {
@@ -682,7 +682,7 @@ validate_llm_sites <- function(tbl) {
       ENTERED_DATE = today()
     ) |>
     pb_validate_sites(agent = TRUE) |>
-    interrogate()
+    interrogate(progress = FALSE)
 }
 
 validate_llm_parameters <- function(tbl) {
@@ -693,7 +693,7 @@ validate_llm_parameters <- function(tbl) {
       MEASURED_TYPE = "Concentration" # not extracted by LLM
     ) |>
     pb_validate_parameters(agent = TRUE) |>
-    interrogate()
+    interrogate(progress = FALSE)
 }
 
 validate_llm_compartments <- function(tbl) {
@@ -713,7 +713,7 @@ validate_llm_compartments <- function(tbl) {
       columns = ENVIRON_COMPARTMENT_SUB,
       set = environ_compartments_sub_vocabulary() |> flatten()
     ) |>
-    interrogate()
+    interrogate(progress = FALSE)
 }
 
 validate_llm_biota <- function(tbl) {
@@ -731,7 +731,7 @@ validate_llm_biota <- function(tbl) {
       )
     ) |>
     pb_validate_biota(agent = TRUE) |>
-    interrogate()
+    interrogate(progress = FALSE)
 }
 
 # TODO: Methods is definitely still a problem.
@@ -746,7 +746,7 @@ validate_llm_methods <- function(tbl) {
       CAMPAIGN_NAME = "Dummy"
     ) |>
     pb_validate_methods(agent = TRUE) |>
-    interrogate()
+    interrogate(progress = FALSE)
 }
 
 # Thin wrapper: dispatches to each per-table function and returns a named
@@ -797,23 +797,26 @@ validate_all_calls <- function(calls_results) {
           summarise_validation()
       })
     ) |>
-    select(pdf, models, tokens, replicate, validation_summary) |>
+    select(id, pdf, models, tokens, replicate, validation_summary) |>
     unnest(validation_summary)
 }
+```
+
+
+```{r}
+#| label: validation-execute
 
 # Keep named agents available for get_agent_report() inspection.
-# call_validations$`a__claude-haiku-4-5__6000__rep1` etc.
+# Index by row-number ID from batch_run_report, e.g. call_validations[["42"]]
 
-# TODO: Exclude
-successful_calls <- calls |> # TODO: How do?
-
-  call_validations <- map(calls, \(c) validate_llm_extraction(c$result))
+# Reuse batch_run_report to identify which calls have a result worth validating.
+successful_ids <- batch_run_report$id[batch_run_report$success]
+call_validations <- calls[successful_ids] |>
+  set_names(successful_ids) |>
+  map(\(c) validate_llm_extraction(c$result))
 
 table_summary <- validate_all_calls(calls_results)
 ```
-
-Ok, we have at least some data to play with. What do they look like?
-Boring!
 
 
 ```{r}
@@ -1266,4 +1269,111 @@ bind_rows(within_model_kappa, cross_model_kappa) |>
   arrange(comparison, score_var, models) |>
   flextable() |>
   autofit()
+```
+
+
+
+```{r}
+#| label: call-comparison
+calls_flat
+
+# KET is right, pairwise might get messy quickly
+
+# campaign and reference are easy.
+
+# almost certainly there are better options than identical()
+compare_campaign <- calls_flat |>
+  filter(level_2 == "campaign") |>
+  group_by(name) |>
+  distinct(value) |>
+  reframe(n = n()) |>
+  filter(n > 1)
+
+# no issues with references
+compare_references <- calls_flat |>
+  filter(level_2 == "references") |>
+  group_by(name) |>
+  distinct(value) |>
+  reframe(n = n()) |>
+  filter(n > 1)
+
+# sites...
+# issue: different calls return variables in different orders!
+# we can't automatically match sites to each other unless we assume that the lat/long are always equal (or, if we have a canonical point of comparison, I guess)
+compare_sites <- calls_flat |>
+  filter(level_2 == "sites") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# we can presumably compare distance with sf
+
+# for example
+compare_sites |>
+  filter(name %in% c("latitude", "longitude")) |>
+  mutate(across(contains("call"), as.numeric))
+
+# how do we check if each value has an equivalent?
+# I guess we just group and ignore idx
+# we may have to call st_distance for g
+distances <- calls_flat |>
+  filter(level_2 == "sites") |>
+  filter(name %in% c("latitude", "longitude")) |>
+  mutate(across(contains("call"), as.numeric)) |>
+  group_by(id, row_idx) |>
+  pivot_wider(names_from = name, values_from = value) |>
+  st_as_sf(coords = c("latitude", "longitude"), na.fail = FALSE)
+
+
+# pair sites and check (great circle) distance?
+
+x <- distances[1:3, 6]
+y <- distances[4:6, 6]
+
+# I guess we make a distance matrix, which should have one value of approximately 0 and be... orthogonal?
+# I believe these distances are in km, would be good to check
+st_distance(x, y)
+
+# parameters should be easier, they have more-or-less canonical names
+compare_parameters <- calls_flat |>
+  filter(level_2 == "parameters") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# compartments - easy
+compare_compartments <- calls_flat |>
+  filter(level_2 == "compartments") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# biota
+# common or linnean name is acceptable as long as they agree
+compare_biota <- calls_flat |>
+  filter(level_2 == "biota") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# methods
+# again, pairing may be an issue here
+compare_methods <- calls_flat |>
+  filter(level_2 == "methods") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# samples
+# might not do the evaluation on this one, since we don't strictly speaking use it
+compare_samples <- calls_flat |>
+  filter(level_2 == "samples") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call")
+
+# comments are pleasantly easy
+compare_comments <- calls_flat |>
+  filter(level_2 == "comments") |>
+  group_by(name) |>
+  pivot_wider(names_from = id, names_prefix = "call") |>
+  mutate(
+    score_1 = str_extract(call1, "(?!Score\\: )[1-5]"),
+    score_2 = str_extract(call2, "(?!Score\\: )[1-5]"),
+    .before = call1
+  )
 ```
