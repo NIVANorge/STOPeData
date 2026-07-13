@@ -23,3 +23,6 @@ inst/doc
 .claude/settings.local.json
 CLAUDE.md
 .posit/assistant/settings.json
+
+/.quarto/
+**/*.quarto_ipynb

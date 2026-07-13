@@ -4,13 +4,21 @@ subtitle: "Comparing the quality, speed, and cost of LLM extraction"
 knitr:
   opts_chunk:
     collapse: true
-    comment: '#>'
 execute:
   error: true
+format: 
+  html:
+    code-fold: true
+  pdf: 
+    echo: false
+    warning: false
 ---
 
 ```{r}
 #| label: setup
+#| echo: false
+#| include: false
+
 library(STOPeData)
 library(ellmer)
 library(tidyverse, mask.ok = c("filter", "lag"))
@@ -20,48 +28,33 @@ library(sf)
 library(eDataDRF)
 library(pointblank)
 library(irr)
+library(here)
 
 
 devtools::load_all() # remove once STOPeData is rebuilt
 
 set_flextable_defaults(
   font.size = 10,
-  font.family = 'Aptos',
+  # font.family = 'Aptos',
   digits = 2,
   theme_fun = theme_vanilla,
   padding = 1
 )
 
 # Create a location to save LLM API calls, if it doesn't exist.
-LLM_CACHE_DIR <- "data-raw/llm_cache/calls"
+LLM_CACHE_DIR <- here("data-raw/llm_cache/calls")
 dir.create(LLM_CACHE_DIR, recursive = TRUE, showWarnings = FALSE)
+
+i_am("README.md")
 ```
+
+# Introduction
 
 The `ellmer` package includes functions that connect to a wide variety of local and remote APIs from a variety of providers. Put simply, we have a great many options. Which are better, and which are worse? We might assume that more expensive models are more effective at data extraction, and that larger and more complex files are more difficult - and require more tokens - than simpler models when extracting data. But can we prove any of these assumptions?
 
-The question of how we evaluate different LLMs is an important one. I'm not quite sure how to do it. There are some obvious measures:
+Token size defines the memory space available to the LLM, and the cost of extraction. 
 
-- Time
-- Cost
-- Does the model fail entirely?
-- Does the model hit a token limit, or otherwise fail totally?
-- Is the data returned obviously wrong/incomplete?
-
-All of these are easy to measure, but the question of the overall quality and accuracy of extracted data are more complicated. We can run our `eDataDRF` validation functions against whatever we get out, but they won't be a perfect fit as they're designed to work with data after human extraction. Still, it may be the easiest approach.
-
-We definitely want to evaluate our "recommended" models from Anthropic, OpenAI and Google. I don't anticipate any major differences. I'd also like to try some of the most popular models from LM Studio, as it supports PDF data extraction out the box, although I haven't been able to get it working yet. 
-
-I then suggest some sort of the following experimental design:
-
-- 3 providers x 2 models, + 1 LM Studio (n = 7)
-- 3 different papers of varying lengths (n = 3)
-- 3 different token limits, small, medium, and large (n = 3)
-- 3 replicates (n = 3) # increase once we've tested it
-
-This will give us 7 * 27 = 189 cases. Which is quite a lot, but we can probably batch them and let them get on with themselves. 
-
-Use multiple models to do a consensus thing and maybe compare against people doing the data extraction manually
-
+# Methods
 
 ```{mermaid}
 %%| label: workflow-diagram
@@ -97,17 +90,21 @@ flowchart TD
     parquet --> kappa["Kappa statistics<br>inter-rater reliability<br>within- and cross-model"]
 ```
 
+## Study Materials
+
+We selected four studies [@tbl-pdfs] that were previously identified as high-quality (score >= 4), covering a variety of time periods, formats, topics, and methods of presenting data.  
 
 ```{r}
-#| label: pdfs
+#| label: tbl-pdfs
+#| tbl-cap: "Study materials (portable document format files) selected for LLM evaluation. OCR (Optical Character Recognition) refers to cases where the paper used has been scanned from a printed copy and automatically converted to text. Depending on the quality of this process, information may be lost or corrupted; we would expect such files to be more difficult to extract data from."
 
 pdfs <- tibble(
   id = c("a", "b", "c", "d"),
   path = c(
-    "data-raw/1997RitterhoffTraceMetalsIn_MS.pdf",
-    "data-raw/2002HellandTransportAndSedimentation_MS.pdf",
-    "data-raw/2021WojtasikTemporalIsolationBetween_MS.pdf",
-    "data-raw/2022KohlerDistributionPatternOf_MS.pdf"
+    here("data-raw/1997RitterhoffTraceMetalsIn_MS.pdf"),
+    here("data-raw/2002HellandTransportAndSedimentation_MS.pdf"),
+    here("data-raw/2021WojtasikTemporalIsolationBetween_MS.pdf"),
+    here("data-raw/2022KohlerDistributionPatternOf_MS.pdf")
   ),
   title = c(
     "Trace metals in field samples of zooplankton from the Fram Strait and the Greenland Sea",
@@ -133,7 +130,6 @@ pdfs <- tibble(
   ) |>
   select(-info)
 
-# TODO: Add more paper details
 pdfs |>
   select(-path) |>
   flextable() |>
@@ -152,71 +148,82 @@ pdfs |>
   )
 ```
 
-Sources for model comparisons: https://platform.claude.com/docs/en/about-claude/models/overview, https://developers.openai.com/api/docs/models/compare, https://ai.google.dev/gemini-api/docs/models
+## Large Language Models
+
+The R `ellmer` package includes API integrations for a variety of Large Language Models from various providers. We selected general, "middle-of-the-road" multimodal models from three of the most prominent providers - Anthropic, Google Gemini, and OpenAI, as well as immediately higher and lower tier models. In addition, we wished to validate the performance of local and/or open-source LLMs. This proved technically difficult, and with the computational resources available we were unable to run models locally at acceptable levels of performance (models could technically be run, but lacked the available memory to load PDF files). As a compromise, we also include the open model Gemma. Gemma is developed by Google (and thus accessible via their API to be run on their servers), but can also be loaded and run locally using services such as Ollama (which supports structured data extraction) and LMStudio and accessed locally with ellmer via their APIs. 
+
+Our selected models are summarised in [@tbl-models]. Details are sourced from providers' model overview pages.
+
+Sources for model comparisons: 
+https://platform.claude.com/docs/en/about-claude/models/overview, 
+https://developers.openai.com/api/docs/models/compare, 
+https://ai.google.dev/gemini-api/docs/models, 
+https://ai.google.dev/gemini-api/docs/pricing
 
 
 ```{r}
-#| label: models
+#| label: tbl-models
+#| tbl-cap: "Summary of LLM models included in the evaluation."
 
 # TODO: Fill out list
 
 models_tbl <- tribble(
-  ~provider          , ~model_label        , ~model_id                ,
-  ~release_date      , ~context_window_k   , ~max_output_k            ,
-  ~cost_input_mtok   , ~cost_output_mtok   ,
-  ~knowledge_cutoff  , ~training_cutoff    , ~complexity              ,
+  ~provider                          , ~model_label                         , ~model_id                                                                                                                                                                     ,
+  ~context_window_k                  , ~max_output_k                        ,
+  ~cost_input_mtok                   , ~cost_output_mtok                    ,
+  ~knowledge_cutoff                  , ~training_cutoff                     , ~description                                                                                                                                                                  ,
   # ---- Anthropic ---------------------------------------------------------------
-  "Anthropic"        , "Claude Haiku 4.5"  , "claude-haiku-4-5"       ,
-  "release_date"     , "200k"              , "64k"                    ,
-  "$1"               , "$5"                ,
-  "Feb 2025"         , "Jul 2025"          , "Low"                    ,
+  "Anthropic"                        , "Claude Haiku 4.5"                   , "claude-haiku-4-5"                                                                                                                                                            ,
+  "200k"                             , "64k"                                ,
+  "$1"                               , "$5"                                 ,
+  "Feb 2025"                         , "Jul 2025"                           , "Low"                                                                                                                                                                         ,
   #
-  "Anthropic"        , "Claude Sonnet 4.6" , "claude-sonnet-4-6"      ,
-  "release_date"     , "1M"                , "128k"                   ,
-  "$3"               , "$15"               ,
-  "Aug 2025"         , "Jan 2026"          , "Moderate"               ,
+  "Anthropic"                        , "Claude Sonnet 4.6"                  , "claude-sonnet-4-6"                                                                                                                                                           ,
+  "1M"                               , "128k"                               ,
+  "$3"                               , "$15"                                ,
+  "Aug 2025"                         , "Jan 2026"                           , "Moderate"                                                                                                                                                                    ,
   #
-  "Anthropic"        , "Claude Opus 4.7"   , "claude-opus-4-7"        ,
-  "release_date"     , "context_window_k"  , "max_output_k"           ,
-  "cost_input_mtok"  , "cost_output_mtok"  ,
-  "knowledge_cutoff" , "training_cutoff"   , "High"                   ,
+  "Anthropic"                        , "Claude Opus 4.7"                    , "claude-opus-4-7"                                                                                                                                                             ,
+  "context_window_k"                 , "max_output_k"                       ,
+  "cost_input_mtok"                  , "cost_output_mtok"                   ,
+  "knowledge_cutoff"                 , "training_cutoff"                    , "High"                                                                                                                                                                        ,
   #
-  "Anthropic"        , "Claude Opus 4.8"   , "claude-opus-4-8"        ,
-  "release_date"     , "1M"                , "128k"                   ,
-  "$5"               , "$25"               ,
-  "Jan 2026"         , "Jan 2026"          , "High"                   ,
+  "Anthropic"                        , "Claude Opus 4.8"                    , "claude-opus-4-8"                                                                                                                                                             ,
+  "1M"                               , "128k"                               ,
+  "$5"                               , "$25"                                ,
+  "Jan 2026"                         , "Jan 2026"                           , "High"                                                                                                                                                                        ,
   # ---- OpenAI ------------------------------------------------------------------
   # TODO: OpenAI distinguishes between input and cached input cost. Wwhat does this mean? I used regular input for now.
   # Also only provides "knowledge cutoff"
-  "OpenAI"           , "GPT-5.4 Mini"      , "gpt-5.4-mini"           ,
-  "release_date"     , "400"               , "128"                    ,
-  "0.75"             , "4.50"              ,
-  "Aug 2025"         , "training_cutoff"   , "Low"                    ,
+  "OpenAI"                           , "GPT-5.4 Mini"                       , "gpt-5.4-mini"                                                                                                                                                                ,
+  "400"                              , "128"                                ,
+  "0.75"                             , "4.50"                               ,
+  "Aug 2025"                         , "training_cutoff"                    , "Our strongest mini model yet for coding, computer use, and subagents"                                                                                                        ,
   #
-  "OpenAI"           , "GPT-5.4"           , "gpt-5.4"                ,
-  "release_date"     , "1050"              , "128"                    ,
-  "2.5"              , "15.0"              ,
-  "Aug 2025"         , "training_cutoff"   , "Moderate"               ,
+  "OpenAI"                           , "GPT-5.4"                            , "gpt-5.4"                                                                                                                                                                     ,
+  "1050"                             , "128"                                ,
+  "2.5"                              , "15.0"                               ,
+  "Aug 2025"                         , "training_cutoff"                    , "A more affordable model for coding and professional work."                                                                                                                   ,
   #
-  "OpenAI"           , "GPT-5.5"           , "gpt-5.5"                ,
-  "release_date"     , "1050"              , "128"                    ,
-  "cost_input_mtok"  , "30.0"              ,
-  "Dec 2025"         , "training_cutoff"   , "Moderate"               ,
+  "OpenAI"                           , "GPT-5.5"                            , "gpt-5.5"                                                                                                                                                                     ,
+  "1050"                             , "128"                                ,
+  "cost_input_mtok"                  , "30.0"                               ,
+  "Dec 2025"                         , "training_cutoff"                    , "A new class of intelligence for coding and professional work."                                                                                                               ,
   # ---- Google Gemini -----------------------------------------------------------
-  "Google Gemini"    , "Gemini 2.5 Pro"    , "gemini-2.5-pro"         ,
-  "release_date"     , "context_window_k"  , "max_output_k"           ,
-  "cost_input_mtok"  , "cost_output_mtok"  ,
-  "knowledge_cutoff" , "training_cutoff"   , "High"                   ,
+  "Google Gemini"                    , "Gemini 2.5 Pro"                     , "gemini-2.5-pro"                                                                                                                                                              ,
+  "1050"                             , "65"                                 ,
+  "1.25 (<= 200k tokens), then 2.5"  , "10.00 (<= 200k tokens), then 15.00" ,
+  "Jan 2025"                         , "training_cutoff"                    , "Our state-of-the-art multipurpose model, which excels at coding and complex reasoning tasks."                                                                                ,
   #
-  "Google Gemini"    , "Gemini 3.1 Pro"    , "gemini-3.1-pro-preview" ,
-  "release_date"     , "context_window_k"  , "max_output_k"           ,
-  "cost_input_mtok"  , "cost_output_mtok"  ,
-  "knowledge_cutoff" , "training_cutoff"   , "High"                   ,
+  "Google Gemini"                    , "Gemini 3.1 Pro Preview"             , "gemini-3.1-pro-preview"                                                                                                                                                      ,
+  "context_window_k"                 , "max_output_k"                       ,
+  "2.00 (<= 200k tokens), then 4.00" , "12.00 (<= 200k tokens), then 18.00" ,
+  "knowledge_cutoff"                 , "training_cutoff"                    , "The latest performance, intelligence, and usability improvements to the best model family in the world for multimodal understanding, agentic capabilities, and vibe-coding." ,
   #
-  "Google Gemini"    , "Gemini 3.5 Flash"  , "gemini-3.5-flash"       ,
-  "release_date"     , "context_window_k"  , "max_output_k"           ,
-  "cost_input_mtok"  , "cost_output_mtok"  ,
-  "knowledge_cutoff" , "training_cutoff"   , "Low"
+  "Google Gemini"                    , "Gemini 3.5 Flash"                   , "gemini-3.5-flash"                                                                                                                                                            ,
+  "1000"                             , "65"                                 ,
+  "1.50"                             , "9.00"                               ,
+  "Jan 2025"                         , "training_cutoff"                    , "Our most intelligent model built for speed, combining frontier intelligence with superior search and grounding."
 )
 # Named vector for use in experimental_setup (label -> API id)
 models <- setNames(models_tbl$model_id, models_tbl$model_label)
@@ -225,11 +232,13 @@ models <- setNames(models_tbl$model_id, models_tbl$model_label)
 models_tbl |> flextable() |> autofit()
 ```
 
-So, what experiments do we want to run?
+## API Calls
 
+Provider APIs are called using the existing API call functionality developed for eData (`STOPeData::extract_pdf_with_llm()`). Each call returns a list object containing extracted data and call metadata (cost, tokens, etc.), which is then saved as as an `.rds` file. 
 
 ```{r}
 #| label: API-calls-setup
+#| code-fold: true
 
 # Recursively walk the list, collecting path-as-vector as we go.
 # Each branch terminates at: (1) a data frame, (2) an atomic scalar.
@@ -413,12 +422,9 @@ run_extraction_batch <- function(
 
 # Rebuild the flat parquet from all per-call RDS files present in the cache.
 # Called every time — cheap, since it just reads already-saved RDS files.
-# TODO: This seems to be doing something strange to our results and flagging calls as successful when they aren't?
-
-# Right, duhh. We only save successful calls to the parquet
 rebuild_flat_parquet <- function(
   calls_results,
-  parquet_path = "data-raw/llm_cache/llm_eval_output_flat.parquet"
+  parquet_path = here("data-raw/llm_cache/llm_eval_output_flat.parquet")
 ) {
   calls_flat <- calls_results |>
     filter(map_lgl(call, \(c) isTRUE(c$success))) |>
@@ -434,17 +440,38 @@ rebuild_flat_parquet <- function(
 }
 ```
 
+For each manuscript and model multiple calls were made, with token count was set to 3,000, 6,000 and 9,000 to determine if call success, effectiveness, and quality varied with this. Each combination of call, model, token count, and pdf was made 5 times, to provide a measure of inter- and intra-call variation.
+
+```{r}
+#| label: tbl-experimental-design
+#| tbl-cap: "Experimental design: combinations of PDFs, models, and token limits."
+
+tibble(
+  Parameter = c(
+    "PDF IDs",
+    "Model IDs",
+    "Token Limits",
+    "Replicates per Combination"
+  ),
+  Values = c(
+    paste(c("a", "b", "c", "d"), collapse = ", "),
+    paste(c("claude-haiku-4-5", "claude-sonnet-4-6"), collapse = ", "),
+    paste(c(3000, 6000, 9000), collapse = ", "),
+    "5"
+  )
+) |>
+  flextable() |>
+  autofit() |>
+  set_header_labels(Parameter = "Parameter", Values = "Values")
+```
+
 ```{r}
 #| label: api-calls
-
-# --- Run / load batch and rebuild parquet ------------------------------------
-
-# TODO: Better error checking. Currently when it fails, you don't find out until you dig into the output
 
 calls_results <- run_extraction_batch(
   pdf_ids = c("a"),
   model_ids = c("claude-haiku-4-5", "claude-sonnet-4-6"),
-  token_counts = c(6000),
+  token_counts = c(3000, 6000),
   n_replicates = 3
 ) |>
   mutate(id = row_number(), .before = everything())
@@ -505,8 +532,18 @@ call_status <- calls_results |>
   )
 ```
 
+# Results
+
+## Call Status
+
+[@tbl-batch-report] reports the details and status of each call. Broadly speaking, two types of errors are possible. In case of connection issue, system downtime, or a lack of API credit, the call will return an HTTP error (e.g. HTTP 400), and no data. However, it has also been observed that in some cases, the API response will be flagged "successful" by the external provider, but returned only empty data. This is believed to be the result of the extraction process hitting the token limit before completing its response; for example when an unusually large PDF is send with a too-small token limit. This sharp distinction between performance at different token limits 
+
+::: {.callout-note collapse="true"}
+## Per-Replicate Call Status Raw Data
+
 ```{r}
-#| label: batch-report
+#| label: tbl-batch-report
+#| tbl-cap: "Per-replicate API call status and error messages."
 
 # --- Batch run status report -------------------------------------------------
 # Inspect the call list-column directly — before any flattening — to report
@@ -547,9 +584,7 @@ batch_run_report |>
     tokens,
     replicate,
     success,
-    error_msg,
-    input_tokens,
-    output_tokens
+    error_msg
   ) |>
   flextable() |>
   autofit() |>
@@ -559,15 +594,16 @@ batch_run_report |>
     tokens = "Token Limit",
     replicate = "Rep",
     success = "Success",
-    error_msg = "Error",
-    input_tokens = "Input Tok",
-    output_tokens = "Output Tok"
+    error_msg = "Error"
   ) |>
   color(i = ~ !success, j = ~ success + error_msg, color = "firebrick")
 ```
 
+:::
+
 ```{r}
-#| label: batch-report-summary
+#| label: tbl-batch-report-summary
+#| tbl-cap: "Summary of API call success rates and mean token usage by PDF, model, and token limit."
 
 # Grouped summary: counts and mean token usage by pdf × model × token limit
 batch_run_report |>
@@ -596,15 +632,22 @@ batch_run_report |>
   )
 ```
 
+::: {.callout-note collapse="true"}
+## All Calls Raw Data
+
 ```{r}
 #| label: tbl-all-calls
+#| tbl-cap: "Status of all API calls, including empty-table detection."
 
 call_status |> flextable() |> autofit()
 ```
 
+:::
+
 
 ```{r}
 #| label: tbl-all-calls-summary
+#| tbl-cap: "Call completeness summary by PDF, model, and token limit."
 
 call_status |>
   group_by(pdf, models, tokens) |>
@@ -619,19 +662,10 @@ call_status |>
   autofit()
 ```
 
-Now that I come to think of it we do already have canonical versions (even if they were partly LLM-assisted, they've been manually checked.) They're not quite in the perfect format, but we can work with them.
-
-Where does that leave us:
-
-1. Run the extraction (n = 1) for a paper
-2. Adapt validation functions to the extracted data (may be easier said than done)
-3. Do a second run of one of the papers. Do a pairwise comparison (as above) for consistency. How do we scale to n > 2?
-4. Scale...
 
 ## eData Validation
 
 We have functions for this, but they're intended to deal with finished data, not fresh from extraction. Still
-
 
 ```{r}
 #| label: edata-validation-setup
@@ -763,7 +797,16 @@ validate_llm_extraction <- function(result) {
     biota = validate_llm_biota,
     methods = validate_llm_methods
   )
-  imap(fns, \(fn, nm) if (!is.null(result[[nm]])) fn(result[[nm]])) |>
+  imap(fns, \(fn, nm) {
+    tbl <- result[[nm]]
+    if (is.null(tbl)) {
+      return(NULL)
+    }
+    if (nrow(tbl) == 0) {
+      return(list(.empty = TRUE))
+    }
+    fn(tbl)
+  }) |>
     compact()
 }
 
@@ -771,6 +814,15 @@ validate_llm_extraction <- function(result) {
 # Returns one row per table with step-level and row-level failure counts.
 summarise_validation <- function(validation_list) {
   imap(validation_list, \(agent, table_name) {
+    if (isTRUE(agent$.empty)) {
+      return(tibble(
+        table = table_name,
+        n_steps = 0L,
+        n_steps_failed = 0L,
+        rows_failed = 0L,
+        pct_steps_pass = 0
+      ))
+    }
     agent$validation_set |>
       summarise(
         table = table_name,
@@ -822,34 +874,56 @@ table_summary <- validate_all_calls(calls_results)
 
 
 ```{r}
-# TODO: Jitter/dodge points
-# TODO: Why are some points not coloured?
-# TOOD: Replace boxplots with something better
-# This approach isn't very good for the sort of steppy data we have.
+#| label: fig-validation-scores
+#| fig-cap: "Proportion of validation steps passed by table and model. Each dot represents one replicate; dots stack at exact values to reflect the discrete nature of step-pass proportions."
 
 table_summary |>
-  ggplot(aes(x = table, y = pct_steps_pass, fill = models)) +
-  geom_point(
-    aes(colour = models),
-    position = position_jitterdodge(dodge.width = 0.75)
+  mutate(tokens = factor(tokens)) |>
+  ggplot(aes(x = table, y = pct_steps_pass, fill = tokens)) +
+  geom_dotplot(
+    binaxis = "y",
+    stackdir = "center",
+    binwidth = 0.04,
+    dotsize = 0.5,
+    position = position_dodge(width = 0.5)
   ) +
+  scale_y_continuous(
+    limits = c(0, 1),
+    name = "Proportion of Validation Passed"
+  ) +
+  facet_wrap(vars(models))
+```
+
+Across all tables, is there a relationship between token count and validation? [@fig-validation-relationship]. Not as present, but there may be with other values.
+
+```{r}
+#| label: fig-validation-relationship
+#| fig-cap: "Across all tables, is there a relationship between token count and validation?"
+
+table_summary |>
+  ggplot(aes(colour = models, y = pct_steps_pass, x = tokens)) +
+  geom_point() +
+  geom_smooth(method = "lm") +
   scale_y_continuous(
     limits = c(0, 1),
     name = "Proportion of Validation Passed"
   )
 ```
 
-
 ```{r}
-#| label: canonical-data
-
-# --- Load canonical datasets -------------------------------------------------
+#| label: canonical-data-setup
 
 pdf_zip_map <- c(
-  a = "data-raw/1997RitterhoffTraceMetalsIn_AllData_20251030_145522.zip",
-  b = "data-raw/2002HellandTransportAndSedimentation_AllData_20251104_075533.zip",
-  c = "data-raw/2021WojtasikTemporalIsolationBetween_AllData_20251030_163338.zip",
-  d = "data-raw/2022KohlerDistributionPatternOf_AllData_20251217_115443.zip"
+  a = here("data-raw/1997RitterhoffTraceMetalsIn_AllData_20251030_145522.zip"),
+  b = here(
+    "data-raw/2002HellandTransportAndSedimentation_AllData_20251104_075533.zip"
+  ),
+  c = here(
+    "data-raw/2021WojtasikTemporalIsolationBetween_AllData_20251030_163338.zip"
+  ),
+  d = here(
+    "data-raw/2022KohlerDistributionPatternOf_AllData_20251217_115443.zip"
+  )
 )
 
 load_canonical <- function(zip_path) {
@@ -947,9 +1021,6 @@ variable_meta <- tribble(
   "methods"      , "protocol_comment"            , NA_character_                 , "exclude"    ,
 )
 
-# Row-matching key columns per table (NULL = single-row, match directly)
-# TODO: Site matching via rounded lat/lon is coarse (~111 m tolerance per 0.001°).
-#       Improve with st_nearest_feature() or site_name fuzzy matching.
 table_keys <- list(
   campaign = NULL,
   references = NULL,
@@ -961,43 +1032,38 @@ table_keys <- list(
 )
 ```
 
-I was going to try and do some more sophisticated matching here, but it looks like everything we get from the call is a string anyway. So I think it's best to just compare strings. ==, True or False, sum.
+[@tbl-canonical-comparison-variables] we check controlled and numerical variables against the "canonical versions" from the source data. This isn't very sophisticated:
+- we just check if strings match
+- for tables (sites, parameters, etc.) with more than one row we only check that what's in the call table is also in the canonical table (so if the call over-matches we don't flag that as an issue)
 
 ```{r}
-#| label: canon-comparison-test
+#| label: tbl-canonical-comparison-variables
+#| tbl-cap: "Caption."
+#| echo: false
 
-# so, pick a call
-calls_flat_1 <- calls_flat |> filter(id == 1)
+variable_meta |>
+  mutate(
+    llm_name = toupper(llm_name),
+    table = str_to_sentence(table),
+    var_type = case_when(
+      var_type %in% c("controlled", "continuous") ~ "Compared",
+      var_type == "exclude" ~ "Skipped",
+      .default = str_to_sentence(var_type)
+    )
+  ) |>
+  select(table, llm_name, var_type) |>
+  flextable() |>
+  autofit() |>
 
-calls_flat_1
-canonical_1 <- canonical_data$a
-
-# pick a table
-calls_flat_1_campaign <- filter(calls_flat_1, level_2 == "campaign") |>
-  select(name, value, type) # fuck, types are wrong
-
-canonical_1_campaign <- canonical_1$campaign |>
-  pivot_longer(cols = everything(), values_transform = as.character)
-
-
-# TODO: Actually, we're overthinking
-joined_tables <- left_join(
-  calls_flat_1_campaign,
-  canonical_1_campaign,
-  by = "name",
-  suffix = c(".call", ".canon"),
-) |>
-  left_join(
-    variable_meta |> filter(table == "campaign"),
-    by = c(name = "canonical_name")
+  set_header_labels(
+    table = "Table",
+    llm_name = "Variable Name",
+    var_type = "Variable Check"
   )
-
-# actually, just run check as characters
-valid_comparisons <- joined_tables |>
-  filter(!is.na(var_type) & var_type != "exclude") |>
-  mutate(match = identical(value.canon, value.call, single.NA = FALSE))
 ```
 
+::: {.callout-note collapse="true"}
+## Canon Comparison Raw Data
 
 ```{r}
 #| label: canon-comparison-all
@@ -1075,12 +1141,32 @@ canonical_comparison <- calls_flat |>
   filter(!map_lgl(result, is.null)) |>
   unnest(result)
 
-canonical_comparison
+canonical_comparison |>
+  flextable() |>
+  autofit() |>
+  colformat_double(j = "prop_match", digits = 2) |>
+  set_header_labels(
+    id = "Call ID",
+    pdf = "PDF",
+    models = "Model",
+    tokens = "Token Limit",
+    replicate = "Rep",
+    table = "Table",
+    n_match = "N Matched",
+    n_total = "N Total",
+    prop_match = "Prop. Matched"
+  )
 ```
 
-```{r}
-#| label: canon-comparison-all-summary
+:::
 
+Our smaller token calls (3000) end up all excluded here, because with all NA data there's nothing to compare.
+
+```{r}
+#| label: fig-canon-comparison-summary
+#| fig-cap:
+#|   - "Mean proportion of fields matching canonical data, by model and token limit."
+#|   - "Proportion of fields matching canonical data, by model and table."
 # what's the best way to summarise this?
 canonical_comparison_summarised <- canonical_comparison |>
   group_by(models, tokens) |>
@@ -1095,8 +1181,11 @@ canonical_comparison_summarised <- canonical_comparison |>
 
 canonical_comparison_summarised |>
   ggplot(aes(x = models, y = mean_prop_match, fill = tokens)) +
-  geom_col()
-
+  geom_boxplot() +
+  scale_y_continuous(limits = c(0, 1))
+```
+```{r}
+#| label: fig-canon-comparison-summary-2
 # realistically, we should at the very least do summary stats
 canonical_comparison |>
   ggplot(aes(x = models, y = prop_match, colour = table)) +
@@ -1218,7 +1307,8 @@ cross_model_kappa <- scores_long |>
 
 
 ```{r}
-#| label:  tbl-combined-results
+#| label: tbl-combined-results
+#| tbl-cap: "Within-model and cross-model kappa statistics for screening score inter-rater agreement."
 
 # Combined results table
 bind_rows(within_model_kappa, cross_model_kappa) |>
@@ -1228,108 +1318,3 @@ bind_rows(within_model_kappa, cross_model_kappa) |>
 ```
 
 
-
-```{r}
-#| label: call-comparison
-calls_flat
-
-# KET is right, pairwise might get messy quickly
-
-# campaign and reference are easy.
-
-# almost certainly there are better options than identical()
-compare_campaign <- calls_flat |>
-  filter(level_2 == "campaign") |>
-  group_by(name) |>
-  distinct(value) |>
-  reframe(n = n()) |>
-  filter(n > 1)
-
-# no issues with references
-compare_references <- calls_flat |>
-  filter(level_2 == "references") |>
-  group_by(name) |>
-  distinct(value) |>
-  reframe(n = n()) |>
-  filter(n > 1)
-
-# sites...
-# issue: different calls return variables in different orders!
-# we can't automatically match sites to each other unless we assume that the lat/long are always equal (or, if we have a canonical point of comparison, I guess)
-compare_sites <- calls_flat |>
-  filter(level_2 == "sites") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# we can presumably compare distance with sf
-
-# for example
-compare_sites |>
-  filter(name %in% c("latitude", "longitude")) |>
-  mutate(across(contains("call"), as.numeric))
-
-# how do we check if each value has an equivalent?
-# I guess we just group and ignore idx
-# we may have to call st_distance for g
-distances <- calls_flat |>
-  filter(level_2 == "sites") |>
-  filter(name %in% c("latitude", "longitude")) |>
-  mutate(across(contains("call"), as.numeric)) |>
-  group_by(id, row_idx) |>
-  pivot_wider(names_from = name, values_from = value) |>
-  st_as_sf(coords = c("latitude", "longitude"), na.fail = FALSE)
-
-
-# pair sites and check (great circle) distance?
-
-x <- distances[1:3, 6]
-y <- distances[4:6, 6]
-
-# I guess we make a distance matrix, which should have one value of approximately 0 and be... orthogonal?
-# I believe these distances are in km, would be good to check
-st_distance(x, y)
-
-# parameters should be easier, they have more-or-less canonical names
-compare_parameters <- calls_flat |>
-  filter(level_2 == "parameters") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# compartments - easy
-compare_compartments <- calls_flat |>
-  filter(level_2 == "compartments") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# biota
-# common or linnean name is acceptable as long as they agree
-compare_biota <- calls_flat |>
-  filter(level_2 == "biota") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# methods
-# again, pairing may be an issue here
-compare_methods <- calls_flat |>
-  filter(level_2 == "methods") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# samples
-# might not do the evaluation on this one, since we don't strictly speaking use it
-compare_samples <- calls_flat |>
-  filter(level_2 == "samples") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call")
-
-# comments are pleasantly easy
-compare_comments <- calls_flat |>
-  filter(level_2 == "comments") |>
-  group_by(name) |>
-  pivot_wider(names_from = id, names_prefix = "call") |>
-  mutate(
-    score_1 = str_extract(call1, "(?!Score\\: )[1-5]"),
-    score_2 = str_extract(call2, "(?!Score\\: )[1-5]"),
-    .before = call1
-  )
-```

@@ -8,7 +8,9 @@
     "bash": {
       "cmd *": "allow",
       "Rscript *": "allow",
-      "head *": "allow"
+      "head *": "allow",
+      "Select-String *": "allow",
+      "Select-Object *": "allow"
     },
     "executeCode": {
       "*": "allow"
