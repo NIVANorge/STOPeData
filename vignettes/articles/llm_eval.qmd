@@ -163,73 +163,92 @@ https://ai.google.dev/gemini-api/docs/pricing
 
 ```{r}
 #| label: tbl-models
-#| tbl-cap: "Summary of LLM models included in the evaluation."
+#| tbl-cap: "Summary of LLM models included in the evaluation. Tok: tokens, a unit of LLM knowledge."
 
 # TODO: Fill out list
 
 models_tbl <- tribble(
-  ~provider                          , ~model_label                         , ~model_id                                                                                                                                                                     ,
+  ~provider                          , ~model_label                         , ~model_id                ,
   ~context_window_k                  , ~max_output_k                        ,
   ~cost_input_mtok                   , ~cost_output_mtok                    ,
-  ~knowledge_cutoff                  , ~training_cutoff                     , ~description                                                                                                                                                                  ,
+  ~knowledge_cutoff                  , ~training_cutoff                     , ~type                    ,
   # ---- Anthropic ---------------------------------------------------------------
-  "Anthropic"                        , "Claude Haiku 4.5"                   , "claude-haiku-4-5"                                                                                                                                                            ,
+  "Anthropic"                        , "Claude Haiku 4.5"                   , "claude-haiku-4-5"       ,
   "200k"                             , "64k"                                ,
   "$1"                               , "$5"                                 ,
-  "Feb 2025"                         , "Jul 2025"                           , "Low"                                                                                                                                                                         ,
+  "Feb 2025"                         , "Jul 2025"                           , "Closed"                 ,
   #
-  "Anthropic"                        , "Claude Sonnet 4.6"                  , "claude-sonnet-4-6"                                                                                                                                                           ,
+  "Anthropic"                        , "Claude Sonnet 4.6"                  , "claude-sonnet-4-6"      ,
   "1M"                               , "128k"                               ,
   "$3"                               , "$15"                                ,
-  "Aug 2025"                         , "Jan 2026"                           , "Moderate"                                                                                                                                                                    ,
+  "Aug 2025"                         , "Jan 2026"                           , "Closed"                 ,
   #
-  "Anthropic"                        , "Claude Opus 4.7"                    , "claude-opus-4-7"                                                                                                                                                             ,
+  "Anthropic"                        , "Claude Opus 4.7"                    , "claude-opus-4-7"        ,
   "context_window_k"                 , "max_output_k"                       ,
   "cost_input_mtok"                  , "cost_output_mtok"                   ,
-  "knowledge_cutoff"                 , "training_cutoff"                    , "High"                                                                                                                                                                        ,
+  "knowledge_cutoff"                 , "training_cutoff"                    , "Closed"                 ,
   #
-  "Anthropic"                        , "Claude Opus 4.8"                    , "claude-opus-4-8"                                                                                                                                                             ,
+  "Anthropic"                        , "Claude Opus 4.8"                    , "claude-opus-4-8"        ,
   "1M"                               , "128k"                               ,
   "$5"                               , "$25"                                ,
-  "Jan 2026"                         , "Jan 2026"                           , "High"                                                                                                                                                                        ,
+  "Jan 2026"                         , "Jan 2026"                           , "Closed"                 ,
   # ---- OpenAI ------------------------------------------------------------------
   # TODO: OpenAI distinguishes between input and cached input cost. Wwhat does this mean? I used regular input for now.
   # Also only provides "knowledge cutoff"
-  "OpenAI"                           , "GPT-5.4 Mini"                       , "gpt-5.4-mini"                                                                                                                                                                ,
+  "OpenAI"                           , "GPT-5.4 Mini"                       , "gpt-5.4-mini"           ,
   "400"                              , "128"                                ,
   "0.75"                             , "4.50"                               ,
-  "Aug 2025"                         , "training_cutoff"                    , "Our strongest mini model yet for coding, computer use, and subagents"                                                                                                        ,
+  "Aug 2025"                         , "training_cutoff"                    , "Closed"                 ,
   #
-  "OpenAI"                           , "GPT-5.4"                            , "gpt-5.4"                                                                                                                                                                     ,
+  "OpenAI"                           , "GPT-5.4"                            , "gpt-5.4"                ,
   "1050"                             , "128"                                ,
   "2.5"                              , "15.0"                               ,
-  "Aug 2025"                         , "training_cutoff"                    , "A more affordable model for coding and professional work."                                                                                                                   ,
+  "Aug 2025"                         , "training_cutoff"                    , "Closed"                 ,
   #
-  "OpenAI"                           , "GPT-5.5"                            , "gpt-5.5"                                                                                                                                                                     ,
+  "OpenAI"                           , "GPT-5.5"                            , "gpt-5.5"                ,
   "1050"                             , "128"                                ,
   "cost_input_mtok"                  , "30.0"                               ,
-  "Dec 2025"                         , "training_cutoff"                    , "A new class of intelligence for coding and professional work."                                                                                                               ,
+  "Dec 2025"                         , "training_cutoff"                    , "Closed"                 ,
   # ---- Google Gemini -----------------------------------------------------------
-  "Google Gemini"                    , "Gemini 2.5 Pro"                     , "gemini-2.5-pro"                                                                                                                                                              ,
+  "Google Gemini"                    , "Gemini 2.5 Pro"                     , "gemini-2.5-pro"         ,
   "1050"                             , "65"                                 ,
   "1.25 (<= 200k tokens), then 2.5"  , "10.00 (<= 200k tokens), then 15.00" ,
-  "Jan 2025"                         , "training_cutoff"                    , "Our state-of-the-art multipurpose model, which excels at coding and complex reasoning tasks."                                                                                ,
+  "Jan 2025"                         , "training_cutoff"                    , "Closed"                 ,
   #
-  "Google Gemini"                    , "Gemini 3.1 Pro Preview"             , "gemini-3.1-pro-preview"                                                                                                                                                      ,
+  "Google Gemini"                    , "Gemini 3.1 Pro Preview"             , "gemini-3.1-pro-preview" ,
   "context_window_k"                 , "max_output_k"                       ,
   "2.00 (<= 200k tokens), then 4.00" , "12.00 (<= 200k tokens), then 18.00" ,
-  "knowledge_cutoff"                 , "training_cutoff"                    , "The latest performance, intelligence, and usability improvements to the best model family in the world for multimodal understanding, agentic capabilities, and vibe-coding." ,
+  "knowledge_cutoff"                 , "training_cutoff"                    , "Closed"                 ,
   #
-  "Google Gemini"                    , "Gemini 3.5 Flash"                   , "gemini-3.5-flash"                                                                                                                                                            ,
+  "Google Gemini"                    , "Gemini 3.5 Flash"                   , "gemini-3.5-flash"       ,
   "1000"                             , "65"                                 ,
   "1.50"                             , "9.00"                               ,
-  "Jan 2025"                         , "training_cutoff"                    , "Our most intelligent model built for speed, combining frontier intelligence with superior search and grounding."
+  "Jan 2025"                         , "training_cutoff"                    , "Closed"                 ,
+  # ---- Google Gemma (open-weights) ---------------------------------------------
+  "Google Gemini"                    , "Gemma 4 26B"                        , "gemma-4-26b-a4b-it"     ,
+  "128k"                             , "8k"                                 ,
+  "Free"                             , "Free"                               ,
+  "knowledge_cutoff"                 , "training_cutoff"                    , "Open"
 )
 # Named vector for use in experimental_setup (label -> API id)
 models <- setNames(models_tbl$model_id, models_tbl$model_label)
 
 
-models_tbl |> flextable() |> autofit()
+models_tbl |>
+  flextable() |>
+  autofit() |>
+  set_header_labels(
+    provider = "Provider",
+    model_label = "Model",
+    model_id = "Model ID",
+    context_window_k = "Context Window",
+    max_output_k = "Max Output",
+    cost_input_mtok = "Input Cost ($/Mtok)",
+    cost_output_mtok = "Output Cost ($/Mtok)",
+    knowledge_cutoff = "Knowledge Cutoff",
+    training_cutoff = "Training Cutoff",
+    description = "Open/Closed"
+  )
 ```
 
 ## API Calls
@@ -1317,4 +1336,143 @@ bind_rows(within_model_kappa, cross_model_kappa) |>
   autofit()
 ```
 
+## Cost Analysis
 
+```{r}
+#| label: cost-analysis
+
+# Parse the cost string columns from models_tbl into numeric $/Mtok values.
+# Handles:
+#   "$1"                              → 1
+#   "1.25 (<= 200k tokens), then 2.5" → 1.25  (use the lower-tier price)
+#   "Free"                            → 0
+#   placeholder strings (no digits)   → NA
+parse_cost <- function(x) {
+  # Extract the first number in the string; return 0 for "Free", NA otherwise
+  case_when(
+    str_to_lower(x) == "free" ~ 0,
+    str_detect(x, "[0-9]") ~ as.numeric(str_extract(x, "[0-9]+\\.?[0-9]*")),
+    .default = NA_real_
+  )
+}
+
+model_costs <- models_tbl |>
+  select(model_id, cost_input_mtok, cost_output_mtok) |>
+  mutate(
+    cost_input_per_mtok = parse_cost(cost_input_mtok),
+    cost_output_per_mtok = parse_cost(cost_output_mtok)
+  )
+
+# Join token counts from batch_run_report with per-model pricing,
+# then compute estimated USD cost for each call.
+call_costs <- batch_run_report |>
+  left_join(model_costs, by = c("models" = "model_id")) |>
+  mutate(
+    cost_usd = (input_tokens / 1e6) *
+      cost_input_per_mtok +
+      (output_tokens / 1e6) * cost_output_per_mtok
+  )
+```
+
+Costs are necessarily an estimate and rather rough - most models provide a cost per token value, and most calls return a token count... but not all of them are trustworthy.
+
+```{r}
+#| label: tbl-cost-summary
+#| tbl-cap: "Estimated API cost per call (USD) by model and token limit. Costs are computed from actual input and output token counts reported by the API, multiplied by the published per-million-token rates."
+
+call_costs |>
+  group_by(models, tokens) |>
+  summarise(
+    n_calls = n(),
+    n_success = sum(success),
+    mean_input_tok = round(mean(input_tokens, na.rm = TRUE)),
+    mean_output_tok = round(mean(output_tokens, na.rm = TRUE)),
+    mean_cost_usd = mean(cost_usd, na.rm = TRUE),
+    total_cost_usd = sum(cost_usd, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  flextable() |>
+  autofit() |>
+  colformat_double(j = c("mean_cost_usd", "total_cost_usd"), digits = 5) |>
+  set_header_labels(
+    models = "Model",
+    tokens = "Token Limit",
+    n_calls = "N Calls",
+    n_success = "N Success",
+    mean_input_tok = "Mean Input Tok",
+    mean_output_tok = "Mean Output Tok",
+    mean_cost_usd = "Mean Cost (USD)",
+    total_cost_usd = "Total Cost (USD)"
+  )
+```
+
+```{r}
+#| label: fig-cost-by-model-tokens
+#| fig-cap: "Estimated cost per call (USD) by model and token limit. Each point is one replicate call; lines connect group means."
+
+call_costs |>
+  filter(success) |>
+  mutate(tokens = factor(tokens)) |>
+  ggplot(aes(x = tokens, y = cost_usd, colour = models, group = models)) +
+  geom_jitter(width = 0.05, alpha = 0.6) +
+  stat_summary(fun = mean, geom = "line") +
+  stat_summary(fun = mean, geom = "point", size = 3, shape = 18) +
+  labs(
+    x = "Token Limit",
+    y = "Estimated Cost (USD)",
+    colour = "Model"
+  )
+```
+
+```{r}
+#| label: fig-cost-vs-quality
+#| fig-cap: "Cost vs. extraction quality (mean proportion of canonical fields matched), by model and token limit. Each point is one replicate; a higher proportion matched at lower cost is preferable."
+
+cost_quality <- call_costs |>
+  filter(success) |>
+  select(id, pdf, models, tokens, replicate, cost_usd) |>
+  mutate(id = as.character(id)) |>
+  left_join(
+    canonical_comparison |>
+      group_by(id, models, tokens, replicate) |>
+      summarise(
+        mean_prop_match = mean(prop_match, na.rm = TRUE),
+        .groups = "drop"
+      ),
+    by = c("id", "models", "tokens", "replicate")
+  )
+
+cost_quality |>
+  mutate(tokens = factor(tokens)) |>
+  ggplot(aes(
+    x = cost_usd,
+    y = mean_prop_match,
+    colour = models,
+    shape = tokens
+  )) +
+  geom_point(size = 3, alpha = 0.8) +
+  scale_y_continuous(
+    limits = c(0, 1),
+    name = "Mean Proportion of Fields Matched"
+  ) +
+  labs(
+    x = "Estimated Cost (USD)",
+    colour = "Model",
+    shape = "Token Limit"
+  )
+```
+
+```{r}
+#| label: fig-cost-vs-output-tokens
+#| fig-cap: "Relationship between output token usage and estimated cost, coloured by model. Output token usage drives most of the cost variation."
+
+call_costs |>
+  filter(success) |>
+  ggplot(aes(x = output_tokens, y = cost_usd, colour = models)) +
+  geom_point(alpha = 0.7) +
+  labs(
+    x = "Output Tokens Used",
+    y = "Estimated Cost (USD)",
+    colour = "Model"
+  )
+```
