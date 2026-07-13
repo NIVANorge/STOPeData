@@ -4,6 +4,8 @@ subtitle: "Comparing the quality, speed, and cost of LLM extraction"
 knitr:
   opts_chunk:
     collapse: true
+    dpi: 300                         # belt-and-suspenders for knitr devices
+    dev: "ragg_png"                  # use ragg for better font rendering
 execute:
   error: true
 format: 
@@ -12,6 +14,11 @@ format:
   pdf: 
     echo: false
     warning: false
+
+filters:
+  - flextable-qmd                    # needed, or the flextables render crazy 
+  - at: post-render
+    path: ../_extensions/flextable-qmd/unwrap-float.lua
 ---
 
 ```{r}
@@ -29,7 +36,6 @@ library(eDataDRF)
 library(pointblank)
 library(irr)
 library(here)
-
 
 devtools::load_all() # remove once STOPeData is rebuilt
 
@@ -108,7 +114,7 @@ pdfs <- tibble(
   ),
   title = c(
     "Trace metals in field samples of zooplankton from the Fram Strait and the Greenland Sea",
-    "Temporal isolation between two strongly differentiated stocks of the Greenland halibut (<i>Reinhardtius hippoglossoides</i> Walbaum, 1792) from the Western Barents Sea",
+    "Temporal isolation between two strongly differentiated stocks of the Greenland halibut (Reinhardtius hippoglossoides, Walbaum, 1792) from the Western Barents Sea",
     "Transport and sedimentation of Cu in a microtidal estuary, SE Norway",
     "Distribution pattern of mercury in northern Barents Sea and Eurasian Basin surface sediment"
   ),
@@ -160,6 +166,7 @@ https://developers.openai.com/api/docs/models/compare,
 https://ai.google.dev/gemini-api/docs/models, 
 https://ai.google.dev/gemini-api/docs/pricing
 
+NB: We can't report a direct cost for Gemma, because it's free (but rate-limited) from Google, or "free" if you run it locally. 
 
 ```{r}
 #| label: tbl-models
@@ -174,23 +181,18 @@ models_tbl <- tribble(
   ~knowledge_cutoff                  , ~training_cutoff                     , ~type                    ,
   # ---- Anthropic ---------------------------------------------------------------
   "Anthropic"                        , "Claude Haiku 4.5"                   , "claude-haiku-4-5"       ,
-  "200k"                             , "64k"                                ,
-  "$1"                               , "$5"                                 ,
+  "200"                              , "64"                                 ,
+  "1"                                , "5"                                  ,
   "Feb 2025"                         , "Jul 2025"                           , "Closed"                 ,
   #
   "Anthropic"                        , "Claude Sonnet 4.6"                  , "claude-sonnet-4-6"      ,
   "1M"                               , "128k"                               ,
-  "$3"                               , "$15"                                ,
+  "3"                                , "15"                                 ,
   "Aug 2025"                         , "Jan 2026"                           , "Closed"                 ,
-  #
-  "Anthropic"                        , "Claude Opus 4.7"                    , "claude-opus-4-7"        ,
-  "context_window_k"                 , "max_output_k"                       ,
-  "cost_input_mtok"                  , "cost_output_mtok"                   ,
-  "knowledge_cutoff"                 , "training_cutoff"                    , "Closed"                 ,
   #
   "Anthropic"                        , "Claude Opus 4.8"                    , "claude-opus-4-8"        ,
   "1M"                               , "128k"                               ,
-  "$5"                               , "$25"                                ,
+  "5"                                , "25"                                 ,
   "Jan 2026"                         , "Jan 2026"                           , "Closed"                 ,
   # ---- OpenAI ------------------------------------------------------------------
   # TODO: OpenAI distinguishes between input and cached input cost. Wwhat does this mean? I used regular input for now.
@@ -225,8 +227,8 @@ models_tbl <- tribble(
   "1.50"                             , "9.00"                               ,
   "Jan 2025"                         , "training_cutoff"                    , "Closed"                 ,
   # ---- Google Gemma (open-weights) ---------------------------------------------
-  "Google Gemini"                    , "Gemma 4 26B"                        , "gemma-4-26b-a4b-it"     ,
-  "128k"                             , "8k"                                 ,
+  "Google Gemini"                    , "Gemma 4 31B"                        , "gemma-4-31b-it"         ,
+  "262"                              , "8k"                                 ,
   "Free"                             , "Free"                               ,
   "knowledge_cutoff"                 , "training_cutoff"                    , "Open"
 )
@@ -485,11 +487,14 @@ tibble(
 ```
 
 ```{r}
-#| label: api-calls
+#| label: api-call
 
+# RUNME
+
+# this is where we set the actual experimental parameters
 calls_results <- run_extraction_batch(
   pdf_ids = c("a"),
-  model_ids = c("claude-haiku-4-5", "claude-sonnet-4-6"),
+  model_ids = c("claude-haiku-4-5", "claude-sonnet-4-6", "gpt-5.4-mini"),
   token_counts = c(3000, 6000),
   n_replicates = 3
 ) |>
@@ -1474,5 +1479,63 @@ call_costs |>
     x = "Output Tokens Used",
     y = "Estimated Cost (USD)",
     colour = "Model"
+  )
+```
+
+## Results Summary Table
+
+@tbl-results-summary still isn't very illuminating. 
+
+```{r}
+#| label: tbl-results-summary
+#| tbl-cap: "Summary of validation accuracy (mean score, 1–5 scale), canonical field matching (mean proportion of canonical fields recovered), and estimated cost per call (USD), by model and token limit. Each row aggregates across all papers and replicates evaluated."
+#| echo: false
+
+# Validation scores: mean score per model × tokens (excluding NAs)
+val_summary <- scores_long |>
+  filter(!is.na(score)) |>
+  group_by(models, tokens) |>
+  summarise(
+    n_papers = n_distinct(pdf),
+    n_replicates = n_distinct(replicate),
+    mean_val_score = mean(score, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Canonical matching: mean proportion of fields matched per model × tokens
+canon_summary <- canonical_comparison |>
+  group_by(models, tokens) |>
+  summarise(
+    mean_prop_match = mean(prop_match, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Cost: mean USD per call per model × tokens
+cost_summary <- call_costs |>
+  filter(success) |>
+  group_by(models, tokens) |>
+  summarise(
+    mean_cost_usd = mean(cost_usd, na.rm = TRUE),
+    .groups = "drop"
+  )
+
+# Combine
+val_summary |>
+  left_join(canon_summary, by = c("models", "tokens")) |>
+  left_join(cost_summary, by = c("models", "tokens")) |>
+  arrange(models, tokens) |>
+  flextable() |>
+  autofit() |>
+  colformat_double(j = "mean_val_score", digits = 2) |>
+  colformat_double(j = "mean_prop_match", digits = 3) |>
+  colformat_double(j = "mean_cost_usd", digits = 5) |>
+  set_header_labels(
+    models = "Model",
+    tokens = "Token Limit",
+    n_papers = "Papers",
+    n_replicates = "Replicates",
+    mean_val_score = "Mean Validation Score",
+    mean_prop_match = "Mean Canonical Match",
+    mean_cost_usd = "Mean Cost (USD)"
   )
 ```
