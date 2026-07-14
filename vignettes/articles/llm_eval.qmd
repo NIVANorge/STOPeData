@@ -8,17 +8,24 @@ knitr:
     dev: "ragg_png"                  # use ragg for better font rendering
 execute:
   error: true
+  cache: true
 format: 
   html:
     code-fold: true
   pdf: 
     echo: false
     warning: false
+  docx:  
+    fig-width: 16
+    fig-dpi: 300                     # high res
+    fig-format: png                  # png is fine; svg not well supported in docx
+    link-citations: true             # TODO: Not working... why?
+    link-bibliography: true
 
 filters:
   - flextable-qmd                    # needed, or the flextables render crazy 
   - at: post-render
-    path: ../_extensions/flextable-qmd/unwrap-float.lua
+    path: ../../_extensions/flextable-qmd/unwrap-float.lua
 ---
 
 ```{r}
@@ -36,6 +43,7 @@ library(eDataDRF)
 library(pointblank)
 library(irr)
 library(here)
+library(patchwork)
 
 devtools::load_all() # remove once STOPeData is rebuilt
 
@@ -170,7 +178,7 @@ NB: We can't report a direct cost for Gemma, because it's free (but rate-limited
 
 ```{r}
 #| label: tbl-models
-#| tbl-cap: "Summary of LLM models included in the evaluation. Tok: tokens, a unit of LLM knowledge."
+#| tbl-cap: "Summary of LLM models included in the evaluation. Tok: tokens, a unit of LLM knowledge; Mtok: million tokens."
 
 # TODO: Fill out list
 
@@ -178,59 +186,57 @@ models_tbl <- tribble(
   ~provider                          , ~model_label                         , ~model_id                ,
   ~context_window_k                  , ~max_output_k                        ,
   ~cost_input_mtok                   , ~cost_output_mtok                    ,
-  ~knowledge_cutoff                  , ~training_cutoff                     , ~type                    ,
+  ~knowledge_cutoff                  , ~type                                ,
   # ---- Anthropic ---------------------------------------------------------------
   "Anthropic"                        , "Claude Haiku 4.5"                   , "claude-haiku-4-5"       ,
   "200"                              , "64"                                 ,
   "1"                                , "5"                                  ,
-  "Feb 2025"                         , "Jul 2025"                           , "Closed"                 ,
+  "Feb 2025"                         , "Closed"                             ,
   #
   "Anthropic"                        , "Claude Sonnet 4.6"                  , "claude-sonnet-4-6"      ,
-  "1M"                               , "128k"                               ,
+  "1000"                             , "128"                                ,
   "3"                                , "15"                                 ,
-  "Aug 2025"                         , "Jan 2026"                           , "Closed"                 ,
+  "Aug 2025"                         , "Closed"                             ,
   #
   "Anthropic"                        , "Claude Opus 4.8"                    , "claude-opus-4-8"        ,
-  "1M"                               , "128k"                               ,
+  "1000"                             , "128"                                ,
   "5"                                , "25"                                 ,
-  "Jan 2026"                         , "Jan 2026"                           , "Closed"                 ,
+  "Jan 2026"                         , "Closed"                             ,
   # ---- OpenAI ------------------------------------------------------------------
-  # TODO: OpenAI distinguishes between input and cached input cost. Wwhat does this mean? I used regular input for now.
-  # Also only provides "knowledge cutoff"
   "OpenAI"                           , "GPT-5.4 Mini"                       , "gpt-5.4-mini"           ,
   "400"                              , "128"                                ,
   "0.75"                             , "4.50"                               ,
-  "Aug 2025"                         , "training_cutoff"                    , "Closed"                 ,
+  "Aug 2025"                         , "Closed"                             ,
   #
   "OpenAI"                           , "GPT-5.4"                            , "gpt-5.4"                ,
   "1050"                             , "128"                                ,
   "2.5"                              , "15.0"                               ,
-  "Aug 2025"                         , "training_cutoff"                    , "Closed"                 ,
+  "Aug 2025"                         , "Closed"                             ,
   #
   "OpenAI"                           , "GPT-5.5"                            , "gpt-5.5"                ,
   "1050"                             , "128"                                ,
   "cost_input_mtok"                  , "30.0"                               ,
-  "Dec 2025"                         , "training_cutoff"                    , "Closed"                 ,
+  "Dec 2025"                         , "Closed"                             ,
   # ---- Google Gemini -----------------------------------------------------------
   "Google Gemini"                    , "Gemini 2.5 Pro"                     , "gemini-2.5-pro"         ,
   "1050"                             , "65"                                 ,
   "1.25 (<= 200k tokens), then 2.5"  , "10.00 (<= 200k tokens), then 15.00" ,
-  "Jan 2025"                         , "training_cutoff"                    , "Closed"                 ,
+  "Jan 2025"                         , "Closed"                             ,
   #
   "Google Gemini"                    , "Gemini 3.1 Pro Preview"             , "gemini-3.1-pro-preview" ,
   "context_window_k"                 , "max_output_k"                       ,
   "2.00 (<= 200k tokens), then 4.00" , "12.00 (<= 200k tokens), then 18.00" ,
-  "knowledge_cutoff"                 , "training_cutoff"                    , "Closed"                 ,
+  "knowledge_cutoff"                 , "Closed"                             ,
   #
   "Google Gemini"                    , "Gemini 3.5 Flash"                   , "gemini-3.5-flash"       ,
   "1000"                             , "65"                                 ,
   "1.50"                             , "9.00"                               ,
-  "Jan 2025"                         , "training_cutoff"                    , "Closed"                 ,
+  "Jan 2025"                         , "Closed"                             ,
   # ---- Google Gemma (open-weights) ---------------------------------------------
   "Google Gemini"                    , "Gemma 4 31B"                        , "gemma-4-31b-it"         ,
   "262"                              , "8k"                                 ,
   "Free"                             , "Free"                               ,
-  "knowledge_cutoff"                 , "training_cutoff"                    , "Open"
+  "Jan 2025"                         , "Open"
 )
 # Named vector for use in experimental_setup (label -> API id)
 models <- setNames(models_tbl$model_id, models_tbl$model_label)
@@ -243,13 +249,13 @@ models_tbl |>
     provider = "Provider",
     model_label = "Model",
     model_id = "Model ID",
-    context_window_k = "Context Window",
-    max_output_k = "Max Output",
+    context_window_k = "Context Window (Ktok)",
+    max_output_k = "Max Output (Ktok)",
     cost_input_mtok = "Input Cost ($/Mtok)",
     cost_output_mtok = "Output Cost ($/Mtok)",
     knowledge_cutoff = "Knowledge Cutoff",
     training_cutoff = "Training Cutoff",
-    description = "Open/Closed"
+    type = "Open/Closed"
   )
 ```
 
@@ -493,9 +499,15 @@ tibble(
 
 # this is where we set the actual experimental parameters
 calls_results <- run_extraction_batch(
-  pdf_ids = c("a"),
-  model_ids = c("claude-haiku-4-5", "claude-sonnet-4-6", "gpt-5.4-mini"),
-  token_counts = c(3000, 6000),
+  pdf_ids = c("a", "b", "c"),
+  model_ids = c(
+    "claude-haiku-4-5",
+    "claude-sonnet-4-6",
+    "gpt-5.4-mini",
+    "gpt-5.4",
+    "gemini-3.5-flash"
+  ),
+  token_counts = c(3000, 6000, 9000),
   n_replicates = 3
 ) |>
   mutate(id = row_number(), .before = everything())
@@ -545,6 +557,7 @@ call_status <- calls_results |>
       tables_with_data > 0
   ) |>
   select(
+    id,
     pdf,
     models,
     tokens,
@@ -556,140 +569,23 @@ call_status <- calls_results |>
   )
 ```
 
-# Results
+## Evaluation
 
-## Call Status
+Model effectiveness and efficiency was evaluated by considering cost, proportion of data passing evaluation, and proportion of data matching canonical (human-curated) extracted datasets. 
 
-[@tbl-batch-report] reports the details and status of each call. Broadly speaking, two types of errors are possible. In case of connection issue, system downtime, or a lack of API credit, the call will return an HTTP error (e.g. HTTP 400), and no data. However, it has also been observed that in some cases, the API response will be flagged "successful" by the external provider, but returned only empty data. This is believed to be the result of the extraction process hitting the token limit before completing its response; for example when an unusually large PDF is send with a too-small token limit. This sharp distinction between performance at different token limits 
+### Cost
 
-::: {.callout-note collapse="true"}
-## Per-Replicate Call Status Raw Data
-
-```{r}
-#| label: tbl-batch-report
-#| tbl-cap: "Per-replicate API call status and error messages."
-
-# --- Batch run status report -------------------------------------------------
-# Inspect the call list-column directly — before any flattening — to report
-# on successes and errors with token counts, broken down by pdf, model, and
-# token limit.
-
-batch_run_report <- calls_results |>
-  mutate(
-    success = map_lgl(call, \(c) isTRUE(c$success)),
-    error_msg = map_chr(call, \(c) c$error %||% NA_character_),
-    # metadata is a named list of summed token counts for successful calls.
-    # Try both naming conventions used across ellmer versions.
-    input_tokens = map_int(call, \(c) {
-      tryCatch(
-        as.integer(
-          c$metadata[["input_tokens"]] %||% c$metadata[["input"]] %||% NA_real_
-        ),
-        error = \(e) NA_integer_
-      )
-    }),
-    output_tokens = map_int(call, \(c) {
-      tryCatch(
-        as.integer(
-          c$metadata[["output_tokens"]] %||%
-            c$metadata[["output"]] %||%
-            NA_real_
-        ),
-        error = \(e) NA_integer_
-      )
-    })
-  )
-
-# Per-replicate detail
-batch_run_report |>
-  select(
-    pdf,
-    models,
-    tokens,
-    replicate,
-    success,
-    error_msg
-  ) |>
-  flextable() |>
-  autofit() |>
-  set_header_labels(
-    pdf = "PDF",
-    models = "Model",
-    tokens = "Token Limit",
-    replicate = "Rep",
-    success = "Success",
-    error_msg = "Error"
-  ) |>
-  color(i = ~ !success, j = ~ success + error_msg, color = "firebrick")
-```
-
-:::
-
-```{r}
-#| label: tbl-batch-report-summary
-#| tbl-cap: "Summary of API call success rates and mean token usage by PDF, model, and token limit."
-
-# Grouped summary: counts and mean token usage by pdf × model × token limit
-batch_run_report |>
-  group_by(pdf, models, tokens) |>
-  summarise(
-    n_calls = n(),
-    n_success = sum(success),
-    n_failed = sum(!success),
-    error_types = paste(sort(unique(na.omit(error_msg))), collapse = "; "),
-    mean_input_tok = round(mean(input_tokens, na.rm = TRUE)),
-    mean_output_tok = round(mean(output_tokens, na.rm = TRUE)),
-    .groups = "drop"
-  ) |>
-  flextable() |>
-  autofit() |>
-  set_header_labels(
-    pdf = "PDF",
-    models = "Model",
-    tokens = "Token Limit",
-    n_calls = "N",
-    n_success = "Success",
-    n_failed = "Failed",
-    error_types = "Error Types",
-    mean_input_tok = "Mean Input Tok",
-    mean_output_tok = "Mean Output Tok"
-  )
-```
-
-::: {.callout-note collapse="true"}
-## All Calls Raw Data
-
-```{r}
-#| label: tbl-all-calls
-#| tbl-cap: "Status of all API calls, including empty-table detection."
-
-call_status |> flextable() |> autofit()
-```
-
-:::
+API calls return expended input tokens (used to ingest the data, schema, and prompt) and output tokens (used to create the response). Costs per token are reported for most closed models (see [@tbl-...]). Overall cost is therefore calculated as follows:
 
 
-```{r}
-#| label: tbl-all-calls-summary
-#| tbl-cap: "Call completeness summary by PDF, model, and token limit."
+$$C = t_i c_i + t_o c_o$$
 
-call_status |>
-  group_by(pdf, models, tokens) |>
-  summarise(
-    n_calls = n(),
-    n_complete = sum(effectively_complete),
-    n_empty_tables = sum(api_success & !effectively_complete),
-    n_failed = sum(!api_success),
-    .groups = "drop"
-  ) |>
-  flextable() |>
-  autofit()
-```
+In the case of the open model Gemma 4 (accessed via the Google Gemini API), usage is free, but rate-limited. 
 
+### eData Validation 
 
-## eData Validation
+Extracted data are validated against the validation functions described in `eDataDRF`, which check the data against a number of rules per table. These functions are intended to validate final data from the eData application after LLM extraction and subsequent human verification, and therefore some variables were "dummied" to avoid irrelevant failures to validate. The number of validation checks passed per table divided by total number of validation checks was used as a simple measure of LLMs' ability to return data consistent with the extraction schema. 
 
-We have functions for this, but they're intended to deal with finished data, not fresh from extraction. Still
 
 ```{r}
 #| label: edata-validation-setup
@@ -881,117 +777,23 @@ validate_all_calls <- function(calls_results) {
 ```
 
 
-```{r}
-#| label: validation-execute
+### Comparison with Canonical Data
 
-# Keep named agents available for get_agent_report() inspection.
-# Index by row-number ID from batch_run_report, e.g. call_validations[["42"]]
+To determine to what extent the LLM-extracted data agreed with human-extracted data, calls were compared to "canonical" datasets extracted using the eData application using LLMs and human processing. Not all extracted data fields are directly comparable, but numerical and controlled vocabulary variables were compared (see @tbl-canonical-comparison-variables). Compared variables were converted to strings and checked for strict equality. In tables consisting of multiple rows of data (e.g. sites, parameters), we checked only that LLM-returned data existed in the canonical dataset.
 
-# Reuse batch_run_report to identify which calls have a result worth validating.
-successful_ids <- batch_run_report$id[batch_run_report$success]
-call_validations <- calls[successful_ids] |>
-  set_names(successful_ids) |>
-  map(\(c) validate_llm_extraction(c$result))
-
-table_summary <- validate_all_calls(calls_results)
-```
-
-
-```{r}
-#| label: fig-validation-scores
-#| fig-cap: "Proportion of validation steps passed by table and model. Each dot represents one replicate; dots stack at exact values to reflect the discrete nature of step-pass proportions."
-
-table_summary |>
-  mutate(tokens = factor(tokens)) |>
-  ggplot(aes(x = table, y = pct_steps_pass, fill = tokens)) +
-  geom_dotplot(
-    binaxis = "y",
-    stackdir = "center",
-    binwidth = 0.04,
-    dotsize = 0.5,
-    position = position_dodge(width = 0.5)
-  ) +
-  scale_y_continuous(
-    limits = c(0, 1),
-    name = "Proportion of Validation Passed"
-  ) +
-  facet_wrap(vars(models))
-```
-
-Across all tables, is there a relationship between token count and validation? [@fig-validation-relationship]. Not as present, but there may be with other values.
-
-```{r}
-#| label: fig-validation-relationship
-#| fig-cap: "Across all tables, is there a relationship between token count and validation?"
-
-table_summary |>
-  ggplot(aes(colour = models, y = pct_steps_pass, x = tokens)) +
-  geom_point() +
-  geom_smooth(method = "lm") +
-  scale_y_continuous(
-    limits = c(0, 1),
-    name = "Proportion of Validation Passed"
-  )
-```
-
-```{r}
-#| label: canonical-data-setup
-
-pdf_zip_map <- c(
-  a = here("data-raw/1997RitterhoffTraceMetalsIn_AllData_20251030_145522.zip"),
-  b = here(
-    "data-raw/2002HellandTransportAndSedimentation_AllData_20251104_075533.zip"
-  ),
-  c = here(
-    "data-raw/2021WojtasikTemporalIsolationBetween_AllData_20251030_163338.zip"
-  ),
-  d = here(
-    "data-raw/2022KohlerDistributionPatternOf_AllData_20251217_115443.zip"
-  )
-)
-
-load_canonical <- function(zip_path) {
-  tmp <- tempfile()
-  dir.create(tmp)
-  unzip(zip_path, exdir = tmp)
-  csvs <- list.files(tmp, full.names = TRUE, pattern = "\\.csv$")
-
-  patterns <- c(
-    campaign = "Campaign",
-    references = "Reference",
-    sites = "Sites",
-    parameters = "Parameters",
-    compartments = "Compartments",
-    biota = "Biota",
-    methods = "Methods"
-  )
-
-  imap(patterns, function(pat, nm) {
-    f <- csvs[grepl(pat, csvs, fixed = TRUE)]
-    if (length(f) == 0) {
-      return(NULL)
-    }
-    read_csv(f[1], show_col_types = FALSE) |> rename_with(tolower)
-  }) |>
-    compact()
-}
-
-# Load canonical data for all four papers (cached in-memory)
-canonical_data <- imap(pdf_zip_map, \(path, id) load_canonical(path))
-```
-
+Proportion of correct data was calculated relative to totals, and a score between 0 and 1 was returned to indicate degree of agreement.
 
 ```{r}
 #| label: canon-comparison-setup
 # --- Variable classification --------------------------------------------------
 # var_type:
-#   "controlled" — compare with case-insensitive exact match → boolean
+#   "controlled" — compare with case-insensitive exact match, return boolean
 #   "continuous" — compute numeric delta (LLM − canonical)
 #   "exclude"  — excluded from comparison
 #
 # canonical_name uses lowercase column names (matching rename_with(tolower) above).
 # LLM schema names that differ from canonical names are mapped explicitly
-# (e.g. country_iso → country, ocean_iho → area).
+# (e.g. country_iso -> country, ocean_iho -> area).
 
 variable_meta <- tribble(
   ~table         , ~llm_name                     , ~canonical_name               , ~var_type    ,
@@ -1060,31 +862,330 @@ table_keys <- list(
 - we just check if strings match
 - for tables (sites, parameters, etc.) with more than one row we only check that what's in the call table is also in the canonical table (so if the call over-matches we don't flag that as an issue)
 
-```{r}
-#| label: tbl-canonical-comparison-variables
-#| tbl-cap: "Caption."
-#| echo: false
+# Results
 
-variable_meta |>
+## Call Status
+
+[@tbl-batch-report] reports the details and status of each call. Broadly speaking, two types of errors are possible. In case of connection issue, system downtime, or a lack of API credit, the call will return an HTTP error (e.g. HTTP 400), and no data. However, it has also been observed that in some cases, the API response will be flagged "successful" by the external provider, but returned only empty data. This is believed to be the result of the extraction process hitting the token limit before completing its response; for example when an unusually large PDF is send with a too-small token limit. This sharp distinction between performance at different token limits 
+
+::: {.callout-note collapse="true"}
+## Per-Replicate Call Status Raw Data
+
+```{r}
+#| label: tbl-batch-report
+#| tbl-cap: "Per-replicate API call status and error messages."
+
+# --- Batch run status report -------------------------------------------------
+# Inspect the call list-column directly — before any flattening — to report
+# on successes and errors with token counts, broken down by pdf, model, and
+# token limit.
+
+batch_run_report <- calls_results |>
   mutate(
-    llm_name = toupper(llm_name),
-    table = str_to_sentence(table),
-    var_type = case_when(
-      var_type %in% c("controlled", "continuous") ~ "Compared",
-      var_type == "exclude" ~ "Skipped",
-      .default = str_to_sentence(var_type)
-    )
+    success = map_lgl(call, \(c) isTRUE(c$success)),
+    error_msg = map_chr(call, \(c) c$error %||% NA_character_),
+    # metadata is a named list of summed token counts for successful calls.
+    # Try both naming conventions used across ellmer versions.
+    input_tokens = map_int(call, \(c) {
+      tryCatch(
+        as.integer(
+          c$metadata[["input_tokens"]] %||% c$metadata[["input"]] %||% NA_real_
+        ),
+        error = \(e) NA_integer_
+      )
+    }),
+    output_tokens = map_int(call, \(c) {
+      tryCatch(
+        as.integer(
+          c$metadata[["output_tokens"]] %||%
+            c$metadata[["output"]] %||%
+            NA_real_
+        ),
+        error = \(e) NA_integer_
+      )
+    })
+  )
+
+# Per-replicate detail
+batch_run_report |>
+  select(
+    id,
+    pdf,
+    models,
+    tokens,
+    replicate,
+    success,
+    error_msg
   ) |>
-  select(table, llm_name, var_type) |>
   flextable() |>
   autofit() |>
-
   set_header_labels(
-    table = "Table",
-    llm_name = "Variable Name",
-    var_type = "Variable Check"
+    id = "Call ID",
+    pdf = "PDF",
+    models = "Model",
+    tokens = "Token Limit",
+    replicate = "Rep",
+    success = "Success",
+    error_msg = "Error"
+  ) |>
+  color(i = ~ !success, j = ~ success + error_msg, color = "firebrick")
+```
+
+:::
+
+```{r}
+#| label: tbl-batch-report-summary
+#| tbl-cap: "Summary of API call success rates and mean token usage by PDF, model, and token limit. Note: Only contains data on most recent API call, *not* all cached calls."
+
+# Grouped summary: counts and mean token usage by pdf × model × token limit
+batch_run_report_summary <- batch_run_report |>
+  group_by(pdf, models, tokens) |>
+  summarise(
+    id = paste0(id, collapse = ", "),
+    n_calls = n(),
+    n_success = sum(success),
+    n_failed = sum(!success),
+    error_types = paste(sort(unique(na.omit(error_msg))), collapse = "; "),
+    mean_input_tok = round(mean(input_tokens, na.rm = TRUE)),
+    mean_output_tok = round(mean(output_tokens, na.rm = TRUE)),
+    .groups = "drop"
+  )
+
+batch_run_report_summary |>
+  flextable() |>
+  autofit() |>
+  set_header_labels(
+    pdf = "PDF",
+    models = "Model",
+    tokens = "Token Limit",
+    n_calls = "N",
+    n_success = "Success",
+    n_failed = "Failed",
+    error_types = "Error Types",
+    mean_input_tok = "Mean Input Tok",
+    mean_output_tok = "Mean Output Tok"
   )
 ```
+
+TODO: Some of these input tokens are rather suspect. Is stuff getting cached? Should we use the max instead?
+
+::: {.callout-note collapse="true"}
+## All Calls Raw Data
+
+```{r}
+#| label: tbl-all-calls
+#| tbl-cap: "Status of all API calls, including both cached and recent calls."
+
+call_status |> flextable() |> autofit()
+```
+
+:::
+
+
+```{r}
+#| label: tbl-all-calls-summary
+#| tbl-cap: "Call completeness summary by PDF, model, and token limit."
+
+call_status |>
+  group_by(pdf, models, tokens) |>
+  summarise(
+    IDs = paste0(id, collapse = ", "),
+    n_calls = n(),
+    n_complete = sum(effectively_complete),
+    n_empty_tables = sum(api_success & !effectively_complete),
+    n_failed = sum(!api_success),
+    .groups = "drop"
+  ) |>
+  flextable() |>
+  autofit()
+```
+
+```{r}
+#| label: tbl-all-calls-summary-by-model
+#| tbl-cap: "Failure rate by model"
+
+model_failure_rate <- call_status |>
+  group_by(models, tokens) |>
+  summarise(
+    n_calls = n(),
+    n_complete = sum(effectively_complete),
+    n_empty_tables = sum(api_success & !effectively_complete),
+    n_failed = sum(!api_success),
+    prop_failed = (n_failed + n_empty_tables) / n_calls,
+    .groups = "drop"
+  )
+
+model_failure_rate |>
+  flextable() |>
+  set_header_labels(
+    models = "Model",
+    tokens = "Tokens",
+    n_calls = "Calls",
+    n_complete = "Complete",
+    n_empty_tables = "Returned Empty",
+    n_failed = "Call Failed",
+    prop_failed = "Failure Rate"
+  ) |>
+  colformat_double(j = "prop_failed", digits = 3) |>
+  autofit()
+```
+
+## eData Validation
+
+```{r}
+#| label: validation-execute
+
+# Keep named agents available for get_agent_report() inspection.
+# Index by row-number ID from batch_run_report, e.g. call_validations[["42"]]
+
+# Reuse batch_run_report to identify which calls have a result worth validating.
+successful_ids <- batch_run_report$id[batch_run_report$success]
+call_validations <- calls[successful_ids] |>
+  set_names(successful_ids) |>
+  map(\(c) validate_llm_extraction(c$result))
+
+table_summary <- validate_all_calls(calls_results)
+```
+
+
+```{r}
+#| label: fig-validation-scores
+#| fig-cap: "Proportion of validation steps passed by table and model. Each dot represents one replicate; dots stack at exact values to reflect the discrete nature of step-pass proportions."
+
+table_summary |>
+  mutate(tokens = factor(tokens)) |>
+  ggplot(aes(x = table, y = pct_steps_pass, fill = tokens)) +
+  geom_dotplot(
+    binaxis = "y",
+    stackdir = "center",
+    binwidth = 0.04,
+    dotsize = 0.5,
+    position = position_dodge(width = 0.5)
+  ) +
+  scale_y_continuous(
+    limits = c(0, 1),
+    name = "Proportion of Validation Passed"
+  ) +
+  facet_wrap(vars(models))
+```
+
+
+```{r}
+#| label: fig-validation-relationship
+#| fig-cap: "Across all tables, is there a relationship between token count and validation? Trend lines based on mean at each token level."
+
+table_summary_provider <- table_summary |>
+  left_join(models_tbl, by = c(models = "model_id")) |>
+  select(
+    id,
+    pdf,
+    models,
+    tokens,
+    replicate,
+    table,
+    n_steps,
+    n_steps_failed,
+    rows_failed,
+    pct_steps_pass,
+    provider
+  )
+
+make_provider_plot <- function(data, prov, palette, title) {
+  d <- data |> filter(provider == prov)
+
+  ggplot(d, aes(x = tokens, y = pct_steps_pass, colour = models)) +
+    geom_point(position = position_jitter(width = 500, height = 0), shape = 1) +
+    stat_summary(
+      aes(x = tokens, colour = models, group = models),
+      fun = mean,
+      geom = "line"
+    ) +
+    scale_colour_viridis_d(option = palette, name = NULL) +
+    scale_y_continuous(
+      limits = c(0, 1),
+      name = "Proportion of Validation Passed"
+    ) +
+    scale_x_continuous(limits = c(2000, 10000), breaks = c(3000, 6000, 9000)) +
+    labs(title = title, x = "Max Tokens") +
+    theme_minimal()
+}
+
+p_anthropic <- make_provider_plot(
+  table_summary_provider,
+  "Anthropic",
+  "viridis",
+  "Anthropic"
+)
+p_gemini <- make_provider_plot(
+  table_summary_provider,
+  "Google Gemini",
+  "plasma",
+  "Google Gemini"
+)
+p_openai <- make_provider_plot(
+  table_summary_provider,
+  "OpenAI",
+  "cividis",
+  "OpenAI"
+)
+
+p_anthropic / p_gemini / p_openai + plot_layout(axes = "collect")
+```
+
+@fig-validation-relationship describes the relationship between token count and proportion of validation passed, per provider and model. We see:
+
+- Claude models show a clear pattern of frequent failures at 3000 tokens. At 6000 and 9000 tokens, success rates are roughly consistent
+- Gemini-3.5-flash fails at all but 9000 tokens
+- OpenAI's models have a consistent validation rate across models and token counts. 
+
+```{r}
+#| label: canonical-data-setup
+
+pdf_zip_map <- c(
+  a = here("data-raw/1997RitterhoffTraceMetalsIn_AllData_20251030_145522.zip"),
+  b = here(
+    "data-raw/2002HellandTransportAndSedimentation_AllData_20251104_075533.zip"
+  ),
+  c = here(
+    "data-raw/2021WojtasikTemporalIsolationBetween_AllData_20251030_163338.zip"
+  ),
+  d = here(
+    "data-raw/2022KohlerDistributionPatternOf_AllData_20251217_115443.zip"
+  )
+)
+
+load_canonical <- function(zip_path) {
+  tmp <- tempfile()
+  dir.create(tmp)
+  unzip(zip_path, exdir = tmp)
+  csvs <- list.files(tmp, full.names = TRUE, pattern = "\\.csv$")
+
+  patterns <- c(
+    campaign = "Campaign",
+    references = "Reference",
+    sites = "Sites",
+    parameters = "Parameters",
+    compartments = "Compartments",
+    biota = "Biota",
+    methods = "Methods"
+  )
+
+  imap(patterns, function(pat, nm) {
+    f <- csvs[grepl(pat, csvs, fixed = TRUE)]
+    if (length(f) == 0) {
+      return(NULL)
+    }
+    read_csv(f[1], show_col_types = FALSE) |> rename_with(tolower)
+  }) |>
+    compact()
+}
+
+# Load canonical data for all four papers (cached in-memory)
+canonical_data <- imap(pdf_zip_map, \(path, id) load_canonical(path))
+```
+
+
+
 
 ::: {.callout-note collapse="true"}
 ## Canon Comparison Raw Data
@@ -1100,72 +1201,78 @@ variable_meta |>
 #   3. Per field: any LLM value == any canonical value → match.
 # Produces one row per (call × table) with n_match, n_total, prop_match.
 
-canonical_comparison <- calls_flat |>
-  distinct(id, pdf, models, tokens, replicate) |>
-  crossing(
-    table = variable_meta |>
-      filter(!is.na(var_type), var_type != "exclude") |>
-      distinct(table) |>
-      pull(table)
-  ) |>
-  mutate(
-    result = pmap(list(id, pdf, table), \(call_id, pdf_id, tbl) {
-      canonical_tbl <- canonical_data[[pdf_id]][[tbl]]
-      if (is.null(canonical_tbl)) {
-        return(NULL)
-      }
-
-      meta <- variable_meta |>
-        filter(
-          .data$table == tbl,
-          !is.na(.data$var_type),
-          .data$var_type != "exclude"
-        )
-
-      llm_vals <- calls_flat |>
-        filter(id == call_id, level_2 == tbl) |>
-        select(name, value) |>
-        inner_join(
-          meta |> select(llm_name, canonical_name),
-          by = c(name = "llm_name")
-        ) |>
-        select(canonical_name, value_call = value)
-
-      canon_vals <- canonical_tbl |>
+# Step 1: Flatten canonical_data (pdf → table → data.frame) into a single long
+# data frame of (pdf, table, canonical_name, value_canon)
+canonical_long <- list()
+for (pdf_id in names(canonical_data)) {
+  for (tbl in names(canonical_data[[pdf_id]])) {
+    tbl_df <- canonical_data[[pdf_id]][[tbl]]
+    if (!is.null(tbl_df) && nrow(tbl_df) > 0) {
+      key <- paste(pdf_id, tbl, sep = "__")
+      canonical_long[[key]] <- tbl_df |>
         pivot_longer(cols = everything(), values_transform = as.character) |>
-        inner_join(
-          meta |> select(canonical_name),
-          by = c(name = "canonical_name")
-        ) |>
-        select(canonical_name = name, value_canon = value)
+        mutate(pdf = pdf_id, table = tbl)
+    }
+  }
+}
+canonical_long <- bind_rows(canonical_long) |>
+  rename(canonical_name = name, value_canon = value)
 
-      if (nrow(llm_vals) == 0 || nrow(canon_vals) == 0) {
-        return(NULL)
-      }
+# Step 2: Filter variable_meta once to reuse below
+meta_filtered <- variable_meta |>
+  filter(!is.na(var_type), var_type != "exclude")
 
-      # For each field: does any LLM value match any canonical value?
-      llm_vals |>
-        left_join(
-          canon_vals,
-          by = "canonical_name",
-          relationship = "many-to-many"
-        ) |>
-        group_by(canonical_name) |>
-        summarise(
-          match = any(value_call == value_canon, na.rm = TRUE),
-          .groups = "drop"
-        ) |>
-        summarise(
-          n_match = sum(match, na.rm = TRUE),
-          n_total = n(),
-          prop_match = n_match / n_total
-        )
-    })
+# Step 3: Build the base grid of every (call, table) combination to evaluate
+call_table_combos <- calls_flat |>
+  distinct(id, pdf, models, tokens, replicate) |>
+  crossing(table = meta_filtered |> distinct(table) |> pull(table))
+
+# Step 4: LLM values — pull from calls_flat and map field names to canonical names
+llm_vals_all <- calls_flat |>
+  inner_join(
+    meta_filtered |> select(table, llm_name, canonical_name),
+    by = c(level_2 = "table", name = "llm_name")
   ) |>
-  filter(!map_lgl(result, is.null)) |>
-  unnest(result)
+  select(id, table = level_2, canonical_name, value_call = value)
+
+# Step 5: Canonical values — keep only fields present in meta
+canon_vals_all <- canonical_long |>
+  inner_join(
+    meta_filtered |> select(table, canonical_name),
+    by = c("table", "canonical_name")
+  ) |>
+  select(pdf, table, canonical_name, value_canon)
+
+# Step 6: Join and compute match statistics
+# - semi_join: restrict to pdf+table combos that have any canonical data
+# - inner_join llm_vals: restrict to combos that have any LLM output for this table
+# - left_join canon_vals: keep all LLM fields; unmatched canon fields → match = FALSE
+canonical_comparison <- call_table_combos |>
+  semi_join(canon_vals_all, by = c("pdf", "table")) |>
+  inner_join(llm_vals_all, by = c("id", "table")) |>
+  left_join(
+    canon_vals_all,
+    by = c("pdf", "table", "canonical_name"),
+    relationship = "many-to-many"
+  ) |>
+  # Per field: does any LLM value match any canonical value?
+  group_by(id, pdf, models, tokens, replicate, table, canonical_name) |>
+  summarise(
+    match = any(value_call == value_canon, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  # Per call+table: aggregate match statistics
+  group_by(id, pdf, models, tokens, replicate, table) |>
+  summarise(
+    n_match = sum(match, na.rm = TRUE),
+    n_total = n(),
+    prop_match = n_match / n_total,
+    .groups = "drop"
+  )
 
 canonical_comparison |>
+  mutate(id = as.integer(id)) |>
+  arrange(id) |>
   flextable() |>
   autofit() |>
   colformat_double(j = "prop_match", digits = 2) |>
@@ -1194,7 +1301,9 @@ Our smaller token calls (3000) end up all excluded here, because with all NA dat
 # what's the best way to summarise this?
 canonical_comparison_summarised <- canonical_comparison |>
   group_by(models, tokens) |>
-  reframe(mean_prop_match = mean(prop_match), n_replicates = max(replicate))
+  replace_na(list(prop_match = 0)) |>
+  reframe(mean_prop_match = mean(prop_match), n_replicates = max(replicate)) |>
+  arrange(desc(mean_prop_match))
 
 # our questions are:
 # which models are most accurate?
@@ -1203,143 +1312,63 @@ canonical_comparison_summarised <- canonical_comparison |>
 
 # for a standard "look how good my LLM is" comparison, we'd just do a bar chart...
 
-canonical_comparison_summarised |>
-  ggplot(aes(x = models, y = mean_prop_match, fill = tokens)) +
-  geom_boxplot() +
-  scale_y_continuous(limits = c(0, 1))
-```
-```{r}
-#| label: fig-canon-comparison-summary-2
-# realistically, we should at the very least do summary stats
 canonical_comparison |>
-  ggplot(aes(x = models, y = prop_match, colour = table)) +
-  geom_boxplot()
-
-# again, we have the issue that points overplot. better with boxplots (sort of)
+  # recode NA as 0 so we don't get unfairly high averages
+  replace_na(list(prop_match = 0)) |>
+  # summarise by call (dropping table) to reduce noisyness of points
+  reframe(
+    .by = id,
+    mean_prop_match = mean(prop_match),
+    tokens,
+    models,
+    pdf,
+    replicate
+  ) |>
+  ggplot(aes(
+    x = ordered(tokens),
+    y = mean_prop_match,
+    fill = ordered(tokens),
+    group = ordered(tokens)
+  )) +
+  geom_point(
+    position = position_jitter(width = 0.3, height = 0),
+    aes(shape = pdf)
+  ) +
+  geom_boxplot(alpha = 0.75) +
+  scale_colour_viridis_d(
+    breaks = c("3000", "6000", "9000"),
+    name = "Max tokens"
+  ) +
+  scale_fill_viridis_d(
+    breaks = c("3000", "6000", "9000"),
+    name = "Max tokens"
+  ) +
+  scale_y_continuous(
+    # limits = c(0, 1),
+    name = "Proportion of data matching canonical"
+  ) +
+  scale_x_discrete(breaks = c("3000", "6000", "9000"), name = "Max tokens") +
+  geom_text(
+    data = model_failure_rate |>
+      mutate(
+        tokens = ordered(tokens),
+        label = scales::percent(prop_failed, accuracy = 1)
+      ),
+    aes(
+      x = tokens,
+      y = Inf,
+      label = label,
+      colour = if_else(prop_failed > 0.1, "red", "grey40")
+    ),
+    inherit.aes = FALSE,
+    vjust = 1.5,
+    size = 2.8
+  ) +
+  scale_colour_identity() +
+  facet_wrap(facets = vars(models), nrow = 1) +
+  theme_minimal()
 ```
 
-```{r}
-#| label: compare-canonical-comments
-
-# Screening comments are a special case: there is no canonical ground truth
-# to compare against, so we assess inter-rater reliability between
-# models/replicates using Cohen's / Fleiss' kappa.
-#
-# Weighted kappa is used throughout: it penalises larger disagreements more
-# (e.g. 1 vs 5) than small ones (1 vs 2), which is appropriate for 1–5
-# ordinal scores.
-
-score_vars <- c(
-  "paper_relevance",
-  "paper_reliability",
-  "paper_data_source",
-  "paper_data_available",
-  "extraction_assessement"
-)
-
-# Extract integer scores from the "Score: N: text" format
-scores_long <- calls_flat |>
-  filter(level_2 == "comments", name %in% score_vars) |>
-  select(id, pdf, models, tokens, replicate, name, value) |>
-  mutate(score = as.integer(str_extract(value, "(?<=Score:\\s)\\d"))) |>
-  select(-value)
-
-
-# --- Within-model kappa (consistency across replicates) ----------------------
-# For each (model, score_variable): matrix rows = pdfs, cols = replicates.
-# Multiple raters → Fleiss' kappa.
-
-within_model_kappa <- scores_long |>
-  group_by(models, name) |>
-  group_map(function(df, key) {
-    mat <- df |>
-      select(pdf, replicate, score) |>
-      pivot_wider(names_from = replicate, values_from = score) |>
-      select(-pdf) |>
-      as.matrix()
-
-    # Drop all-NA columns (failed/empty replicates)
-    mat <- mat[, colSums(!is.na(mat)) > 0, drop = FALSE]
-    if (ncol(mat) < 2 || nrow(mat) < 2) {
-      return(tibble())
-    }
-
-    res <- tryCatch(kappam.fleiss(mat), error = function(e) NULL)
-    if (is.null(res)) {
-      return(tibble())
-    }
-
-    tibble(
-      models = key$models,
-      score_var = key$name,
-      n_subjects = nrow(mat),
-      n_raters = ncol(mat),
-      kappa = round(res$value, 3),
-      z = round(res$statistic, 2),
-      p_value = round(res$p.value, 4),
-      comparison = "within_model (replicates)"
-    )
-  }) |>
-  list_rbind()
-
-
-# --- Cross-model kappa (agreement between models) ----------------------------
-# Average scores across replicates per (pdf, model) first, then compare models.
-# 2 models → weighted kappa2; >2 models → Fleiss kappa.
-
-cross_model_kappa <- scores_long |>
-  group_by(pdf, models, name) |>
-  summarise(mean_score = round(mean(score, na.rm = TRUE)), .groups = "drop") |>
-  group_by(name) |>
-  group_map(function(df, key) {
-    mat <- df |>
-      select(pdf, models, mean_score) |>
-      pivot_wider(names_from = models, values_from = mean_score) |>
-      select(-pdf) |>
-      as.matrix()
-
-    mat <- mat[, colSums(!is.na(mat)) > 0, drop = FALSE]
-    if (ncol(mat) < 2 || nrow(mat) < 2) {
-      return(tibble())
-    }
-
-    res <- tryCatch(
-      if (ncol(mat) == 2) {
-        kappa2(mat, weight = "equal")
-      } else {
-        kappam.fleiss(mat)
-      },
-      error = function(e) NULL
-    )
-    if (is.null(res)) {
-      return(tibble())
-    }
-
-    tibble(
-      models = "all",
-      score_var = key$name,
-      n_subjects = nrow(mat),
-      n_raters = ncol(mat),
-      kappa = round(res$value, 3),
-      z = round(res$statistic, 2),
-      p_value = round(res$p.value, 4),
-      comparison = "cross_model"
-    )
-  }) |>
-  list_rbind()
-```
-
-
-```{r}
-#| label: tbl-combined-results
-#| tbl-cap: "Within-model and cross-model kappa statistics for screening score inter-rater agreement."
-
-# Combined results table
-bind_rows(within_model_kappa, cross_model_kappa) |>
-  arrange(comparison, score_var, models) |>
-  flextable() |>
-  autofit()
-```
 
 ## Cost Analysis
 
@@ -1376,10 +1405,11 @@ call_costs <- batch_run_report |>
     cost_usd = (input_tokens / 1e6) *
       cost_input_per_mtok +
       (output_tokens / 1e6) * cost_output_per_mtok
-  )
+  ) |>
+  select(-model_provider) # TODO: Why in there twice?
 ```
 
-Costs are necessarily an estimate and rather rough - most models provide a cost per token value, and most calls return a token count... but not all of them are trustworthy.
+Costs are necessarily an estimate and rather rough - most models provide a cost per token value, and most calls return a token count... but not all of them are trustworthy. I suspect that behind the scenes some data is getting cached between calls, which means subsequent calls with the same/similar data are much cheaper. This is probably a good thing, but I'm not sure how to deal with this in the analysis.
 
 ```{r}
 #| label: tbl-cost-summary
@@ -1411,22 +1441,43 @@ call_costs |>
   )
 ```
 
+Surprisingly, cost and max token count correlate for Anthropic models, but don't seem to for OpenAI [@fig-cost-by-model-tokens]. This is a surprise. Note the drop in mean costs for Anthropic (and in some cases for OpenAI) at 6000 tokens. I'm fairly sure this is a consequence of caching (as discussed above), while the 9000-token calls were run a day later. I can try and turn caching off and re-run for more accurate numbers, though this may be expensive and time-consuming. 
+
 ```{r}
 #| label: fig-cost-by-model-tokens
-#| fig-cap: "Estimated cost per call (USD) by model and token limit. Each point is one replicate call; lines connect group means."
+#| fig-cap: "Estimated cost per call (USD) by model and token limit, split by provider. Each point is one replicate call; lines connect group means."
 
-call_costs |>
-  filter(success) |>
-  mutate(tokens = factor(tokens)) |>
-  ggplot(aes(x = tokens, y = cost_usd, colour = models, group = models)) +
-  geom_jitter(width = 0.05, alpha = 0.6) +
-  stat_summary(fun = mean, geom = "line") +
-  stat_summary(fun = mean, geom = "point", size = 3, shape = 18) +
-  labs(
-    x = "Token Limit",
-    y = "Estimated Cost (USD)",
-    colour = "Model"
-  )
+make_cost_plot <- function(data, prov, palette, title) {
+  d <- data |> filter(provider == prov)
+  ggplot(d, aes(x = tokens, y = cost_usd, colour = models)) +
+    geom_point(
+      position = position_jitter(width = 500, height = 0),
+      shape = 1,
+      alpha = 0.6
+    ) +
+    stat_summary(aes(group = models), fun = mean, geom = "line") +
+    scale_colour_viridis_d(option = palette, name = NULL) +
+    scale_x_continuous(limits = c(2000, 10000), breaks = c(3000, 6000, 9000)) +
+    scale_y_continuous(name = "Estimated Cost (USD)", limits = c(0, 0.3)) +
+    labs(title = title, x = "Max Tokens") +
+    theme_minimal()
+}
+
+pc_anthropic <- make_cost_plot(
+  call_costs,
+  "Anthropic",
+  "viridis",
+  "Anthropic"
+)
+pc_gemini <- make_cost_plot(
+  call_costs,
+  "Google Gemini",
+  "plasma",
+  "Google Gemini"
+)
+pc_openai <- make_cost_plot(call_costs, "OpenAI", "cividis", "OpenAI")
+
+pc_anthropic / pc_gemini / pc_openai + plot_layout(axes = "collect")
 ```
 
 ```{r}
@@ -1438,14 +1489,10 @@ cost_quality <- call_costs |>
   select(id, pdf, models, tokens, replicate, cost_usd) |>
   mutate(id = as.character(id)) |>
   left_join(
-    canonical_comparison |>
-      group_by(id, models, tokens, replicate) |>
-      summarise(
-        mean_prop_match = mean(prop_match, na.rm = TRUE),
-        .groups = "drop"
-      ),
-    by = c("id", "models", "tokens", "replicate")
-  )
+    canonical_comparison_summarised,
+    by = c("models", "tokens")
+  ) |>
+  replace_na(list(mean_prop_match = 0, n_replicates = 3))
 
 cost_quality |>
   mutate(tokens = factor(tokens)) |>
@@ -1456,10 +1503,10 @@ cost_quality |>
     shape = tokens
   )) +
   geom_point(size = 3, alpha = 0.8) +
-  scale_y_continuous(
-    limits = c(0, 1),
-    name = "Mean Proportion of Fields Matched"
-  ) +
+  # scale_y_continuous(
+  #   limits = c(0, 1),
+  #   name = "Mean Proportion of Fields Matched"
+  # ) +
   labs(
     x = "Estimated Cost (USD)",
     colour = "Model",
@@ -1468,19 +1515,56 @@ cost_quality |>
 ```
 
 ```{r}
-#| label: fig-cost-vs-output-tokens
-#| fig-cap: "Relationship between output token usage and estimated cost, coloured by model. Output token usage drives most of the cost variation."
+#| label: fig-cost-vs-validation
+#| fig-cap: "Estimated cost per call (USD) vs. mean eData validation rate (proportion of validation steps passed), split by provider. Each point is one replicate; higher validation at lower cost is preferable. Failed calls (i.e. mean validation pass rate of 0) excluded."
 
-call_costs |>
+cost_validation <- call_costs |>
   filter(success) |>
-  ggplot(aes(x = output_tokens, y = cost_usd, colour = models)) +
-  geom_point(alpha = 0.7) +
-  labs(
-    x = "Output Tokens Used",
-    y = "Estimated Cost (USD)",
-    colour = "Model"
-  )
+  select(id, models, tokens, replicate, cost_usd, provider) |>
+  left_join(
+    table_summary |>
+      group_by(id, models, tokens, replicate) |>
+      summarise(
+        mean_pct_pass = mean(pct_steps_pass, na.rm = TRUE),
+        .groups = "drop"
+      ),
+    by = c("id", "models", "tokens", "replicate")
+  ) |>
+  filter(!is.na(mean_pct_pass), mean_pct_pass != 0)
+
+make_cost_validation_plot <- function(data, prov, palette, title) {
+  d <- data |> filter(provider == prov)
+  ggplot(d, aes(x = cost_usd, y = mean_pct_pass, colour = models)) +
+    geom_point(size = 2.5, alpha = 0.7) +
+    scale_colour_viridis_d(option = palette, name = NULL) +
+    scale_y_continuous(limits = c(0, 1), name = "Mean Validation Rate") +
+    scale_x_continuous(limits = c(0, 0.3)) +
+    labs(title = title, x = "Estimated Cost (USD)") +
+    theme_minimal()
+}
+
+pcv_anthropic <- make_cost_validation_plot(
+  cost_validation,
+  "Anthropic",
+  "viridis",
+  "Anthropic"
+)
+pcv_gemini <- make_cost_validation_plot(
+  cost_validation,
+  "Google Gemini",
+  "plasma",
+  "Google Gemini"
+)
+pcv_openai <- make_cost_validation_plot(
+  cost_validation,
+  "OpenAI",
+  "cividis",
+  "OpenAI"
+)
+
+pcv_anthropic / pcv_gemini / pcv_openai + plot_layout(axes = "collect")
 ```
+
 
 ## Results Summary Table
 
@@ -1537,5 +1621,32 @@ val_summary |>
     mean_val_score = "Mean Validation Score",
     mean_prop_match = "Mean Canonical Match",
     mean_cost_usd = "Mean Cost (USD)"
+  )
+```
+
+# Appendices
+
+```{r}
+#| label: tbl-canonical-comparison-variables
+#| tbl-cap: "List of tables and variables returned by LLM extraction, alongside whether these variables are used in the comparison (controlled vocabulary or numeric values), or are skipped (free or descriptive text)."
+#| echo: false
+
+variable_meta |>
+  mutate(
+    llm_name = toupper(llm_name),
+    table = str_to_sentence(table),
+    var_type = case_when(
+      var_type %in% c("controlled", "continuous") ~ "Compared",
+      var_type == "exclude" ~ "Skipped",
+      .default = str_to_sentence(var_type)
+    )
+  ) |>
+  select(table, llm_name, var_type) |>
+  flextable() |>
+  autofit() |>
+  set_header_labels(
+    table = "Table",
+    llm_name = "Variable Name",
+    var_type = "Variable Check"
   )
 ```
