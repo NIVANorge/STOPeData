@@ -3,7 +3,8 @@
     "edit": {
       "*.R": "allow",
       "*.md": "allow",
-      "*.qmd": "allow"
+      "*.qmd": "allow",
+      "*": "allow"
     },
     "bash": {
       "cmd *": "allow",

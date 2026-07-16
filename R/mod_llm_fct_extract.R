@@ -6,6 +6,7 @@
 #' It's designed to run inside a mirai() call for async execution.
 #'
 #' @param pdf_path Character. Path to the PDF file to extract data from.
+#' @param model_provider Character. The provider of the LLM. One of Anthropic, OpenAI, or Google
 #' @param api_key Character. Anthropic API key (should start with "sk-ant-").
 #' @param extraction_prompt Character. The prompt text instructing the LLM
 #'   on what to extract.
@@ -13,6 +14,7 @@
 #'   expected output format (e.g., S7 class with properties).
 #' @param max_tokens Integer. Maximum tokens for the API response.
 #' @param params Function. Maximum tokens for the API response.
+#' @param cache Boolean Attempt to use ellmer's built in cache function. Disabled for calls to Google LLMs
 #'
 #' @return Named list with three elements:
 #'   \describe{
@@ -21,7 +23,7 @@
 #'     \item{success}{Logical indicating if extraction succeeded}
 #'   }
 #'
-#' @importFrom ellmer chat_anthropic params content_pdf_file
+#' @importFrom ellmer chat_anthropic params content_pdf_file google_upload
 #' @importFrom glue glue
 #' @importFrom dplyr reframe across where
 #' @export
@@ -35,7 +37,8 @@ extract_pdf_with_llm <- function(
   params = NULL,
   extraction_prompt,
   extraction_schema,
-  max_tokens
+  max_tokens,
+  cache = "none"
 ) {
   tryCatch(
     {
@@ -48,11 +51,16 @@ extract_pdf_with_llm <- function(
       }
 
       # Initialise chat using the provider-specific ellmer function
+      # cache is only supported by Anthropic (valid: "5m", "1h", "none")
       tryCatch(
         {
+          chat_args <- list(model = model_name, params = params)
+          if (model_provider == "Anthropic") {
+            chat_args$cache <- cache
+          }
           chat <- do.call(
             getExportedValue("ellmer", chat_fn),
-            list(model = model_name, params = params)
+            chat_args
           )
         },
         error = function(e) stop(glue("Error initialising LLM chat: {e}"))
@@ -75,7 +83,6 @@ extract_pdf_with_llm <- function(
 
       # Get cost and token info
       # Sum across the table, in the unlikely event we get stuff back across multiple chats?
-      # TODO: Fixme
       total_values <- chat$get_tokens() |>
         reframe(across(where(\(x) is.double(x)), sum)) |>
         as.vector()

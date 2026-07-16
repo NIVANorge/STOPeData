@@ -8,7 +8,6 @@ knitr:
     dev: "ragg_png"                  # use ragg for better font rendering
 execute:
   error: true
-  cache: true
 format: 
   html:
     code-fold: true
@@ -16,11 +15,14 @@ format:
     echo: false
     warning: false
   docx:  
+    fig-height: 8
     fig-width: 16
     fig-dpi: 300                     # high res
     fig-format: png                  # png is fine; svg not well supported in docx
     link-citations: true             # TODO: Not working... why?
     link-bibliography: true
+    echo: false
+    warning: false
 
 filters:
   - flextable-qmd                    # needed, or the flextables render crazy 
@@ -178,9 +180,7 @@ NB: We can't report a direct cost for Gemma, because it's free (but rate-limited
 
 ```{r}
 #| label: tbl-models
-#| tbl-cap: "Summary of LLM models included in the evaluation. Tok: tokens, a unit of LLM knowledge; Mtok: million tokens."
-
-# TODO: Fill out list
+#| tbl-cap: "Summary of LLM models included in the evaluation. Tok: tokens, a unit of LLM knowledge; Mtok: million tokens. Note that different providers report tokens to different levels of precision. For example, 1000 kTok and 1050 kTok likely represent the same underlying value of 1,048,576 tokens."
 
 models_tbl <- tribble(
   ~provider                          , ~model_label                         , ~model_id                ,
@@ -215,7 +215,7 @@ models_tbl <- tribble(
   #
   "OpenAI"                           , "GPT-5.5"                            , "gpt-5.5"                ,
   "1050"                             , "128"                                ,
-  "cost_input_mtok"                  , "30.0"                               ,
+  "5"                                , "30.0"                               ,
   "Dec 2025"                         , "Closed"                             ,
   # ---- Google Gemini -----------------------------------------------------------
   "Google Gemini"                    , "Gemini 2.5 Pro"                     , "gemini-2.5-pro"         ,
@@ -224,16 +224,16 @@ models_tbl <- tribble(
   "Jan 2025"                         , "Closed"                             ,
   #
   "Google Gemini"                    , "Gemini 3.1 Pro Preview"             , "gemini-3.1-pro-preview" ,
-  "context_window_k"                 , "max_output_k"                       ,
+  "1000"                             , "65"                                 ,
   "2.00 (<= 200k tokens), then 4.00" , "12.00 (<= 200k tokens), then 18.00" ,
-  "knowledge_cutoff"                 , "Closed"                             ,
+  "Jan 2025"                         , "Closed"                             ,
   #
   "Google Gemini"                    , "Gemini 3.5 Flash"                   , "gemini-3.5-flash"       ,
   "1000"                             , "65"                                 ,
   "1.50"                             , "9.00"                               ,
   "Jan 2025"                         , "Closed"                             ,
   # ---- Google Gemma (open-weights) ---------------------------------------------
-  "Google Gemini"                    , "Gemma 4 31B"                        , "gemma-4-31b-it"         ,
+  "Google Deepmind"                  , "Gemma 4 31B"                        , "gemma-4-31b-it"         ,
   "262"                              , "8k"                                 ,
   "Free"                             , "Free"                               ,
   "Jan 2025"                         , "Open"
@@ -333,7 +333,8 @@ run_extraction <- function(
     api_key = Sys.getenv(env_var),
     extraction_prompt = create_extraction_prompt(),
     extraction_schema = create_extraction_schema(),
-    max_tokens = as.integer(max_tokens)
+    max_tokens = as.integer(max_tokens),
+    cache = "none"
   )
 }
 
@@ -449,21 +450,62 @@ run_extraction_batch <- function(
 
 # Rebuild the flat parquet from all per-call RDS files present in the cache.
 # Called every time — cheap, since it just reads already-saved RDS files.
+# Preserves an existing `id` column from the input; falls back to row_number()
+# if none is present, so ids in calls_flat are stable and match call_status.
 rebuild_flat_parquet <- function(
   calls_results,
   parquet_path = here("data-raw/llm_cache/llm_eval_output_flat.parquet")
 ) {
+  if (!"id" %in% names(calls_results)) {
+    calls_results <- mutate(calls_results, id = as.character(row_number()))
+  }
   calls_flat <- calls_results |>
     filter(map_lgl(call, \(c) isTRUE(c$success))) |>
-    mutate(
-      id = as.character(row_number()),
-      flat = map(call, flatten_call)
-    ) |>
+    mutate(flat = map(call, flatten_call)) |>
     select(id, pdf, models, tokens, replicate, flat) |>
     unnest(flat)
 
   write_parquet(calls_flat, parquet_path)
   calls_flat
+}
+
+# Load ALL cached RDS files from the cache directory, regardless of which
+# batch produced them. Parses the filename convention
+# {pdf}_{safe_model}_{tokens}_rep{replicate}.rds to recover call parameters.
+# Returns a tibble with the same structure as calls_results (id, pdf, models,
+# tokens, replicate, call), sorted consistently so ids are stable across runs.
+load_all_cached_calls <- function(cache_dir = LLM_CACHE_DIR) {
+  rds_files <- list.files(cache_dir, pattern = "\\.rds$", full.names = TRUE)
+  if (length(rds_files) == 0) {
+    return(tibble(
+      id = character(),
+      pdf = character(),
+      models = character(),
+      tokens = integer(),
+      replicate = integer(),
+      call = list()
+    ))
+  }
+  m <- str_match(
+    basename(rds_files),
+    "^([a-d])_(.+)_(\\d+)_rep(\\d+)\\.rds$"
+  )
+  tibble(
+    rds_path = rds_files,
+    pdf = m[, 2],
+    models = m[, 3],
+    tokens = as.integer(m[, 4]),
+    replicate = as.integer(m[, 5])
+  ) |>
+    arrange(pdf, models, tokens, replicate) |>
+    mutate(
+      id = as.character(row_number()),
+      call = map(rds_path, \(p) {
+        message(glue("Loading cached: {basename(p)}"))
+        readRDS(p)
+      })
+    ) |>
+    select(id, pdf, models, tokens, replicate, call)
 }
 ```
 
@@ -478,13 +520,24 @@ tibble(
     "PDF IDs",
     "Model IDs",
     "Token Limits",
-    "Replicates per Combination"
+    "Replicates per Combination",
+    "Total Combinations"
   ),
   Values = c(
     paste(c("a", "b", "c", "d"), collapse = ", "),
-    paste(c("claude-haiku-4-5", "claude-sonnet-4-6"), collapse = ", "),
+    paste(
+      c(
+        "claude-haiku-4-5",
+        "claude-sonnet-4-6",
+        "gpt-5.4-mini",
+        "gpt-5.4",
+        "gemini-3.5-flash"
+      ),
+      collapse = ", "
+    ),
     paste(c(3000, 6000, 9000), collapse = ", "),
-    "5"
+    "3",
+    (4 * 5 * 3 * 3)
   )
 ) |>
   flextable() |>
@@ -497,33 +550,77 @@ tibble(
 
 # RUNME
 
+# calls_results <- run_extraction_batch(
+#   pdf_ids = c("a", "b", "c", "d"),
+#   model_ids = c(
+#     "claude-haiku-4-5",
+#     "claude-sonnet-4-6",
+#     "gpt-5.4-mini",
+#     "gpt-5.4",
+#     "gemini-3.5-flash"
+#   ),
+#   token_counts = c(3000, 6000, 9000),
+#   n_replicates = 3
+# ) |>
+#   mutate(id = row_number(), .before = everything())
+
 # this is where we set the actual experimental parameters
 calls_results <- run_extraction_batch(
-  pdf_ids = c("a", "b", "c"),
+  pdf_ids = c("a", "b", "c", "d"),
   model_ids = c(
-    "claude-haiku-4-5",
-    "claude-sonnet-4-6",
-    "gpt-5.4-mini",
-    "gpt-5.4",
-    "gemini-3.5-flash"
+    "claude-opus-4-8"
   ),
   token_counts = c(3000, 6000, 9000),
   n_replicates = 3
 ) |>
   mutate(id = row_number(), .before = everything())
 
-# nb: the number of IDs in calls_results and calls_flats may not be the same, because the flat file also includes all previous calls in the folder
-calls_flat <- rebuild_flat_parquet(calls_results)
+# Load ALL cached calls (all batches) for use in the analysis.
+# calls_results above is kept for tbl-batch-report / tbl-batch-report-summary only.
+calls_all <- load_all_cached_calls() |>
+  left_join(
+    models_tbl |> select(model_id, provider),
+    by = c("models" = "model_id")
+  )
 
-# Named list of individual call objects, keyed by their parameter combination.
-# Scales automatically with whatever is in calls_results.
+# nb: calls_flat is rebuilt from ALL cached calls, not just the most recent batch.
+calls_flat <- rebuild_flat_parquet(calls_all)
+
+# Named list of individual call objects keyed by parameter combination.
+# Covers all cached calls so individual agents remain accessible for inspection.
 calls <- setNames(
-  calls_results$call,
+  calls_all$call,
   with(
-    calls_results,
+    calls_all,
     paste(pdf, models, tokens, paste0("rep", replicate), sep = "_")
   )
 )
+
+# batch_run_all mirrors batch_run_report but covers all cached calls.
+# Used for cost analysis and the results summary table.
+batch_run_all <- calls_all |>
+  mutate(
+    success = map_lgl(call, \(c) isTRUE(c$success)),
+    error_msg = map_chr(call, \(c) c$error %||% NA_character_),
+    input_tokens = map_int(call, \(c) {
+      tryCatch(
+        as.integer(
+          c$metadata[["input_tokens"]] %||% c$metadata[["input"]] %||% NA_real_
+        ),
+        error = \(e) NA_integer_
+      )
+    }),
+    output_tokens = map_int(call, \(c) {
+      tryCatch(
+        as.integer(
+          c$metadata[["output_tokens"]] %||%
+            c$metadata[["output"]] %||%
+            NA_real_
+        ),
+        error = \(e) NA_integer_
+      )
+    })
+  )
 
 # --- Empty-table detection ---------------------------------------------------
 # "Successful" API calls (success == TRUE) may still return all-NA tables if
@@ -544,9 +641,8 @@ call_completeness <- calls_flat |>
     .groups = "drop"
   )
 
-call_status <- calls_results |>
+call_status <- calls_all |>
   mutate(
-    id = as.character(row_number()),
     api_success = map_lgl(call, \(c) isTRUE(c$success))
   ) |>
   left_join(call_completeness, by = "id") |>
@@ -862,12 +958,59 @@ table_keys <- list(
 - we just check if strings match
 - for tables (sites, parameters, etc.) with more than one row we only check that what's in the call table is also in the canonical table (so if the call over-matches we don't flag that as an issue)
 
+```{r}
+#| label: canonical-data-setup
+
+pdf_zip_map <- c(
+  a = here("data-raw/1997RitterhoffTraceMetalsIn_AllData_20251030_145522.zip"),
+  b = here(
+    "data-raw/2002HellandTransportAndSedimentation_AllData_20251104_075533.zip"
+  ),
+  c = here(
+    "data-raw/2021WojtasikTemporalIsolationBetween_AllData_20251030_163338.zip"
+  ),
+  d = here(
+    "data-raw/2022KohlerDistributionPatternOf_AllData_20251217_115443.zip"
+  )
+)
+
+load_canonical <- function(zip_path) {
+  tmp <- tempfile()
+  dir.create(tmp)
+  unzip(zip_path, exdir = tmp)
+  csvs <- list.files(tmp, full.names = TRUE, pattern = "\\.csv$")
+
+  patterns <- c(
+    campaign = "Campaign",
+    references = "Reference",
+    sites = "Sites",
+    parameters = "Parameters",
+    compartments = "Compartments",
+    biota = "Biota",
+    methods = "Methods"
+  )
+
+  imap(patterns, function(pat, nm) {
+    f <- csvs[grepl(pat, csvs, fixed = TRUE)]
+    if (length(f) == 0) {
+      return(NULL)
+    }
+    read_csv(f[1], show_col_types = FALSE) |> rename_with(tolower)
+  }) |>
+    compact()
+}
+
+# Load canonical data for all four papers (cached in-memory)
+canonical_data <- imap(pdf_zip_map, \(path, id) load_canonical(path))
+```
+
 # Results
 
 ## Call Status
 
 [@tbl-batch-report] reports the details and status of each call. Broadly speaking, two types of errors are possible. In case of connection issue, system downtime, or a lack of API credit, the call will return an HTTP error (e.g. HTTP 400), and no data. However, it has also been observed that in some cases, the API response will be flagged "successful" by the external provider, but returned only empty data. This is believed to be the result of the extraction process hitting the token limit before completing its response; for example when an unusually large PDF is send with a too-small token limit. This sharp distinction between performance at different token limits 
 
+::: {.content-hidden when-format="docx"}
 ::: {.callout-note collapse="true"}
 ## Per-Replicate Call Status Raw Data
 
@@ -879,6 +1022,8 @@ table_keys <- list(
 # Inspect the call list-column directly — before any flattening — to report
 # on successes and errors with token counts, broken down by pdf, model, and
 # token limit.
+
+# TODO: All the google models are having problems with JSON! And gemma isn't working at all!
 
 batch_run_report <- calls_results |>
   mutate(
@@ -933,6 +1078,8 @@ batch_run_report |>
 
 :::
 
+:::
+
 ```{r}
 #| label: tbl-batch-report-summary
 #| tbl-cap: "Summary of API call success rates and mean token usage by PDF, model, and token limit. Note: Only contains data on most recent API call, *not* all cached calls."
@@ -969,6 +1116,8 @@ batch_run_report_summary |>
 
 TODO: Some of these input tokens are rather suspect. Is stuff getting cached? Should we use the max instead?
 
+::: {.content-hidden when-format="docx"}
+
 ::: {.callout-note collapse="true"}
 ## All Calls Raw Data
 
@@ -978,6 +1127,8 @@ TODO: Some of these input tokens are rather suspect. Is stuff getting cached? Sh
 
 call_status |> flextable() |> autofit()
 ```
+
+:::
 
 :::
 
@@ -999,6 +1150,8 @@ call_status |>
   flextable() |>
   autofit()
 ```
+
+@tbl-all-calls-summary-by-model gives us the failure rate per model and token. It includes both cases where tables are returned empty (i.e. the extraction hit the token limit), and other cases where the call returned an error code.
 
 ```{r}
 #| label: tbl-all-calls-summary-by-model
@@ -1035,22 +1188,44 @@ model_failure_rate |>
 ```{r}
 #| label: validation-execute
 
-# Keep named agents available for get_agent_report() inspection.
-# Index by row-number ID from batch_run_report, e.g. call_validations[["42"]]
+# call_validations: named list of pointblank agents for the most-recent batch
+#   only (for interactive inspection via get_agent_report()).
+# table_summary:   validation results across ALL cached calls (used for plots
+#   and tables in the Results section).
 
-# Reuse batch_run_report to identify which calls have a result worth validating.
-successful_ids <- batch_run_report$id[batch_run_report$success]
-call_validations <- calls[successful_ids] |>
-  set_names(successful_ids) |>
-  map(\(c) validate_llm_extraction(c$result))
+validation_rds <- here("data-raw/llm_cache/validation_results.rds")
 
-table_summary <- validate_all_calls(calls_results)
+if (file.exists(validation_rds)) {
+  message("Cache hit — loading validation results")
+  cached <- readRDS(validation_rds)
+  call_validations <- cached$call_validations
+  table_summary <- cached$table_summary
+} else {
+  message("Cache miss — running validation")
+  # Validate most-recent-batch successful calls for agent inspection
+  successful_keys <- batch_run_report |>
+    filter(success) |>
+    mutate(
+      key = paste(pdf, models, tokens, paste0("rep", replicate), sep = "_")
+    ) |>
+    pull(key)
+  call_validations <- calls[successful_keys] |>
+    set_names(successful_keys) |>
+    map(\(c) validate_llm_extraction(c$result))
+  # Validate all cached calls for analysis
+  table_summary <- validate_all_calls(calls_all)
+  saveRDS(
+    list(call_validations = call_validations, table_summary = table_summary),
+    validation_rds
+  )
+}
 ```
 
 
 ```{r}
 #| label: fig-validation-scores
 #| fig-cap: "Proportion of validation steps passed by table and model. Each dot represents one replicate; dots stack at exact values to reflect the discrete nature of step-pass proportions."
+#| include: false
 
 table_summary |>
   mutate(tokens = factor(tokens)) |>
@@ -1069,10 +1244,16 @@ table_summary |>
   facet_wrap(vars(models))
 ```
 
+@fig-validation-relationship describes the relationship between token count and proportion of validation passed, per provider and model. We see:
+
+- Claude models show a clear pattern of frequent failures at 3000 tokens. At 6000 and 9000 tokens, success rates are roughly consistent
+- Gemini-3.5-flash fails at all but 9000 tokens
+- OpenAI's models have a consistent validation rate across models and token counts. 
+
 
 ```{r}
 #| label: fig-validation-relationship
-#| fig-cap: "Across all tables, is there a relationship between token count and validation? Trend lines based on mean at each token level."
+#| fig-cap: "Across all tables, is there a relationship between token count and validation? Trend lines based on mean at each token level. Each point represents a single extraction of pdf a, b, c, or d"
 
 table_summary_provider <- table_summary |>
   left_join(models_tbl, by = c(models = "model_id")) |>
@@ -1094,13 +1275,22 @@ make_provider_plot <- function(data, prov, palette, title) {
   d <- data |> filter(provider == prov)
 
   ggplot(d, aes(x = tokens, y = pct_steps_pass, colour = models)) +
-    geom_point(position = position_jitter(width = 500, height = 0), shape = 1) +
+    geom_point(
+      position = position_jitter(width = 500, height = 0),
+      alpha = 0.5
+    ) +
     stat_summary(
       aes(x = tokens, colour = models, group = models),
       fun = mean,
       geom = "line"
     ) +
-    scale_colour_viridis_d(option = palette, name = NULL) +
+    # todo: tweak being/end as more models added
+    scale_colour_viridis_d(
+      option = palette,
+      name = NULL,
+      begin = 0.2,
+      end = 0.8
+    ) +
     scale_y_continuous(
       limits = c(0, 1),
       name = "Proportion of Validation Passed"
@@ -1129,63 +1319,14 @@ p_openai <- make_provider_plot(
   "OpenAI"
 )
 
-p_anthropic / p_gemini / p_openai + plot_layout(axes = "collect")
+p_anthropic /
+  p_gemini /
+  p_openai +
+  plot_layout(axes = "collect") +
+  plot_annotation(title = "fig-validation-relationship")
 ```
 
-@fig-validation-relationship describes the relationship between token count and proportion of validation passed, per provider and model. We see:
-
-- Claude models show a clear pattern of frequent failures at 3000 tokens. At 6000 and 9000 tokens, success rates are roughly consistent
-- Gemini-3.5-flash fails at all but 9000 tokens
-- OpenAI's models have a consistent validation rate across models and token counts. 
-
-```{r}
-#| label: canonical-data-setup
-
-pdf_zip_map <- c(
-  a = here("data-raw/1997RitterhoffTraceMetalsIn_AllData_20251030_145522.zip"),
-  b = here(
-    "data-raw/2002HellandTransportAndSedimentation_AllData_20251104_075533.zip"
-  ),
-  c = here(
-    "data-raw/2021WojtasikTemporalIsolationBetween_AllData_20251030_163338.zip"
-  ),
-  d = here(
-    "data-raw/2022KohlerDistributionPatternOf_AllData_20251217_115443.zip"
-  )
-)
-
-load_canonical <- function(zip_path) {
-  tmp <- tempfile()
-  dir.create(tmp)
-  unzip(zip_path, exdir = tmp)
-  csvs <- list.files(tmp, full.names = TRUE, pattern = "\\.csv$")
-
-  patterns <- c(
-    campaign = "Campaign",
-    references = "Reference",
-    sites = "Sites",
-    parameters = "Parameters",
-    compartments = "Compartments",
-    biota = "Biota",
-    methods = "Methods"
-  )
-
-  imap(patterns, function(pat, nm) {
-    f <- csvs[grepl(pat, csvs, fixed = TRUE)]
-    if (length(f) == 0) {
-      return(NULL)
-    }
-    read_csv(f[1], show_col_types = FALSE) |> rename_with(tolower)
-  }) |>
-    compact()
-}
-
-# Load canonical data for all four papers (cached in-memory)
-canonical_data <- imap(pdf_zip_map, \(path, id) load_canonical(path))
-```
-
-
-
+::: {.content-hidden when-format="docx"}
 
 ::: {.callout-note collapse="true"}
 ## Canon Comparison Raw Data
@@ -1291,14 +1432,13 @@ canonical_comparison |>
 
 :::
 
-Our smaller token calls (3000) end up all excluded here, because with all NA data there's nothing to compare.
+:::
+
+Our smaller token calls (3000) end up all excluded here, because with all NA data there's nothing to compare. @fig-canon-comparison-summary is an alternative way of looking at similar data (in this case, matching vs. canonical data as opposed to validation). As you can see, there's quite a lot of variation within groups and not a lot between groups. The percentages give the number of failed calls (i.e. hit the token limit). Without these, models can end up looking far more reliable than they actually are (e.g. gemini 3.5 flash, 9000 tokens). The lack of any real trends in here may go away as we increase the replicate number, but it may also be an artifact of caching (see above). 
 
 ```{r}
 #| label: fig-canon-comparison-summary
-#| fig-cap:
-#|   - "Mean proportion of fields matching canonical data, by model and token limit."
-#|   - "Proportion of fields matching canonical data, by model and table."
-# what's the best way to summarise this?
+#| fig-cap: "remove?"
 canonical_comparison_summarised <- canonical_comparison |>
   group_by(models, tokens) |>
   replace_na(list(prop_match = 0)) |>
@@ -1397,16 +1537,17 @@ model_costs <- models_tbl |>
     cost_output_per_mtok = parse_cost(cost_output_mtok)
   )
 
-# Join token counts from batch_run_report with per-model pricing,
+# Join token counts from batch_run_all with per-model pricing,
 # then compute estimated USD cost for each call.
-call_costs <- batch_run_report |>
+# batch_run_all covers the full set of cached calls; batch_run_report
+# (most-recent batch only) is kept for tbl-batch-report and tbl-batch-report-summary.
+call_costs <- batch_run_all |>
   left_join(model_costs, by = c("models" = "model_id")) |>
   mutate(
     cost_usd = (input_tokens / 1e6) *
       cost_input_per_mtok +
       (output_tokens / 1e6) * cost_output_per_mtok
-  ) |>
-  select(-model_provider) # TODO: Why in there twice?
+  )
 ```
 
 Costs are necessarily an estimate and rather rough - most models provide a cost per token value, and most calls return a token count... but not all of them are trustworthy. I suspect that behind the scenes some data is getting cached between calls, which means subsequent calls with the same/similar data are much cheaper. This is probably a good thing, but I'm not sure how to deal with this in the analysis.
@@ -1456,7 +1597,12 @@ make_cost_plot <- function(data, prov, palette, title) {
       alpha = 0.6
     ) +
     stat_summary(aes(group = models), fun = mean, geom = "line") +
-    scale_colour_viridis_d(option = palette, name = NULL) +
+    scale_colour_viridis_d(
+      option = palette,
+      name = NULL,
+      begin = 0.2,
+      end = 0.8
+    ) +
     scale_x_continuous(limits = c(2000, 10000), breaks = c(3000, 6000, 9000)) +
     scale_y_continuous(name = "Estimated Cost (USD)", limits = c(0, 0.3)) +
     labs(title = title, x = "Max Tokens") +
@@ -1477,8 +1623,15 @@ pc_gemini <- make_cost_plot(
 )
 pc_openai <- make_cost_plot(call_costs, "OpenAI", "cividis", "OpenAI")
 
-pc_anthropic / pc_gemini / pc_openai + plot_layout(axes = "collect")
+pc_anthropic /
+  pc_gemini /
+  pc_openai +
+  plot_layout(axes = "collect") +
+  plot_annotation(title = "fig-cost-by-model-tokens")
 ```
+
+@fig-cost-vs-validation and @fig-cost-vs-quality are difficult to interpret, but I don't immediately know how to improve this. 
+
 
 ```{r}
 #| label: fig-cost-vs-quality
@@ -1486,7 +1639,7 @@ pc_anthropic / pc_gemini / pc_openai + plot_layout(axes = "collect")
 
 cost_quality <- call_costs |>
   filter(success) |>
-  select(id, pdf, models, tokens, replicate, cost_usd) |>
+  select(id, pdf, models, tokens, replicate, cost_usd, provider) |>
   mutate(id = as.character(id)) |>
   left_join(
     canonical_comparison_summarised,
@@ -1494,25 +1647,60 @@ cost_quality <- call_costs |>
   ) |>
   replace_na(list(mean_prop_match = 0, n_replicates = 3))
 
-cost_quality |>
-  mutate(tokens = factor(tokens)) |>
-  ggplot(aes(
-    x = cost_usd,
-    y = mean_prop_match,
-    colour = models,
-    shape = tokens
-  )) +
-  geom_point(size = 3, alpha = 0.8) +
-  # scale_y_continuous(
-  #   limits = c(0, 1),
-  #   name = "Mean Proportion of Fields Matched"
-  # ) +
-  labs(
-    x = "Estimated Cost (USD)",
-    colour = "Model",
-    shape = "Token Limit"
-  )
+make_cost_quality_plot <- function(data, prov, palette, title) {
+  d <- data |> filter(provider == prov)
+  ggplot(
+    d,
+    aes(
+      x = cost_usd,
+      y = mean_prop_match,
+      colour = models,
+      shape = factor(tokens)
+    )
+  ) +
+    geom_point(size = 3, alpha = 0.8) +
+    scale_colour_viridis_d(
+      option = palette,
+      name = NULL,
+      begin = 0.2,
+      end = 0.8
+    ) +
+    scale_y_continuous(
+      name = "Mean Proportion of Fields Matched",
+      limits = c(0, 1)
+    ) +
+    scale_x_continuous(limits = c(0, 0.3)) +
+    labs(title = title, x = "Estimated Cost (USD)", shape = "Token Limit") +
+    theme_minimal() +
+    facet_wrap(nrow = 1, facets = vars(models))
+}
+
+pcq_anthropic <- make_cost_quality_plot(
+  cost_quality,
+  "Anthropic",
+  "viridis",
+  "Anthropic"
+)
+pcq_gemini <- make_cost_quality_plot(
+  cost_quality,
+  "Google Gemini",
+  "plasma",
+  "Google Gemini"
+)
+pcq_openai <- make_cost_quality_plot(
+  cost_quality,
+  "OpenAI",
+  "cividis",
+  "OpenAI"
+)
+
+pcq_anthropic /
+  pcq_gemini /
+  pcq_openai +
+  plot_layout(axes = "collect") +
+  plot_annotation(title = "fig-cost-vs-quality")
 ```
+
 
 ```{r}
 #| label: fig-cost-vs-validation
@@ -1534,13 +1722,27 @@ cost_validation <- call_costs |>
 
 make_cost_validation_plot <- function(data, prov, palette, title) {
   d <- data |> filter(provider == prov)
-  ggplot(d, aes(x = cost_usd, y = mean_pct_pass, colour = models)) +
+  ggplot(
+    d,
+    aes(
+      x = cost_usd,
+      y = mean_pct_pass,
+      colour = models,
+      shape = ordered(tokens)
+    )
+  ) +
     geom_point(size = 2.5, alpha = 0.7) +
-    scale_colour_viridis_d(option = palette, name = NULL) +
+    scale_colour_viridis_d(
+      option = palette,
+      name = NULL,
+      begin = 0.2,
+      end = 0.8
+    ) +
     scale_y_continuous(limits = c(0, 1), name = "Mean Validation Rate") +
     scale_x_continuous(limits = c(0, 0.3)) +
     labs(title = title, x = "Estimated Cost (USD)") +
-    theme_minimal()
+    theme_minimal() +
+    facet_wrap(nrow = 1, facets = vars(models))
 }
 
 pcv_anthropic <- make_cost_validation_plot(
@@ -1562,27 +1764,34 @@ pcv_openai <- make_cost_validation_plot(
   "OpenAI"
 )
 
-pcv_anthropic / pcv_gemini / pcv_openai + plot_layout(axes = "collect")
+pcv_anthropic /
+  pcv_gemini /
+  pcv_openai +
+  plot_layout(axes = "collect") +
+  plot_annotation(title = "fig-cost-vs-validation")
 ```
 
 
 ## Results Summary Table
 
-@tbl-results-summary still isn't very illuminating. 
+Considering our results so far [@tbl-results-summary], Gemini 3.5-Flash (9000 tokens) edges out the other LLMs in terms of strict validation and canonical matching score, but hits the token limit and fails to return any data at all at 3000 and 6000 tokens. Sonnet 4.6 provides good performance at 6000 tokens and 9000 tokens, but Haiku 4.5 is roughly equal and significantly cheaper at 6000 tokens (but not 9000 tokens). However, the difference in performances is not substantial across providers or token limits, except for both Sonnet 4.6 and Haiku 4.5 which perform extremely poorly at 3000 tokens. 
+
+As ever, these results should be taken with a pinch of salt, due to the questions around caching raised earlier.
+
 
 ```{r}
 #| label: tbl-results-summary
-#| tbl-cap: "Summary of validation accuracy (mean score, 1–5 scale), canonical field matching (mean proportion of canonical fields recovered), and estimated cost per call (USD), by model and token limit. Each row aggregates across all papers and replicates evaluated."
+#| tbl-cap: "Summary of mean eData validation pass rate (proportion of validation steps passed), canonical field matching (mean proportion of canonical fields recovered), and estimated cost per call (USD), by model and token limit. Each row aggregates across all papers and replicates evaluated."
 #| echo: false
 
-# Validation scores: mean score per model × tokens (excluding NAs)
-val_summary <- scores_long |>
-  filter(!is.na(score)) |>
+# Validation scores: mean pass rate per model × tokens
+val_summary <- table_summary |>
+  filter(!is.na(pct_steps_pass)) |>
   group_by(models, tokens) |>
   summarise(
     n_papers = n_distinct(pdf),
     n_replicates = n_distinct(replicate),
-    mean_val_score = mean(score, na.rm = TRUE),
+    mean_val_score = mean(pct_steps_pass, na.rm = TRUE),
     .groups = "drop"
   )
 
@@ -1607,18 +1816,18 @@ cost_summary <- call_costs |>
 val_summary |>
   left_join(canon_summary, by = c("models", "tokens")) |>
   left_join(cost_summary, by = c("models", "tokens")) |>
-  arrange(models, tokens) |>
+  arrange(desc(mean_val_score), desc(mean_prop_match)) |>
   flextable() |>
   autofit() |>
   colformat_double(j = "mean_val_score", digits = 2) |>
-  colformat_double(j = "mean_prop_match", digits = 3) |>
-  colformat_double(j = "mean_cost_usd", digits = 5) |>
+  colformat_double(j = "mean_prop_match", digits = 2) |>
+  colformat_double(j = "mean_cost_usd", digits = 2) |>
   set_header_labels(
     models = "Model",
     tokens = "Token Limit",
     n_papers = "Papers",
     n_replicates = "Replicates",
-    mean_val_score = "Mean Validation Score",
+    mean_val_score = "Mean Validation Pass Rate",
     mean_prop_match = "Mean Canonical Match",
     mean_cost_usd = "Mean Cost (USD)"
   )

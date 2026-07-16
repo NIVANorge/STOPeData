@@ -27,3 +27,5 @@ CLAUDE.md
 /.quarto/
 **/*.quarto_ipynb
 *.rmarkdown
+
+/.luarc.json
