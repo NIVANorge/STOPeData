@@ -11,7 +11,9 @@
       "Rscript *": "allow",
       "head *": "allow",
       "Select-String *": "allow",
-      "Select-Object *": "allow"
+      "Select-Object *": "allow",
+      "findstr *": "allow",
+      "powershell *": "allow"
     },
     "executeCode": {
       "*": "allow"

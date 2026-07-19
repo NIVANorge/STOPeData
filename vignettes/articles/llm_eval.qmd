@@ -30,6 +30,29 @@ filters:
     path: ../../_extensions/flextable-qmd/unwrap-float.lua
 ---
 
+
+Since 2017's breakthrough in Generative Pre-Trained Transformers [@vaswani], public, scientific and commercial interest in Large Language Models has ballooned. By encoding text as numeric tokens ("tokenisation"), machine learning algorithms can be used to predict text based on training material [@rajaramanTheoryTokenizationLLMs2025]. Large Language Models combine a massive set of training data with self-supervised machine learning to create a system that can establish statistical relationships between tokens, allowing prediction of a probably appropriate response to a prompt. Today's LLMs are able to create plausible, human-like output in areas well covered by their training data, which include works of fiction, scientific literature, code, and much of the publicly available internet [@houLLMApplicationsCurrent2025].
+
+Because LLMs are designed to create contextually appropriate responses to prompts, their use in science is seriously undermined by their tendency to generate appropriate but false outputs ("hallucination"). Simultaneously, LLMs offer powerful document summarisation capabilities, and their ability to parse PDFs has continually improved in recent years [@ke2025]. Structured data (sometimes information) extraction has been developed to constrain the format of extracted data to a specified format, including in scientific fields [@dagdelen2024]. Although specific predictions are beyond the capabilities of this paper's authors, given PDFs de facto status as the standard format for official documents across the professional world, and considerable progress in the capabilities of commercial LLM products it seems reasonable to expect extraction capabilities to continue to improve in coming years. LLM data extraction from PDFs will likely become faster, cheaper, and better; even as LLMs flood the scientific publishing landscape, for better and for worse [@liangQuantifyingLargeLanguage2025].
+
+The R package ellmer [@wickham2025] provides an R-based interface to the Application Programming Interface (API) of many LLM providers, and allows the extraction of structured data using a JSON-format approximation of the tables described above. Ellmer supports a wide range of LLM providers. Within the application, we chose to limit displayed models to the most commonly used (at time of writing) multi-modal (that is, capable of interpreting diverse types of data) provided by the largest providers (Anthropic, OpenAI, Google Gemini), to limit the need to test against available models to a smaller pool. However, the user, can, via the advanced settings, select any of the LLMs currently available from these providers' APIs. 
+
+Regardless of the choice of LLM, extraction proceeds linearly. Firstly, a prompt (see below) is provided that instructs the LLM to consider itself an "an expert at extracting environmental exposure study data from scientific documents", as well as strict instructions to avoid guessing, include verbatim quotes where necessary, and to never include data not explicitly mentioned in the manuscript.
+
+Secondly, we create a structured data schema [@anthropic2024extracting_json]; a JSON file that instructs the LLM to generate information in a certain structure based on the prompt and PDF file. Through this, we can control tables, definitions, vocabulary, allowed values, and whether a given piece of information is "required" (in which case the LLM will attempt to fill it out even if no relevant data is available). The schema is created dynamically by calling controlled vocabulary functions; this allows the extraction schema to automatically update when controlled vocabulary is changed upstream.
+
+Finally, the PDF is uploaded (either to the server or to a temporary directory if the app is running locally) to allow the R environment to access it. These three documents are sent to the providers' servers via an ellmer wrapper function, along with an API key and token limit (the default of 6000 seems to be sufficient for the majority of tested papers). The LLM predicts a tokenised version of the output schema from the tokenised input schema, prompt, and PDF; this is then detokenised into JSON before being returned to the app.
+
+Inside the app, the returned data is split into separate tables, and UI elements (field forms, tables, a map) across modules are updated to display this information. Strictly speaking, this slows down the data extraction process, as the user is required to proceed module by module to check that extracted data is valid. However, it also allows us to reuse existing validation logic (provided by the shinyvalidate package [@sievertShinyvalidateInputValidation2023]), encourages the user to spend more time and cognitive energy on understanding the data, and provides the opportunity for the user to make informed value judgements that the LLM is incapable of.
+
+# Data Extraction from Non-English Languages
+
+Large Language Models are technically capable of translating between different languages, and thus structured data extraction could technically be performed on a source PDF of any language. Initial assessment of LLM translation of scientific papers has yielded promising results: @kleidermacherScienceLanguagesAssessing2026 evaluated LLM (GPT-4o) translation accuracy for 15 scientifc articles across various fields both automatically (using an LLM-based interrogation approach) and by translating English language articles into the native language of English as a Second Language speakers. The authors considered the output generally accurate (an average score across LLMs of 95.9% against the study's benchmarks), but user evaluation showed that 87% of authors reported "some or many" issues with the use of technical terms in the translations. As the eData Data Reporting Format intrinsically relies on controlled technical vocabulary, it is likely that attempting to use the application to extract data from non-English sources would be considerably more involved and error-prone, especially in cases where a small training corpus was available in the target language. There are no hard barriers to this extraction, and a user expert in the target language, chemical pollution data, and the language used to describe such data in the target language would likely be able to produce a high quality output. This would be a promising avenue for future investigation, but evaluating the efficiency and accuracy of the process would require a pool of such researchers, and is currently outside the scope of this study.
+
+# Local, Open Source, and Proprietary LLMs
+
+# LLM Evaluation
+
 ```{r}
 #| label: setup
 #| echo: false
@@ -166,21 +189,13 @@ pdfs |>
 
 ## Large Language Models
 
-The R `ellmer` package includes API integrations for a variety of Large Language Models from various providers. We selected general, "middle-of-the-road" multimodal models from three of the most prominent providers - Anthropic, Google Gemini, and OpenAI, as well as immediately higher and lower tier models. In addition, we wished to validate the performance of local and/or open-source LLMs. This proved technically difficult, and with the computational resources available we were unable to run models locally at acceptable levels of performance (models could technically be run, but lacked the available memory to load PDF files). As a compromise, we also include the open model Gemma. Gemma is developed by Google (and thus accessible via their API to be run on their servers), but can also be loaded and run locally using services such as Ollama (which supports structured data extraction) and LMStudio and accessed locally with ellmer via their APIs. 
+The R `ellmer` package includes API integrations for a variety of Large Language Models from various providers. We selected general, "middle-of-the-road" multimodal models from three of the most prominent providers - Anthropic, Google Gemini (and Deepmind), and OpenAI, as well as immediately higher and lower tier models. In addition, we wished to validate the performance of local and/or open-source LLMs. This proved technically difficult, and with the computational resources available we were unable to run models locally at acceptable levels of performance (models could technically be run, but lacked the available memory to load PDF files). As a compromise, we also include the open model Gemma 4. Gemma 4 is developed by Google (and thus accessible via their API to be run on their servers), but can also be loaded and run locally using services such as Ollama (which supports structured data extraction) and LMStudio and accessed locally with ellmer via their APIs. 
 
-Our selected models are summarised in [@tbl-models]. Details are sourced from providers' model overview pages.
-
-Sources for model comparisons: 
-https://platform.claude.com/docs/en/about-claude/models/overview, 
-https://developers.openai.com/api/docs/models/compare, 
-https://ai.google.dev/gemini-api/docs/models, 
-https://ai.google.dev/gemini-api/docs/pricing
-
-NB: We can't report a direct cost for Gemma, because it's free (but rate-limited) from Google, or "free" if you run it locally. 
+Our selected models are summarised in [@tbl-models]. Details are sourced from providers' model overview pages [@anthropicModelsOverview2026; @openaiCompareModelsOpenAI2026; @googlegeminiModelsGeminiAPI2026; @googlegeminiGeminiDeveloperAPI2026]. 
 
 ```{r}
 #| label: tbl-models
-#| tbl-cap: "Summary of LLM models included in the evaluation. Tok: tokens, a unit of LLM knowledge; Mtok: million tokens. Note that different providers report tokens to different levels of precision. For example, 1000 kTok and 1050 kTok likely represent the same underlying value of 1,048,576 tokens."
+#| tbl-cap: "Summary of LLM models included in the evaluation. Tok: tokens, a unit of LLM knowledge; Mtok: million tokens. Google Deepmind's Gemma 4 model is free to use with a developer account, but rate-limited (and thus extremely slow.) Note that different providers report tokens to different levels of precision. For example, 1000 kTok and 1050 kTok likely represent the same underlying value of 1,048,576 tokens."
 
 models_tbl <- tribble(
   ~provider                          , ~model_label                         , ~model_id                ,
@@ -218,22 +233,22 @@ models_tbl <- tribble(
   "5"                                , "30.0"                               ,
   "Dec 2025"                         , "Closed"                             ,
   # ---- Google Gemini -----------------------------------------------------------
-  "Google Gemini"                    , "Gemini 2.5 Pro"                     , "gemini-2.5-pro"         ,
+  "Google Gemini/Deepmind"           , "Gemini 2.5 Pro"                     , "gemini-2.5-pro"         ,
   "1050"                             , "65"                                 ,
   "1.25 (<= 200k tokens), then 2.5"  , "10.00 (<= 200k tokens), then 15.00" ,
   "Jan 2025"                         , "Closed"                             ,
   #
-  "Google Gemini"                    , "Gemini 3.1 Pro Preview"             , "gemini-3.1-pro-preview" ,
+  "Google Gemini/Deepmind"           , "Gemini 3.1 Pro Preview"             , "gemini-3.1-pro-preview" ,
   "1000"                             , "65"                                 ,
   "2.00 (<= 200k tokens), then 4.00" , "12.00 (<= 200k tokens), then 18.00" ,
   "Jan 2025"                         , "Closed"                             ,
   #
-  "Google Gemini"                    , "Gemini 3.5 Flash"                   , "gemini-3.5-flash"       ,
+  "Google Gemini/Deepmind"           , "Gemini 3.5 Flash"                   , "gemini-3.5-flash"       ,
   "1000"                             , "65"                                 ,
   "1.50"                             , "9.00"                               ,
   "Jan 2025"                         , "Closed"                             ,
   # ---- Google Gemma (open-weights) ---------------------------------------------
-  "Google Deepmind"                  , "Gemma 4 31B"                        , "gemma-4-31b-it"         ,
+  "Google Gemini/Deepmind"           , "Gemma 4 31B"                        , "gemma-4-31b-it"         ,
   "262"                              , "8k"                                 ,
   "Free"                             , "Free"                               ,
   "Jan 2025"                         , "Open"
@@ -309,10 +324,10 @@ flatten_to_rows <- function(x, path = character()) {
 # Map provider display names → the ellmer chat function and API key env var.
 # model_provider is the string extract_pdf_with_llm() checks internally.
 provider_config <- tribble(
-  ~provider       , ~model_provider , ~env_var            , ~chat_fn             ,
-  "Anthropic"     , "Anthropic"     , "ANTHROPIC_API_KEY" , "chat_anthropic"     ,
-  "OpenAI"        , "OpenAI"        , "OPENAI_API_KEY"    , "chat_openai"        ,
-  "Google Gemini" , "Google"        , "GOOGLE_API_KEY"    , "chat_google_gemini"
+  ~provider                , ~model_provider , ~env_var            , ~chat_fn             ,
+  "Anthropic"              , "Anthropic"     , "ANTHROPIC_API_KEY" , "chat_anthropic"     ,
+  "OpenAI"                 , "OpenAI"        , "OPENAI_API_KEY"    , "chat_openai"        ,
+  "Google Gemini/Deepmind" , "Google"        , "GOOGLE_API_KEY"    , "chat_google_gemini" ,
 )
 
 # Run a single extraction. Looks up the API key from the env var at call time.
@@ -512,65 +527,44 @@ load_all_cached_calls <- function(cache_dir = LLM_CACHE_DIR) {
 For each manuscript and model multiple calls were made, with token count was set to 3,000, 6,000 and 9,000 to determine if call success, effectiveness, and quality varied with this. Each combination of call, model, token count, and pdf was made 5 times, to provide a measure of inter- and intra-call variation.
 
 ```{r}
-#| label: tbl-experimental-design
-#| tbl-cap: "Experimental design: combinations of PDFs, models, and token limits."
-
-tibble(
-  Parameter = c(
-    "PDF IDs",
-    "Model IDs",
-    "Token Limits",
-    "Replicates per Combination",
-    "Total Combinations"
-  ),
-  Values = c(
-    paste(c("a", "b", "c", "d"), collapse = ", "),
-    paste(
-      c(
-        "claude-haiku-4-5",
-        "claude-sonnet-4-6",
-        "gpt-5.4-mini",
-        "gpt-5.4",
-        "gemini-3.5-flash"
-      ),
-      collapse = ", "
-    ),
-    paste(c(3000, 6000, 9000), collapse = ", "),
-    "3",
-    (4 * 5 * 3 * 3)
-  )
-) |>
-  flextable() |>
-  autofit() |>
-  set_header_labels(Parameter = "Parameter", Values = "Values")
-```
-
-```{r}
 #| label: api-call
 
 # RUNME
-
-# calls_results <- run_extraction_batch(
-#   pdf_ids = c("a", "b", "c", "d"),
-#   model_ids = c(
-#     "claude-haiku-4-5",
-#     "claude-sonnet-4-6",
-#     "gpt-5.4-mini",
-#     "gpt-5.4",
-#     "gemini-3.5-flash"
-#   ),
-#   token_counts = c(3000, 6000, 9000),
-#   n_replicates = 3
-# ) |>
-#   mutate(id = row_number(), .before = everything())
 
 # this is where we set the actual experimental parameters
 calls_results <- run_extraction_batch(
   pdf_ids = c("a", "b", "c", "d"),
   model_ids = c(
-    "claude-opus-4-8"
+    "claude-opus-4-8",
+    "claude-haiku-4-5",
+    "claude-sonnet-4-6",
+    "gpt-5.5",
+    "gpt-5.4-mini",
+    "gpt-5.4",
+    "gemini-3.5-flash",
+    "gemini-2.5-pro",
+    "gemini-3.1-pro-preview",
+    "gemma-4-31b-it"
   ),
   token_counts = c(3000, 6000, 9000),
+  n_replicates = 3
+) |>
+  mutate(id = row_number(), .before = everything())
+
+# separately, we'll run 12,000 token limits only for the models that seem to need it
+# opus, all google models
+calls_results <- run_extraction_batch(
+  pdf_ids = c("a", "b", "c", "d"),
+  model_ids = c(
+    "claude-haiku-4-5",
+    "claude-sonnet-4-6",
+    "gpt-5.4-mini",
+    "gpt-5.4",
+    "gemini-3.5-flash",
+    "gemini-2.5-pro",
+    "gemini-3.1-pro-preview"
+  ),
+  token_counts = c(12000),
   n_replicates = 3
 ) |>
   mutate(id = row_number(), .before = everything())
@@ -665,6 +659,42 @@ call_status <- calls_all |>
   )
 ```
 
+```{r}
+#| label: tbl-experimental-design
+#| tbl-cap: "Experimental design: one row per model, showing token limits, PDF IDs, and replicates."
+
+calls_all_summary <- calls_all |>
+  group_by(models) |>
+  summarise(
+    provider = unique(provider),
+    total_calls = length(unique(tokens)) *
+      length(unique(pdf)) *
+      max(replicate),
+    tokens = paste0(sort(unique(tokens)), collapse = ", "),
+    pdfs = paste0(sort(unique(pdf)), collapse = ", "),
+    replicates = max(replicate),
+    .groups = "drop"
+  )
+
+calls_all_summary |>
+  flextable() |>
+  set_header_labels(
+    provider = "Provider",
+    models = "Model",
+    tokens = "Tokens",
+    pdfs = "PDF IDs",
+    replicates = "Replicates",
+    total_calls = "Total Calls"
+  ) |>
+  autofit()
+
+total_calls <- sum(calls_all_summary$total_calls)
+# quick manual check. we have 7 models with 4 tokens and 3 with 3
+if ((7 * 4 * 4 * 3) + (3 * 4 * 3 * 3) != total_calls) {
+  stop("Mismatch in n calls")
+}
+```
+
 ## Evaluation
 
 Model effectiveness and efficiency was evaluated by considering cost, proportion of data passing evaluation, and proportion of data matching canonical (human-curated) extracted datasets. 
@@ -676,7 +706,7 @@ API calls return expended input tokens (used to ingest the data, schema, and pro
 
 $$C = t_i c_i + t_o c_o$$
 
-In the case of the open model Gemma 4 (accessed via the Google Gemini API), usage is free, but rate-limited. 
+In the case of the open model Gemma 4 (accessed via the Google Gemini/Deepmind API), usage is free, but rate-limited. 
 
 ### eData Validation 
 
@@ -892,65 +922,55 @@ Proportion of correct data was calculated relative to totals, and a score betwee
 # (e.g. country_iso -> country, ocean_iho -> area).
 
 variable_meta <- tribble(
-  ~table         , ~llm_name                     , ~canonical_name               , ~var_type    ,
+  ~table         , ~llm_name                     , ~canonical_name               , ~var_type    , ~comment                                                                                                                                         ,
   # campaign
-  "campaign"     , "campaign_start_date"         , "campaign_start_date"         , "continuous" ,
-  "campaign"     , "campaign_end_date"           , "campaign_end_date"           , "continuous" ,
-  "campaign"     , "campaign_name"               , NA_character_                 , "exclude"    ,
-  "campaign"     , "campaign_name_short"         , NA_character_                 , "exclude"    ,
-  "campaign"     , "organisation"                , "organisation"                , "exclude"    ,
-  "campaign"     , "campaign_comment"            , NA_character_                 , "exclude"    ,
-  "campaign"     , "campaign_rationale"          , NA_character_                 , "exclude"    ,
+  "campaign"     , "campaign_start_date"         , "campaign_start_date"         , "continuous" , "Starting and ending dates are expected to match"                                                                                                ,
+  "campaign"     , "campaign_end_date"           , "campaign_end_date"           , "continuous" , "Starting and ending dates are expected to match"                                                                                                ,
+  "campaign"     , "campaign_name"               , NA_character_                 , "exclude"    , "Free text"                                                                                                                                      ,
+  "campaign"     , "campaign_name_short"         , NA_character_                 , "exclude"    , "Free text"                                                                                                                                      ,
+  "campaign"     , "organisation"                , "organisation"                , "exclude"    , "Free text"                                                                                                                                      ,
+  "campaign"     , "campaign_comment"            , NA_character_                 , "exclude"    , "Free text"                                                                                                                                      ,
+  "campaign"     , "campaign_rationale"          , NA_character_                 , "exclude"    , "Free text"                                                                                                                                      ,
   # references
-  "references"   , "reference_type"              , "reference_type"              , "controlled" ,
-  "references"   , "year"                        , "year"                        , "continuous" ,
-  "references"   , "volume"                      , "volume"                      , "continuous" ,
-  "references"   , "issue"                       , "issue"                       , "continuous" ,
-  "references"   , "author"                      , NA_character_                 , "exclude"    ,
-  "references"   , "title"                       , NA_character_                 , "exclude"    ,
-  "references"   , "doi"                         , NA_character_                 , "exclude"    ,
-  "references"   , "periodical_journal"          , NA_character_                 , "exclude"    ,
-  "references"   , "publisher"                   , NA_character_                 , "exclude"    ,
+  "references"   , "reference_type"              , "reference_type"              , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "references"   , "year"                        , "year"                        , "continuous" , "Discrete value"                                                                                                                                 ,
+  "references"   , "volume"                      , "volume"                      , "continuous" , "Discrete value"                                                                                                                                 ,
+  "references"   , "issue"                       , "issue"                       , "continuous" , "Discrete value"                                                                                                                                 ,
+  "references"   , "author"                      , NA_character_                 , "exclude"    , "Often subject to syntactical variation."                                                                                                        ,
+  "references"   , "title"                       , NA_character_                 , "exclude"    , "Unlikely to vary, but also not controlled. Incidental details such as sub/superscripts, italicisation of scientific names may cause divergence" ,
+  "references"   , "doi"                         , NA_character_                 , "exclude"    , "Not always included, may or may not include URL."                                                                                               ,
+  "references"   , "periodical_journal"          , NA_character_                 , "exclude"    , "Journal name may be full or abbreviated"                                                                                                        ,
+  "references"   , "publisher"                   , NA_character_                 , "exclude"    , "Non-mandatory field, may not be captured in PDF."                                                                                               ,
   # sites
-  "sites"        , "latitude"                    , "latitude"                    , "continuous" ,
-  "sites"        , "longitude"                   , "longitude"                   , "continuous" ,
-  "sites"        , "country_iso"                 , "country"                     , "controlled" ,
-  "sites"        , "ocean_iho"                   , "area"                        , "controlled" ,
-  "sites"        , "site_geographic_feature"     , "site_geographic_feature"     , "controlled" ,
-  "sites"        , "site_geographic_feature_sub" , "site_geographic_feature_sub" , "controlled" ,
-  "sites"        , "site_code"                   , NA_character_                 , "exclude"    ,
-  "sites"        , "site_name"                   , NA_character_                 , "exclude"    ,
-  "sites"        , "site_comment"                , NA_character_                 , "exclude"    ,
+  "sites"        , "latitude"                    , "latitude"                    , "continuous" , "Discrete value"                                                                                                                                 ,
+  "sites"        , "longitude"                   , "longitude"                   , "continuous" , "Discrete value"                                                                                                                                 ,
+  "sites"        , "country_iso"                 , "country"                     , "controlled" , "Controlled vocabulary, generally clearly designed"                                                                                              ,
+  "sites"        , "ocean_iho"                   , "area"                        , "controlled" , "Controlled vocabulary, although extraction is often inconsistent with sites on coasts or other boundaries"                                      ,
+  "sites"        , "site_geographic_feature"     , "site_geographic_feature"     , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "sites"        , "site_geographic_feature_sub" , "site_geographic_feature_sub" , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "sites"        , "site_code"                   , NA_character_                 , "exclude"    , "Free text"                                                                                                                                      ,
+  "sites"        , "site_name"                   , NA_character_                 , "exclude"    , "Free text"                                                                                                                                      ,
+  "sites"        , "site_comment"                , NA_character_                 , "exclude"    , "Free text"                                                                                                                                      ,
   # parameters
-  "parameters"   , "parameter_type"              , "parameter_type"              , "controlled" ,
-  "parameters"   , "cas_rn"                      , NA_character_                 , "exclude"    ,
-  "parameters"   , "parameter_name"              , NA_character_                 , "exclude"    ,
-  "parameters"   , "parameter_comment"           , NA_character_                 , "exclude"    ,
+  "parameters"   , "parameter_type"              , "parameter_type"              , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "parameters"   , "cas_rn"                      , NA_character_                 , "exclude"    , "Not always reported, not all stressors have CAS."                                                                                               ,
+  "parameters"   , "parameter_name"              , NA_character_                 , "exclude"    , "Stressor names may be extracted inconsistently (e.g. Cu or copper)"                                                                             ,
+  "parameters"   , "parameter_comment"           , NA_character_                 , "exclude"    , "Free text"                                                                                                                                      ,
   # compartments
-  "compartments" , "environ_compartment"         , "environ_compartment"         , "controlled" ,
-  "compartments" , "environ_compartment_sub"     , "environ_compartment_sub"     , "controlled" ,
-  "compartments" , "measured_category"           , "measured_category"           , "controlled" ,
+  "compartments" , "environ_compartment"         , "environ_compartment"         , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "compartments" , "environ_compartment_sub"     , "environ_compartment_sub"     , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "compartments" , "measured_category"           , "measured_category"           , "controlled" , "Controlled vocabulary"                                                                                                                          ,
   # biota
-  "biota"        , "species_group"               , "species_group"               , "controlled" ,
-  "biota"        , "sample_tissue"               , "sample_tissue"               , "controlled" ,
-  "biota"        , "sample_species_lifestage"    , "sample_species_lifestage"    , "controlled" ,
-  "biota"        , "sample_species_gender"       , "sample_species_gender"       , "controlled" ,
-  "biota"        , "sample_species"              , NA_character_                 , "exclude"    ,
-  "biota"        , "sample_id"                   , NA_character_                 , "exclude"    ,
+  "biota"        , "species_group"               , "species_group"               , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "biota"        , "sample_tissue"               , "sample_tissue"               , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "biota"        , "sample_species_lifestage"    , "sample_species_lifestage"    , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "biota"        , "sample_species_gender"       , "sample_species_gender"       , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "biota"        , "sample_species"              , NA_character_                 , "exclude"    , "Extraction inconsistently returns common or scientific name"                                                                                    ,
+  "biota"        , "sample_id"                   , NA_character_                 , "exclude"    , "Automatically generated by application."                                                                                                        ,
   # methods
-  "methods"      , "protocol_category"           , "protocol_category"           , "controlled" ,
-  "methods"      , "protocol_name"               , "protocol_name"               , "controlled" ,
-  "methods"      , "protocol_comment"            , NA_character_                 , "exclude"    ,
-)
-
-table_keys <- list(
-  campaign = NULL,
-  references = NULL,
-  sites = c("latitude", "longitude"),
-  parameters = "parameter_name",
-  compartments = c("environ_compartment", "environ_compartment_sub"),
-  biota = c("sample_species", "sample_tissue"),
-  methods = c("protocol_category", "protocol_name")
+  "methods"      , "protocol_category"           , "protocol_category"           , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "methods"      , "protocol_name"               , "protocol_name"               , "controlled" , "Controlled vocabulary"                                                                                                                          ,
+  "methods"      , "protocol_comment"            , NA_character_                 , "exclude"    , "Free text"
 )
 ```
 
@@ -1114,8 +1134,6 @@ batch_run_report_summary |>
   )
 ```
 
-TODO: Some of these input tokens are rather suspect. Is stuff getting cached? Should we use the max instead?
-
 ::: {.content-hidden when-format="docx"}
 
 ::: {.callout-note collapse="true"}
@@ -1154,12 +1172,14 @@ call_status |>
 @tbl-all-calls-summary-by-model gives us the failure rate per model and token. It includes both cases where tables are returned empty (i.e. the extraction hit the token limit), and other cases where the call returned an error code.
 
 ```{r}
-#| label: tbl-all-calls-summary-by-model
+#| label: tbl-all-calls-summary-by-model-token
 #| tbl-cap: "Failure rate by model"
 
 model_failure_rate <- call_status |>
   group_by(models, tokens) |>
+  left_join(models_tbl, by = c(models = "model_id")) |>
   summarise(
+    provider = unique(provider),
     n_calls = n(),
     n_complete = sum(effectively_complete),
     n_empty_tables = sum(api_success & !effectively_complete),
@@ -1177,6 +1197,92 @@ model_failure_rate |>
     n_complete = "Complete",
     n_empty_tables = "Returned Empty",
     n_failed = "Call Failed",
+    prop_failed = "Failure Rate"
+  ) |>
+  colformat_double(j = "prop_failed", digits = 3) |>
+  autofit()
+```
+
+@fig-failure-rate-by-model-token
+
+```{r}
+#| label: fig-failure-rate-by-model-token
+#| fig-cap: "Success rate by model and token limit, split by provider. Each point is one model–token combination; lines connect models across token settings."
+
+make_failure_plot <- function(data, prov, palette, title) {
+  d <- data |> filter(provider == prov)
+  ggplot(
+    d,
+    aes(x = tokens, y = 1 - prop_failed, colour = models, shape = models)
+  ) +
+    geom_point(alpha = 0.5, size = 2) +
+    geom_line(aes(group = models), alpha = 0.5, linetype = "dashed") +
+    scale_colour_viridis_d(
+      option = palette,
+      begin = 0.2,
+      end = 0.8,
+      name = "LLM"
+    ) +
+    scale_shape_discrete(name = "LLM") +
+    scale_x_continuous(
+      limits = c(2000, 13000),
+      breaks = c(3000, 6000, 9000, 12000)
+    ) +
+    scale_y_continuous(name = "Success Rate", limits = c(0, 1)) +
+    labs(title = title, x = "Max Tokens") +
+    theme_minimal()
+}
+
+pf_anthropic <- make_failure_plot(
+  model_failure_rate,
+  "Anthropic",
+  "viridis",
+  "Anthropic"
+)
+pf_gemini <- make_failure_plot(
+  model_failure_rate,
+  "Google Gemini/Deepmind",
+  "plasma",
+  "Google Gemini/Deepmind"
+)
+pf_openai <- make_failure_plot(
+  model_failure_rate,
+  "OpenAI",
+  "cividis",
+  "OpenAI"
+)
+
+pf_anthropic /
+  pf_gemini /
+  pf_openai +
+  plot_layout(axes = "collect", guides = "collect") +
+  plot_annotation(title = "fig-failure-rate-by-model-token")
+```
+
+Per model, stick all token counts and PDFs together:
+
+```{r}
+#| label: tbl-all-calls-summary-by-model
+#| tbl-cap: "Failure rate by model"
+
+model_failure_rate <- call_status |>
+  group_by(models) |>
+  summarise(
+    tokens = paste0(unique(tokens), collapse = ", "),
+    n_calls = n(),
+    n_complete = sum(effectively_complete),
+    n_empty_tables = sum(api_success & !effectively_complete),
+    n_failed = sum(!api_success),
+    prop_failed = (n_failed + n_empty_tables) / n_calls,
+    .groups = "drop"
+  )
+
+model_failure_rate |>
+  flextable() |>
+  set_header_labels(
+    models = "Model",
+    tokens = "Tokens",
+    n_calls = "Calls",
     prop_failed = "Failure Rate"
   ) |>
   colformat_double(j = "prop_failed", digits = 3) |>
@@ -1250,7 +1356,6 @@ table_summary |>
 - Gemini-3.5-flash fails at all but 9000 tokens
 - OpenAI's models have a consistent validation rate across models and token counts. 
 
-
 ```{r}
 #| label: fig-validation-relationship
 #| fig-cap: "Across all tables, is there a relationship between token count and validation? Trend lines based on mean at each token level. Each point represents a single extraction of pdf a, b, c, or d"
@@ -1295,7 +1400,10 @@ make_provider_plot <- function(data, prov, palette, title) {
       limits = c(0, 1),
       name = "Proportion of Validation Passed"
     ) +
-    scale_x_continuous(limits = c(2000, 10000), breaks = c(3000, 6000, 9000)) +
+    scale_x_continuous(
+      limits = c(2000, 13000),
+      breaks = c(3000, 6000, 9000, 12000)
+    ) +
     labs(title = title, x = "Max Tokens") +
     theme_minimal()
 }
@@ -1308,9 +1416,9 @@ p_anthropic <- make_provider_plot(
 )
 p_gemini <- make_provider_plot(
   table_summary_provider,
-  "Google Gemini",
+  "Google Gemini/Deepmind",
   "plasma",
-  "Google Gemini"
+  "Google Gemini/Deepmind"
 )
 p_openai <- make_provider_plot(
   table_summary_provider,
@@ -1603,7 +1711,10 @@ make_cost_plot <- function(data, prov, palette, title) {
       begin = 0.2,
       end = 0.8
     ) +
-    scale_x_continuous(limits = c(2000, 10000), breaks = c(3000, 6000, 9000)) +
+    scale_x_continuous(
+      limits = c(2000, 13000),
+      breaks = c(3000, 6000, 9000, 12000)
+    ) +
     scale_y_continuous(name = "Estimated Cost (USD)", limits = c(0, 0.3)) +
     labs(title = title, x = "Max Tokens") +
     theme_minimal()
@@ -1617,9 +1728,9 @@ pc_anthropic <- make_cost_plot(
 )
 pc_gemini <- make_cost_plot(
   call_costs,
-  "Google Gemini",
+  "Google Gemini/Deepmind",
   "plasma",
-  "Google Gemini"
+  "Google Gemini/Deepmind"
 )
 pc_openai <- make_cost_plot(call_costs, "OpenAI", "cividis", "OpenAI")
 
@@ -1636,6 +1747,7 @@ pc_anthropic /
 ```{r}
 #| label: fig-cost-vs-quality
 #| fig-cap: "Cost vs. extraction quality (mean proportion of canonical fields matched), by model and token limit. Each point is one replicate; a higher proportion matched at lower cost is preferable."
+#| include: false
 
 cost_quality <- call_costs |>
   filter(success) |>
@@ -1683,9 +1795,9 @@ pcq_anthropic <- make_cost_quality_plot(
 )
 pcq_gemini <- make_cost_quality_plot(
   cost_quality,
-  "Google Gemini",
+  "Google Gemini/Deepmind",
   "plasma",
-  "Google Gemini"
+  "Google Gemini/Deepmind"
 )
 pcq_openai <- make_cost_quality_plot(
   cost_quality,
@@ -1753,9 +1865,9 @@ pcv_anthropic <- make_cost_validation_plot(
 )
 pcv_gemini <- make_cost_validation_plot(
   cost_validation,
-  "Google Gemini",
+  "Google Gemini/Deepmind",
   "plasma",
-  "Google Gemini"
+  "Google Gemini/Deepmind"
 )
 pcv_openai <- make_cost_validation_plot(
   cost_validation,
@@ -1776,64 +1888,377 @@ pcv_anthropic /
 
 Considering our results so far [@tbl-results-summary], Gemini 3.5-Flash (9000 tokens) edges out the other LLMs in terms of strict validation and canonical matching score, but hits the token limit and fails to return any data at all at 3000 and 6000 tokens. Sonnet 4.6 provides good performance at 6000 tokens and 9000 tokens, but Haiku 4.5 is roughly equal and significantly cheaper at 6000 tokens (but not 9000 tokens). However, the difference in performances is not substantial across providers or token limits, except for both Sonnet 4.6 and Haiku 4.5 which perform extremely poorly at 3000 tokens. 
 
-As ever, these results should be taken with a pinch of salt, due to the questions around caching raised earlier.
+
+```{r}
+# Per-call averages for validation and canonical matching (averaged across tables),
+# joined with success flag and summed cost — one row per pdf × model × tokens × replicate
+val_per_call <- table_summary |>
+  replace_na(list(pct_steps_pass = 0)) |>
+  group_by(id, pdf, models, tokens, replicate) |>
+  summarise(val_score = mean(pct_steps_pass), .groups = "drop")
+
+match_per_call <- canonical_comparison |>
+  replace_na(list(prop_match = 0)) |>
+  group_by(id, pdf, models, tokens, replicate) |>
+  summarise(match_score = mean(prop_match), .groups = "drop")
+
+cost_per_call <- call_costs |>
+  group_by(id, pdf, models, tokens, replicate) |>
+  summarise(cost_usd = sum(cost_usd, na.rm = TRUE), .groups = "drop")
+
+calls_combined <- call_status |>
+  select(id, pdf, models, tokens, replicate, effectively_complete) |>
+  left_join(
+    val_per_call,
+    by = c("id", "pdf", "models", "tokens", "replicate")
+  ) |>
+  left_join(
+    match_per_call,
+    by = c("id", "pdf", "models", "tokens", "replicate")
+  ) |>
+  left_join(
+    cost_per_call,
+    by = c("id", "pdf", "models", "tokens", "replicate")
+  ) |>
+  replace_na(list(val_score = 0, match_score = 0))
+```
+
+```{r}
+#| label: fig-summary-plot
+
+make_summary_plot <- function(
+  calls_data,
+  models_tbl,
+  prov,
+  palette,
+  title,
+  n_slots = NULL
+) {
+  prov_models <- models_tbl |> filter(provider == prov) |> pull(model_id)
+
+  token_levels <- c("3,000", "6,000", "9,000", "12,000")
+  lighten_amts <- c(
+    "3,000" = 0.9,
+    "6,000" = 0.6,
+    "9,000" = 0.4,
+    "12,000" = 0.00
+  )
+
+  model_costs <- calls_data |>
+    filter(models %in% prov_models) |>
+    group_by(models) |>
+    summarise(mean_cost = mean(cost_usd, na.rm = TRUE), .groups = "drop") |>
+    arrange(mean_cost)
+
+  model_order <- model_costs$models
+
+  short_names <- models_tbl |>
+    filter(model_id %in% prov_models) |>
+    mutate(short = str_remove(model_label, "(^Claude |^GPT-)|Gemini ")) |>
+    select(model_id, short) |>
+    deframe()
+
+  axis_labels <- model_costs |>
+    mutate(
+      label = paste0(
+        "**",
+        short_names[models],
+        "**",
+        "<br><span style='font-size:8pt'>$",
+        formatC(mean_cost, format = "f", digits = 3),
+        "/call</span>"
+      )
+    ) |>
+    select(models, label) |>
+    deframe()
+
+  # Add phantom slots to align x-axis with providers that have more models
+  model_order_display <- model_order
+  if (!is.null(n_slots) && length(model_order) < n_slots) {
+    n_phantoms <- n_slots - length(model_order)
+    phantoms <- paste0(".phantom_", seq_len(n_phantoms))
+    model_order_display <- c(phantoms, model_order)
+    axis_labels <- c(axis_labels, setNames(rep("", n_phantoms), phantoms))
+  }
+
+  plot_data <- calls_data |>
+    filter(models %in% prov_models) |>
+    mutate(
+      effectively_complete = as.numeric(effectively_complete),
+      actual_val = effectively_complete * val_score,
+      actual_match = effectively_complete * match_score,
+      models = factor(models, levels = model_order),
+      tokens = factor(
+        tokens,
+        levels = c(3000, 6000, 9000, 12000),
+        labels = token_levels
+      )
+    ) |>
+    group_by(models, tokens) |>
+    summarise(
+      across(
+        c(effectively_complete, actual_val, actual_match),
+        list(mean = \(x) mean(x, na.rm = TRUE), se = \(x) {
+          sd(x, na.rm = TRUE) / sqrt(sum(!is.na(x)))
+        })
+      ),
+      .groups = "drop"
+    ) |>
+    pivot_longer(
+      cols = -c(models, tokens),
+      names_to = c("metric", ".value"),
+      names_pattern = "^(.+)_(mean|se)$"
+    ) |>
+    mutate(
+      metric = factor(
+        metric,
+        levels = c("effectively_complete", "actual_val", "actual_match"),
+        labels = c(
+          "Calls Returned Data",
+          "Data Validation Passed",
+          "Data Canonical Matches"
+        )
+      )
+    ) |>
+    complete(models, tokens, metric, fill = list(mean = 0, se = NA_real_)) |>
+    mutate(
+      fill_id = paste0(as.character(models), "__", as.character(tokens)),
+      token_short = case_when(
+        tokens == "3,000" ~ "3k",
+        tokens == "6,000" ~ "6k",
+        tokens == "9,000" ~ "9k",
+        tokens == "12,000" ~ "12k"
+      ),
+      # dark text on light-filled bars (3k/6k), white text on darker bars (9k/12k)
+      text_color = if_else(tokens %in% c("3,000", "6,000"), "grey25", "white")
+    )
+
+  n_models <- length(model_order)
+  base_colors <- setNames(
+    viridis::viridis(n_models, option = palette, begin = 0.2, end = 0.8),
+    model_order
+  )
+
+  color_tbl <- plot_data |>
+    distinct(models, tokens) |>
+    mutate(
+      fill_id = paste0(as.character(models), "__", as.character(tokens)),
+      fill_color = lighten(
+        base_colors[as.character(models)],
+        lighten_amts[as.character(tokens)]
+      )
+    )
+
+  fill_values <- deframe(color_tbl |> select(fill_id, fill_color))
+  legend_breaks <- paste0(model_order[1], "__", token_levels)
+
+  ggplot(plot_data, aes(x = models, y = mean, fill = fill_id, group = tokens)) +
+    geom_col(position = position_dodge(width = 0.9), width = 0.85) +
+    geom_text(
+      data = \(d) filter(d, mean > 0.02),
+      aes(y = 0.01, label = token_short, color = text_color),
+      position = position_dodge(width = 0.9),
+      vjust = 0,
+      size = 2.5,
+      fontface = "bold"
+    ) +
+    scale_fill_manual(
+      values = fill_values,
+      breaks = legend_breaks,
+      labels = token_levels,
+      name = "Token Limit"
+    ) +
+    scale_color_identity(guide = "none") +
+    scale_x_discrete(labels = axis_labels, limits = model_order_display) +
+    scale_y_continuous(
+      limits = c(0, 1),
+      labels = scales::percent_format(accuracy = 1),
+      expand = FALSE
+    ) +
+    facet_wrap(~metric, nrow = 1) +
+    labs(title = title, x = NULL, y = NULL) +
+    theme(
+      panel.background = element_blank(),
+      panel.grid.major = element_line(colour = "grey92"),
+      panel.grid.minor = element_blank(),
+      panel.border = element_blank(),
+      strip.background = element_blank(),
+      strip.text = element_text(size = rel(0.9)),
+      axis.text.y = element_text(size = rel(0.85), colour = "grey30"),
+      axis.text.x = ggtext::element_markdown(
+        hjust = 0.5,
+        lineheight = 1.4,
+        size = rel(1.1)
+      ),
+      axis.ticks = element_blank(),
+      legend.background = element_blank(),
+      legend.key = element_blank(),
+      plot.background = element_blank(),
+      plot.title = element_text(size = rel(1.1), face = "bold"),
+      plot.margin = margin(t = 5, r = 10, b = 10, l = 5)
+    )
+}
+
+sp_anthropic <- make_summary_plot(
+  calls_combined,
+  models_tbl,
+  "Anthropic",
+  "viridis",
+  "Anthropic",
+  n_slots = 4
+)
+
+sp_gemini <- make_summary_plot(
+  calls_combined,
+  models_tbl,
+  "Google Gemini/Deepmind",
+  "plasma",
+  "Google Gemini/Deepmind",
+  n_slots = 4
+)
+sp_openai <- make_summary_plot(
+  calls_combined,
+  models_tbl,
+  "OpenAI",
+  "cividis",
+  "OpenAI",
+  n_slots = 4
+)
+
+sp_anthropic /
+  sp_gemini /
+  sp_openai +
+  plot_layout(axes = "collect") +
+  plot_annotation(title = "fig-summary-plot")
+```
 
 
 ```{r}
-#| label: tbl-results-summary
-#| tbl-cap: "Summary of mean eData validation pass rate (proportion of validation steps passed), canonical field matching (mean proportion of canonical fields recovered), and estimated cost per call (USD), by model and token limit. Each row aggregates across all papers and replicates evaluated."
-#| echo: false
+# how do the different papers compare?
 
-# Validation scores: mean pass rate per model × tokens
-val_summary <- table_summary |>
-  filter(!is.na(pct_steps_pass)) |>
-  group_by(models, tokens) |>
-  summarise(
-    n_papers = n_distinct(pdf),
-    n_replicates = n_distinct(replicate),
-    mean_val_score = mean(pct_steps_pass, na.rm = TRUE),
-    .groups = "drop"
+calls_by_pdf <- calls_combined |>
+  group_by(pdf, models) |>
+  reframe(prop_success = mean(effectively_complete)) |>
+  left_join(
+    pdfs |> select(id, num_images, num_tables, file_size_kb, num_pages),
+    by = c(pdf = "id")
   )
 
-# Canonical matching: mean proportion of fields matched per model × tokens
-canon_summary <- canonical_comparison |>
-  group_by(models, tokens) |>
-  summarise(
-    mean_prop_match = mean(prop_match, na.rm = TRUE),
-    .groups = "drop"
-  )
+calls_combined |>
+  group_by(pdf, models) |>
+  reframe(prop_success = mean(effectively_complete)) |>
+  ggplot(aes(x = pdf, y = prop_success)) +
+  geom_point(aes(colour = models)) +
+  geom_boxplot()
 
-# Cost: mean USD per call per model × tokens
-cost_summary <- call_costs |>
-  filter(success) |>
-  group_by(models, tokens) |>
-  summarise(
-    mean_cost_usd = mean(cost_usd, na.rm = TRUE),
-    .groups = "drop"
-  )
-
-# Combine
-val_summary |>
-  left_join(canon_summary, by = c("models", "tokens")) |>
-  left_join(cost_summary, by = c("models", "tokens")) |>
-  arrange(desc(mean_val_score), desc(mean_prop_match)) |>
-  flextable() |>
-  autofit() |>
-  colformat_double(j = "mean_val_score", digits = 2) |>
-  colformat_double(j = "mean_prop_match", digits = 2) |>
-  colformat_double(j = "mean_cost_usd", digits = 2) |>
-  set_header_labels(
-    models = "Model",
-    tokens = "Token Limit",
-    n_papers = "Papers",
-    n_replicates = "Replicates",
-    mean_val_score = "Mean Validation Pass Rate",
-    mean_prop_match = "Mean Canonical Match",
-    mean_cost_usd = "Mean Cost (USD)"
-  )
+calls_by_pdf |>
+  group_by(pdf) |>
+  reframe(prop_success = mean(prop_success), file_size_kb, num_pages) |>
+  distinct()
 ```
 
 # Appendices
+
+# Appendix 1: Extraction Prompt
+
+A copy of the default extraction prompt is included below.
+
+```{md}
+# Environmental Exposure Study Data Extraction Prompt
+
+You are an expert at extracting environmental exposure study data from scientific documents. Extract the following information from the uploaded document, following these strict guidelines:
+
+## CRITICAL RULES
+
+- Only extract information that is explicitly stated in the document
+- Likewise, only report sites and compartments if they have been directly analysed and measurements reported.
+- Do NOT guess, infer, make assumptions, or use outside knowledge to fill gaps
+- Do NOT use your knowledge of places, chemicals, or studies to add information not in the document
+- Ensure that information on ALL relevant biota is extracted. This may
+  be hidden in tables or appendices
+- Use 'null' for any field where information is not clearly provided in the text
+- For coordinates: ONLY extract if latitude/longitude are explicitly stated as numbers in the document
+- For dates, use YYYY-MM-DD format only
+- Where uncertain over interpretation, or where the existing schema does not capture enough nuance for interpretation report additional details (preferrably verbatim quotes) in *_comment fields.
+
+## CONTROLLED VOCABULARY
+
+Use exact terms from the schema as much as possible.
+
+### Environmental Compartments
+
+See schema
+
+### Measurement Categories
+
+See schema
+
+### Geographic Features
+
+See schema
+
+### Species Groups (for Biota)
+
+See schema
+
+### Biota-Specific Information
+
+#### Species Name
+
+- Extract species scientific name and/or common name to use for lookup
+  against species data
+
+#### Tissue Types
+
+- See schema
+
+#### Life Stages
+
+- See schema
+
+#### Genders
+
+- See schema
+
+### Reliability Evaluation Systems
+
+- See schema
+
+### Reference Types
+
+- See schema
+
+### Methods/Protocols
+
+- See schema
+- In the case that multiple or diverse protocols are used, report as many as possible from the paper.
+
+## EXTRACTION FOCUS AREAS
+
+### 1. Study Metadata
+
+- See schema
+
+### 2. Bibliographic Information
+
+- See schema
+
+### 3. Sampling Sites
+
+- See schema
+
+### 4. Sample Information
+
+- See schema
+
+### 5. Measured Parameters
+
+- See schema
+- If the same parameter is referred to by multiple different names (e.g. Copper and Cu, Paracetamol and Acetaminophen) only include one name, preferably the fullest and most universal. However, if multiple parameters with the same chemical composition but otherwise relevant differences (e.g. particle size, structure, etc.), report these as different parameters. If uncertain, report back in the comments section.
+
+```
+
+## Appendix 2: Variables used in canonical data comparison
 
 ```{r}
 #| label: tbl-canonical-comparison-variables
@@ -1850,12 +2275,17 @@ variable_meta |>
       .default = str_to_sentence(var_type)
     )
   ) |>
-  select(table, llm_name, var_type) |>
+  select(table, llm_name, var_type, comment) |>
   flextable() |>
   autofit() |>
   set_header_labels(
     table = "Table",
     llm_name = "Variable Name",
-    var_type = "Variable Check"
+    var_type = "Variable Check",
+    comment = "Rationale"
   )
 ```
+
+
+# References
+
