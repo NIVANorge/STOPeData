@@ -26,7 +26,7 @@ Feature](https://github.com/NIVANorge/STOPeData/issues/new?labels=enhancement&te
 
 ## About The Project
 
-![](inst/images/graphical_abstract.png)
+![](reference/figures/graphical_abstract.png)
 
 This app is designed to guide users through the formatting, cleaning and
 annotation of exposure/pollution/monitoring data (e.g. mg/L of a
@@ -116,7 +116,7 @@ Run the application locally
 
 ### Diagrams
 
-![complicated_workflow](inst/app/www/app_mapp.png)
+![complicated_workflow](reference/figures/app_mapp.png)
 
 complicated_workflow
 
