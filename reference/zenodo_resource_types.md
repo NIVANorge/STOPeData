@@ -12,10 +12,6 @@ application.
 zenodo_resource_types
 ```
 
-## Format
-
-An object of class `character` of length 5.
-
 ## See also
 
 Other zenodo:

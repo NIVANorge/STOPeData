@@ -51,7 +51,11 @@ Character vector of parameter names
 ## Examples
 
 ``` r
-get_parameters_filtered("Stressor", "Homogeneous metal compounds", eDataDRF::parameters_vocabulary())
+get_parameters_filtered(
+  "Stressor",
+  "Homogeneous metal compounds",
+  eDataDRF::parameters_vocabulary()
+)
 #>  [1] "Actinium"          "Aluminum"          "Americium"        
 #>  [4] "Antimony"          "Arsenic"           "Arsenic (III)"    
 #>  [7] "Arsenic ion (5+)"  "Arsenide"          "Barium"           

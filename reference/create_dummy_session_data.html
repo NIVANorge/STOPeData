@@ -92,13 +92,34 @@ with test data instead of empty tibbles.</p>
     <div class="section level2">
     <h2 id="ref-examples">Examples<a class="anchor" aria-label="anchor" href="#ref-examples"></a></h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">session_data</span> <span class="op">&lt;-</span> <span class="fu">create_dummy_session_data</span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in guess_where_config(path):</span> Unable to locate a config file from the default location.Please restore this file or use the 'GOLEM_CONFIG_PATH' environment variable to</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span>       set a custom path to the config file.</span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> The default path is: /home/runner/work/STOPeData/STOPeData/docs/reference/inst/golem-config.yml</span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">session_data</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'session_data' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [1] "ENTERED_BY"               "sitesData"               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [3] "sitesDataValid"           "parametersData"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [5] "parametersDataValid"      "compartmentsData"        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [7] "compartmentsDataValid"    "referenceData"           </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>  [9] "referenceDataValid"       "campaignData"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [11] "campaignDataValid"        "methodsData"             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [13] "methodsDataValid"         "samplesData"             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [15] "samplesDataValid"         "biotaData"               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [17] "biotaDataValid"           "samplesDataWithBiota"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [19] "measurementsData"         "measurementsDataValid"   </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [21] "datasetDetails"           "creedRelevance"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [23] "creedReliability"         "creedScores"             </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [25] "creedReport"              "creedGetData"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [27] "creedCalculateScores"     "schemaLLM"               </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [29] "promptLLM"                "rawLLM"                  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [31] "metaData"                 "pdfPath"                 </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [33] "campaignDataLLM"          "referenceDataLLM"        </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [35] "sitesDataLLM"             "parametersDataLLM"       </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [37] "compartmentsDataLLM"      "methodsDataLLM"          </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [39] "samplesDataLLM"           "biotaDataLLM"            </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [41] "llmExtractionComplete"    "llmExtractionSuccessful" </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [43] "llmPopulateModules"       "llmScreeningComplete"    </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [45] "llmScreeningComments"     "llmScreeningSuccessful"  </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [47] "saveExtractionComplete"   "saveExtractionSuccessful"</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [49] "creedReliabilityValid"    "creedRelevanceValid"     </span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">session_data</span><span class="op">$</span><span class="va">sitesData</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'session_data' not found</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> [1] 2</span>
 </code></pre></div>
     </div>
   </main><aside class="col-md-3"><nav id="toc" aria-label="Table of contents"><h2>On this page</h2>

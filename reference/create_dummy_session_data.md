@@ -43,11 +43,32 @@ Other create:
 
 ``` r
 session_data <- create_dummy_session_data()
-#> Error in guess_where_config(path): Unable to locate a config file from the default location.Please restore this file or use the 'GOLEM_CONFIG_PATH' environment variable to
-#>       set a custom path to the config file.
-#> The default path is: /home/runner/work/STOPeData/STOPeData/docs/reference/inst/golem-config.yml
 names(session_data)
-#> Error: object 'session_data' not found
+#>  [1] "ENTERED_BY"               "sitesData"               
+#>  [3] "sitesDataValid"           "parametersData"          
+#>  [5] "parametersDataValid"      "compartmentsData"        
+#>  [7] "compartmentsDataValid"    "referenceData"           
+#>  [9] "referenceDataValid"       "campaignData"            
+#> [11] "campaignDataValid"        "methodsData"             
+#> [13] "methodsDataValid"         "samplesData"             
+#> [15] "samplesDataValid"         "biotaData"               
+#> [17] "biotaDataValid"           "samplesDataWithBiota"    
+#> [19] "measurementsData"         "measurementsDataValid"   
+#> [21] "datasetDetails"           "creedRelevance"          
+#> [23] "creedReliability"         "creedScores"             
+#> [25] "creedReport"              "creedGetData"            
+#> [27] "creedCalculateScores"     "schemaLLM"               
+#> [29] "promptLLM"                "rawLLM"                  
+#> [31] "metaData"                 "pdfPath"                 
+#> [33] "campaignDataLLM"          "referenceDataLLM"        
+#> [35] "sitesDataLLM"             "parametersDataLLM"       
+#> [37] "compartmentsDataLLM"      "methodsDataLLM"          
+#> [39] "samplesDataLLM"           "biotaDataLLM"            
+#> [41] "llmExtractionComplete"    "llmExtractionSuccessful" 
+#> [43] "llmPopulateModules"       "llmScreeningComplete"    
+#> [45] "llmScreeningComments"     "llmScreeningSuccessful"  
+#> [47] "saveExtractionComplete"   "saveExtractionSuccessful"
+#> [49] "creedReliabilityValid"    "creedRelevanceValid"     
 nrow(session_data$sitesData)
-#> Error: object 'session_data' not found
+#> [1] 2
 ```

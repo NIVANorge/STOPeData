@@ -16,7 +16,8 @@ extract_pdf_with_llm(
   params = NULL,
   extraction_prompt,
   extraction_schema,
-  max_tokens
+  max_tokens,
+  cache = "none"
 )
 ```
 
@@ -25,6 +26,27 @@ extract_pdf_with_llm(
 - pdf_path:
 
   Character. Path to the PDF file to extract data from.
+
+- model_provider:
+
+  Character. The provider of the LLM. One of Anthropic, OpenAI, or
+  Google
+
+- model_name:
+
+  Character. The specific model to call (e.g. "claude-sonnet-5").
+
+- env_var:
+
+  Character. Name of the environment variable holding the API key for
+  this provider (set via
+  [`Sys.setenv()`](https://rdrr.io/r/base/Sys.setenv.html) before the
+  call).
+
+- chat_fn:
+
+  Character. Name of the `ellmer` chat-constructor function to use for
+  this provider (e.g. "chat_anthropic").
 
 - api_key:
 
@@ -46,6 +68,11 @@ extract_pdf_with_llm(
 - max_tokens:
 
   Integer. Maximum tokens for the API response.
+
+- cache:
+
+  Boolean Attempt to use ellmer's built in cache function. Disabled for
+  calls to Google LLMs
 
 ## Value
 
