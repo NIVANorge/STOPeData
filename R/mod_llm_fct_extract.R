@@ -2,8 +2,8 @@
 
 #' Core async function for LLM extraction
 #'
-#' This function performs the actual PDF extraction using the Anthropic API.
-#' It's designed to run inside a mirai() call for async execution.
+#' This function performs the actual PDF extraction using the Anthropic, Google Gemini or OpenAI APIs.
+#' It's designed to run inside a `mirai::mirai()`` call for async execution.
 #'
 #' @param pdf_path Character. Path to the PDF file to extract data from.
 #' @param model_provider Character. The provider of the LLM. One of Anthropic, OpenAI, or Google
@@ -12,7 +12,7 @@
 #'   for this provider (set via \code{Sys.setenv()} before the call).
 #' @param chat_fn Character. Name of the \code{ellmer} chat-constructor function to use
 #'   for this provider (e.g. "chat_anthropic").
-#' @param api_key Character. Anthropic API key (should start with "sk-ant-").
+#' @param api_key Character. API key.
 #' @param extraction_prompt Character. The prompt text instructing the LLM
 #'   on what to extract.
 #' @param extraction_schema List or S7 class. The structured schema defining
@@ -117,7 +117,7 @@ extract_pdf_with_llm <- function(
 
 #' Parse LLM API errors into user-facing messages
 #'
-#' Detects HTTP status codes from httr2/ellmer error conditions and returns
+#' Detects HTTP status codes from `httr2`/`ellmer` error conditions and returns
 #' a string with the code and most likely cause. Falls back to the raw
 #' condition message for non-HTTP errors.
 #'

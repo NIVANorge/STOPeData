@@ -32,7 +32,7 @@ Feature](https://github.com/NIVANorge/STOPeData/issues/new?labels=enhancement&te
 
 ## About The Project
 
-<img src="inst/images/graphical_abstract.png"
+<img src="man/figures/graphical_abstract.png"
 data-fig-alt="Flow diagram-style illustration of eData extraction process. Left to right, process is organised into Extract, Structure, Validate, Assess, FAIR. Extract shows snippets of text from a study (sampling sites, media, stressors, techniques, organisms). Structure shows same data organised into structured tables. Validate shows application UI used to validate data. Assess shows tables representing data quality scoring. FAIR shows output data format: csv and txt." />
 
 This app is designed to guide users through the formatting, cleaning and
@@ -125,7 +125,7 @@ Run the application locally
 
 ### Diagrams
 
-![complicated_workflow](inst/app/www/app_mapp.png)
+![complicated_workflow](man/figures/app_mapp.png)
 
 An overview of the manual/LLM assisted workflow.
 
