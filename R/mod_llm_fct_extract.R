@@ -7,6 +7,11 @@
 #'
 #' @param pdf_path Character. Path to the PDF file to extract data from.
 #' @param model_provider Character. The provider of the LLM. One of Anthropic, OpenAI, or Google
+#' @param model_name Character. The specific model to call (e.g. "claude-sonnet-5").
+#' @param env_var Character. Name of the environment variable holding the API key
+#'   for this provider (set via \code{Sys.setenv()} before the call).
+#' @param chat_fn Character. Name of the \code{ellmer} chat-constructor function to use
+#'   for this provider (e.g. "chat_anthropic").
 #' @param api_key Character. Anthropic API key (should start with "sk-ant-").
 #' @param extraction_prompt Character. The prompt text instructing the LLM
 #'   on what to extract.

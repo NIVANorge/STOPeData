@@ -38,10 +38,10 @@ create_existing_parameter("Chemical", "Cadmium", eDataDRF::parameters_vocabulary
 \code{\link[eDataDRF:parameters_vocabulary]{eDataDRF::parameters_vocabulary()}},
 \code{\link[eDataDRF:parameter_types_vocabulary]{eDataDRF::parameter_types_vocabulary()}}
 
-Other create: 
-\code{\link{create_compartment_combination}()},
-\code{\link{create_dummy_session_data}()},
-\code{\link{create_new_parameter}()},
-\code{\link{create_new_site}()}
+Other create:
+\code{\link[=create_compartment_combination]{create_compartment_combination()}},
+\code{\link[=create_dummy_session_data]{create_dummy_session_data()}},
+\code{\link[=create_new_parameter]{create_new_parameter()}},
+\code{\link[=create_new_site]{create_new_site()}}
 }
 \concept{create}

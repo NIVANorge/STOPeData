@@ -34,10 +34,10 @@ nrow(session_data$sitesData)
 \code{\link[eDataDRF:example_CREED_relevance_tibble]{eDataDRF::example_CREED_relevance_tibble()}},
 \code{\link[eDataDRF:example_CREED_scores_tibble]{eDataDRF::example_CREED_scores_tibble()}}
 
-Other create: 
-\code{\link{create_compartment_combination}()},
-\code{\link{create_existing_parameter}()},
-\code{\link{create_new_parameter}()},
-\code{\link{create_new_site}()}
+Other create:
+\code{\link[=create_compartment_combination]{create_compartment_combination()}},
+\code{\link[=create_existing_parameter]{create_existing_parameter()}},
+\code{\link[=create_new_parameter]{create_new_parameter()}},
+\code{\link[=create_new_site]{create_new_site()}}
 }
 \concept{create}

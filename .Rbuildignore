@@ -25,3 +25,18 @@ _\.new\.png$
 ^vignettes/\.quarto$
 ^vignettes/*_files$
 ^codecov\.yml$
+
+# Non-standard top-level files/dirs (R CMD check NOTE)
+^CLAUDE\.md$
+^Dockerfile$
+^_extensions$
+^_quarto\.yml$
+^dependencies\.R$
+^docker-compose\.yml$
+^manifest\.json$
+^references\.bib$
+
+# Editor/assistant state (hidden files NOTE)
+^\.claude$
+^\.posit$
+^\.luarc\.json$

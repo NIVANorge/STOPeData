@@ -40,10 +40,10 @@ error messages.
 }
 }
 \seealso{
-Other validate: 
-\code{\link{validate_and_lookup_identifier}()},
-\code{\link{validate_dataset_structure}()},
-\code{\link{validate_doi_format}()},
-\code{\link{validate_pmid_format}()}
+Other validate:
+\code{\link[=validate_and_lookup_identifier]{validate_and_lookup_identifier()}},
+\code{\link[=validate_dataset_structure]{validate_dataset_structure()}},
+\code{\link[=validate_doi_format]{validate_doi_format()}},
+\code{\link[=validate_pmid_format]{validate_pmid_format()}}
 }
 \concept{validate}

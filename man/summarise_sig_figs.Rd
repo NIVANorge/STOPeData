@@ -20,21 +20,21 @@ summarise_sig_figs(c(1.23, 4.567, 8.9))
 summarise_sig_figs(c(0.001, 0.0023))
 }
 \seealso{
-Other summarise: 
-\code{\link{calculate_coordinate_precision}()},
-\code{\link{manual_completion_message}()},
-\code{\link{summarise_CREED_details}()},
-\code{\link{summarise_CREED_relevance}()},
-\code{\link{summarise_CREED_reliability}()},
-\code{\link{summarise_biota}()},
-\code{\link{summarise_compartments}()},
-\code{\link{summarise_date_range}()},
-\code{\link{summarise_lod_loq}()},
-\code{\link{summarise_measured_units}()},
-\code{\link{summarise_multiple}()},
-\code{\link{summarise_protocols}()},
-\code{\link{summarise_reference}()},
-\code{\link{summarise_sites}()},
-\code{\link{summarise_uncertainty_comments}()}
+Other summarise:
+\code{\link[=calculate_coordinate_precision]{calculate_coordinate_precision()}},
+\code{\link[=manual_completion_message]{manual_completion_message()}},
+\code{\link[=summarise_CREED_details]{summarise_CREED_details()}},
+\code{\link[=summarise_CREED_relevance]{summarise_CREED_relevance()}},
+\code{\link[=summarise_CREED_reliability]{summarise_CREED_reliability()}},
+\code{\link[=summarise_biota]{summarise_biota()}},
+\code{\link[=summarise_compartments]{summarise_compartments()}},
+\code{\link[=summarise_date_range]{summarise_date_range()}},
+\code{\link[=summarise_lod_loq]{summarise_lod_loq()}},
+\code{\link[=summarise_measured_units]{summarise_measured_units()}},
+\code{\link[=summarise_multiple]{summarise_multiple()}},
+\code{\link[=summarise_protocols]{summarise_protocols()}},
+\code{\link[=summarise_reference]{summarise_reference()}},
+\code{\link[=summarise_sites]{summarise_sites()}},
+\code{\link[=summarise_uncertainty_comments]{summarise_uncertainty_comments()}}
 }
 \concept{summarise}

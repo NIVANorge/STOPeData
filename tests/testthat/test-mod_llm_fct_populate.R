@@ -3,13 +3,13 @@ library(tibble)
 library(dplyr)
 library(glue)
 
-# Source internal functions directly (they are @noRd / unexported).
+# Internal functions (they are @noRd / unexported) are already visible here via
+# test_check()'s package namespace environment; no need to source() the file.
 # golem::print_dev() is called inside some functions but not validate_species_against_database,
 # so we stub it to avoid a hard dependency on the full package environment.
 if (!requireNamespace("golem", quietly = TRUE) || !exists("print_dev")) {
   print_dev <- function(...) invisible(NULL)
 }
-source(testthat::test_path("../../R/mod_llm_fct_populate.R"))
 
 # Mini species database covering all test cases:
 #   - Unique scientific + common name pairs (Gadus morhua, Salmo salar, Anguilla anguilla)

@@ -42,10 +42,10 @@ It handles the complete workflow:
 }
 }
 \seealso{
-Other validate: 
-\code{\link{validate_and_parse_bibtex}()},
-\code{\link{validate_dataset_structure}()},
-\code{\link{validate_doi_format}()},
-\code{\link{validate_pmid_format}()}
+Other validate:
+\code{\link[=validate_and_parse_bibtex]{validate_and_parse_bibtex()}},
+\code{\link[=validate_dataset_structure]{validate_dataset_structure()}},
+\code{\link[=validate_doi_format]{validate_doi_format()}},
+\code{\link[=validate_pmid_format]{validate_pmid_format()}}
 }
 \concept{validate}

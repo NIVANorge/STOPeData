@@ -43,10 +43,10 @@ from the relevant controlled vocabularies.
 \code{\link[eDataDRF:countries_vocabulary]{eDataDRF::countries_vocabulary()}}, \code{\link[eDataDRF:ocean_vocabulary]{eDataDRF::ocean_vocabulary()}},
 \code{\link[eDataDRF:altitude_units_vocabulary]{eDataDRF::altitude_units_vocabulary()}}
 
-Other create: 
-\code{\link{create_compartment_combination}()},
-\code{\link{create_dummy_session_data}()},
-\code{\link{create_existing_parameter}()},
-\code{\link{create_new_parameter}()}
+Other create:
+\code{\link[=create_compartment_combination]{create_compartment_combination()}},
+\code{\link[=create_dummy_session_data]{create_dummy_session_data()}},
+\code{\link[=create_existing_parameter]{create_existing_parameter()}},
+\code{\link[=create_new_parameter]{create_new_parameter()}}
 }
 \concept{create}

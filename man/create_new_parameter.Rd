@@ -26,10 +26,10 @@ create_new_parameter("Chemical", "Jane Smith")
 \code{\link[eDataDRF:parameter_types_vocabulary]{eDataDRF::parameter_types_vocabulary()}},
 \code{\link[eDataDRF:measured_types_vocabulary]{eDataDRF::measured_types_vocabulary()}}
 
-Other create: 
-\code{\link{create_compartment_combination}()},
-\code{\link{create_dummy_session_data}()},
-\code{\link{create_existing_parameter}()},
-\code{\link{create_new_site}()}
+Other create:
+\code{\link[=create_compartment_combination]{create_compartment_combination()}},
+\code{\link[=create_dummy_session_data]{create_dummy_session_data()}},
+\code{\link[=create_existing_parameter]{create_existing_parameter()}},
+\code{\link[=create_new_site]{create_new_site()}}
 }
 \concept{create}

@@ -10,6 +10,7 @@
 #' @importFrom purrr map_chr
 #' @importFrom tools file_ext
 #' @importFrom mirai daemons everywhere
+#' @importFrom utils packageDescription
 #' @import eDataDRF
 #' @noRd
 
@@ -75,7 +76,10 @@ initialise_userData <- function() {
     metaData = list(
       session = list(
         app_name = "STOPeData",
-        app_version = get_golem_version() %||% "unknown",
+        app_version = tryCatch(
+          get_golem_version(),
+          error = function(e) "unknown"
+        ),
         format_version = tryCatch(
           packageDescription("eDataDRF")$Version,
           error = function(e) "unknown"

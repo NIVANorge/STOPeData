@@ -14,11 +14,22 @@ extract_pdf_with_llm(
   params = NULL,
   extraction_prompt,
   extraction_schema,
-  max_tokens
+  max_tokens,
+  cache = "none"
 )
 }
 \arguments{
 \item{pdf_path}{Character. Path to the PDF file to extract data from.}
+
+\item{model_provider}{Character. The provider of the LLM. One of Anthropic, OpenAI, or Google}
+
+\item{model_name}{Character. The specific model to call (e.g. "claude-sonnet-5").}
+
+\item{env_var}{Character. Name of the environment variable holding the API key
+for this provider (set via \code{Sys.setenv()} before the call).}
+
+\item{chat_fn}{Character. Name of the \code{ellmer} chat-constructor function to use
+for this provider (e.g. "chat_anthropic").}
 
 \item{api_key}{Character. Anthropic API key (should start with "sk-ant-").}
 
@@ -31,6 +42,8 @@ on what to extract.}
 expected output format (e.g., S7 class with properties).}
 
 \item{max_tokens}{Integer. Maximum tokens for the API response.}
+
+\item{cache}{Boolean Attempt to use ellmer's built in cache function. Disabled for calls to Google LLMs}
 }
 \value{
 Named list with three elements:

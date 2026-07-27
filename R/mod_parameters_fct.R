@@ -160,7 +160,11 @@ create_existing_parameter <- function(
 #'   [eDataDRF::parameter_types_vocabulary()],
 #'   [eDataDRF::parameter_types_sub_vocabulary()]
 #' @examples
-#' get_parameters_filtered("Stressor", "Homogeneous metal compounds", eDataDRF::parameters_vocabulary())
+#' get_parameters_filtered(
+#'   "Stressor",
+#'   "Homogeneous metal compounds",
+#'   eDataDRF::parameters_vocabulary()
+#' )
 #' get_parameters_filtered("Chemical", dummy_parameters = eDataDRF::parameters_vocabulary())
 #' @export
 get_parameters_filtered <- function(

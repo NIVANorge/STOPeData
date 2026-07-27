@@ -27,10 +27,10 @@ validate_dataset_structure(data.frame(), "Sites")
 \seealso{
 \code{\link[=detect_dataset_type]{detect_dataset_type()}}, \code{\link[eDataDRF:initialise_sites_tibble]{eDataDRF::initialise_sites_tibble()}}
 
-Other validate: 
-\code{\link{validate_and_lookup_identifier}()},
-\code{\link{validate_and_parse_bibtex}()},
-\code{\link{validate_doi_format}()},
-\code{\link{validate_pmid_format}()}
+Other validate:
+\code{\link[=validate_and_lookup_identifier]{validate_and_lookup_identifier()}},
+\code{\link[=validate_and_parse_bibtex]{validate_and_parse_bibtex()}},
+\code{\link[=validate_doi_format]{validate_doi_format()}},
+\code{\link[=validate_pmid_format]{validate_pmid_format()}}
 }
 \concept{validate}

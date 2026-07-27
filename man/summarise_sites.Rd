@@ -45,21 +45,21 @@ summarise_sites(eDataDRF::example_sites_tibble(), COUNTRY_ISO = TRUE, PRECISION 
 \code{\link[eDataDRF:ocean_vocabulary]{eDataDRF::ocean_vocabulary()}}, \code{\link[eDataDRF:geographic_features_vocabulary]{eDataDRF::geographic_features_vocabulary()}},
 \code{\link[eDataDRF:geographic_features_sub_vocabulary]{eDataDRF::geographic_features_sub_vocabulary()}}
 
-Other summarise: 
-\code{\link{calculate_coordinate_precision}()},
-\code{\link{manual_completion_message}()},
-\code{\link{summarise_CREED_details}()},
-\code{\link{summarise_CREED_relevance}()},
-\code{\link{summarise_CREED_reliability}()},
-\code{\link{summarise_biota}()},
-\code{\link{summarise_compartments}()},
-\code{\link{summarise_date_range}()},
-\code{\link{summarise_lod_loq}()},
-\code{\link{summarise_measured_units}()},
-\code{\link{summarise_multiple}()},
-\code{\link{summarise_protocols}()},
-\code{\link{summarise_reference}()},
-\code{\link{summarise_sig_figs}()},
-\code{\link{summarise_uncertainty_comments}()}
+Other summarise:
+\code{\link[=calculate_coordinate_precision]{calculate_coordinate_precision()}},
+\code{\link[=manual_completion_message]{manual_completion_message()}},
+\code{\link[=summarise_CREED_details]{summarise_CREED_details()}},
+\code{\link[=summarise_CREED_relevance]{summarise_CREED_relevance()}},
+\code{\link[=summarise_CREED_reliability]{summarise_CREED_reliability()}},
+\code{\link[=summarise_biota]{summarise_biota()}},
+\code{\link[=summarise_compartments]{summarise_compartments()}},
+\code{\link[=summarise_date_range]{summarise_date_range()}},
+\code{\link[=summarise_lod_loq]{summarise_lod_loq()}},
+\code{\link[=summarise_measured_units]{summarise_measured_units()}},
+\code{\link[=summarise_multiple]{summarise_multiple()}},
+\code{\link[=summarise_protocols]{summarise_protocols()}},
+\code{\link[=summarise_reference]{summarise_reference()}},
+\code{\link[=summarise_sig_figs]{summarise_sig_figs()}},
+\code{\link[=summarise_uncertainty_comments]{summarise_uncertainty_comments()}}
 }
 \concept{summarise}

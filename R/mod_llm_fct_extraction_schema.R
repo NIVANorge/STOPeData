@@ -405,6 +405,8 @@ create_extraction_schema <- function(
 #' @param pretty Logical. Pretty-print the JSON? Default TRUE.
 #' @return A JSON Schema character string.
 #' @importFrom jsonlite toJSON
+#' @importFrom S7 S7_inherits
+#' @importFrom ellmer TypeObject TypeArray TypeEnum TypeBasic
 #' @noRd
 schema_to_json <- function(type, pretty = TRUE) {
   toJSON(
@@ -418,7 +420,7 @@ schema_to_json <- function(type, pretty = TRUE) {
 # Internal: recursively convert an ellmer Type S7 object to a plain list
 # that mirrors standard JSON Schema structure.
 type_to_list <- function(type) {
-  if (S7::S7_inherits(type, TypeObject)) {
+  if (S7_inherits(type, TypeObject)) {
     schema <- list(type = "object")
     if (!is.null(type@description)) {
       schema$description <- type@description
@@ -429,7 +431,7 @@ type_to_list <- function(type) {
     return(schema)
   }
 
-  if (S7::S7_inherits(type, TypeArray)) {
+  if (S7_inherits(type, TypeArray)) {
     schema <- list(type = "array", items = type_to_list(type@items))
     if (!is.null(type@description)) {
       schema$description <- type@description
@@ -437,7 +439,7 @@ type_to_list <- function(type) {
     return(schema)
   }
 
-  if (S7::S7_inherits(type, TypeEnum)) {
+  if (S7_inherits(type, TypeEnum)) {
     schema <- list(type = "string", enum = type@values)
     if (!is.null(type@description)) {
       schema$description <- type@description
@@ -445,7 +447,7 @@ type_to_list <- function(type) {
     return(schema)
   }
 
-  if (S7::S7_inherits(type, TypeBasic)) {
+  if (S7_inherits(type, TypeBasic)) {
     schema <- list(type = type@type)
     if (!is.null(type@description)) {
       schema$description <- type@description

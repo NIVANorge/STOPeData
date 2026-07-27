@@ -162,6 +162,7 @@ get_export_metadata <- function(session = NULL) {
 #' @param metadata_list List containing metadata fields
 #' @return Tibble with Property and Value columns
 #' @importFrom tibble tibble
+#' @importFrom yaml as.yaml
 #' @examples
 #' create_metadata_tibble(list(campaign = "North Sea 2022", version = "1.0", user = "Jane"))
 #' @export
@@ -468,7 +469,7 @@ build_session_zip <- function(session, moduleState, dest_file) {
     tryCatch(
       {
         if (stringr::str_detect(dataset_name, "CREED")) {}
-        print_dev(glue("prepping {dataset_name} for export"))
+        # print_dev(glue("prepping {dataset_name} for export"))
 
         data <- rv[[dataset_name]]
 

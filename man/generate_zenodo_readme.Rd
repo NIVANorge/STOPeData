@@ -51,7 +51,7 @@ readme <- generate_zenodo_readme(
 cat(readme)
 }
 \seealso{
-Other zenodo: 
+Other zenodo:
 \code{\link{zenodo_licenses}},
 \code{\link{zenodo_resource_types}}
 }

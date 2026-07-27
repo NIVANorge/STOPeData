@@ -200,11 +200,10 @@ mod_CREED_gateway_server <- function(id) {
       ) {
         samplesData
       } else {
-        tibble(NULL)
         print_dev(
           "auto_populate_gateway_criteria(): samplesDataWithBiota & samplesData empty, returning tibble(NULL)"
         )
-        x
+        tibble(NULL)
       }
 
       # Build module_data list from session userData

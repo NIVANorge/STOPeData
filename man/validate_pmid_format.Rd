@@ -22,10 +22,10 @@ validate_pmid_format("PMID: 9876543")
 validate_pmid_format("not-a-pmid")
 }
 \seealso{
-Other validate: 
-\code{\link{validate_and_lookup_identifier}()},
-\code{\link{validate_and_parse_bibtex}()},
-\code{\link{validate_dataset_structure}()},
-\code{\link{validate_doi_format}()}
+Other validate:
+\code{\link[=validate_and_lookup_identifier]{validate_and_lookup_identifier()}},
+\code{\link[=validate_and_parse_bibtex]{validate_and_parse_bibtex()}},
+\code{\link[=validate_dataset_structure]{validate_dataset_structure()}},
+\code{\link[=validate_doi_format]{validate_doi_format()}}
 }
 \concept{validate}

@@ -37,8 +37,8 @@ highlighting the most commonly used licenses.
 zenodo_licenses[zenodo_licenses$popular, c("id", "title")]
 }
 \seealso{
-Other zenodo: 
-\code{\link{generate_zenodo_readme}()},
+Other zenodo:
+\code{\link[=generate_zenodo_readme]{generate_zenodo_readme()}},
 \code{\link{zenodo_resource_types}}
 }
 \concept{zenodo}

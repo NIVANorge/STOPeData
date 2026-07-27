@@ -29,10 +29,10 @@ create_compartment_combination("Biota", "Biota, Aquatic", "Internal")
 \seealso{
 \code{\link[eDataDRF:initialise_campaign_tibble]{eDataDRF::initialise_campaign_tibble()}}
 
-Other create: 
-\code{\link{create_dummy_session_data}()},
-\code{\link{create_existing_parameter}()},
-\code{\link{create_new_parameter}()},
-\code{\link{create_new_site}()}
+Other create:
+\code{\link[=create_dummy_session_data]{create_dummy_session_data()}},
+\code{\link[=create_existing_parameter]{create_existing_parameter()}},
+\code{\link[=create_new_parameter]{create_new_parameter()}},
+\code{\link[=create_new_site]{create_new_site()}}
 }
 \concept{create}
