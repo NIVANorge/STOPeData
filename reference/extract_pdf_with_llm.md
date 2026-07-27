@@ -8,7 +8,12 @@ API. It's designed to run inside a mirai() call for async execution.
 ``` r
 extract_pdf_with_llm(
   pdf_path,
+  model_provider,
+  model_name,
+  env_var,
+  chat_fn,
   api_key,
+  params = NULL,
   extraction_prompt,
   extraction_schema,
   max_tokens
@@ -24,6 +29,10 @@ extract_pdf_with_llm(
 - api_key:
 
   Character. Anthropic API key (should start with "sk-ant-").
+
+- params:
+
+  Function. Maximum tokens for the API response.
 
 - extraction_prompt:
 

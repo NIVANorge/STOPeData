@@ -89,6 +89,10 @@ Build and download session data as ZIP archives and metadata files.
 
 - [`write_metadata_txt()`](https://nivanorge.github.io/STOPeData/reference/write_metadata_txt.md)
   : Create readable metadata text file
+- [`write_metadata_yaml()`](https://nivanorge.github.io/STOPeData/reference/write_metadata_yaml.md)
+  : Write metadata as a YAML file
+- [`format_duration()`](https://nivanorge.github.io/STOPeData/reference/format_duration.md)
+  : Format a duration in seconds as a human-readable string
 - [`get_git_commit()`](https://nivanorge.github.io/STOPeData/reference/get_git_commit.md)
   : Get git commit hash
 - [`get_export_metadata()`](https://nivanorge.github.io/STOPeData/reference/get_export_metadata.md)
@@ -190,6 +194,13 @@ General-purpose helpers for the Shiny app.
   file
 - [`get_session_data_safe()`](https://nivanorge.github.io/STOPeData/reference/get_session_data_safe.md)
   : Safely retrieve data from session reactive values
+
+## LLM Extraction
+
+Run structured data extraction from PDFs using an LLM.
+
+- [`extract_pdf_with_llm()`](https://nivanorge.github.io/STOPeData/reference/extract_pdf_with_llm.md)
+  : Core async function for LLM extraction
 
 ## App
 

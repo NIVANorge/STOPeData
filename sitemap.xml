@@ -1,7 +1,9 @@
 <urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
 <url><loc>https://nivanorge.github.io/STOPeData/404.html</loc></url>
+<url><loc>https://nivanorge.github.io/STOPeData/CLAUDE.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/LICENSE-text.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/LICENSE.html</loc></url>
+<url><loc>https://nivanorge.github.io/STOPeData/articles/api.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/articles/application.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/articles/application_data.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/articles/index.html</loc></url>
@@ -27,6 +29,8 @@
 <url><loc>https://nivanorge.github.io/STOPeData/reference/download_all_data.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/extract_clean_doi.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/extract_clean_pmid.html</loc></url>
+<url><loc>https://nivanorge.github.io/STOPeData/reference/extract_pdf_with_llm.html</loc></url>
+<url><loc>https://nivanorge.github.io/STOPeData/reference/format_duration.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/generate_zenodo_readme.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/get_dataset_display_name.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/get_export_metadata.html</loc></url>
@@ -72,6 +76,7 @@
 <url><loc>https://nivanorge.github.io/STOPeData/reference/validate_pmid_format.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/write_creed_report_txt.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/write_metadata_txt.html</loc></url>
+<url><loc>https://nivanorge.github.io/STOPeData/reference/write_metadata_yaml.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/zenodo_licenses.html</loc></url>
 <url><loc>https://nivanorge.github.io/STOPeData/reference/zenodo_resource_types.html</loc></url>
 </urlset>

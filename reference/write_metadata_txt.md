@@ -1,6 +1,8 @@
 # Create readable metadata text file
 
-Create a human-readable text file with export metadata
+Create a human-readable text file with export metadata. Retained for
+backward compatibility; new exports use
+[`write_metadata_yaml()`](https://nivanorge.github.io/STOPeData/reference/write_metadata_yaml.md).
 
 ## Usage
 
@@ -27,7 +29,7 @@ NULL (invisibly). File is written to disk as a side effect.
 ``` r
 if (FALSE) { # \dontrun{
   meta <- list(campaign_name = "North Sea 2022", export_datetime = Sys.time(),
-               user = "Jane", app_name = "STOPeData", app_version = "1.0",
+               user = "Ole", app_name = "STOPeData", app_version = "1.0",
                clientData = "localhost")
   write_metadata_txt(meta, tempfile(fileext = ".txt"))
 } # }

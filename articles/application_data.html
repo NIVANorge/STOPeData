@@ -35,7 +35,8 @@
 <li class="active nav-item dropdown">
   <button class="nav-link dropdown-toggle" type="button" id="dropdown-articles" data-bs-toggle="dropdown" aria-expanded="false" aria-haspopup="true">Articles</button>
   <ul class="dropdown-menu" aria-labelledby="dropdown-articles">
-<li><a class="dropdown-item" href="../articles/application_data.html">Application Data</a></li>
+<li><a class="dropdown-item" href="../articles/api.html">API Keys</a></li>
+    <li><a class="dropdown-item" href="../articles/application_data.html">Application Data</a></li>
     <li><a class="dropdown-item" href="../articles/application.html">eData Application</a></li>
     <li><a class="dropdown-item" href="../articles/naming.html">Naming Conventions</a></li>
   </ul>
@@ -136,14 +137,15 @@
 <span>    methodsDataLLM <span class="op">=</span> <span class="fu">tibble</span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span>,</span>
 <span>    samplesDataLLM <span class="op">=</span> <span class="fu">tibble</span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span>,</span>
 <span>    biotaDataLLM <span class="op">=</span> <span class="fu">tibble</span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span>,</span>
-<span>    samplesDataLLM <span class="op">=</span> <span class="fu">tibble</span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span>,</span>
 <span></span>
 <span>    <span class="co"># LLM extraction status flags ----</span></span>
 <span>    llmExtractionComplete <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># tracks if the LLM data extraction process has completed, or the user has pressed the dummy data button</span></span>
 <span>    llmExtractionSuccessful <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># tracks if the LLM data extraction process (or dummy data) returned a tibble in the expected format</span></span>
-<span>    llmPopulateModules <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># tracks if the user has sent LLM data to modukles</span></span>
+<span>    llmPopulateModules <span class="op">=</span> <span class="cn">FALSE</span>, <span class="co"># tracks if the user has sent LLM data to modules</span></span>
 <span></span>
-<span>    llmExtractionComments <span class="op">=</span> <span class="fu">tibble</span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span>,</span>
+<span>    <span class="co"># track screening (in essence a very limited extraction) separately</span></span>
+<span>    llmScreeningComments <span class="op">=</span> <span class="fu">tibble</span><span class="op">(</span><span class="cn">NULL</span><span class="op">)</span>,</span>
+<span>    llmScreeningSuccessful <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span></span>
 <span>    <span class="co"># Import data from save status flags ----</span></span>
 <span>    saveExtractionComplete <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -257,7 +259,7 @@
 </div>
 
 <div class="pkgdown-footer-right">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.0.</p>
+  <p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.2.1.</p>
 </div>
 
     </footer>
