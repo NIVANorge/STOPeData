@@ -29,3 +29,9 @@ CLAUDE.md
 *.rmarkdown
 
 /.luarc.json
+
+# LLM eval cache/output (regenerable, not source)
+data-raw/llm_cache/
+data-raw/*_AllData_*.zip
+**/*_cache/
+vignettes/articles/.vdoc*.r
