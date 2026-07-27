@@ -1,0 +1,28 @@
+name: Check README.md is up to date
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - README.qmd
+      - README.md
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: quarto-dev/quarto-actions/setup@v2
+      - name: Render README.qmd
+        uses: quarto-dev/quarto-actions/render@v2
+        with:
+          path: README.qmd
+      - name: Fail if README.md is out of date
+        run: |
+          if ! git diff --exit-code -- README.md; then
+            echo "::error::README.md is out of date with README.qmd. Run 'quarto render README.qmd' locally and commit the result."
+            exit 1
+          fi
