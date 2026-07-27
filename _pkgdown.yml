@@ -33,6 +33,8 @@ reference:
     desc: "Build and download session data as ZIP archives and metadata files."
     contents:
       - write_metadata_txt
+      - write_metadata_yaml
+      - format_duration
       - get_git_commit
       - get_export_metadata
       - get_dataset_display_name
@@ -91,6 +93,11 @@ reference:
       - printreactiveValues
       - info_accordion
       - get_session_data_safe
+
+  - title: "LLM Extraction"
+    desc: "Run structured data extraction from PDFs using an LLM."
+    contents:
+      - extract_pdf_with_llm
 
   - title: "App"
     desc: "Run the STOPeData Shiny application."
