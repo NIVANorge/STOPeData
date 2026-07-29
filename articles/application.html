@@ -90,9 +90,23 @@
 <span><span class="co"># this is how I run the app locally when I'm developing it</span></span>
 <span><span class="fu">golem</span><span class="fu">::</span><span class="fu"><a href="https://thinkr-open.github.io/golem/reference/run_dev.html" class="external-link">run_dev</a></span><span class="op">(</span><span class="op">)</span> </span></code></pre></div>
 </div>
+<section class="level2"><h2 id="building-and-running-the-docker-image">Building and running the Docker image<a class="anchor" aria-label="anchor" href="#building-and-running-the-docker-image"></a>
+</h2>
+<p>Build the image from the repository root:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> build <span class="at">-t</span> edata .</span></code></pre></div>
+</div>
+<p>The build includes a test stage that runs the test suite and fails the build if any test fails. Run the built image, exposing the app on <a href="http://localhost:3838" class="external-link uri">http://localhost:3838</a>:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> run <span class="at">-p</span> 3838:3838 edata</span></code></pre></div>
+</div>
+<p>Or use Docker Compose, which does the same thing:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode bash"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">docker</span> compose up <span class="at">--build</span></span></code></pre></div>
+</div>
 <p>It calls <code>~app.R</code>. This sets up the <code>logger</code> framework, sets some Golem options, and calls <code><a href="../reference/run_app.html">STOPeData::run_app()</a></code>, located in <code>~.R</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">logger</span><span class="fu">::</span><span class="fu"><a href="https://daroczig.github.io/logger/reference/log_appender.html" class="external-link">log_appender</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/appender_stdout.html" class="external-link">appender_stdout</a></span><span class="op">)</span></span>
 <span><span class="fu">logger</span><span class="fu">::</span><span class="fu"><a href="https://daroczig.github.io/logger/reference/log_layout.html" class="external-link">log_layout</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="fu"><a href="https://daroczig.github.io/logger/reference/layout_json.html" class="external-link">layout_json</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="fu">logger</span><span class="fu">::</span><span class="fu"><a href="https://daroczig.github.io/logger/reference/log_threshold.html" class="external-link">log_threshold</a></span><span class="op">(</span><span class="fu">logger</span><span class="fu">::</span><span class="va"><a href="https://daroczig.github.io/logger/reference/log_levels.html" class="external-link">INFO</a></span><span class="op">)</span></span>
@@ -113,7 +127,7 @@
 </div>
 <p><code><a href="../reference/run_app.html">STOPeData::run_app()</a></code> calls <code>~/R/run_app.R</code>, which is a wrapper function created by the <code>Golem</code> package.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">run_app</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>  <span class="va">onStart</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">options</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="op">)</span>,</span>
@@ -138,7 +152,7 @@
 </div>
 <p>This calls <code><a href="https://rdrr.io/pkg/shiny/man/shinyApp.html" class="external-link">shiny::shinyApp()</a></code> on the ui and server objects created by <code>~/R/app_ui.R</code> and <code>~R/app_server.R</code>.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode cell-code" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">app_ui</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">request</span><span class="op">)</span> <span class="op">{</span></span>
 <span> <span class="co"># ui goes here</span></span>
 <span><span class="op">}</span></span>
@@ -148,10 +162,7 @@
 <span><span class="op">}</span></span></code></pre></div>
 </div>
 <p>In actual fact, though, the application is heavily modularised/functionalised. This means that the functional code you’re looking for is more likely to be in the module files (<code>~/R/mod_*.R</code>) or function files (<code>~/R/mod_*_fct.R</code>,<code>fct_*.R</code>, and <code>utils_*.R</code>).</p>
-
-
-
-<script id="quarto-html-after-body" type="application/javascript">
+</section><script id="quarto-html-after-body" type="application/javascript">
   window.document.addEventListener("DOMContentLoaded", function (event) {
       var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
       var mailtoRegex = new RegExp(/^mailto:/);

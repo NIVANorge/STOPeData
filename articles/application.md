@@ -15,6 +15,28 @@ shiny::runApp('app.R', host='0.0.0.0', port=3838)
 golem::run_dev() 
 ```
 
+## Building and running the Docker image
+
+Build the image from the repository root:
+
+``` bash
+docker build -t edata .
+```
+
+The build includes a test stage that runs the test suite and fails the
+build if any test fails. Run the built image, exposing the app on
+<http://localhost:3838>:
+
+``` bash
+docker run -p 3838:3838 edata
+```
+
+Or use Docker Compose, which does the same thing:
+
+``` bash
+docker compose up --build
+```
+
 It calls `~app.R`. This sets up the `logger` framework, sets some Golem
 options, and calls
 [`STOPeData::run_app()`](https://nivanorge.github.io/STOPeData/reference/run_app.md),
