@@ -1,7 +1,8 @@
 # Core async function for LLM extraction
 
-This function performs the actual PDF extraction using the Anthropic
-API. It's designed to run inside a mirai() call for async execution.
+This function performs the actual PDF extraction using the Anthropic,
+Google Gemini or OpenAI APIs. It's designed to run inside a
+\`mirai::mirai()“ call for async execution.
 
 ## Usage
 
@@ -50,7 +51,7 @@ extract_pdf_with_llm(
 
 - api_key:
 
-  Character. Anthropic API key (should start with "sk-ant-").
+  Character. API key.
 
 - params:
 

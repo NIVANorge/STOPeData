@@ -17,5 +17,5 @@ retrieval fails
 
 ``` r
 get_git_commit()
-#> [1] "2de4db2"
+#> [1] "7891cb8"
 ```
