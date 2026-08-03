@@ -31,7 +31,7 @@ for this provider (set via \code{Sys.setenv()} before the call).}
 \item{chat_fn}{Character. Name of the \code{ellmer} chat-constructor function to use
 for this provider (e.g. "chat_anthropic").}
 
-\item{api_key}{Character. Anthropic API key (should start with "sk-ant-").}
+\item{api_key}{Character. API key.}
 
 \item{params}{Function. Maximum tokens for the API response.}
 
@@ -54,6 +54,6 @@ Named list with three elements:
 }
 }
 \description{
-This function performs the actual PDF extraction using the Anthropic API.
-It's designed to run inside a mirai() call for async execution.
+This function performs the actual PDF extraction using the Anthropic, Google Gemini or OpenAI APIs.
+It's designed to run inside a `mirai::mirai()`` call for async execution.
 }
