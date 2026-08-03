@@ -37,7 +37,7 @@ mod_sites_ui <- function(id) {
         card_body(
           style = "min-height: 300px !important;",
           ### Info accordion ----
-          info_accordion(content_file = "inst/app/www/md/intro_sites.md"),
+          info_accordion(content_file = "app/md/intro_sites.md"),
 
           ### Table controls ----
           div(

@@ -1,4 +1,4 @@
-# library(testthat)
-# library(STOPeData)
+library(testthat)
+library(STOPeData)
 
-# test_check("STOPeData")
+test_check("STOPeData")

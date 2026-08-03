@@ -23,7 +23,7 @@ mod_data_ui <- function(id) {
       fill = TRUE,
       card_body(
         ## Info accordion ----
-        info_accordion(content_file = "inst/app/www/md/intro_data.md"),
+        info_accordion(content_file = "app/md/intro_data.md"),
 
         ## Dynamic validation status accordion ----
         div(

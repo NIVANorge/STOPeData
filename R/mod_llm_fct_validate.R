@@ -21,11 +21,7 @@ map_to_vocabulary <- function(
   }
 
   mapping_table <- read_csv(
-    system.file(
-      "extdata/clean",
-      "llm_vocabulary_mapping.csv",
-      package = "STOPeData"
-    ),
+    app_sys("extdata/clean", "llm_vocabulary_mapping.csv"),
     show_col_types = FALSE
   )
 

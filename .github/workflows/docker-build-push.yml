@@ -6,7 +6,8 @@ on:
     paths:
       - 'app.R'
       - 'R/**'
-      - 'inst/app/www/md/**'
+      - 'inst/app/md/**'
+      - 'inst/app/www/**'
       - '.github/**'
       - 'deployment/base/**'
       - 'renv.lock'

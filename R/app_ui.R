@@ -6,6 +6,7 @@
 #' @importFrom bslib page_navbar nav_panel nav_spacer nav_menu nav_item bs_theme navset_card_tab sidebar navbar_options input_dark_mode
 #' @importFrom bsicons bs_icon
 #' @importFrom htmltools HTML
+#' @importFrom utils packageVersion
 #' @import eDataDRF
 #' @noRd
 app_ui <- function(request) {
@@ -262,7 +263,9 @@ app_ui <- function(request) {
             " This app is currently in development and no responsibility is accepted for crashes or data loss. ",
             "App Version: ",
             "<em>",
-            golem::get_golem_version(),
+            # See mod_landing_ui(): golem::get_golem_version() needs a source
+            # tree, packageVersion() works for an installed package too.
+            as.character(packageVersion("STOPeData")),
             "</em>",
             "."
           ))

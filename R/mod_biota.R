@@ -132,7 +132,7 @@ mod_biota_ui <- function(id) {
 
           ## Column 2: Instructions accordion ----
           info_accordion(
-            content_file = "inst/app/www/md/intro_biota.md"
+            content_file = "app/md/intro_biota.md"
           ) # <-- this is now the second child of layout_columns
         )
       )

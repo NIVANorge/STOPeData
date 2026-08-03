@@ -25,7 +25,7 @@ mod_samples_ui <- function(id) {
       full_screen = TRUE,
       card_body(
         ## Info accordion ----
-        info_accordion(content_file = "inst/app/www/md/intro_samples.md"),
+        info_accordion(content_file = "app/md/intro_samples.md"),
 
         ## Sample combination form ----
         layout_column_wrap(

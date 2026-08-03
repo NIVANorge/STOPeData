@@ -23,7 +23,7 @@ mod_methods_ui <- function(id) {
       fill = TRUE,
       card_body(
         ## Info accordion ----
-        info_accordion(content_file = "inst/app/www/md/intro_methods.md"),
+        info_accordion(content_file = "app/md/intro_methods.md"),
 
         ## Method selection form ----
         layout_column_wrap(

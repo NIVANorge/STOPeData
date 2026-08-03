@@ -228,7 +228,9 @@ test_llm_connection <- function(
 #' @importFrom readr read_file
 #' @noRd
 create_extraction_prompt <- function() {
-  read_file("inst/app/www/md/extraction_prompt.md")
+  # Always called in the main Shiny process (the resulting prompt is passed
+  # into the mirai worker as an argument), so app_sys() resolves correctly.
+  read_file(app_sys("app/md/extraction_prompt.md"))
 }
 
 #' Clear LLM data from session reactiveValues#

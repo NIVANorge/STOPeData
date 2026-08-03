@@ -67,7 +67,7 @@ mod_llm_ui <- function(id) {
       card_body(
         ## Info accordion ----
         info_accordion(
-          content_file = "inst/app/www/md/intro_llm.md"
+          content_file = "app/md/intro_llm.md"
         ),
 
         ## Upload and API section ----

@@ -536,11 +536,7 @@ create_conditional_criterion <- function(
 #' names(purpose)
 #' @export
 copper_CREED_purpose_statement <- function() {
-  read_yaml(system.file(
-    "app/www/md/",
-    "CREED_Copper_Purpose.yml",
-    package = "STOPeData"
-  ))
+  read_yaml(app_sys("extdata", "CREED_Copper_Purpose.yml"))
 }
 
 

@@ -18,7 +18,7 @@ mod_review_ui <- function(id) {
       fill = TRUE,
       card_body(
         ## Info accordion ----
-        info_accordion(content_file = "inst/app/www/md/intro_review.md"),
+        info_accordion(content_file = "app/md/intro_review.md"),
 
         ## Data availability status ----
         div(

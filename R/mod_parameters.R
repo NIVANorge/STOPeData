@@ -93,7 +93,7 @@ mod_parameters_ui <- function(id) {
             )
           ),
           ## Info accordion ----
-          info_accordion(content_file = "inst/app/www/md/intro_parameters.md")
+          info_accordion(content_file = "app/md/intro_parameters.md")
         ),
 
         ## Action buttons and validation status ----

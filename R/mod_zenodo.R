@@ -28,7 +28,7 @@ mod_Zenodo_ui <- function(id) {
         style = "padding-bottom: 80px;",
 
         # ===== Info accordion =====
-        info_accordion(content_file = "inst/app/www/md/intro_zenodo.md"),
+        info_accordion(content_file = "app/md/intro_zenodo.md"),
 
         hr(),
 
@@ -252,29 +252,14 @@ mod_Zenodo_server <- function(id) {
     ## Null-coalescing helper: returns a if non-NULL and non-empty, else b ----
     `%||%` <- function(a, b) if (!is.null(a) && nzchar(a)) a else b
 
-    ## Initialise Zenodo managers once per session ----
-    # Two managers are created at startup (sandbox + production) so switching
-    # environments does not require a round-trip to re-initialise.
-    # TODO: Make Zenodo uplink more robust and move to an aschynchronous
-    tryCatch(
-      {
-        zenodo_sandbox <- ZenodoManager$new(
-          url = "http://sandbox.zenodo.org/api",
-          sandbox = TRUE,
-          token = Sys.getenv("ZENODO_SANDBOX_TOKEN"),
-          logger = "DEBUG"
-        )
-        zenodo_production <- ZenodoManager$new(
-          url = "https://zenodo.org/api",
-          sandbox = FALSE,
-          token = Sys.getenv("ZENODO_TOKEN"),
-          logger = "INFO"
-        )
-      },
-      error = function(e) {
-        showNotification(type = "error", ui = glue("Zenodo returned error:"))
-      }
-    )
+    ## Zenodo manager cache ----
+    # ZenodoManager$new() performs a live HTTP round-trip to authenticate.
+    # Building both managers at module init therefore made *app startup*
+    # depend on network access, which broke headless test runs and cost two
+    # requests for every user who never opens this tab. They are now built
+    # lazily by current_zenodo() below and cached here, so each environment
+    # is still only initialised once per session.
+    zenodo_managers <- list(sandbox = NULL, production = NULL)
 
     # Warn users if tokens not found
     if (Sys.getenv("ZENODO_TOKEN") == "") {
@@ -297,9 +282,42 @@ mod_Zenodo_server <- function(id) {
     }
 
     ## current_zenodo reactive: returns the active ZenodoManager ----
-    # Switches between sandbox and production based on the environment toggle.
+    # Switches between sandbox and production based on the environment toggle,
+    # constructing the manager on first use and caching it in zenodo_managers.
+    # Returns NULL if the connection could not be established; callers must
+    # handle that. A failed attempt is not cached, so a transient network
+    # failure is retried on the next call.
     current_zenodo <- reactive({
-      if (input$zenEnvironment) zenodo_sandbox else zenodo_production
+      env <- if (input$zenEnvironment) "sandbox" else "production"
+
+      if (is.null(zenodo_managers[[env]])) {
+        zenodo_managers[[env]] <<- tryCatch(
+          if (env == "sandbox") {
+            ZenodoManager$new(
+              url = "http://sandbox.zenodo.org/api",
+              sandbox = TRUE,
+              token = Sys.getenv("ZENODO_SANDBOX_TOKEN"),
+              logger = "DEBUG"
+            )
+          } else {
+            ZenodoManager$new(
+              url = "https://zenodo.org/api",
+              sandbox = FALSE,
+              token = Sys.getenv("ZENODO_TOKEN"),
+              logger = "INFO"
+            )
+          },
+          error = function(e) {
+            showNotification(
+              type = "error",
+              ui = glue("Zenodo returned an error: {conditionMessage(e)}")
+            )
+            NULL
+          }
+        )
+      }
+
+      zenodo_managers[[env]]
     })
 
     ## author_count reactiveVal: tracks number of visible author rows ----
@@ -1147,6 +1165,13 @@ mod_Zenodo_server <- function(id) {
         {
           zenodo <- current_zenodo()
           env_name <- if (input$zenEnvironment) "Sandbox" else "Production"
+
+          if (is.null(zenodo)) {
+            stop(glue(
+              "Could not connect to Zenodo {env_name}. Check your token and
+               network connection."
+            ))
+          }
 
           showNotification(
             paste0("Uploading to Zenodo ", env_name, "..."),

@@ -9,7 +9,8 @@ info_accordion(title = "Instructions", content_file, ...)
 \arguments{
 \item{title}{the desired title of the accordion panel}
 
-\item{content_file}{the path to a markdown file}
+\item{content_file}{package-relative path to a markdown file, e.g.
+\code{"app/md/intro_sites.md"}. \code{NULL} renders an empty panel.}
 
 \item{...}{other arguments to accordion()}
 }
@@ -19,10 +20,18 @@ a bslib::accordion html element
 \description{
 Creates a collapsible single-panel bslib accordion displaying
 the contents of a markdown file, with an info icon.
+
+\code{content_file} is a package-relative path (everything after \verb{inst/}),
+resolved with \code{app_sys()} (defined in \code{app_config.R}, not exported by
+golem). It is deliberately \emph{not} a \verb{www/} URL like image \code{src}s are:
+the markdown is read from disk by R and rendered into the HTML server
+side, so the browser never requests it and it needs no resource path.
+Hence the files live in \verb{inst/app/md/}, outside the publicly-served
+\verb{inst/app/www/}.
 }
 \examples{
 \dontrun{
   # Used inside a Shiny UI function
-  info_accordion("Instructions", "path/to/instructions.md")
+  info_accordion("Instructions", "app/md/intro_sites.md")
 }
 }

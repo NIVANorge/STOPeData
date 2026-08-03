@@ -10,7 +10,7 @@
 #' @importFrom purrr map_chr
 #' @importFrom tools file_ext
 #' @importFrom mirai daemons everywhere
-#' @importFrom utils packageDescription
+#' @importFrom utils packageDescription packageVersion
 #' @import eDataDRF
 #' @noRd
 
@@ -77,7 +77,7 @@ initialise_userData <- function() {
       session = list(
         app_name = "STOPeData",
         app_version = tryCatch(
-          get_golem_version(),
+          as.character(packageVersion("STOPeData")),
           error = function(e) "unknown"
         ),
         format_version = tryCatch(

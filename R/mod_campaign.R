@@ -18,7 +18,7 @@ mod_campaign_ui <- function(id) {
       fill = TRUE,
       card_body(
         ## # Info accordion ----
-        info_accordion(content_file = "inst/app/www/md/intro_campaign.md"),
+        info_accordion(content_file = "app/md/intro_campaign.md"),
         ## # Input fields layout ----
         layout_column_wrap(
           width = "300px",

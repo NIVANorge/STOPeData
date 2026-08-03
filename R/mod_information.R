@@ -7,18 +7,9 @@ mod_information_ui <- function(id) {
   ns <- NS(id)
   tagList(
     card(card_body(
-      includeMarkdown(system.file(
-        "app/www/md/manual.md",
-        package = "STOPeData"
-      )),
-      includeMarkdown(system.file(
-        "app/www/md/citations.md",
-        package = "STOPeData"
-      )),
-      includeMarkdown(system.file(
-        "app/www/md/package_citations.md",
-        package = "STOPeData"
-      ))
+      includeMarkdown(app_sys("app/md/manual.md")),
+      includeMarkdown(app_sys("app/md/citations.md")),
+      includeMarkdown(app_sys("app/md/package_citations.md"))
     ))
   )
 }

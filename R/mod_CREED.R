@@ -20,7 +20,7 @@ mod_CREED_ui <- function(id) {
         ## Info accordion ----
         info_accordion(
           title = "CREED",
-          content_file = "inst/app/www/md/intro_CREED.md",
+          content_file = "app/md/intro_CREED.md",
           div(
             "Required criteria (",
             tooltip(

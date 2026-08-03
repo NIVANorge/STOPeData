@@ -5,6 +5,7 @@
 #' @importFrom shinyjs disabled
 #' @importFrom bslib layout_column_wrap card card_body
 #' @importFrom bslib input_task_button
+#' @importFrom utils packageVersion
 mod_landing_ui <- function(id) {
   ns <- NS(id)
   tagList(
@@ -19,7 +20,7 @@ mod_landing_ui <- function(id) {
           ## Info accordion ----
           info_accordion(
             title = "Getting Started",
-            content_file = "inst/app/www/md/intro_landing.md",
+            content_file = "app/md/intro_landing.md",
             div(
               "Most sections can be expanded to fill the full screen with the ",
               tooltip(
@@ -91,8 +92,12 @@ mod_landing_ui <- function(id) {
             style = "margin-bottom: 10px;",
             # style = "display: block !important; margin: auto !important; max-width: 100% !important; max-height: 500px !important;",
             info_accordion(
-              title = paste0("Version ", golem::get_golem_version()),
-              content_file = "inst/app/www/md/whats_new.md"
+              # packageVersion() reads the installed DESCRIPTION via
+              # .libPaths(); golem::get_golem_version() searches upward from
+              # the working directory for a package *source* tree, so it
+              # errors for an installed package. See also app_ui().
+              title = paste0("Version ", packageVersion("STOPeData")),
+              content_file = "app/md/whats_new.md"
             ),
             br()
           )
