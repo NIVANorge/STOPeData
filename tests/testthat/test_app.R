@@ -76,3 +76,17 @@ test_that("Test that initialise_userData() works", {
     initialise_userData()
   )
 })
+
+# testServer() above only runs the server function, not app_ui(), so UI-time
+# errors (e.g. a missing package dataset) can slip through. Render the real
+# UI here as a separate check.
+test_that("Test that app_ui() builds and renders without error", {
+  if (grepl("testthat", getwd())) {
+    setwd("../..") # see "Test that app runs" above
+  }
+  ui <- expect_no_error(app_ui(request = list()))
+  expect_no_error(htmltools::renderTags(ui))
+  if (!grepl("testthat", getwd())) {
+    setwd("tests/testthat")
+  }
+})
