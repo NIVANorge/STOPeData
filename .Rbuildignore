@@ -25,6 +25,7 @@ _\.new\.png$
 ^vignettes/\.quarto$
 ^vignettes/*_files$
 ^codecov\.yml$
+^.quarto$
 
 # Non-standard top-level files/dirs (R CMD check NOTE)
 ^CLAUDE\.md$
