@@ -129,6 +129,15 @@ llm_http_error_message <- function(e) {
   msg <- conditionMessage(e)
   code <- regmatches(msg, regexpr("[45][0-9]{2}", msg))
 
+  # ellmer/httr2 append the provider's explanation of *why* the request was
+  # rejected (e.g. "too many optional parameters ... limit: 24") after the
+  # boilerplate "HTTP 400 Bad Request." first line - keep it, it's the
+  # actionable part. Also check $parent in case it lands on the parent cond.
+  detail <- sub("^HTTP [45][0-9]{2}[^\n]*\n?", "", msg)
+  parent_detail <- tryCatch(conditionMessage(e$parent), error = function(...) "")
+  if (!nzchar(trimws(detail)) && nzchar(parent_detail)) detail <- parent_detail
+  detail <- trimws(gsub("\\s+", " ", detail))
+
   if (length(code) == 1L) {
     explanation <- switch(
       code,
@@ -144,7 +153,11 @@ llm_http_error_message <- function(e) {
       "529" = "API overloaded - the provider under high load; try again in a few minutes.",
       "Unexpected HTTP error."
     )
-    glue("HTTP {code}: {explanation}")
+    if (nzchar(detail) && !identical(detail, trimws(gsub("\\s+", " ", msg)))) {
+      glue("HTTP {code}: {explanation} ({detail})")
+    } else {
+      glue("HTTP {code}: {explanation}")
+    }
   } else {
     msg
   }

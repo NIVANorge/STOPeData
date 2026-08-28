@@ -396,7 +396,7 @@ downloadable_tabular_datasets <- function() {
     "measurementsData",
     "creedRelevance",
     "creedReliability",
-    # "creedDetails", # Fixme: Renable when needed
+    "creedDetails",
     "creedScores"
   )
 }
@@ -408,8 +408,6 @@ downloadable_tabular_datasets <- function() {
 #' @return Character vector of dataset names.
 #' @noRd
 downloadable_text_datasets <- function() {
-  # Note: metaData is no longer exported as a text object — it is written as a
-  # dedicated YAML file by build_session_zip() / write_metadata_yaml().
   c("schemaLLM", "promptLLM", "rawLLM")
 }
 

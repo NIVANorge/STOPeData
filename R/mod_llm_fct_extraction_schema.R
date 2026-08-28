@@ -2,6 +2,63 @@
 # Uses vocabulary functions from fct_formats.R to reduce duplication
 # Updated to use glue instead of paste0 for string construction
 
+#' Flatten the sub-compartment vocabulary into a compact hierarchical string
+#'
+#' [eDataDRF::environ_compartments_sub_vocabulary()] is a named list where each
+#' top-level compartment (Aquatic / Atmospheric / Terrestrial / Biota) maps to a
+#' character vector of sub-compartments, and the standalone entries
+#' ("Not relevant", "Not reported", "Other") map to `NULL`. Rendered for a prompt
+#' as `"Aquatic {Freshwater | Marine/Salt Water | ...}; Atmospheric {...}; ...;
+#' Not relevant; Not reported; Other"` so the two-level structure survives without
+#' dumping nested named vectors.
+#'
+#' @param vocab The vocabulary list. Defaults to the eDataDRF accessor.
+#' @return A single character string.
+#' @noRd
+format_compartments_sub_vocab <- function(
+  vocab = environ_compartments_sub_vocabulary()
+) {
+  parts <- vapply(
+    names(vocab),
+    function(nm) {
+      subs <- unname(vocab[[nm]])
+      if (length(subs) == 0) {
+        nm
+      } else {
+        paste0(nm, " {", paste(subs, collapse = " | "), "}")
+      }
+    },
+    character(1)
+  )
+  paste(parts, collapse = "; ")
+}
+
+#' Flatten the protocol-options vocabulary into a compact hierarchical string
+#'
+#' [eDataDRF::protocol_options_vocabulary()] is a tibble of `Protocol_Type` /
+#' `Short_Name` / `Long_Name`. Rendered per category (in vocabulary order) as
+#' `"Sampling Protocol (one of: Not relevant, Not reported, Point, ...);
+#' Fractionation Protocol (one of: ...); ..."`, using the `Short_Name` values the
+#' app itself stores (see `mod_methods.R`).
+#'
+#' @param vocab The vocabulary tibble. Defaults to the eDataDRF accessor.
+#' @return A single character string.
+#' @noRd
+format_protocol_options_vocab <- function(
+  vocab = protocol_options_vocabulary()
+) {
+  groups <- split(vocab$Short_Name, vocab$Protocol_Type)
+  groups <- groups[unique(vocab$Protocol_Type)]
+  parts <- vapply(
+    names(groups),
+    function(nm) {
+      paste0(nm, " (one of: ", paste(groups[[nm]], collapse = ", "), ")")
+    },
+    character(1)
+  )
+  paste(parts, collapse = "; ")
+}
+
 #' Create campaign schema
 #' @return An ellmer type array defining the campaign extraction schema.
 #' @importFrom glue glue
@@ -12,32 +69,32 @@ create_campaign_schema <- function() {
       .description = "Basic study/campaign information",
       campaign_name = type_string(
         description = "Identifier for the study/campaign (max 100 chars)",
-        required = FALSE
+        required = TRUE
       ),
       campaign_name_short = type_string(
         description = "Abbreviated form of the Identifier for the study/campaign (max 20 char, no spaces or underscores). 
       Should be specific to location, study, and date as much as possible",
-        required = FALSE
+        required = TRUE
       ),
       campaign_start_date = type_string(
         description = "Study start date in YYYY-MM-DD format",
-        required = FALSE
+        required = TRUE
       ),
       campaign_end_date = type_string(
         description = "Study end date in YYYY-MM-DD format",
-        required = FALSE
+        required = TRUE
       ),
       organisation = type_string(
         description = "Organisation that conducted the study (max 50 chars)",
-        required = FALSE
+        required = TRUE
       ),
       campaign_comment = type_string(
         description = "Additional study details or notes (max 1000 chars)",
-        required = FALSE
+        required = TRUE
       ),
       campaign_rationale = type_string(
         description = "The rationale given for the study or sampling campaign. Max 500 chars.",
-        required = FALSE
+        required = TRUE
       )
     )
   )
@@ -52,17 +109,17 @@ create_references_schema <- function() {
       .description = "Bibliographic information about this document. Return NA if not found.",
       author = type_string(
         description = "Authors in format: Last1, First1; Last2, First2 (max 1000 chars)",
-        required = FALSE
+        required = TRUE
       ),
       title = type_string(
         description = "Document title (max 1000 chars). Return NA if not found.",
-        required = FALSE
+        required = TRUE
       ),
       reference_type = type_string(
         description = as.character(glue(
           "Type of reference. One of {paste0(reference_type_vocabulary(), collapse = ';')}."
         )),
-        required = FALSE
+        required = TRUE
       ),
       year = type_integer(
         description = "Publication year (1800-2026). Return NA if not found.",
@@ -70,7 +127,7 @@ create_references_schema <- function() {
       ),
       periodical_journal = type_string(
         description = "Journal name for articles. Return NA if not found, or irrelevant.",
-        required = FALSE
+        required = TRUE
       ),
       volume = type_integer(
         description = "Journal volume number. Return NA if not found, or irrelevant.",
@@ -82,11 +139,11 @@ create_references_schema <- function() {
       ),
       publisher = type_string(
         description = "Publisher name. Return NA if not found, or irrelevant.",
-        required = FALSE
+        required = TRUE
       ),
       doi = type_string(
         description = "Digital Object Identifier. Return NA if not found.",
-        required = FALSE
+        required = TRUE
       )
     )
   )
@@ -102,11 +159,11 @@ create_sites_schema <- function() {
       .description = "Information about a sampling site",
       site_code = type_string(
         description = "Short site identifier/code",
-        required = FALSE
+        required = TRUE
       ),
       site_name = type_string(
         description = "Descriptive site name. If many sampling sites are reported without specific coordinates, note in the name and site_comment that they have been merged into a single site for convenience.",
-        required = FALSE
+        required = TRUE
       ),
       latitude = type_number(
         description = "Latitude in decimal degrees (-90 to 90) - ONLY if explicitly stated in document",
@@ -119,31 +176,31 @@ create_sites_schema <- function() {
       country_iso = type_string(
         description = "ISO Country where (terrestrial) site is located. Use full name (ISO 3166 and not codes (3166-2)) 
         In case of site at the land-sea interface, return both country and IHO ocean/sea. If a purely oceanic sampling site, return Not relevant",
-        required = FALSE
+        required = TRUE
       ),
       ocean_iho = type_string(
         description = as.character(glue(
           "Ocean or sea where (marine) site is located. In case of site at the land-sea interface, return both country and IHO ocean/sea. 
           If purely terrestrial, return Not relevant..: {paste(areas_vocabulary(), collapse = ', ')}"
         )),
-        required = FALSE
+        required = TRUE
       ),
       site_geographic_feature = type_string(
         description = as.character(glue(
           "Geographic feature type from: {paste(geographic_features_vocabulary(), collapse = ', ')}"
         )),
-        required = FALSE
+        required = TRUE
       ),
       site_geographic_feature_sub = type_string(
         description = as.character(glue(
           "Geographic sub-feature type from: {paste(geographic_features_sub_vocabulary(), collapse = ', ')}. ",
           "As these are currently mostly water-based use other most of the time."
         )),
-        required = FALSE
+        required = TRUE
       ),
       site_comment = type_string(
         description = "Any additional details about the site not captured in the previous variables. If coordinates are converted from another CRS or from minute degrees to decimal degrees, report original figures and that a conversion was performed here.",
-        required = FALSE
+        required = TRUE
       )
     )
   )
@@ -159,19 +216,19 @@ create_parameters_schema <- function() {
       parameter_name = type_string(
         description = "Name of the parameter/chemical/stressor measured. If a parameter is reported under multiple names
          (e.g. Copper and Cu, Paracetamol and Acetaminophen), only return one entry. Most obviously chemicals, but also include water quality parameters, etc., if not otherwise specified.",
-        required = FALSE
+        required = TRUE
       ),
       parameter_type = type_string(
         description = "Type: Stressor, Quality parameter, Normalization, or Background",
-        required = FALSE
+        required = TRUE
       ),
       cas_rn = type_string(
         description = "CAS Registry Number if chemical",
-        required = FALSE
+        required = TRUE
       ),
       parameter_comment = type_string(
         description = "Any other comments relevant to understanding/interpreting measured parameters.",
-        required = FALSE
+        required = TRUE
       )
     )
   )
@@ -187,19 +244,19 @@ create_compartments_schema <- function() {
       .description = "An environmental compartment sampled",
       environ_compartment = type_string(
         description = "Main compartment: Aquatic, Atmospheric, Terrestrial, or Biota",
-        required = FALSE
+        required = TRUE
       ),
       environ_compartment_sub = type_string(
         description = as.character(glue(
-          "Sub-compartment: {paste(environ_compartments_sub_vocabulary(), collapse = ', ')}"
+          "Sub-compartment, nested under the main compartment: {format_compartments_sub_vocab()}"
         )),
-        required = FALSE
+        required = TRUE
       ),
       measured_category = type_string(
         description = as.character(glue(
           "Measurement category: {paste(measured_categories_vocabulary(), collapse = ', ')}"
         )),
-        required = FALSE
+        required = TRUE
       )
     )
   )
@@ -215,35 +272,35 @@ create_biota_schema <- function() {
       .description = "Biological sampling information",
       sample_id = type_string(
         description = "Sample identifier",
-        required = FALSE
+        required = TRUE
       ),
       species_group = type_string(
         description = as.character(glue(
           "Taxonomic group: {paste(species_groups_vocabulary(), collapse = ', ')}"
         )),
-        required = FALSE
+        required = TRUE
       ),
       sample_species = type_string(
         description = "Species name (scientific if reported otherwise common)",
-        required = FALSE
+        required = TRUE
       ),
       sample_tissue = type_string(
         description = as.character(glue(
           "Tissue type: {paste(tissue_types_vocabulary(), collapse = ', ')}"
         )),
-        required = FALSE
+        required = TRUE
       ),
       sample_species_lifestage = type_string(
         description = as.character(glue(
           "Life stage: {paste(lifestage_vocabulary(), collapse = ', ')}"
         )),
-        required = FALSE
+        required = TRUE
       ),
       sample_species_gender = type_string(
         description = as.character(glue(
           "Gender: {paste(gender_vocabulary(), collapse = ', ')}"
         )),
-        required = FALSE
+        required = TRUE
       )
     )
   )
@@ -261,17 +318,17 @@ create_methods_schema <- function() {
         description = as.character(glue(
           "Protocol type: {paste(protocol_categories_vocabulary(), collapse = ', ')}"
         )),
-        required = FALSE
+        required = TRUE
       ),
       protocol_name = type_string(
         description = as.character(glue(
-          "Protocol name is more like a rough grouping: {paste(protocol_options_vocabulary(), collapse = ', ')}"
+          "Protocol name is a rough grouping within the protocol category: {format_protocol_options_vocab()}"
         )),
-        required = FALSE
+        required = TRUE
       ),
       protocol_comment = type_string(
         description = "Additional details about the method, including a more specific description of the method (appliance name, reagents, use of SRM, lab spike samples, lab replicates, control recoveries, method blanks, field blanks, or field QC)., ideally transcribed from source without modification.",
-        required = FALSE
+        required = TRUE
       )
     )
   )
