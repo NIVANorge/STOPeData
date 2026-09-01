@@ -533,8 +533,20 @@ mod_data_server <- function(id, parent_session) {
       if (modulesStatus()) {
         moduleState$data_entry_ready <- TRUE
 
-        # only add combinations if the user isn't exporting their own data
-        if (isFALSE(session$userData$reactiveValues$saveExtractionSuccessful)) {
+        # Generate combinations when the user is building a fresh extraction
+        # (saveExtractionSuccessful == FALSE), OR when resuming an imported
+        # session that was exported before the Data step, so no measurement rows
+        # exist yet (e.g. the user only got as far as filling in Biota). Skip
+        # only when the resumed session already carries measurement rows, so we
+        # don't clobber values entered in a previous session.
+        resumed_without_measurements <-
+          isTRUE(session$userData$reactiveValues$saveExtractionSuccessful) &&
+            nrow(session$userData$reactiveValues$measurementsData) == 0
+
+        if (
+          isFALSE(session$userData$reactiveValues$saveExtractionSuccessful) ||
+            resumed_without_measurements
+        ) {
           new_combinations <- session$userData$reactiveValues$measurementsData |>
             mutate(SUBSAMPLE = as.character(SUBSAMPLE)) |>
             add_row(create_measurement_combinations()) |>
@@ -557,6 +569,10 @@ mod_data_server <- function(id, parent_session) {
     }) |>
       bindEvent(
         isTRUE(modulesStatus()),
+        # Also run once straight after an import: when a resumed session comes
+        # back with every upstream module already valid there is no
+        # FALSE -> TRUE transition of modulesStatus() to trigger generation.
+        session$userData$reactiveValues$saveExtractionComplete,
         ignoreInit = TRUE,
         ignoreNULL = TRUE
       )

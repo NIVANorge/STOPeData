@@ -164,7 +164,6 @@ import_session_from_zip <- function(zip_path, session) {
   }
 
   # Restore session metadata from YAML if present ----
-  browser()
   yaml_meta_files <- extracted_files[grepl(
     "_metadata_([0-9]{8}_[0-9]{6}).yaml",
     extracted_files,

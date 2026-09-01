@@ -285,7 +285,21 @@ mod_biota_server <- function(id) {
 
       # Only select columns that exist
       available_columns <- intersect(expected_columns, names(biota_samples))
-      return(biota_samples[, available_columns, drop = FALSE])
+      biota_samples <- biota_samples[, available_columns, drop = FALSE]
+
+      # Flatten any compound-class columns (e.g. glue vectors, whose class() is
+      # c("glue", "character")). rhandsontable::hot_to_r() assumes a single-string
+      # class per column; a compound class makes its colClasses lookup return NA
+      # and then errors with as(x, "NA") on the next table edit.
+      biota_samples[] <- lapply(biota_samples, function(col) {
+        if (is.character(col) && !identical(class(col), "character")) {
+          as.character(col)
+        } else {
+          col
+        }
+      })
+
+      return(biota_samples)
     }
 
     ## Helper: Merge biota data back into samples
@@ -515,9 +529,19 @@ mod_biota_server <- function(id) {
     observe({
       req(input$biota_table)
       if (!is.null(input$biota_table) && moduleState$has_biota_samples) {
-        updated_data <- hot_to_r(input$biota_table)
+        updated_data <- tryCatch(
+          hot_to_r(input$biota_table),
+          error = function(e) {
+            print_dev(glue(
+              "mod_biota: could not parse biota table edit ({e$message})"
+            ))
+            NULL
+          }
+        )
         # CHANGED: Update userData instead of moduleState
-        session$userData$reactiveValues$biotaData <- updated_data
+        if (!is.null(updated_data)) {
+          session$userData$reactiveValues$biotaData <- updated_data
+        }
       }
     }) |>
       bindEvent(input$biota_table)

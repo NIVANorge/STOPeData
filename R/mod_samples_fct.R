@@ -380,24 +380,29 @@ create_sample_combinations <- function(
     }
 
     # Create SUBSAMPLE_ID using glue ----
-    all_combinations$SUBSAMPLE_ID <- glue(
+    # as.character() strips the "glue" class: a glue vector's class() is
+    # c("glue", "character"), which breaks rhandsontable::hot_to_r() downstream
+    # (compound class -> colClasses lookup returns NA -> as(x, NA) error).
+    all_combinations$SUBSAMPLE_ID <- as.character(glue(
       "{all_combinations$SITE_CODE}",
       "_{create_abbrev(all_combinations$PARAMETER_NAME, 8)}",
       "_{create_abbrev(all_combinations$ENVIRON_COMPARTMENT, 6)}",
       "_{create_abbrev(all_combinations$ENVIRON_COMPARTMENT_SUB, 6)}",
       "_{gsub('-', '', all_combinations$SAMPLING_DATE)}",
       "{glue('_R{sprintf(\"%02s\", all_combinations$SUBSAMPLE)}')}"
-    )
+    ))
 
     # Generate sample IDs using vectorized function
-    all_combinations$SAMPLE_ID <- generate_sample_id_with_components(
+    # as.character() for the same reason: generate_sample_id_with_components()
+    # returns a glue vector.
+    all_combinations$SAMPLE_ID <- as.character(generate_sample_id_with_components(
       all_combinations$SITE_CODE,
       all_combinations$PARAMETER_NAME,
       all_combinations$ENVIRON_COMPARTMENT,
       all_combinations$ENVIRON_COMPARTMENT_SUB,
       all_combinations$SAMPLING_DATE,
       all_combinations$SUBSAMPLE
-    )
+    ))
 
     # Reorder columns to match expected structure
     all_combinations <- all_combinations[, c(
