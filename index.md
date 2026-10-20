@@ -6,8 +6,8 @@ family](https://stop.niva.no/), designed to make extracting data on
 chemical concentrations in the environment from papers and reports
 easier.
 
-🖥️ [Test Version](https://edata.test-stop.niva.no) (NIVA login required)
-· 🖥️ [Prod](https://edata.stop.niva.no) (Login required) · 🪲 [Report
+🖥️ [Test Version](https://edata.test-stop.niva.no) · 🖥️
+[Prod](https://edata.stop.niva.no) · 🪲 [Report
 Bug](https://github.com/NIVANorge/STOPeData/issues/new?labels=bug&template=bug-report---.md)
 · ❔[Request
 Feature](https://github.com/NIVANorge/STOPeData/issues/new?labels=enhancement&template=feature-request---.md)
@@ -22,7 +22,7 @@ Feature](https://github.com/NIVANorge/STOPeData/issues/new?labels=enhancement&te
 - [Usage](#usage)
 - [Roadmap](#roadmap)
 - [Contact](#contact)
-- [Acknowledgments](#acknowledgments)
+- [Acknowledgements](#acknowledgments)
 
 ## About The Project
 
@@ -54,7 +54,7 @@ Predictor](https://github.com/NIVANorge/STOP).
 ### Prerequisites
 
 - [R](https://www.r-project.org/about.html) version \>=4.1.0 (currently
-  built on 4.5.3)
+  built on 4.6.1)
 - [pak](https://pak.r-lib.org/), for dependency installation
 
 ### Installation
